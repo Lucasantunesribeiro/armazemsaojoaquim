@@ -1,5 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Static export for Netlify
+  output: 'export',
+  
   // Compression and optimization
   compress: true,
   poweredByHeader: false,
@@ -14,9 +17,10 @@ const nextConfig = {
     ],
     formats: ['image/avif', 'image/webp'],
     minimumCacheTTL: 31536000,
+    unoptimized: true, // Required for static export
   },
 
-  // Não usar output export para permitir CSS correto
+  // Trailing slash for static export
   trailingSlash: true,
   
   // Compiler options
