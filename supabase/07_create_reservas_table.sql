@@ -186,4 +186,16 @@ ORDER BY mes DESC;
 
 -- Grant permissions
 GRANT SELECT, INSERT, UPDATE ON public.reservas TO authenticated;
-GRANT SELECT ON public.reservas_stats TO authenticated; 
+GRANT SELECT ON public.reservas_stats TO authenticated;
+
+-- Políticas RLS para users
+DROP POLICY IF EXISTS "Users can read own profile" ON users;
+CREATE POLICY "Users can read own profile" ON users 
+  FOR SELECT USING (auth.uid()::text = id::text);
+
+DROP POLICY IF EXISTS "Users can update own profile" ON users 
+  FOR UPDATE USING (auth.uid()::text = id::text);
+
+DROP POLICY IF EXISTS "Enable insert for authenticated users only" ON users;
+CREATE POLICY "Enable insert for authenticated users only" ON users
+  FOR INSERT WITH CHECK (auth.uid()::text = id::text); 

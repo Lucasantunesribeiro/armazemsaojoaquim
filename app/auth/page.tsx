@@ -89,9 +89,9 @@ export default function AuthPage() {
   const handleRegister = async (data: RegisterForm) => {
     setLoading(true)
     try {
-      const redirectUrl = process.env.NODE_ENV === 'production' 
-        ? 'https://armazemsaojoaquim.netlify.app/auth/callback'
-        : `${window.location.origin}/auth/callback`
+      const redirectUrl = window.location.hostname === 'localhost' 
+        ? `${window.location.origin}/auth/callback`
+        : 'https://armazemsaojoaquim.netlify.app/auth/callback'
 
       const { data: authData, error } = await supabase.auth.signUp({
         email: data.email,
@@ -128,9 +128,9 @@ export default function AuthPage() {
   const handleGoogleLogin = async () => {
     setLoading(true)
     try {
-      const redirectUrl = process.env.NODE_ENV === 'production' 
-        ? 'https://armazemsaojoaquim.netlify.app/auth/callback'
-        : `${window.location.origin}/auth/callback`
+      const redirectUrl = window.location.hostname === 'localhost' 
+        ? `${window.location.origin}/auth/callback`
+        : 'https://armazemsaojoaquim.netlify.app/auth/callback'
 
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
@@ -164,9 +164,9 @@ export default function AuthPage() {
 
     setResendingEmail(true)
     try {
-      const redirectUrl = process.env.NODE_ENV === 'production' 
-        ? 'https://armazemsaojoaquim.netlify.app/auth/callback'
-        : `${window.location.origin}/auth/callback`
+      const redirectUrl = window.location.hostname === 'localhost' 
+        ? `${window.location.origin}/auth/callback`
+        : 'https://armazemsaojoaquim.netlify.app/auth/callback'
 
       const { error } = await supabase.auth.resend({
         type: 'signup',

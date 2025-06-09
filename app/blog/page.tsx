@@ -3,12 +3,12 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { supabase } from '../../lib/supabase'
 import { Calendar, User, ArrowRight, Search } from 'lucide-react'
 import { Card, CardContent, CardHeader } from '../../components/ui/Card'
 import Input from '../../components/ui/Input'
 import Button from '../../components/ui/Button'
 import { formatDate } from '../../lib/utils'
+import { toast } from 'react-hot-toast'
 
 interface BlogPost {
   id: string
@@ -27,39 +27,25 @@ export default function BlogPage() {
   const [searchTerm, setSearchTerm] = useState('')
 
   useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        // Usando dados mockados temporariamente até corrigir a estrutura da tabela
+        const mockPosts: BlogPost[] = []
+        setPosts(mockPosts)
+      } catch (error) {
+        console.error('Erro ao carregar posts:', error)
+        toast.error('Erro ao carregar posts do blog')
+      } finally {
+        setLoading(false)
+      }
+    }
+
     fetchPosts()
   }, [])
 
   useEffect(() => {
     filterPosts()
   }, [posts, searchTerm])
-
-  const fetchPosts = async () => {
-    try {
-      // Durante build time sem env vars, usa dados mock
-      if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
-        setPosts([])
-        setLoading(false)
-        return
-      }
-
-      const { data, error } = await supabase
-        .from('blog_posts')
-        .select('id, titulo, resumo, imagem, slug, created_at, author_id')
-        .eq('publicado', true)
-        .order('created_at', { ascending: false })
-
-      if (error) {
-        console.error('Erro ao carregar posts:', error)
-      } else {
-        setPosts(data || [])
-      }
-    } catch (error) {
-      console.error('Erro inesperado:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
 
   const filterPosts = () => {
     if (!searchTerm) {

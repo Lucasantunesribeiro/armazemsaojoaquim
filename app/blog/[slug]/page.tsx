@@ -2,7 +2,6 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
 import { ArrowLeft, Calendar, User, Clock } from 'lucide-react'
-import { supabase } from '../../../lib/supabase'
 import { formatDate } from '../../../lib/utils'
 
 interface BlogPost {
@@ -58,23 +57,26 @@ const mockPosts: BlogPost[] = [
 
 async function getBlogPost(slug: string): Promise<BlogPost | null> {
   try {
-    // Durante build time sem env vars, usa dados mock
-    if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
-      return mockPosts.find(post => post.slug === slug) || null
+    // Tentar carregar do Supabase primeiro
+    try {
+      const { supabase } = await import('../../../lib/supabase')
+      
+      const { data, error } = await supabase
+        .from('blog_posts')
+        .select('*')
+        .eq('slug', slug)
+        .eq('publicado', true)
+        .single()
+
+      if (!error && data) {
+        return data
+      }
+    } catch (supabaseError) {
+      console.warn('Supabase error, falling back to mock data:', supabaseError)
     }
 
-    const { data, error } = await supabase
-      .from('blog_posts')
-      .select('*')
-      .eq('slug', slug)
-      .eq('publicado', true)
-      .single()
-
-    if (error || !data) {
-      return mockPosts.find(post => post.slug === slug) || null
-    }
-
-    return data
+    // Fallback para dados mock
+    return mockPosts.find(post => post.slug === slug) || null
   } catch (error) {
     console.warn('Error fetching blog post:', error)
     return mockPosts.find(post => post.slug === slug) || null
@@ -172,21 +174,26 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
 
 export async function generateStaticParams() {
   try {
-    // Durante build time sem env vars, retorna slugs estáticos
-    if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
-      return mockPosts.map(post => ({
-        slug: post.slug,
-      }))
+    // Tentar carregar do Supabase primeiro
+    try {
+      const { supabase } = await import('../../../lib/supabase')
+      
+      const { data: posts } = await supabase
+        .from('blog_posts')
+        .select('slug')
+        .eq('publicado', true)
+
+      if (posts && posts.length > 0) {
+        return posts.map((post: { slug: string }) => ({
+          slug: post.slug,
+        }))
+      }
+    } catch (supabaseError) {
+      console.warn('Supabase error, falling back to mock data:', supabaseError)
     }
 
-    const { data: posts } = await supabase
-      .from('blog_posts')
-      .select('slug')
-      .eq('publicado', true)
-
-    return posts?.map((post: { slug: string }) => ({
-      slug: post.slug,
-    })) || mockPosts.map(post => ({
+    // Fallback para dados mock
+    return mockPosts.map(post => ({
       slug: post.slug,
     }))
   } catch (error) {

@@ -182,35 +182,19 @@ const ReservasPage = () => {
     try {
       let userId = user?.id
 
-      // Se não está logado, criar usuário temporário ou registrar
+      // Se não está logado, solicitar login via email
       if (!userId) {
-        const { data: authData, error: authError } = await supabase.auth.signUp({
+        const { error } = await supabase.auth.signInWithOtp({
           email: formData.email,
-          password: `temp_${Date.now()}`, // Password temporário
-          options: {
-            data: {
-              name: formData.name,
-              phone: formData.phone,
-            }
-          }
         })
 
-        if (authError) {
-          // Se usuário já existe, tentar login
-          const { data: signInData, error: signInError } = await supabase.auth.signInWithOtp({
-            email: formData.email,
-          })
-
-          if (signInError) throw signInError
-          
-          toast.success('Código de verificação enviado para seu email!')
-          return
-        }
-
-        userId = authData.user?.id
+        if (error) throw error
+        
+        toast.success('Código de verificação enviado para seu email! Confirme para continuar.')
+        return
       }
 
-      // Criar reserva
+      // Criar reserva apenas se usuário está autenticado
       const { data: reservation, error } = await supabase
         .from('reservas')
         .insert([
