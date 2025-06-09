@@ -48,13 +48,13 @@ export default function Error({
           </Link>
         </div>
         
-        {process.env.NODE_ENV === 'development' && (
-          <details className="mt-6 text-left">
-            <summary className="cursor-pointer text-sm text-cinza-medio">
-              Detalhes do erro (desenvolvimento)
+        {typeof window !== 'undefined' && window.location.hostname === 'localhost' && (
+          <details className="mt-8 p-4 bg-gray-100 rounded-lg">
+            <summary className="cursor-pointer font-medium text-gray-700 mb-2">
+              Detalhes técnicos (desenvolvimento)
             </summary>
-            <pre className="mt-2 p-3 bg-red-50 rounded text-xs text-red-800 overflow-auto">
-              {error.message}
+            <pre className="text-sm text-gray-600 whitespace-pre-wrap">
+              {error.stack}
             </pre>
           </details>
         )}
