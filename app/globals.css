@@ -1,0 +1,377 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+
+:root {
+  /* Cores principais corrigidas */
+  --amarelo-armazem: #F4C430;
+  --madeira-escura: #2D1810;
+  --vermelho-portas: #B22222;
+  --cinza-claro: #F8F9FA;
+  --cinza-medio: #4A5568;
+  --pedra-natural: #8B7355;
+  --verde-natura: #2F7D32;
+  --rosa-suave: #C2185B;
+  --preto-suave: #1A1A1A;
+  
+  /* Cores de estado */
+  --success: #2E7D32;
+  --warning: #F57C00;
+  --error: #D32F2F;
+  --info: #1976D2;
+  
+  /* Sistema de cores adaptativo */
+  --background: #FFFFFF;
+  --surface: #F5F5F5;
+  --text-primary: #2D1810;
+  --text-secondary: #4A5568;
+  --border: #E5E5E5;
+  --shadow: rgba(45, 24, 16, 0.1);
+}
+
+/* Modo escuro */
+:root.dark {
+  --background: #1A1A1A;
+  --surface: #2D2D2D;
+  --text-primary: #F4C430;
+  --text-secondary: #CCCCCC;
+  --border: #404040;
+  --shadow: rgba(244, 196, 48, 0.1);
+  --amarelo-armazem: #F4C430;
+  --madeira-escura: #F4C430;
+}
+
+/* Critical CSS - Prevent layout shifts */
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  line-height: 1.6;
+  color: var(--text-primary);
+  background-color: var(--background);
+  transition: background-color 0.3s ease, color 0.3s ease;
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+/* Critical layout classes to prevent CLS */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+  width: 100%;
+}
+
+.hero-skeleton {
+  width: 100%;
+  height: 100vh;
+  min-height: 600px;
+  background: linear-gradient(135deg, var(--amarelo-armazem) 0%, var(--vermelho-portas) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.header-skeleton {
+  width: 100%;
+  height: 80px;
+  background: var(--background);
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.card-skeleton {
+  width: 100%;
+  height: 300px;
+  background: var(--surface);
+  border-radius: 8px;
+  border: 1px solid var(--border);
+}
+
+/* Image containers to prevent layout shift */
+.image-container {
+  position: relative;
+  overflow: hidden;
+  background: var(--surface);
+}
+
+.image-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+/* Aspect ratio utilities */
+.aspect-video { 
+  aspect-ratio: 16 / 9; 
+}
+
+.aspect-square { 
+  aspect-ratio: 1 / 1; 
+}
+
+.aspect-4-3 { 
+  aspect-ratio: 4 / 3; 
+}
+
+.aspect-3-2 { 
+  aspect-ratio: 3 / 2; 
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Playfair Display', serif;
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+/* Prevent font-related layout shifts */
+.font-playfair {
+  font-family: 'Playfair Display', serif;
+}
+
+.font-inter {
+  font-family: 'Inter', sans-serif;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--surface);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--cinza-medio);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-primary);
+}
+
+/* Animation classes with performance optimization */
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+.animate-slide-up {
+  animation: slideUp 0.6s ease-out;
+}
+
+.animate-bounce-gentle {
+  animation: bounceGentle 2s infinite;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { 
+    transform: translateY(50px); 
+    opacity: 0; 
+  }
+  to { 
+    transform: translateY(0); 
+    opacity: 1; 
+  }
+}
+
+@keyframes bounceGentle {
+  0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+  40% { transform: translateY(-10px); }
+  60% { transform: translateY(-5px); }
+}
+
+/* Utility classes */
+.text-gradient {
+  background: linear-gradient(135deg, var(--amarelo-armazem) 0%, var(--vermelho-portas) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.backdrop-blur-custom {
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+/* Loading states with better performance */
+.loading {
+  position: relative;
+  overflow: hidden;
+}
+
+.loading::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(244, 196, 48, 0.2), transparent);
+  animation: loading 1.5s infinite;
+  will-change: transform;
+}
+
+@keyframes loading {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(300%); }
+}
+
+/* PWA and performance improvements */
+.pwa-hidden {
+  display: none !important;
+}
+
+/* Focus improvements for accessibility */
+.focus-visible:focus-visible,
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 2px solid var(--amarelo-armazem);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Screen reader only content */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  :root {
+    --text-primary: #000000;
+    --background: #FFFFFF;
+    --border: #000000;
+  }
+  
+  :root.dark {
+    --text-primary: #FFFFFF;
+    --background: #000000;
+    --border: #FFFFFF;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/* Performance optimizations */
+.gpu-accelerated {
+  transform: translateZ(0);
+  will-change: transform;
+}
+
+.optimized-image {
+  content-visibility: auto;
+  contain-intrinsic-size: 300px 200px;
+}
+
+/* Mobile optimizations */
+@media (max-width: 768px) {
+  .container {
+    padding: 0 0.75rem;
+  }
+  
+  body {
+    font-size: 14px;
+  }
+}
+
+/* Critical button styles to prevent layout shift */
+button, .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 500;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  border: none;
+  text-decoration: none;
+  font-family: inherit;
+  min-height: 44px; /* Touch target size */
+  min-width: 44px;
+  padding: 0.5rem 1rem;
+}
+
+/* Critical link styles */
+a {
+  color: inherit;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+/* Critical form styles */
+input, textarea, select {
+  font-family: inherit;
+  font-size: inherit;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.75rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  background: var(--background);
+  color: var(--text-primary);
+}
+
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  border-color: var(--amarelo-armazem);
+  box-shadow: 0 0 0 3px rgba(244, 196, 48, 0.1);
+}
+
+/* Critical card styles */
+.card {
+  background: var(--background);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: 0 1px 3px var(--shadow);
+  transition: box-shadow 0.2s ease;
+}
+
+.card:hover {
+  box-shadow: 0 4px 12px var(--shadow);
+}
