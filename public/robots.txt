@@ -1,0 +1,44 @@
+# Robots.txt para Armazém São Joaquim
+# Restaurante histórico em Santa Teresa - Rio de Janeiro
+
+User-agent: *
+Allow: /
+
+# Permitir acesso a todas as páginas principais
+Allow: /menu
+Allow: /reservas  
+Allow: /blog
+Allow: /auth
+
+# Bloquear áreas administrativas e arquivos técnicos
+Disallow: /api/
+Disallow: /_next/
+Disallow: /admin/
+Disallow: /.env*
+Disallow: /node_modules/
+
+# Permitir indexação de imagens
+Allow: /images/
+Allow: /icons/
+Allow: /*.jpg
+Allow: /*.jpeg
+Allow: /*.png
+Allow: /*.webp
+Allow: /*.svg
+
+# Configurações específicas para Google
+User-agent: Googlebot
+Allow: /
+Crawl-delay: 1
+
+# Configurações para Bing
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 2
+
+# Sitemap location
+Sitemap: https://armazemsaojoaquim.com.br/sitemap.xml
+Sitemap: https://armazemsaojoaquim.com.br/sitemap-0.xml
+
+# Host directive (preferred domain)
+Host: armazemsaojoaquim.com.br 
