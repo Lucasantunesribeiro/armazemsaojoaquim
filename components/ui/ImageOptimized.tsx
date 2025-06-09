@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect, CSSProperties } from 'react'
-import { useOptimization, getOptimizedImageSrc, supportsWebP } from '@/lib/hooks/useOptimization'
+import { useOptimization, getOptimizedImageSrc, supportsWebP } from '../../lib/hooks/useOptimization'
 
 interface ImageOptimizedProps {
   src: string

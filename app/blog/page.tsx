@@ -12,13 +12,62 @@ import { toast } from 'react-hot-toast'
 
 interface BlogPost {
   id: string
-  titulo: string
-  resumo: string
-  imagem: string | null
+  title: string
+  excerpt: string | null
+  image_url: string | null
   slug: string
   created_at: string
-  author_id: string
+  author: string
 }
+
+// Mock data para garantir que sempre há conteúdo
+const mockPosts: BlogPost[] = [
+  {
+    id: '1',
+    title: 'A História do Armazém São Joaquim',
+    excerpt: 'Conheça a fascinante história de 170 anos do nosso restaurante histórico no coração de Santa Teresa.',
+    image_url: '/images/armazem-historia-1854.jpg',
+    slug: 'historia-do-armazem-sao-joaquim',
+    created_at: '2024-01-15T10:00:00Z',
+    author: 'Armazém São Joaquim'
+  },
+  {
+    id: '2',
+    title: 'Os Segredos da Nossa Feijoada Tradicional',
+    excerpt: 'Descubra os segredos da nossa famosa feijoada tradicional que conquistou o paladar carioca.',
+    image_url: '/images/feijoada-tradicional-brasileira.jpg',
+    slug: 'segredos-da-nossa-feijoada',
+    created_at: '2024-01-10T10:00:00Z',
+    author: 'Armazém São Joaquim'
+  },
+  {
+    id: '3',
+    title: 'Santa Teresa: Um Bairro Histórico',
+    excerpt: 'Explore a história e charme do bairro onde nosso restaurante está localizado há quase dois séculos.',
+    image_url: '/images/santa-teresa-bairro-historico.jpg',
+    slug: 'santa-teresa-bairro-historico',
+    created_at: '2024-01-05T10:00:00Z',
+    author: 'Armazém São Joaquim'
+  },
+  {
+    id: '4',
+    title: 'A Arte de Preparar Drinks Artesanais',
+    excerpt: 'Conheça os segredos por trás dos nossos cocktails especiais e a tradição de Santa Teresa.',
+    image_url: '/images/mixologia-drinks-artesanais.jpg',
+    slug: 'arte-drinks-artesanais',
+    created_at: '2024-01-20T10:00:00Z',
+    author: 'Armazém São Joaquim'
+  },
+  {
+    id: '5',
+    title: 'O Bondinho de Santa Teresa',
+    excerpt: 'A história do icônico transporte que conecta Santa Teresa ao centro do Rio de Janeiro.',
+    image_url: '/images/bondinho-santa-teresa-historico.jpg',
+    slug: 'bondinho-santa-teresa',
+    created_at: '2024-01-25T10:00:00Z',
+    author: 'Armazém São Joaquim'
+  }
+]
 
 export default function BlogPage() {
   const [posts, setPosts] = useState<BlogPost[]>([])
@@ -29,12 +78,29 @@ export default function BlogPage() {
   useEffect(() => {
     const fetchPosts = async () => {
       try {
-        // Usando dados mockados temporariamente até corrigir a estrutura da tabela
-        const mockPosts: BlogPost[] = []
-        setPosts(mockPosts)
+        // Tentar carregar do Supabase primeiro
+        try {
+          const { supabase } = await import('../../lib/supabase')
+          
+          const { data, error } = await supabase
+            .from('blog_posts')
+            .select('id, title, excerpt, image_url, slug, created_at, author')
+            .eq('published', true)
+            .order('created_at', { ascending: false })
+
+          if (!error && data && data.length > 0) {
+            setPosts(data)
+          } else {
+            // Fallback para dados mock
+            setPosts(mockPosts)
+          }
+        } catch (supabaseError) {
+          console.warn('Supabase error, using mock data:', supabaseError)
+          setPosts(mockPosts)
+        }
       } catch (error) {
         console.error('Erro ao carregar posts:', error)
-        toast.error('Erro ao carregar posts do blog')
+        setPosts(mockPosts) // Sempre usar mock como fallback
       } finally {
         setLoading(false)
       }
@@ -54,22 +120,22 @@ export default function BlogPage() {
     }
 
     const filtered = posts.filter(post =>
-      post.titulo.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      post.resumo.toLowerCase().includes(searchTerm.toLowerCase())
+      post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (post.excerpt && post.excerpt.toLowerCase().includes(searchTerm.toLowerCase()))
     )
     setFilteredPosts(filtered)
   }
 
   if (loading) {
     return (
-      <div className="min-h-screen pt-20 flex items-center justify-center">
+      <div className="min-h-screen pt-32 flex items-center justify-center">
         <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-amarelo-armazem"></div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen pt-20 bg-cinza-claro">
+    <div className="min-h-screen pt-32 bg-cinza-claro">
       <div className="container mx-auto px-4 py-12">
         <div className="max-w-6xl mx-auto">
           {/* Header */}
@@ -105,8 +171,8 @@ export default function BlogPage() {
                 <div className="grid grid-cols-1 lg:grid-cols-2">
                   <div className="relative h-64 lg:h-auto">
                     <Image
-                      src={filteredPosts[0].imagem || '/images/armazem-default.jpg'}
-                      alt={filteredPosts[0].titulo}
+                      src={filteredPosts[0].image_url || '/images/armazem-sem-imagem.jpg'}
+                      alt={filteredPosts[0].title}
                       fill
                       className="object-cover"
                     />
@@ -117,15 +183,15 @@ export default function BlogPage() {
                       <span>{formatDate(filteredPosts[0].created_at)}</span>
                       <span className="mx-2">•</span>
                       <User className="w-4 h-4 mr-1" />
-                      <span>Armazém São Joaquim</span>
+                      <span>{filteredPosts[0].author}</span>
                     </div>
                     
                     <h3 className="font-playfair text-3xl font-bold text-madeira-escura mb-4">
-                      {filteredPosts[0].titulo}
+                      {filteredPosts[0].title}
                     </h3>
                     
                     <p className="text-cinza-medio mb-6 text-lg leading-relaxed">
-                      {filteredPosts[0].resumo}
+                      {filteredPosts[0].excerpt}
                     </p>
                     
                     <Link 
@@ -167,8 +233,8 @@ export default function BlogPage() {
                         <CardHeader className="p-0">
                           <div className="relative h-48 overflow-hidden rounded-t-lg">
                             <Image
-                              src={post.imagem || '/images/armazem-default.jpg'}
-                              alt={post.titulo}
+                              src={post.image_url || '/images/armazem-sem-imagem.jpg'}
+                              alt={post.title}
                               fill
                               className="object-cover group-hover:scale-105 transition-transform duration-300"
                             />
@@ -182,15 +248,15 @@ export default function BlogPage() {
                             <span>{formatDate(post.created_at)}</span>
                             <span className="mx-2">•</span>
                             <User className="w-4 h-4 mr-1" />
-                            <span>Armazém São Joaquim</span>
+                            <span>{post.author}</span>
                           </div>
                           
                           <h3 className="font-playfair text-xl font-semibold text-madeira-escura mb-3 group-hover:text-amarelo-armazem transition-colors">
-                            {post.titulo}
+                            {post.title}
                           </h3>
                           
                           <p className="text-cinza-medio mb-4 line-clamp-3">
-                            {post.resumo}
+                            {post.excerpt}
                           </p>
                           
                           <Link 

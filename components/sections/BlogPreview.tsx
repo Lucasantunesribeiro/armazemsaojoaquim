@@ -10,7 +10,7 @@ const BlogPreview = () => {
       id: 1,
       title: 'A História do Bondinho de Santa Teresa',
       excerpt: 'Descubra como o icônico bondinho se tornou símbolo do bairro e parte da identidade carioca.',
-      image: '/images/bondinho-santa-teresa.jpg',
+      image: '/images/bondinho-santa-teresa-historico.jpg',
       author: 'Armazém São Joaquim',
       date: '2024-01-15',
       slug: 'historia-bondinho-santa-teresa'
@@ -19,7 +19,7 @@ const BlogPreview = () => {
       id: 2,
       title: 'Os Segredos da Mixologia Artesanal',
       excerpt: 'Conheça as técnicas e ingredientes especiais que tornam nossos drinks únicos.',
-      image: '/images/drinks-artesanais.jpg',
+      image: '/images/mixologia-drinks-artesanais.jpg',
       author: 'Chef Bartender',
       date: '2024-01-10',
       slug: 'segredos-mixologia-artesanal'
@@ -28,7 +28,7 @@ const BlogPreview = () => {
       id: 3,
       title: 'Santa Teresa: Boemia e Cultura',
       excerpt: 'Explore a rica vida cultural e boêmia que faz de Santa Teresa um bairro único no Rio.',
-      image: '/images/santa-teresa-cultura.jpg',
+      image: '/images/santa-teresa-vida-cultural.jpg',
       author: 'Equipe Cultural',
       date: '2024-01-05',
       slug: 'santa-teresa-boemia-cultura'

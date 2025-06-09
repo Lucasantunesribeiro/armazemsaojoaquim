@@ -10,13 +10,13 @@ import { formatCurrency } from '../../lib/utils'
 
 interface MenuItem {
   id: string
-  nome: string
-  descricao: string
-  preco: number
-  categoria: string
-  disponivel: boolean
-  ingredientes: string[] | null
-  alergenos: string[] | null
+  name: string
+  description: string | null
+  price: number
+  category: string
+  available: boolean
+  ingredients: string[] | null
+  allergens: string[] | null
 }
 
 const categoryIcons = {
@@ -61,9 +61,9 @@ export default function MenuPage() {
       const { data, error } = await supabase
         .from('menu_items')
         .select('*')
-        .eq('disponivel', true)
-        .order('categoria')
-        .order('nome')
+        .eq('available', true)
+        .order('category')
+        .order('name')
 
       if (error) {
         console.error('Erro ao carregar menu:', error)
@@ -81,13 +81,13 @@ export default function MenuPage() {
     let filtered = menuItems
 
     if (selectedCategory !== 'Todos') {
-      filtered = filtered.filter(item => item.categoria === selectedCategory)
+      filtered = filtered.filter(item => item.category === selectedCategory)
     }
 
     if (searchTerm) {
       filtered = filtered.filter(item =>
-        item.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.descricao.toLowerCase().includes(searchTerm.toLowerCase())
+        item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (item.description && item.description.toLowerCase().includes(searchTerm.toLowerCase()))
       )
     }
 
@@ -95,10 +95,10 @@ export default function MenuPage() {
   }
 
   const groupedItems = filteredItems.reduce((acc, item) => {
-    if (!acc[item.categoria]) {
-      acc[item.categoria] = []
+    if (!acc[item.category]) {
+      acc[item.category] = []
     }
-    acc[item.categoria].push(item)
+    acc[item.category].push(item)
     return acc
   }, {} as Record<string, MenuItem[]>)
 
@@ -111,7 +111,7 @@ export default function MenuPage() {
   }
 
   return (
-    <div className="min-h-screen pt-20 bg-cinza-claro">
+    <div className="min-h-screen pt-32 bg-cinza-claro">
       <div className="container mx-auto px-4 py-12">
         <div className="max-w-6xl mx-auto">
           {/* Header */}
@@ -199,40 +199,40 @@ export default function MenuPage() {
                           <CardContent className="p-6">
                             <div className="flex justify-between items-start mb-3">
                               <h3 className="font-playfair text-xl font-semibold text-madeira-escura group-hover:text-amarelo-armazem transition-colors">
-                                {item.nome}
+                                {item.name}
                               </h3>
                               <span className="text-2xl font-bold text-vermelho-portas">
-                                {formatCurrency(item.preco)}
+                                {formatCurrency(item.price)}
                               </span>
                             </div>
                             
                             <p className="text-cinza-medio mb-4 leading-relaxed">
-                              {item.descricao}
+                              {item.description}
                             </p>
                             
-                            {item.ingredientes && item.ingredientes.length > 0 && (
+                            {item.ingredients && item.ingredients.length > 0 && (
                               <div className="mb-3">
                                 <h4 className="text-sm font-semibold text-madeira-escura mb-1">
                                   Ingredientes:
                                 </h4>
                                 <p className="text-sm text-cinza-medio">
-                                  {item.ingredientes.join(', ')}
+                                  {item.ingredients.join(', ')}
                                 </p>
                               </div>
                             )}
                             
-                            {item.alergenos && item.alergenos.length > 0 && (
+                            {item.allergens && item.allergens.length > 0 && (
                               <div className="mb-3">
                                 <h4 className="text-sm font-semibold text-vermelho-portas mb-1">
                                   Alérgenos:
                                 </h4>
                                 <div className="flex flex-wrap gap-1">
-                                  {item.alergenos.map((alergeno, index) => (
+                                  {item.allergens.map((allergen: string, index: number) => (
                                     <span
                                       key={index}
                                       className="px-2 py-1 bg-red-100 text-red-800 text-xs rounded-full"
                                     >
-                                      {alergeno}
+                                      {allergen}
                                     </span>
                                   ))}
                                 </div>

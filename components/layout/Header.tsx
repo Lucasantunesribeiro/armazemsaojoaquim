@@ -85,7 +85,7 @@ const Header = () => {
             <ThemeToggle />
             {user ? (
               <div className="flex items-center space-x-3">
-                <Link href="/reservas">
+                <Link href="/reservas?view=list">
                   <Button variant="outline" size="sm">
                     <Calendar className="w-4 h-4 mr-2" />
                     Minhas Reservas
@@ -149,7 +149,7 @@ const Header = () => {
               <div className="px-4 pt-4 border-t border-cinza-claro dark:border-gray-700">
                 {user ? (
                   <div className="space-y-3">
-                    <Link href="/reservas" onClick={() => setIsMenuOpen(false)}>
+                    <Link href="/reservas?view=list" onClick={() => setIsMenuOpen(false)}>
                       <Button variant="outline" size="sm" className="w-full">
                         <Calendar className="w-4 h-4 mr-2" />
                         Minhas Reservas
