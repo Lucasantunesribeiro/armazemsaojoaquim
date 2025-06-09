@@ -11,15 +11,15 @@ export default function HeroSection() {
   
   const heroImages = [
     {
-      src: '/images/hero-1.jpg',
+      src: '/images/armazem-fachada-historica.jpg',
       alt: 'Fachada histórica do Armazém São Joaquim em Santa Teresa'
     },
     {
-      src: '/images/hero-2.jpg',
+      src: '/images/armazem-interior-aconchegante.jpg',
       alt: 'Interior aconchegante do restaurante com decoração autêntica'
     },
     {
-      src: '/images/hero-3.jpg',
+      src: '/images/santa-teresa-vista-panoramica.jpg',
       alt: 'Vista panorâmica de Santa Teresa a partir do Armazém'
     }
   ]
@@ -190,7 +190,7 @@ export default function HeroSection() {
             aria-selected={index === currentImageIndex}
             aria-label={`Ver ${image.alt}`}
             aria-controls={`hero-image-${index}`}
-            className={`w-3 h-3 rounded-full transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-black/50 ${
+            className={`w-2 h-2 rounded-full transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-black/50 ${
               index === currentImageIndex 
                 ? 'bg-amarelo-armazem scale-125' 
                 : 'bg-white/50 hover:bg-white/75'

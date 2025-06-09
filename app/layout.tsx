@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { Inter, Playfair_Display } from 'next/font/google'
-import Analytics from '@/components/Analytics'
+import Analytics from '../components/Analytics'
 import './globals.css'
 import Header from '../components/layout/Header'
 import Footer from '../components/sections/Footer'
@@ -145,7 +145,7 @@ export default function RootLayout({
         {/* Preload critical resources */}
         <link 
           rel="preload" 
-          href="/images/hero-1.jpg" 
+          href="/images/armazem-fachada-historica.jpg" 
           as="image" 
           type="image/jpeg"
           media="(min-width: 768px)"

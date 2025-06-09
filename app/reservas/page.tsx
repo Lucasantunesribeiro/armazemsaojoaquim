@@ -4,11 +4,12 @@ import React, { useState, useEffect } from 'react'
 import { Calendar, Clock, Users, MapPin, Phone, Mail, CheckCircle, AlertCircle, MessageSquare, ArrowLeft, ArrowRight, User } from 'lucide-react'
 import Button from '../../components/ui/Button'
 import Input from '../../components/ui/Input'
-import { Card, CardContent, CardHeader } from '@/components/ui/Card'
+import { Card, CardContent, CardHeader } from '../../components/ui/Card'
 import { LoadingSpinner } from '../../components/ui/Loading'
 import { useSupabase } from '../../components/providers/SupabaseProvider'
 import { supabase } from '../../lib/supabase'
 import { toast } from 'react-hot-toast'
+import { useRouter, useSearchParams } from 'next/navigation'
 
 interface ReservationData {
   name: string
@@ -33,6 +34,8 @@ interface UserReservation {
 
 const ReservasPage = () => {
   const { user } = useSupabase()
+  const router = useRouter()
+  const searchParams = useSearchParams()
   const [step, setStep] = useState(1)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [showSuccess, setShowSuccess] = useState(false)
@@ -77,6 +80,14 @@ const ReservasPage = () => {
     'Evento especial',
     'Outro'
   ]
+
+  useEffect(() => {
+    // Verifica se há parâmetro view=list na URL
+    const view = searchParams.get('view')
+    if (view === 'list') {
+      setViewMode('list')
+    }
+  }, [searchParams])
 
   useEffect(() => {
     if (user && viewMode === 'list') {
@@ -178,22 +189,15 @@ const ReservasPage = () => {
   const handleSubmit = async () => {
     if (!validateStep(2)) return
 
+    // Verificar se usuário está logado antes de prosseguir
+    if (!user) {
+      toast.error('Você precisa estar logado para fazer uma reserva')
+      router.push('/auth')
+      return
+    }
+
     setIsSubmitting(true)
     try {
-      let userId = user?.id
-
-      // Se não está logado, solicitar login via email
-      if (!userId) {
-        const { error } = await supabase.auth.signInWithOtp({
-          email: formData.email,
-        })
-
-        if (error) throw error
-        
-        toast.success('Código de verificação enviado para seu email! Confirme para continuar.')
-        return
-      }
-
       // Criar reserva apenas se usuário está autenticado
       const { data: reservation, error } = await supabase
         .from('reservas')
@@ -203,8 +207,8 @@ const ReservasPage = () => {
             horario: formData.time,
             pessoas: parseInt(formData.guests),
             status: 'pendente',
-            user_id: userId,
-            observacoes: `Ocasião: ${formData.occasion}\nSolicitações: ${formData.requests}`.trim()
+            user_id: user.id,
+            observacoes: `Nome: ${formData.name}\nTelefone: ${formData.phone}\nOcasião: ${formData.occasion}\nSolicitações: ${formData.requests}`.trim()
           }
         ])
         .select()
@@ -215,6 +219,7 @@ const ReservasPage = () => {
       // Enviar email de confirmação
       await sendConfirmationEmail(reservation.id)
 
+      setStep(4)
       setShowSuccess(true)
       toast.success('Reserva solicitada com sucesso!')
       
@@ -275,10 +280,20 @@ const ReservasPage = () => {
     return tomorrow.toISOString().split('T')[0]
   }
 
+  // Verificar se deve redirecionar para login
+  const handleReservationStart = () => {
+    if (!user) {
+      toast.error('Você precisa estar logado para fazer uma reserva')
+      router.push('/auth')
+      return
+    }
+    setViewMode('new')
+  }
+
   // Visualização das reservas existentes
   if (viewMode === 'list') {
     return (
-      <div className="min-h-screen pt-20 bg-cinza-claro">
+      <div className="min-h-screen pt-32 bg-cinza-claro">
         <div className="container mx-auto px-4 py-12">
           <div className="max-w-4xl mx-auto">
             <div className="flex items-center justify-between mb-8">
@@ -287,7 +302,7 @@ const ReservasPage = () => {
               </h1>
               <Button 
                 variant="outline" 
-                onClick={() => setViewMode('new')}
+                onClick={handleReservationStart}
                 className="flex items-center gap-2"
               >
                 <Calendar className="w-4 h-4" />
@@ -302,8 +317,8 @@ const ReservasPage = () => {
                 <p className="text-cinza-medio mb-6">
                   Você precisa estar logado para visualizar suas reservas
                 </p>
-                <Button onClick={() => setViewMode('new')}>
-                  Fazer Nova Reserva
+                <Button onClick={() => router.push('/auth')}>
+                  Fazer Login
                 </Button>
               </div>
             ) : loading ? (
@@ -317,7 +332,7 @@ const ReservasPage = () => {
                 <p className="text-cinza-medio mb-6">
                   Você ainda não possui reservas. Que tal fazer a primeira?
                 </p>
-                <Button onClick={() => setViewMode('new')}>
+                <Button onClick={handleReservationStart}>
                   Fazer Primeira Reserva
                 </Button>
               </div>
@@ -364,8 +379,8 @@ const ReservasPage = () => {
 
   // Formulário de nova reserva (resto do código permanece igual...)
   return (
-    <div className="min-h-screen bg-cinza-claro py-20">
-      <div className="container mx-auto px-4">
+    <div className="min-h-screen bg-cinza-claro pt-32">
+      <div className="container mx-auto px-4 py-12">
         <div className="max-w-4xl mx-auto">
           {/* Header */}
           <div className="text-center mb-12">
