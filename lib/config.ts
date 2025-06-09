@@ -1,5 +1,39 @@
 // Configurações centralizadas do projeto Armazém São Joaquim
 
+// Função segura para acessar variáveis de ambiente
+const getEnvVar = (key: string, defaultValue?: string): string => {
+  if (typeof window !== 'undefined') {
+    // Client-side: usar apenas NEXT_PUBLIC_ vars ou fallbacks
+    switch (key) {
+      case 'NODE_ENV':
+        return process.env.NODE_ENV || 'production'
+      case 'NEXT_PUBLIC_SITE_URL':
+        return process.env.NEXT_PUBLIC_SITE_URL || 'https://armazemsaojoaquim.netlify.app'
+      case 'NEXT_PUBLIC_SUPABASE_URL':
+        return process.env.NEXT_PUBLIC_SUPABASE_URL || ''
+      case 'NEXT_PUBLIC_SUPABASE_ANON_KEY':
+        return process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
+      case 'NEXT_PUBLIC_GA_ID':
+        return process.env.NEXT_PUBLIC_GA_ID || ''
+      default:
+        return defaultValue || ''
+    }
+  }
+  // Server-side: acesso normal
+  return process.env[key] || defaultValue || ''
+}
+
+// Constantes de ambiente
+export const ENV = {
+  NODE_ENV: getEnvVar('NODE_ENV', 'production'),
+  SITE_URL: getEnvVar('NEXT_PUBLIC_SITE_URL', 'https://armazemsaojoaquim.netlify.app'),
+  SUPABASE_URL: getEnvVar('NEXT_PUBLIC_SUPABASE_URL'),
+  SUPABASE_ANON_KEY: getEnvVar('NEXT_PUBLIC_SUPABASE_ANON_KEY'),
+  GA_ID: getEnvVar('NEXT_PUBLIC_GA_ID'),
+  IS_PRODUCTION: getEnvVar('NODE_ENV') === 'production',
+  IS_DEVELOPMENT: getEnvVar('NODE_ENV') === 'development',
+}
+
 export const config = {
   // ============================
   // INFORMAÇÕES BÁSICAS
@@ -114,7 +148,7 @@ export const config = {
   // ============================
   site: {
     name: 'Armazém São Joaquim',
-    url: process.env.NEXT_PUBLIC_SITE_URL || 'https://armazemsaojoaquim.netlify.app',
+    url: ENV.SITE_URL,
     title: 'Armazém São Joaquim - "En esta casa tenemos memoria"',
     description: 'Restaurante histórico em Santa Teresa, Rio de Janeiro. 170 anos de história, drinks excepcionais e gastronomia única no coração de Santa Teresa.',
     keywords: [
@@ -190,16 +224,19 @@ export const config = {
     menuItems: 300, // 5 minutos
     blogPosts: 600, // 10 minutos
     staticPages: 3600, // 1 hora
-    userReservations: 60 // 1 minuto
+    userReservations: 60, // 1 minuto
+    revalidateInterval: 3600, // 1 hora
+    imageCacheTTL: 31536000, // 1 ano
+    staticCacheTTL: 86400, // 1 dia
   },
 
   // ============================
   // CONFIGURAÇÕES DE DESENVOLVIMENTO
   // ============================
   dev: {
-    enableAnalytics: process.env.NODE_ENV === 'production',
-    enableDebugLogs: process.env.NODE_ENV === 'development',
-    mockData: process.env.NODE_ENV === 'development' && !process.env.NEXT_PUBLIC_SUPABASE_URL
+    enableAnalytics: ENV.IS_PRODUCTION,
+    enableDebugLogs: ENV.IS_DEVELOPMENT,
+    mockData: ENV.IS_DEVELOPMENT && !ENV.SUPABASE_URL
   },
 
   // ============================
@@ -210,13 +247,16 @@ export const config = {
     reservations: true,
     blog: true,
     menu: true,
-    analytics: process.env.NODE_ENV === 'production',
+    analytics: ENV.IS_PRODUCTION,
     seo: true,
     pwa: true,
     socialLogin: true,
     reviews: false, // Futuro
     delivery: false, // Futuro
-    events: false // Futuro
+    events: false, // Futuro
+    enableAnalytics: ENV.IS_PRODUCTION,
+    enableDebugLogs: ENV.IS_DEVELOPMENT,
+    mockData: ENV.IS_DEVELOPMENT && !ENV.SUPABASE_URL
   },
 
   // ============================
@@ -251,6 +291,14 @@ export const config = {
         info: 3000
       }
     }
+  },
+
+  // ============================
+  // CONFIGURAÇÕES DE API
+  // ============================
+  api: {
+    timeout: 10000,
+    retries: 3
   }
 }
 
