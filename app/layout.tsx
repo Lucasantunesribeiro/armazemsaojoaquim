@@ -1,5 +1,3 @@
-'use client'
-
 import type { Metadata } from 'next'
 import { Inter, Playfair_Display } from 'next/font/google'
 import Analytics from '@/components/Analytics'
@@ -9,7 +7,6 @@ import Footer from '../components/sections/Footer'
 import { Toaster } from 'react-hot-toast'
 import { SupabaseProvider } from '../components/providers/SupabaseProvider'
 import Script from 'next/script'
-import { useEffect } from 'react'
 
 const inter = Inter({ 
   subsets: ['latin'], 
@@ -96,12 +93,6 @@ export default function RootLayout({
 }: {
   children: React.ReactNode
 }) {
-  useEffect(() => {
-    if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
-      console.log('Running in development mode')
-    }
-  }, [])
-
   return (
     <html lang="pt-BR" className={`${inter.variable} ${playfair.variable}`}>
       <head>
@@ -182,7 +173,7 @@ export default function RootLayout({
         {/* CSP for security */}
         <meta 
           httpEquiv="Content-Security-Policy" 
-          content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https:; media-src 'self'; object-src 'none'; frame-src 'none';"
+          content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https:; media-src 'self'; object-src 'none';"
         />
       </head>
       <body className="font-inter antialiased bg-background text-text-primary">
