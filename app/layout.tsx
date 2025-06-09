@@ -1,3 +1,5 @@
+'use client'
+
 import type { Metadata } from 'next'
 import { Inter, Playfair_Display } from 'next/font/google'
 import Analytics from '@/components/Analytics'
