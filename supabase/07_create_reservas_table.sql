@@ -193,7 +193,8 @@ DROP POLICY IF EXISTS "Users can read own profile" ON users;
 CREATE POLICY "Users can read own profile" ON users 
   FOR SELECT USING (auth.uid()::text = id::text);
 
-DROP POLICY IF EXISTS "Users can update own profile" ON users 
+DROP POLICY IF EXISTS "Users can update own profile" ON users;
+CREATE POLICY "Users can update own profile" ON users 
   FOR UPDATE USING (auth.uid()::text = id::text);
 
 DROP POLICY IF EXISTS "Enable insert for authenticated users only" ON users;
