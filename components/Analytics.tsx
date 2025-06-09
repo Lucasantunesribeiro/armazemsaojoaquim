@@ -1,7 +1,8 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { getCLS, getFID, getFCP, getLCP, getTTFB } from 'web-vitals'
+import { ENV } from '../lib/config'
 
 interface WebVitalMetric {
   name: string
@@ -11,8 +12,8 @@ interface WebVitalMetric {
 }
 
 // Analytics configuration
-const ANALYTICS_ID = process.env.NEXT_PUBLIC_GA_ID
-const DEBUG_MODE = process.env.NODE_ENV === 'development'
+const ANALYTICS_ID = ENV.GA_ID
+const DEBUG_MODE = ENV.IS_DEVELOPMENT
 
 // Track Web Vitals
 function sendToAnalytics(metric: WebVitalMetric) {

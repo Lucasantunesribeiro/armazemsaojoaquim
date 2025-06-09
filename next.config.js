@@ -3,6 +3,12 @@ const nextConfig = {
   // Static export for Netlify
   output: 'export',
   
+  // Environment variables for client-side
+  env: {
+    NODE_ENV: process.env.NODE_ENV,
+    NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL || 'https://armazemsaojoaquim.netlify.app',
+  },
+  
   // Compression and optimization
   compress: true,
   poweredByHeader: false,

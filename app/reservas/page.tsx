@@ -1,11 +1,14 @@
 'use client'
 
-import { useState } from 'react'
-import { Calendar, Clock, Users, MapPin, Phone, Mail, CheckCircle, AlertCircle } from 'lucide-react'
-import Button from '@/components/ui/Button'
-import Input from '@/components/ui/Input'
+import React, { useState, useEffect } from 'react'
+import { Calendar, Clock, Users, MapPin, Phone, Mail, CheckCircle, AlertCircle, MessageSquare, ArrowLeft, ArrowRight, User } from 'lucide-react'
+import Button from '../../components/ui/Button'
+import Input from '../../components/ui/Input'
 import { Card, CardContent, CardHeader } from '@/components/ui/Card'
-import toast from 'react-hot-toast'
+import { LoadingSpinner } from '../../components/ui/Loading'
+import { useSupabase } from '../../components/providers/SupabaseProvider'
+import { supabase } from '../../lib/supabase'
+import { toast } from 'react-hot-toast'
 
 interface ReservationData {
   name: string
@@ -18,19 +21,38 @@ interface ReservationData {
   requests: string
 }
 
+interface UserReservation {
+  id: string
+  data: string
+  horario: string
+  pessoas: number
+  status: string
+  observacoes: string | null
+  created_at: string
+}
+
 const ReservasPage = () => {
+  const { user } = useSupabase()
   const [step, setStep] = useState(1)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [showSuccess, setShowSuccess] = useState(false)
+  const [viewMode, setViewMode] = useState<'new' | 'list'>('new')
+  const [userReservations, setUserReservations] = useState<UserReservation[]>([])
   const [loading, setLoading] = useState(false)
-  const [reservation, setReservation] = useState<ReservationData>({
+  const [confirmationSent, setConfirmationSent] = useState(false)
+
+  const [formData, setFormData] = useState<ReservationData>({
     name: '',
     email: '',
     phone: '',
     date: '',
     time: '',
-    guests: '',
+    guests: '2',
     occasion: '',
     requests: ''
   })
+
+  const [errors, setErrors] = useState<Partial<ReservationData>>({})
 
   const timeSlots = [
     '12:00', '12:30', '13:00', '13:30', '14:00', '14:30',
@@ -56,81 +78,307 @@ const ReservasPage = () => {
     'Outro'
   ]
 
+  useEffect(() => {
+    if (user && viewMode === 'list') {
+      fetchUserReservations()
+    }
+  }, [user, viewMode])
+
+  const fetchUserReservations = async () => {
+    if (!user) return
+    
+    setLoading(true)
+    try {
+      const { data, error } = await supabase
+        .from('reservas')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+
+      if (error) throw error
+      setUserReservations(data || [])
+    } catch (error) {
+      console.error('Erro ao buscar reservas:', error)
+      toast.error('Erro ao carregar suas reservas')
+    } finally {
+      setLoading(false)
+    }
+  }
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    setReservation(prev => ({
-      ...prev,
-      [e.target.name]: e.target.value
-    }))
+    const { name, value } = e.target
+    setFormData(prev => ({ ...prev, [name]: value }))
+    
+    // Clear error when user starts typing
+    if (errors[name as keyof ReservationData]) {
+      setErrors(prev => ({ ...prev, [name]: undefined }))
+    }
+  }
+
+  const validateStep = (currentStep: number) => {
+    const newErrors: Partial<ReservationData> = {}
+
+    if (currentStep === 1) {
+      if (!formData.date) newErrors.date = 'Data é obrigatória'
+      if (!formData.time) newErrors.time = 'Horário é obrigatório'
+      if (!formData.guests) newErrors.guests = 'Número de pessoas é obrigatório'
+    }
+
+    if (currentStep === 2) {
+      if (!formData.name.trim()) newErrors.name = 'Nome é obrigatório'
+      if (!formData.email.trim()) newErrors.email = 'Email é obrigatório'
+      if (!formData.phone.trim()) newErrors.phone = 'Telefone é obrigatório'
+      
+      // Validate email format
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+      if (formData.email && !emailRegex.test(formData.email)) {
+        newErrors.email = 'Email inválido'
+      }
+    }
+
+    setErrors(newErrors)
+    return Object.keys(newErrors).length === 0
   }
 
   const handleNext = () => {
-    if (step === 1) {
-      if (!reservation.date || !reservation.time || !reservation.guests) {
-        toast.error('Por favor, preencha todos os campos obrigatórios')
-        return
-      }
+    if (validateStep(step)) {
+      setStep(prev => prev + 1)
     }
-    
-    if (step === 2) {
-      if (!reservation.name || !reservation.email || !reservation.phone) {
-        toast.error('Por favor, preencha todos os campos obrigatórios')
-        return
-      }
-    }
-    
-    setStep(prev => prev + 1)
   }
 
   const handleBack = () => {
     setStep(prev => prev - 1)
   }
 
-  const handleSubmit = async () => {
-    setLoading(true)
-    
+  const sendConfirmationEmail = async (reservationId: string) => {
     try {
-      // Simulação de envio de reserva
-      await new Promise(resolve => setTimeout(resolve, 2000))
+      const { emailService } = await import('../../lib/email-service')
       
-      toast.success('Reserva enviada com sucesso! Entraremos em contato para confirmar.')
-      setStep(4) // Tela de sucesso
+      const emailData = {
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        date: formData.date,
+        time: formData.time,
+        guests: parseInt(formData.guests),
+        occasion: formData.occasion,
+        requests: formData.requests,
+        reservationId
+      }
+      
+      const success = await emailService.sendConfirmationEmail(emailData)
+      setConfirmationSent(success)
+      return success
     } catch (error) {
-      toast.error('Erro ao enviar reserva. Tente novamente.')
+      console.error('Erro ao enviar email:', error)
+      return false
+    }
+  }
+
+  const handleSubmit = async () => {
+    if (!validateStep(2)) return
+
+    setIsSubmitting(true)
+    try {
+      let userId = user?.id
+
+      // Se não está logado, criar usuário temporário ou registrar
+      if (!userId) {
+        const { data: authData, error: authError } = await supabase.auth.signUp({
+          email: formData.email,
+          password: `temp_${Date.now()}`, // Password temporário
+          options: {
+            data: {
+              name: formData.name,
+              phone: formData.phone,
+            }
+          }
+        })
+
+        if (authError) {
+          // Se usuário já existe, tentar login
+          const { data: signInData, error: signInError } = await supabase.auth.signInWithOtp({
+            email: formData.email,
+          })
+
+          if (signInError) throw signInError
+          
+          toast.success('Código de verificação enviado para seu email!')
+          return
+        }
+
+        userId = authData.user?.id
+      }
+
+      // Criar reserva
+      const { data: reservation, error } = await supabase
+        .from('reservas')
+        .insert([
+          {
+            data: formData.date,
+            horario: formData.time,
+            pessoas: parseInt(formData.guests),
+            status: 'pendente',
+            user_id: userId,
+            observacoes: `Ocasião: ${formData.occasion}\nSolicitações: ${formData.requests}`.trim()
+          }
+        ])
+        .select()
+        .single()
+
+      if (error) throw error
+
+      // Enviar email de confirmação
+      await sendConfirmationEmail(reservation.id)
+
+      setShowSuccess(true)
+      toast.success('Reserva solicitada com sucesso!')
+      
+    } catch (error: any) {
+      console.error('Erro ao criar reserva:', error)
+      toast.error(error.message || 'Erro ao criar reserva. Tente novamente.')
     } finally {
-      setLoading(false)
+      setIsSubmitting(false)
     }
   }
 
   const resetForm = () => {
-    setReservation({
+    setFormData({
       name: '',
       email: '',
       phone: '',
       date: '',
       time: '',
-      guests: '',
+      guests: '2',
       occasion: '',
       requests: ''
     })
     setStep(1)
+    setShowSuccess(false)
+    setErrors({})
+    setConfirmationSent(false)
   }
 
   const formatDate = (dateString: string) => {
-    if (!dateString) return ''
     return new Date(dateString).toLocaleDateString('pt-BR', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
     })
   }
 
-  const getMinDate = () => {
-    const today = new Date()
-    today.setDate(today.getDate() + 1) // Mínimo de 1 dia de antecedência
-    return today.toISOString().split('T')[0]
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'confirmada': return 'text-green-600 bg-green-100'
+      case 'pendente': return 'text-yellow-600 bg-yellow-100'
+      case 'cancelada': return 'text-red-600 bg-red-100'
+      default: return 'text-gray-600 bg-gray-100'
+    }
   }
 
+  const getStatusText = (status: string) => {
+    switch (status) {
+      case 'confirmada': return 'Confirmada'
+      case 'pendente': return 'Pendente'
+      case 'cancelada': return 'Cancelada'
+      default: return status
+    }
+  }
+
+  const getMinDate = () => {
+    const tomorrow = new Date()
+    tomorrow.setDate(tomorrow.getDate() + 1)
+    return tomorrow.toISOString().split('T')[0]
+  }
+
+  // Visualização das reservas existentes
+  if (viewMode === 'list') {
+    return (
+      <div className="min-h-screen pt-20 bg-cinza-claro">
+        <div className="container mx-auto px-4 py-12">
+          <div className="max-w-4xl mx-auto">
+            <div className="flex items-center justify-between mb-8">
+              <h1 className="font-playfair text-3xl md:text-4xl font-bold text-madeira-escura">
+                Minhas Reservas
+              </h1>
+              <Button 
+                variant="outline" 
+                onClick={() => setViewMode('new')}
+                className="flex items-center gap-2"
+              >
+                <Calendar className="w-4 h-4" />
+                Nova Reserva
+              </Button>
+            </div>
+
+            {!user ? (
+              <div className="bg-white rounded-lg shadow-sm p-8 text-center">
+                <User className="w-16 h-16 text-cinza-medio mx-auto mb-4" />
+                <h3 className="text-xl font-semibold mb-2">Faça login para ver suas reservas</h3>
+                <p className="text-cinza-medio mb-6">
+                  Você precisa estar logado para visualizar suas reservas
+                </p>
+                <Button onClick={() => setViewMode('new')}>
+                  Fazer Nova Reserva
+                </Button>
+              </div>
+            ) : loading ? (
+              <div className="flex justify-center py-12">
+                <LoadingSpinner size="lg" />
+              </div>
+            ) : userReservations.length === 0 ? (
+              <div className="bg-white rounded-lg shadow-sm p-8 text-center">
+                <Calendar className="w-16 h-16 text-cinza-medio mx-auto mb-4" />
+                <h3 className="text-xl font-semibold mb-2">Nenhuma reserva encontrada</h3>
+                <p className="text-cinza-medio mb-6">
+                  Você ainda não possui reservas. Que tal fazer a primeira?
+                </p>
+                <Button onClick={() => setViewMode('new')}>
+                  Fazer Primeira Reserva
+                </Button>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {userReservations.map((reservation) => (
+                  <div key={reservation.id} className="bg-white rounded-lg shadow-sm p-6">
+                    <div className="flex flex-col md:flex-row md:items-center md:justify-between">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-4 mb-2">
+                          <h3 className="text-lg font-semibold text-madeira-escura">
+                            {formatDate(reservation.data)} às {reservation.horario}
+                          </h3>
+                          <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(reservation.status)}`}>
+                            {getStatusText(reservation.status)}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-6 text-cinza-medio">
+                          <div className="flex items-center gap-2">
+                            <Users className="w-4 h-4" />
+                            <span>{reservation.pessoas} pessoa{reservation.pessoas > 1 ? 's' : ''}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Calendar className="w-4 h-4" />
+                            <span>Criada em {formatDate(reservation.created_at)}</span>
+                          </div>
+                        </div>
+                        {reservation.observacoes && (
+                          <p className="text-sm text-cinza-medio mt-2">
+                            {reservation.observacoes}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // Formulário de nova reserva (resto do código permanece igual...)
   return (
     <div className="min-h-screen bg-cinza-claro py-20">
       <div className="container mx-auto px-4">
@@ -195,7 +443,7 @@ const ReservasPage = () => {
                         <input
                           type="date"
                           name="date"
-                          value={reservation.date}
+                          value={formData.date}
                           onChange={handleInputChange}
                           min={getMinDate()}
                           className="w-full pl-12 pr-4 py-3 border border-cinza-medio rounded-lg focus:ring-2 focus:ring-amarelo-armazem focus:border-transparent"
@@ -212,7 +460,7 @@ const ReservasPage = () => {
                         <Users className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-cinza-medio" />
                         <select
                           name="guests"
-                          value={reservation.guests}
+                          value={formData.guests}
                           onChange={handleInputChange}
                           className="w-full pl-12 pr-4 py-3 border border-cinza-medio rounded-lg focus:ring-2 focus:ring-amarelo-armazem focus:border-transparent appearance-none"
                           required
@@ -235,9 +483,9 @@ const ReservasPage = () => {
                         <button
                           key={time}
                           type="button"
-                          onClick={() => setReservation(prev => ({ ...prev, time }))}
+                          onClick={() => setFormData(prev => ({ ...prev, time }))}
                           className={`p-3 border rounded-lg text-center transition-all ${
-                            reservation.time === time
+                            formData.time === time
                               ? 'bg-amarelo-armazem border-amarelo-armazem text-madeira-escura'
                               : 'border-cinza-medio hover:border-amarelo-armazem hover:bg-amarelo-armazem/10'
                           }`}
@@ -255,7 +503,7 @@ const ReservasPage = () => {
                     </label>
                     <select
                       name="occasion"
-                      value={reservation.occasion}
+                      value={formData.occasion}
                       onChange={handleInputChange}
                       className="w-full px-4 py-3 border border-cinza-medio rounded-lg focus:ring-2 focus:ring-amarelo-armazem focus:border-transparent"
                     >
@@ -281,7 +529,7 @@ const ReservasPage = () => {
                     label="Nome completo"
                     type="text"
                     name="name"
-                    value={reservation.name}
+                    value={formData.name}
                     onChange={handleInputChange}
                     placeholder="Seu nome completo"
                     required
@@ -292,7 +540,7 @@ const ReservasPage = () => {
                       label="E-mail"
                       type="email"
                       name="email"
-                      value={reservation.email}
+                      value={formData.email}
                       onChange={handleInputChange}
                       placeholder="seu@email.com"
                       required
@@ -302,7 +550,7 @@ const ReservasPage = () => {
                       label="Telefone"
                       type="tel"
                       name="phone"
-                      value={reservation.phone}
+                      value={formData.phone}
                       onChange={handleInputChange}
                       placeholder="(11) 99999-9999"
                       required
@@ -316,7 +564,7 @@ const ReservasPage = () => {
                     <textarea
                       id="requests"
                       name="requests"
-                      value={reservation.requests}
+                      value={formData.requests}
                       onChange={handleInputChange}
                       rows={4}
                       className="w-full px-4 py-3 border border-cinza-medio rounded-lg focus:ring-2 focus:ring-amarelo-armazem focus:border-transparent resize-none"
@@ -346,20 +594,20 @@ const ReservasPage = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div>
                         <p className="text-sm text-cinza-medio">Data</p>
-                        <p className="font-semibold text-madeira-escura">{formatDate(reservation.date)}</p>
+                        <p className="font-semibold text-madeira-escura">{formatDate(formData.date)}</p>
                       </div>
                       <div>
                         <p className="text-sm text-cinza-medio">Horário</p>
-                        <p className="font-semibold text-madeira-escura">{reservation.time}</p>
+                        <p className="font-semibold text-madeira-escura">{formData.time}</p>
                       </div>
                       <div>
                         <p className="text-sm text-cinza-medio">Pessoas</p>
-                        <p className="font-semibold text-madeira-escura">{reservation.guests} {reservation.guests === '1' ? 'pessoa' : 'pessoas'}</p>
+                        <p className="font-semibold text-madeira-escura">{formData.guests} {formData.guests === '1' ? 'pessoa' : 'pessoas'}</p>
                       </div>
-                      {reservation.occasion && (
+                      {formData.occasion && (
                         <div>
                           <p className="text-sm text-cinza-medio">Ocasião</p>
-                          <p className="font-semibold text-madeira-escura">{reservation.occasion}</p>
+                          <p className="font-semibold text-madeira-escura">{formData.occasion}</p>
                         </div>
                       )}
                     </div>
@@ -373,20 +621,20 @@ const ReservasPage = () => {
                     <div className="space-y-3">
                       <div>
                         <p className="text-sm text-cinza-medio">Nome</p>
-                        <p className="font-semibold text-madeira-escura">{reservation.name}</p>
+                        <p className="font-semibold text-madeira-escura">{formData.name}</p>
                       </div>
                       <div>
                         <p className="text-sm text-cinza-medio">E-mail</p>
-                        <p className="font-semibold text-madeira-escura">{reservation.email}</p>
+                        <p className="font-semibold text-madeira-escura">{formData.email}</p>
                       </div>
                       <div>
                         <p className="text-sm text-cinza-medio">Telefone</p>
-                        <p className="font-semibold text-madeira-escura">{reservation.phone}</p>
+                        <p className="font-semibold text-madeira-escura">{formData.phone}</p>
                       </div>
-                      {reservation.requests && (
+                      {formData.requests && (
                         <div>
                           <p className="text-sm text-cinza-medio">Pedidos Especiais</p>
-                          <p className="font-semibold text-madeira-escura">{reservation.requests}</p>
+                          <p className="font-semibold text-madeira-escura">{formData.requests}</p>
                         </div>
                       )}
                     </div>
@@ -410,7 +658,7 @@ const ReservasPage = () => {
                     <Button onClick={handleBack} variant="outline">
                       Voltar
                     </Button>
-                    <Button onClick={handleSubmit} variant="primary" size="lg" loading={loading}>
+                    <Button onClick={handleSubmit} variant="primary" size="lg" loading={isSubmitting}>
                       Confirmar Reserva
                     </Button>
                   </div>
@@ -429,7 +677,7 @@ const ReservasPage = () => {
                       Reserva Enviada com Sucesso!
                     </h3>
                     <p className="text-cinza-medio mb-6">
-                      Recebemos sua solicitação de reserva para <strong>{formatDate(reservation.date)}</strong> às <strong>{reservation.time}</strong>.
+                      Recebemos sua solicitação de reserva para <strong>{formatDate(formData.date)}</strong> às <strong>{formData.time}</strong>.
                       Entraremos em contato em breve para confirmar.
                     </p>
                   </div>
@@ -447,8 +695,8 @@ const ReservasPage = () => {
                     <Button onClick={resetForm} variant="outline">
                       Nova Reserva
                     </Button>
-                    <Button onClick={() => window.location.href = '/'} variant="primary">
-                      Voltar ao Início
+                    <Button onClick={() => setViewMode('list')} variant="primary">
+                      Ver Minhas Reservas
                     </Button>
                   </div>
                 </div>
