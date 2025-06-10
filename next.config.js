@@ -1,19 +1,16 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Remove static export to allow API routes
-  // output: 'export', // Commented out to enable API routes
-  
   // Environment variables for client-side
   env: {
     NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL || 'https://armazemsaojoaquim.netlify.app',
   },
   
-  // Compression and optimization
+  // Basic optimizations
   compress: true,
   poweredByHeader: false,
   swcMinify: true,
 
-  // Image optimization for production
+  // Image optimization
   images: {
     domains: [
       'localhost',
@@ -22,30 +19,24 @@ const nextConfig = {
     ],
     formats: ['image/avif', 'image/webp'],
     minimumCacheTTL: 31536000,
-    // unoptimized: true, // Only needed for static export
   },
-
-  // Remove trailing slash as it's only needed for static export
-  // trailingSlash: true,
   
   // Compiler options
   compiler: {
     removeConsole: process.env.NODE_ENV === 'production',
   },
 
-  // Disable ESLint during builds for faster performance
+  // Build optimizations
   eslint: {
     ignoreDuringBuilds: true,
   },
-
-  // TypeScript check optimization
   typescript: {
     ignoreBuildErrors: process.env.NODE_ENV === 'production',
   },
 
-  // Webpack configuration to handle Supabase dependencies
-  webpack: (config, { isServer }) => {
-    // Handle Supabase dependencies
+  // Webpack configuration
+  webpack: (config, { isServer, dev }) => {
+    // Handle problematic packages
     if (!isServer) {
       config.resolve.fallback = {
         ...config.resolve.fallback,
@@ -53,20 +44,27 @@ const nextConfig = {
         net: false,
         tls: false,
         crypto: false,
+        stream: false,
+        url: false,
+        zlib: false,
+        http: false,
+        https: false,
+        assert: false,
+        os: false,
+        path: false,
       }
     }
 
-    // Mark problematic packages as external for server builds
-    if (isServer) {
-      config.externals = [...(config.externals || []), 'resend']
+    // Optimize for production
+    if (!dev) {
+      config.resolve.alias = {
+        ...config.resolve.alias,
+        '@supabase/realtime-js': require.resolve('@supabase/realtime-js'),
+        'resend': require.resolve('resend'),
+      }
     }
 
     return config
-  },
-
-  // Experimental features for better performance
-  experimental: {
-    optimizeCss: true,
   },
 
   // Headers para performance e segurança

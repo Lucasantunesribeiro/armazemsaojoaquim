@@ -1,9 +1,13 @@
 import { createClient } from '@supabase/supabase-js'
 import { Database } from '../types/database.types'
-import { ENV } from './config'
 
-const supabaseUrl = ENV.SUPABASE_URL
-const supabaseAnonKey = ENV.SUPABASE_ANON_KEY
+// Configuração direta das variáveis de ambiente
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
+
+if (!supabaseUrl || !supabaseAnonKey) {
+  console.warn('⚠️ Supabase credentials not configured')
+}
 
 export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
   auth: {
