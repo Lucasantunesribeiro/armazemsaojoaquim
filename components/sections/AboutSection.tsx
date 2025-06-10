@@ -39,7 +39,7 @@ const AboutSection = () => {
             <div className="relative">
               <div className="relative h-96 rounded-lg overflow-hidden shadow-xl">
                 <Image
-                  src="/images/armazem-historia-1854.jpg"
+                  src="/images/armazem-fachada-historica.jpg"
                   alt="Armazém São Joaquim histórico construído em 1854"
                   fill
                   className="object-cover"

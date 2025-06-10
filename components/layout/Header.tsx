@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { Menu, X, User, LogOut, Calendar } from 'lucide-react'
 import { useSupabase } from '../providers/SupabaseProvider'
@@ -49,13 +50,11 @@ const Header = () => {
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-3">
-            <div className="w-12 h-12 bg-amarelo-armazem rounded-lg flex items-center justify-center">
-              <span className="text-madeira-escura font-bold text-xl">A</span>
+            <div className="w-12 h-12 bg-amarelo-armazem rounded-lg flex items-center justify-center overflow-hidden">
+              <Image src="/images/logo.jpg" alt="Armazém São Joaquim" width={100} height={100} />
             </div>
             <div className="hidden sm:block">
-              <h1 className="font-playfair font-bold text-xl text-madeira-escura dark:text-amarelo-armazem">
-                Armazém São Joaquim
-              </h1>
+              <h1 className="font-playfair font-bold text-xl text-madeira-escura dark:text-amarelo-armazem">Armazém São Joaquim</h1>
               <p className="text-sm text-cinza-medio dark:text-gray-400">
                 "En esta casa tenemos memoria"
               </p>

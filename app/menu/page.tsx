@@ -7,6 +7,7 @@ import { Card, CardContent } from '../../components/ui/Card'
 import Button from '../../components/ui/Button'
 import Input from '../../components/ui/Input'
 import { formatCurrency } from '../../lib/utils'
+import { toast } from 'react-hot-toast'
 
 interface MenuItem {
   id: string
@@ -19,6 +20,8 @@ interface MenuItem {
   allergens: string[] | null
 }
 
+
+
 const categoryIcons = {
   'Aperitivos': Coffee,
   'Saladas': Utensils,
@@ -27,6 +30,9 @@ const categoryIcons = {
   'Feijoada': Wine,
   'Sanduíches': Coffee,
   'Sobremesas': Cake,
+  'Bebidas': Wine,
+  'Drinks': Wine,
+  'Pratos Principais': Utensils,
 }
 
 const categoryColors = {
@@ -37,6 +43,9 @@ const categoryColors = {
   'Feijoada': 'bg-madeira-escura',
   'Sanduíches': 'bg-cinza-medio',
   'Sobremesas': 'bg-rosa-suave',
+  'Bebidas': 'bg-vermelho-portas',
+  'Drinks': 'bg-vermelho-portas',
+  'Pratos Principais': 'bg-amarelo-armazem',
 }
 
 export default function MenuPage() {
@@ -46,7 +55,7 @@ export default function MenuPage() {
   const [selectedCategory, setSelectedCategory] = useState<string>('Todos')
   const [searchTerm, setSearchTerm] = useState('')
 
-  const categories = ['Todos', 'Aperitivos', 'Saladas', 'Pratos Individuais', 'Guarnições', 'Feijoada', 'Sanduíches', 'Sobremesas']
+  const categories = ['Todos', 'Bebidas', 'Aperitivos', 'Saladas', 'Pratos Individuais', 'Guarnições', 'Feijoada', 'Sanduíches', 'Sobremesas']
 
   useEffect(() => {
     fetchMenuItems()
@@ -58,24 +67,196 @@ export default function MenuPage() {
 
   const fetchMenuItems = async () => {
     try {
-      const { data, error } = await supabase
-        .from('menu_items')
-        .select('*')
-        .eq('available', true)
-        .order('category')
-        .order('name')
-
-      if (error) {
-        console.error('Erro ao carregar menu:', error)
-      } else {
-        setMenuItems(data || [])
+      console.log('Carregando dados do menu...')
+      
+      // Verificar se as variáveis de ambiente estão configuradas
+      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+      const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+      
+      if (!supabaseUrl || !supabaseKey) {
+        console.error('❌ Variáveis de ambiente não configuradas:', {
+          url: !!supabaseUrl,
+          key: !!supabaseKey
+        })
+        toast.error('Configuração faltando - usando dados de exemplo')
+        setMenuItems(getMockMenuItems())
+        return
       }
-    } catch (error) {
-      console.error('Erro inesperado:', error)
+      
+      // Tentar carregar do Supabase
+      try {
+        const { data, error } = await supabase
+          .from('menu_items')
+          .select(`
+            id,
+            nome,
+            descricao,
+            preco,
+            categoria,
+            disponivel,
+            ingredientes,
+            alergenos
+          `)
+          .eq('disponivel', true)
+
+        if (error) {
+          console.error('❌ Erro Supabase:', error)
+          toast.error(`Erro no banco: ${error.message}`)
+          setMenuItems(getMockMenuItems())
+          return
+        }
+
+        if (data && data.length > 0) {
+          console.log(`✅ Carregados ${data.length} itens do Supabase`)
+          console.log('📊 Primeiro item (PT):', data[0])
+          
+          // Mapear campos PT → EN
+          const mappedItems = data.map((item: any) => ({
+            id: item.id,
+            name: item.nome,
+            description: item.descricao,
+            price: item.preco,
+            category: item.categoria,
+            available: item.disponivel,
+            ingredients: item.ingredientes,
+            allergens: item.alergenos
+          }))
+          
+          console.log('📊 Primeiro item (EN):', mappedItems[0])
+          setMenuItems(mappedItems as MenuItem[])
+          toast.success(`Cardápio carregado: ${data.length} itens`)
+          return
+        } else {
+          console.log('⚠️ Banco de dados vazio')
+          toast('Banco vazio, usando itens de exemplo', { icon: '⚠️' })
+          setMenuItems(getMockMenuItems())
+        }
+      } catch (supabaseError) {
+        console.error('❌ Erro no Supabase:', supabaseError)
+        toast.error('Erro na conexão, usando dados de exemplo')
+        setMenuItems(getMockMenuItems())
+      }
+
+             // Fallback para dados mock
+       console.log('📝 Usando dados de exemplo...')
+       setMenuItems(getMockMenuItems())
+       
+     } catch (generalError) {
+       console.error('❌ Erro geral:', generalError)
+       toast.error('Erro ao carregar menu')
+       setMenuItems(getMockMenuItems())
     } finally {
       setLoading(false)
     }
   }
+
+  const getMockMenuItems = (): MenuItem[] => [
+    // Aperitivos
+    {
+      id: '1',
+      name: 'Pastéis de Santa Teresa',
+      description: 'Pastéis tradicionais fritos na hora com queijo coalho crocante',
+      price: 18.90,
+      category: 'Aperitivos',
+      available: true,
+      ingredients: ['massa', 'queijo coalho', 'temperos locais'],
+      allergens: ['glúten', 'leite']
+    },
+    {
+      id: '2',
+      name: 'Bolinho de Bacalhau',
+      description: 'Bolinhos crocantes recheados com bacalhau desfiado',
+      price: 24.90,
+      category: 'Aperitivos',
+      available: true,
+      ingredients: ['bacalhau', 'batata', 'ovos', 'salsa'],
+      allergens: ['peixe', 'ovos', 'glúten']
+    },
+    // Pratos Individuais
+    {
+      id: '3',
+      name: 'Feijoada Completa',
+      description: 'Feijoada tradicional servida com arroz, couve, farofa e laranja',
+      price: 45.90,
+      category: 'Pratos Individuais',
+      available: true,
+      ingredients: ['feijão preto', 'carnes variadas', 'arroz', 'couve', 'farofa'],
+      allergens: null
+    },
+    {
+      id: '4',
+      name: 'Bobó de Camarão',
+      description: 'Cremoso bobó de camarão com leite de coco e dendê',
+      price: 52.90,
+      category: 'Pratos Individuais',
+      available: true,
+      ingredients: ['camarão', 'mandioca', 'leite de coco', 'dendê'],
+      allergens: ['crustáceos']
+    },
+    {
+      id: '5',
+      name: 'Moqueca de Peixe',
+      description: 'Moqueca capixaba com peixe fresco, tomate e pimentão',
+      price: 48.90,
+      category: 'Pratos Individuais',
+      available: true,
+      ingredients: ['peixe', 'tomate', 'pimentão', 'leite de coco'],
+      allergens: ['peixe']
+    },
+    // Sanduíches
+    {
+      id: '6',
+      name: 'Sanduba do Armazém',
+      description: 'Pão artesanal com linguiça calabresa, queijo e vinagrete',
+      price: 22.90,
+      category: 'Sanduíches',
+      available: true,
+      ingredients: ['pão artesanal', 'linguiça calabresa', 'queijo', 'vinagrete'],
+      allergens: ['glúten', 'leite']
+    },
+    // Bebidas
+    {
+      id: '7',
+      name: 'Caipirinha de Cachaça Artesanal',
+      description: 'Caipirinha tradicional com cachaça artesanal e limão galego',
+      price: 15.90,
+      category: 'Bebidas',
+      available: true,
+      ingredients: ['cachaça artesanal', 'limão galego', 'açúcar mascavo'],
+      allergens: null
+    },
+    {
+      id: '8',
+      name: 'Chopp Artesanal',
+      description: 'Chopp gelado da cervejaria local de Santa Teresa',
+      price: 12.90,
+      category: 'Bebidas',
+      available: true,
+      ingredients: ['malte', 'lúpulo', 'fermento'],
+      allergens: ['glúten']
+    },
+    // Sobremesas
+    {
+      id: '9',
+      name: 'Brigadeiro Gourmet',
+      description: 'Brigadeiro artesanal com chocolate belga e granulado especial',
+      price: 8.90,
+      category: 'Sobremesas',
+      available: true,
+      ingredients: ['chocolate belga', 'leite condensado', 'manteiga', 'granulado'],
+      allergens: ['leite', 'glúten']
+    },
+    {
+      id: '10',
+      name: 'Pudim de Leite Condensado',
+      description: 'Pudim cremoso da casa com calda de açúcar queimado',
+      price: 12.90,
+      category: 'Sobremesas',
+      available: true,
+      ingredients: ['leite condensado', 'ovos', 'açúcar', 'baunilha'],
+      allergens: ['leite', 'ovos']
+    }
+  ]
 
   const filterItems = () => {
     let filtered = menuItems
@@ -194,15 +375,21 @@ export default function MenuPage() {
 
                     {/* Items Grid */}
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                      {items.map((item) => (
+                      {items.map((item) => {
+                        // Debug individual item
+                        if (!item.name || item.price == null) {
+                          console.error('🚨 Item inválido:', item)
+                        }
+                        
+                        return (
                         <Card key={item.id} className="group hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
                           <CardContent className="p-6">
                             <div className="flex justify-between items-start mb-3">
                               <h3 className="font-playfair text-xl font-semibold text-madeira-escura group-hover:text-amarelo-armazem transition-colors">
-                                {item.name}
+                                {item.name || 'Nome não disponível'}
                               </h3>
                               <span className="text-2xl font-bold text-vermelho-portas">
-                                {formatCurrency(item.price)}
+                                {item.price != null ? formatCurrency(item.price) : 'Preço não disponível'}
                               </span>
                             </div>
                             
@@ -240,7 +427,8 @@ export default function MenuPage() {
                             )}
                           </CardContent>
                         </Card>
-                      ))}
+                        )
+                      })}
                     </div>
                   </div>
                 )

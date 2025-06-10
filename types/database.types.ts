@@ -126,7 +126,6 @@ export type Database = {
           pessoas: number
           status: string
           observacoes: string | null
-          email_confirmacao_enviado: boolean
           telefone_confirmacao: string | null
           codigo_confirmacao: string | null
           confirmado_em: string | null
@@ -144,7 +143,6 @@ export type Database = {
           pessoas: number
           status?: string
           observacoes?: string | null
-          email_confirmacao_enviado?: boolean
           telefone_confirmacao?: string | null
           codigo_confirmacao?: string | null
           confirmado_em?: string | null
@@ -162,7 +160,6 @@ export type Database = {
           pessoas?: number
           status?: string
           observacoes?: string | null
-          email_confirmacao_enviado?: boolean
           telefone_confirmacao?: string | null
           codigo_confirmacao?: string | null
           confirmado_em?: string | null

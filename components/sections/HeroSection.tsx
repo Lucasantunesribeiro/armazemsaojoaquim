@@ -190,7 +190,7 @@ export default function HeroSection() {
             aria-selected={index === currentImageIndex}
             aria-label={`Ver ${image.alt}`}
             aria-controls={`hero-image-${index}`}
-            className={`w-2 h-2 rounded-full transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-black/50 ${
+            className={`w-1.5 h-1.5 rounded-full transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-black/50 ${
               index === currentImageIndex 
                 ? 'bg-amarelo-armazem scale-125' 
                 : 'bg-white/50 hover:bg-white/75'

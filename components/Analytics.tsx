@@ -33,24 +33,24 @@ function sendToAnalytics(metric: WebVitalMetric) {
     })
   }
 
-  // Send to custom analytics endpoint
-  if (typeof window !== 'undefined') {
-    fetch('/api/analytics', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        type: 'web-vital',
-        name: metric.name,
-        value: metric.value,
-        id: metric.id,
-        rating: metric.rating,
-        url: window.location.href,
-        timestamp: Date.now(),
-      }),
-    }).catch(console.error)
-  }
+  // Send to custom analytics endpoint (disabled for now)
+  // if (typeof window !== 'undefined') {
+  //   fetch('/api/analytics', {
+  //     method: 'POST',
+  //     headers: {
+  //       'Content-Type': 'application/json',
+  //     },
+  //     body: JSON.stringify({
+  //       type: 'web-vital',
+  //       name: metric.name,
+  //       value: metric.value,
+  //       id: metric.id,
+  //       rating: metric.rating,
+  //       url: window.location.href,
+  //       timestamp: Date.now(),
+  //     }),
+  //   }).catch(console.error)
+  // }
 }
 
 // Observe performance metrics
@@ -113,23 +113,23 @@ export function trackError(error: Error, errorInfo?: any) {
     })
   }
 
-  // Send to error tracking service
-  if (typeof window !== 'undefined') {
-    fetch('/api/errors', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        message: error.message,
-        stack: error.stack,
-        errorInfo,
-        url: window.location.href,
-        userAgent: navigator.userAgent,
-        timestamp: Date.now(),
-      }),
-    }).catch(console.error)
-  }
+  // Send to error tracking service (disabled for now)
+  // if (typeof window !== 'undefined') {
+  //   fetch('/api/errors', {
+  //     method: 'POST',
+  //     headers: {
+  //       'Content-Type': 'application/json',
+  //     },
+  //     body: JSON.stringify({
+  //       message: error.message,
+  //       stack: error.stack,
+  //       errorInfo,
+  //       url: window.location.href,
+  //       userAgent: navigator.userAgent,
+  //       timestamp: Date.now(),
+  //     }),
+  //   }).catch(console.error)
+  // }
 }
 
 export default function Analytics() {
