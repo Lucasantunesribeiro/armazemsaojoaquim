@@ -26,7 +26,7 @@ const mockPosts: BlogPost[] = [
     id: '1',
     title: 'A História do Armazém São Joaquim',
     excerpt: 'Conheça a fascinante história de 170 anos do nosso restaurante histórico no coração de Santa Teresa.',
-    image_url: '/images/armazem-historia-1854.jpg',
+    image_url: '/images/historia.jpg',
     slug: 'historia-do-armazem-sao-joaquim',
     created_at: '2024-01-15T10:00:00Z',
     author: 'Armazém São Joaquim'

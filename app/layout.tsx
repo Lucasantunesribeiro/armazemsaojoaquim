@@ -130,10 +130,16 @@ export default function RootLayout({
           `
         }} />
         
-        <meta name="theme-color" content="#F4C430" />
+                <meta name="theme-color" content="#F4C430" />
         <meta name="theme-color" content="#1A1A1A" media="(prefers-color-scheme: dark)" />
-        <link rel="apple-touch-icon" href="/icon-192.png" />
+        
+        {/* Favicon */}
+        <link rel="icon" type="image/jpeg" href="/images/logo.jpg" />
+        <link rel="shortcut icon" type="image/jpeg" href="/images/logo.jpg" />
+        <link rel="apple-touch-icon" href="/images/logo.jpg" />
+        
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+        <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="apple-mobile-web-app-title" content="Armazém São Joaquim" />
@@ -150,12 +156,7 @@ export default function RootLayout({
           type="image/jpeg"
           media="(min-width: 768px)"
         />
-        <link 
-          rel="preload" 
-          href="/images/armazem-logo.webp" 
-          as="image" 
-          type="image/webp"
-        />
+
         
         {/* Critical font preload */}
         <link
@@ -251,7 +252,7 @@ export default function RootLayout({
             }
             
             // Only log in development
-            if (process.env.NODE_ENV === 'development') {
+            if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
               getCLS(entry => console.log('CLS:', entry.value));
               getLCP(entry => console.log('LCP:', entry.startTime));
               getFID(entry => console.log('FID:', entry.processingStart - entry.startTime));

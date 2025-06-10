@@ -1,117 +1,49 @@
 {
-  "name": "Armazém São Joaquim - Restaurante Histórico em Santa Teresa",
-  "short_name": "Armazém São Joaquim",
-  "description": "Restaurante histórico em Santa Teresa, Rio de Janeiro. 170 anos de história, drinks excepcionais e gastronomia única no coração de Santa Teresa.",
+  "name": "Armazém São Joaquim",
+  "short_name": "Armazém SJ",
+  "description": "Restaurante histórico em Santa Teresa, Rio de Janeiro",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#2D1810",
+  "background_color": "#F4C430",
   "theme_color": "#F4C430",
   "orientation": "portrait-primary",
   "scope": "/",
-  "categories": ["food", "restaurants", "business"],
   "lang": "pt-BR",
-  "dir": "ltr",
   "icons": [
     {
-      "src": "/android-chrome-192x192.png",
+      "src": "/images/logo.jpg",
       "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "maskable any"
-    },
-    {
-      "src": "/android-chrome-512x512.png", 
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "maskable any"
-    },
-    {
-      "src": "/apple-touch-icon.png",
-      "sizes": "180x180", 
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/icon-512.png",
-      "sizes": "512x512", 
-      "type": "image/png",
-      "purpose": "any"
+      "type": "image/jpeg"
     }
   ],
+  "categories": ["food", "restaurant", "business"],
+  "screenshots": [],
   "shortcuts": [
     {
       "name": "Fazer Reserva",
       "short_name": "Reserva",
-      "description": "Reserve sua mesa no Armazém São Joaquim",
+      "description": "Reserve sua mesa",
       "url": "/reservas",
       "icons": [
         {
-          "src": "/icon-96.png",
+          "src": "/images/logo.jpg",
           "sizes": "96x96",
-          "type": "image/png"
+          "type": "image/jpeg"
         }
       ]
     },
     {
       "name": "Ver Cardápio",
-      "short_name": "Cardápio", 
-      "description": "Explore nosso cardápio completo",
+      "short_name": "Cardápio",
+      "description": "Veja nosso cardápio",
       "url": "/menu",
       "icons": [
         {
-          "src": "/icon-96.png",
-          "sizes": "96x96", 
-          "type": "image/png"
-        }
-      ]
-    },
-    {
-      "name": "Histórias do Blog",
-      "short_name": "Blog",
-      "description": "Leia nossas histórias e memórias",
-      "url": "/blog",
-      "icons": [
-        {
-          "src": "/icon-96.png",
+          "src": "/images/logo.jpg",
           "sizes": "96x96",
-          "type": "image/png"
+          "type": "image/jpeg"
         }
       ]
-    }
-  ],
-  "screenshots": [
-    {
-      "src": "/screenshot-desktop.png",
-      "sizes": "1280x720",
-      "type": "image/png",
-      "form_factor": "wide",
-      "label": "Homepage do Armazém São Joaquim"
-    },
-    {
-      "src": "/screenshot-mobile.png", 
-      "sizes": "375x667",
-      "type": "image/png",
-      "form_factor": "narrow",
-      "label": "Homepage mobile do Armazém São Joaquim"
-    }
-  ],
-  "prefer_related_applications": false,
-  "edge_side_panel": {
-    "preferred_width": 400
-  },
-  "protocol_handlers": [
-    {
-      "protocol": "mailto",
-      "url": "/contato?email=%s"
-    },
-    {
-      "protocol": "tel", 
-      "url": "/contato?phone=%s"
     }
   ]
 } 
