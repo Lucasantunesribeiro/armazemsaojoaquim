@@ -4,48 +4,8 @@
 
 [build.environment]
   NODE_VERSION = "20"
-  NODE_ENV = "production"
-  NEXT_TELEMETRY_DISABLED = "1"
-  NEXT_PUBLIC_SITE_URL = "https://armazemsaojoaquim.netlify.app"
   NPM_FLAGS = "--legacy-peer-deps"
 
 # Plugin Next.js para Netlify
 [[plugins]]
-  package = "@netlify/plugin-nextjs"
-
-# Headers de segurança
-[[headers]]
-  for = "/*"
-  [headers.values]
-    X-Frame-Options = "DENY"
-    X-Content-Type-Options = "nosniff"
-    X-XSS-Protection = "1; mode=block"
-    Referrer-Policy = "strict-origin-when-cross-origin"
-    Permissions-Policy = "geolocation=(), microphone=(), camera=()"
-
-# Cache para assets estáticos
-[[headers]]
-  for = "/_next/static/*"
-  [headers.values]
-    Cache-Control = "public, max-age=31536000, immutable"
-
-[[headers]]
-  for = "/images/*"
-  [headers.values]
-    Cache-Control = "public, max-age=31536000, immutable"
-
-[[headers]]
-  for = "/manifest.json"
-  [headers.values]
-    Cache-Control = "public, max-age=86400"
-
-[[headers]]
-  for = "/sw.js"
-  [headers.values]
-    Cache-Control = "public, max-age=0, must-revalidate"
-
-# Headers para API routes
-[[headers]]
-  for = "/api/*"
-  [headers.values]
-    Cache-Control = "no-cache, no-store, must-revalidate" 
+  package = "@netlify/plugin-nextjs" 

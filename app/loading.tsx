@@ -1,11 +1,11 @@
+import Image from "next/image";
+
 export default function Loading() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-cinza-claro">
       <div className="text-center">
         <div className="relative">
-          <div className="w-16 h-16 bg-amarelo-armazem rounded-lg flex items-center justify-center mx-auto mb-4 animate-pulse">
-            <span className="text-madeira-escura font-bold text-2xl">A</span>
-          </div>
+          <Image src="/logo.png" alt="Logo" width={100} height={100} />
           <div className="animate-spin rounded-full h-20 w-20 border-b-2 border-amarelo-armazem absolute -top-2 -left-2"></div>
         </div>
         <h2 className="font-playfair text-xl font-semibold text-madeira-escura mb-2">
