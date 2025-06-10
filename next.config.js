@@ -12,20 +12,14 @@ const nextConfig = {
 
   // Image optimization
   images: {
+    unoptimized: true, // Required for Netlify static builds
     domains: [
       'localhost',
       'armazemsaojoaquim.netlify.app',
       'armazemsaojoaquim.com.br',
     ],
-    formats: ['image/avif', 'image/webp'],
-    minimumCacheTTL: 31536000,
   },
   
-  // Compiler options
-  compiler: {
-    removeConsole: process.env.NODE_ENV === 'production',
-  },
-
   // Build optimizations
   eslint: {
     ignoreDuringBuilds: true,
@@ -34,9 +28,9 @@ const nextConfig = {
     ignoreBuildErrors: process.env.NODE_ENV === 'production',
   },
 
-  // Webpack configuration
-  webpack: (config, { isServer, dev }) => {
-    // Handle problematic packages
+  // Simplified webpack configuration
+  webpack: (config, { isServer }) => {
+    // Only add fallbacks for client-side
     if (!isServer) {
       config.resolve.fallback = {
         ...config.resolve.fallback,
@@ -44,23 +38,6 @@ const nextConfig = {
         net: false,
         tls: false,
         crypto: false,
-        stream: false,
-        url: false,
-        zlib: false,
-        http: false,
-        https: false,
-        assert: false,
-        os: false,
-        path: false,
-      }
-    }
-
-    // Optimize for production
-    if (!dev) {
-      config.resolve.alias = {
-        ...config.resolve.alias,
-        '@supabase/realtime-js': require.resolve('@supabase/realtime-js'),
-        'resend': require.resolve('resend'),
       }
     }
 
