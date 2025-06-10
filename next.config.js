@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Static export for Netlify
-  output: 'export',
+  // Remove static export to allow API routes
+  // output: 'export', // Commented out to enable API routes
   
   // Environment variables for client-side
   env: {
@@ -22,11 +22,11 @@ const nextConfig = {
     ],
     formats: ['image/avif', 'image/webp'],
     minimumCacheTTL: 31536000,
-    unoptimized: true, // Required for static export
+    // unoptimized: true, // Only needed for static export
   },
 
-  // Trailing slash for static export
-  trailingSlash: true,
+  // Remove trailing slash as it's only needed for static export
+  // trailingSlash: true,
   
   // Compiler options
   compiler: {
@@ -41,6 +41,32 @@ const nextConfig = {
   // TypeScript check optimization
   typescript: {
     ignoreBuildErrors: process.env.NODE_ENV === 'production',
+  },
+
+  // Webpack configuration to handle Supabase dependencies
+  webpack: (config, { isServer }) => {
+    // Handle Supabase dependencies
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+        net: false,
+        tls: false,
+        crypto: false,
+      }
+    }
+
+    // Mark problematic packages as external for server builds
+    if (isServer) {
+      config.externals = [...(config.externals || []), 'resend']
+    }
+
+    return config
+  },
+
+  // Experimental features for better performance
+  experimental: {
+    optimizeCss: true,
   },
 
   // Headers para performance e segurança

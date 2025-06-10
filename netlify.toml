@@ -1,18 +1,22 @@
 [build]
   command = "npm ci && npm run build"
-  publish = "out"
+  publish = ".next"
 
 [build.environment]
   NODE_VERSION = "20"
   NODE_ENV = "production"
   NEXT_TELEMETRY_DISABLED = "1"
   NEXT_PUBLIC_SITE_URL = "https://armazemsaojoaquim.netlify.app"
-  # Forçar instalação limpa
-  NPM_FLAGS = "--no-optional"
+  # Resend API Key será configurada via dashboard Netlify
+  # RESEND_API_KEY = "configured_in_netlify_dashboard"
 
-# Plugin Next.js para Netlify
+# Plugin Next.js para Netlify - Agora com SSR
 [[plugins]]
   package = "@netlify/plugin-nextjs"
+
+# Configuração das funções serverless
+[functions]
+  node_bundler = "esbuild"
 
 # Headers de segurança
 [[headers]]
@@ -45,32 +49,11 @@
   [headers.values]
     Cache-Control = "public, max-age=0, must-revalidate"
 
-# Redirects SPA fallback (Next.js vai gerenciar as rotas)
-[[redirects]]
-  from = "/*"
-  to = "/404.html"
-  status = 404
-
-# Redirect rules para SPA
-[[redirects]]
-  from = "/auth"
-  to = "/auth.html"
-  status = 200
-
-[[redirects]]
-  from = "/blog"
-  to = "/blog.html"
-  status = 200
-
-[[redirects]]
-  from = "/menu"
-  to = "/menu.html"
-  status = 200
-
-[[redirects]]
-  from = "/reservas"
-  to = "/reservas.html"
-  status = 200
+# Headers para API routes
+[[headers]]
+  for = "/api/*"
+  [headers.values]
+    Cache-Control = "no-cache, no-store, must-revalidate"
 
 # Configurações de otimização
 [build.processing]
@@ -88,10 +71,4 @@
   pretty_urls = true
 
 [build.processing.images]
-  compress = true
-
-# Fallback para todas as outras rotas
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200 
+  compress = true 
