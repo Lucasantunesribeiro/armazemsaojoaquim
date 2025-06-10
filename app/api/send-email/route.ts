@@ -2,7 +2,15 @@ import { NextRequest, NextResponse } from 'next/server'
 import { Resend } from 'resend'
 import { supabase } from '../../../lib/supabase'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
+// Validar API key do Resend
+const RESEND_API_KEY = process.env.RESEND_API_KEY
+
+if (!RESEND_API_KEY) {
+  console.error('❌ RESEND_API_KEY não configurada!')
+}
+
+// Inicializar Resend apenas se a API key estiver disponível
+const resend = RESEND_API_KEY ? new Resend(RESEND_API_KEY) : null
 
 interface EmailRequest {
   type: 'reservation_confirmation' | 'reservation_reminder'
@@ -19,6 +27,18 @@ interface EmailRequest {
 
 export async function POST(request: NextRequest) {
   try {
+    // Verificar se o Resend está configurado
+    if (!resend || !RESEND_API_KEY) {
+      console.error('❌ Resend não configurado - API key faltando')
+      return NextResponse.json(
+        { 
+          error: 'Serviço de email temporariamente indisponível',
+          details: 'RESEND_API_KEY não configurada' 
+        },
+        { status: 503 }
+      )
+    }
+
     const body: EmailRequest = await request.json()
     const { type, to, reservationData } = body
 
@@ -61,7 +81,7 @@ export async function POST(request: NextRequest) {
     })
 
     if (error) {
-      console.error('Erro ao enviar email:', error)
+      console.error('❌ Erro ao enviar email:', error)
       return NextResponse.json(
         { error: 'Erro ao enviar email', details: error },
         { status: 500 }
@@ -69,7 +89,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Log enviado com sucesso
-    console.log('Email enviado:', {
+    console.log('✅ Email enviado:', {
       type,
       recipient: to,
       emailId: data?.id,
@@ -83,12 +103,21 @@ export async function POST(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('Erro na API de email:', error)
+    console.error('❌ Erro na API de email:', error)
     return NextResponse.json(
-      { error: 'Erro interno do servidor' },
+      { error: 'Erro interno do servidor', details: error instanceof Error ? error.message : 'Erro desconhecido' },
       { status: 500 }
     )
   }
+}
+
+// Função para verificar status do serviço de email
+export async function GET() {
+  return NextResponse.json({
+    status: resend ? 'ok' : 'misconfigured',
+    hasApiKey: !!RESEND_API_KEY,
+    message: resend ? 'Serviço de email funcionando' : 'API key do Resend não configurada'
+  })
 }
 
 function generateConfirmationEmail(reservationData: any): string {
