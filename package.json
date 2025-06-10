@@ -9,8 +9,7 @@
     "lint": "next lint",
     "type-check": "tsc --noEmit",
     "build:check": "npm run type-check && npm run build",
-    "clean": "rmdir /s /q .next 2>nul & rmdir /s /q out 2>nul & rmdir /s /q node_modules\\.cache 2>nul & echo Limpeza concluida",
-    "postinstall": "patch-package"
+    "clean": "rmdir /s /q .next 2>nul & rmdir /s /q out 2>nul & rmdir /s /q node_modules\\.cache 2>nul & echo Limpeza concluida"
   },
   "engines": {
     "node": ">=18.0.0",
@@ -54,8 +53,7 @@
   "devDependencies": {
     "critters": "^0.0.23",
     "eslint": "^8",
-    "eslint-config-next": "14.0.4",
-    "patch-package": "^8.0.0"
+    "eslint-config-next": "14.0.4"
   },
   "overrides": {
     "@types/react": "^18",
