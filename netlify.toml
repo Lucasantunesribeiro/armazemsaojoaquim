@@ -7,16 +7,11 @@
   NODE_ENV = "production"
   NEXT_TELEMETRY_DISABLED = "1"
   NEXT_PUBLIC_SITE_URL = "https://armazemsaojoaquim.netlify.app"
-  # Resend API Key será configurada via dashboard Netlify
-  # RESEND_API_KEY = "configured_in_netlify_dashboard"
+  NPM_FLAGS = "--legacy-peer-deps"
 
-# Plugin Next.js para Netlify - Agora com SSR
+# Plugin Next.js para Netlify
 [[plugins]]
   package = "@netlify/plugin-nextjs"
-
-# Configuração das funções serverless
-[functions]
-  node_bundler = "esbuild"
 
 # Headers de segurança
 [[headers]]
@@ -53,22 +48,4 @@
 [[headers]]
   for = "/api/*"
   [headers.values]
-    Cache-Control = "no-cache, no-store, must-revalidate"
-
-# Configurações de otimização
-[build.processing]
-  skip_processing = false
-
-[build.processing.css]
-  bundle = true
-  minify = true
-
-[build.processing.js]
-  bundle = true
-  minify = true
-
-[build.processing.html]
-  pretty_urls = true
-
-[build.processing.images]
-  compress = true 
+    Cache-Control = "no-cache, no-store, must-revalidate" 

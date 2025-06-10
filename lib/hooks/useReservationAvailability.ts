@@ -1,6 +1,10 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../supabase'
-import { formatDate } from '../utils'
+
+// Função simples para formatar data
+const formatDate = (date: Date): string => {
+  return date.toISOString().split('T')[0]
+}
 
 interface TimeSlot {
   time: string
@@ -212,8 +216,6 @@ export function useReservationAvailability() {
     isDateFullyBooked,
     checkSpecificTimeAvailability,
     getNextAvailableDate,
-    refreshAvailability,
-    businessHours,
-    maxReservationsPerSlot
+    refreshAvailability
   }
 } 
