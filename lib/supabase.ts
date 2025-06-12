@@ -1,12 +1,15 @@
 import { createClient } from '@supabase/supabase-js'
 import { Database } from '../types/database.types'
 
-// Configuração direta das variáveis de ambiente
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
+// Configuração com fallbacks para evitar erros de build
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co'
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder-key'
 
-if (!supabaseUrl || !supabaseAnonKey) {
-  console.warn('⚠️ Supabase credentials not configured')
+// Verificar se as credenciais estão configuradas corretamente
+const isConfigured = supabaseUrl !== 'https://placeholder.supabase.co' && supabaseAnonKey !== 'placeholder-key'
+
+if (!isConfigured && typeof window !== 'undefined') {
+  console.warn('⚠️ Supabase credentials not configured. Some features may not work properly.')
 }
 
 export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
@@ -18,3 +21,6 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
 
 export const createClientComponentClient = () => supabase
 export const createServerComponentClient = () => supabase
+
+// Função utilitária para verificar se o Supabase está configurado
+export const isSupabaseConfigured = () => isConfigured
