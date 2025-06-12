@@ -135,6 +135,7 @@ export const reservasApi = {
       .single()
 
     if (error) throw error
+    if (!data) throw new Error('Falha ao criar reserva')
     return data
   },
 
@@ -148,6 +149,7 @@ export const reservasApi = {
       .single()
 
     if (error) throw error
+    if (!data) throw new Error('Falha ao atualizar reserva')
     return data
   },
 

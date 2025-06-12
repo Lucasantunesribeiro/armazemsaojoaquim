@@ -172,7 +172,78 @@ const nextConfig = {
       use: ['@svgr/webpack'],
     })
 
+    // Resolver problemas com módulos CSS inexistentes
+    config.resolve.fallback = {
+      ...config.resolve.fallback,
+      'swiper/css': false,
+      'swiper/components/core/core.min.css': false,
+    }
+
     // Otimizar bundle size
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      '@': require('path').resolve(__dirname),
+    }
+
+    // Configuração para resolver problemas de SSR
+    if (isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        'self': false,
+        'window': false,
+        'document': false,
+        'navigator': false,
+        'location': false,
+        'localStorage': false,
+        'sessionStorage': false,
+        'swiper/css': false,
+        'swiper/components/core/core.min.css': false,
+      }
+    }
+
+    // Garantir que polyfills sejam carregados primeiro
+    const originalEntry = config.entry
+    config.entry = async () => {
+      const entries = await originalEntry()
+      
+      if (entries['main.js'] && !entries['main.js'].includes('./lib/polyfills.ts')) {
+        entries['main.js'].unshift('./lib/polyfills.ts')
+      }
+      
+      return entries
+    }
+
+    // Definir self globalmente para resolver o erro
+    config.plugins = config.plugins || []
+    
+    if (isServer) {
+      // Adicionar plugin para definir self no servidor
+      const webpack = require('webpack')
+      config.plugins.push(
+        new webpack.DefinePlugin({
+          'self': 'global',
+          'window': 'global',
+          'document': '{}',
+          'navigator': '{ userAgent: "Node.js" }',
+          'location': '{ href: "", hostname: "localhost" }'
+        })
+      )
+      
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        'self': false,
+        'window': false,
+        'document': false,
+        'navigator': false,
+        'location': false,
+        'localStorage': false,
+        'sessionStorage': false,
+        'swiper/css': false,
+        'swiper/components/core/core.min.css': false,
+      }
+    }
+
+    // Adicionar alias para resolver imports
     config.resolve.alias = {
       ...config.resolve.alias,
       '@': require('path').resolve(__dirname),

@@ -1,4 +1,6 @@
-// Mock do Supabase para build sem configuração
+import type { Database } from '@/types/database.types'
+
+// Mock completo do Supabase para evitar problemas de build
 const createMockClient = () => {
   const mockQuery = {
     data: [],
@@ -74,25 +76,11 @@ const createMockClient = () => {
   }
 }
 
-// Configuração com fallbacks para evitar erros de build
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co'
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder-key'
-
-// Verificar se as credenciais estão configuradas corretamente
-const isConfigured = supabaseUrl !== 'https://placeholder.supabase.co' && 
-                    supabaseAnonKey !== 'placeholder-key' &&
-                    supabaseUrl.includes('supabase.co')
-
 // Sempre usar mock client para evitar problemas de build
-const supabase = createMockClient()
-
-export { supabase }
-
-export const createClientComponentClient = () => supabase
-export const createServerComponentClient = () => supabase
+export const supabase = createMockClient()
 
 // Função para verificar se o Supabase está configurado
-export const isSupabaseConfigured = () => isConfigured
+export const isSupabaseConfigured = () => false
 
 // Função para obter status da conexão
 export const getSupabaseStatus = async () => {
@@ -102,3 +90,12 @@ export const getSupabaseStatus = async () => {
     data: null
   }
 }
+
+// Função para criar cliente (sempre retorna mock)
+export const getSupabaseClient = () => supabase
+
+// Exportar o cliente padrão para compatibilidade
+export const supabaseClientDefault = supabase
+
+// Função para criar mock client
+export const createMockSupabaseClient = () => supabase

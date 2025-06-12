@@ -184,15 +184,15 @@ export function usePerformance() {
         path,
         duration,
         metrics: metrics,
-        userAgent: navigator.userAgent,
-        viewport: {
+        userAgent: typeof window !== 'undefined' ? navigator.userAgent : 'server',
+        viewport: typeof window !== 'undefined' ? {
           width: window.innerWidth,
           height: window.innerHeight
-        },
+        } : { width: 0, height: 0 },
         connection: connectionInfo
       })
     }
-  }, [metrics, connectionInfo, trackInteraction])
+  }, [trackInteraction, metrics, connectionInfo])
 
   // Detectar slow pages
   const detectSlowPages = useCallback(() => {

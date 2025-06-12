@@ -40,6 +40,8 @@ export default function AuthPage() {
 
   // Verificar se há erro na URL
   useEffect(() => {
+    if (typeof window === 'undefined') return
+    
     const urlParams = new URLSearchParams(window.location.search)
     const error = urlParams.get('error')
     if (error) {
@@ -94,7 +96,7 @@ export default function AuthPage() {
   const handleRegister = async (data: RegisterForm) => {
     setLoading(true)
     try {
-      const redirectUrl = window.location.hostname === 'localhost' 
+      const redirectUrl = typeof window !== 'undefined' && window.location.hostname === 'localhost' 
         ? `${window.location.origin}/auth/callback`
         : 'https://armazemsaojoaquim.netlify.app/auth/callback'
 
@@ -137,7 +139,7 @@ export default function AuthPage() {
   const handleGoogleLogin = async () => {
     setLoading(true)
     try {
-      const redirectUrl = window.location.hostname === 'localhost' 
+      const redirectUrl = typeof window !== 'undefined' && window.location.hostname === 'localhost' 
         ? `${window.location.origin}/auth/callback`
         : 'https://armazemsaojoaquim.netlify.app/auth/callback'
 
@@ -176,7 +178,7 @@ export default function AuthPage() {
 
     setResendingEmail(true)
     try {
-      const redirectUrl = window.location.hostname === 'localhost' 
+      const redirectUrl = typeof window !== 'undefined' && window.location.hostname === 'localhost' 
         ? `${window.location.origin}/auth/callback`
         : 'https://armazemsaojoaquim.netlify.app/auth/callback'
 

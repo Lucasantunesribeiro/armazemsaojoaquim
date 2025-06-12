@@ -70,13 +70,15 @@ const AboutSection = () => {
 
   useEffect(() => {
     const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true)
-          setTimeout(() => setStatsAnimated(true), 500)
-        }
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && !statsAnimated) {
+            setIsVisible(true)
+            setTimeout(() => setStatsAnimated(true), 500)
+          }
+        })
       },
-      { threshold: 0.2 }
+      { threshold: 0.3 }
     )
 
     if (sectionRef.current) {
@@ -84,7 +86,7 @@ const AboutSection = () => {
     }
 
     return () => observer.disconnect()
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [])
 
   useEffect(() => {
     if (isVisible) {

@@ -300,26 +300,12 @@ export function useSystemMonitoring() {
   useEffect(() => {
     const cleanupFn = startMonitoring()
     return cleanupFn
-  }, []) // Array vazio para executar apenas uma vez
+  }, [startMonitoring])
 
   // Cleanup quando o componente for desmontado
   useEffect(() => {
     return cleanup
   }, [cleanup])
-
-  useEffect(() => {
-    if (isMonitoring) {
-      startMonitoring()
-    }
-
-    return () => {
-      if (intervalsRef.current) {
-        Object.values(intervalsRef.current).forEach(interval => {
-          if (interval) clearInterval(interval)
-        })
-      }
-    }
-  }, [isMonitoring]) // eslint-disable-line react-hooks/exhaustive-deps
 
   return {
     metrics,
