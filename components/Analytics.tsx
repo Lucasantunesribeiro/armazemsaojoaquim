@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
-import { getCLS, getFID, getFCP, getLCP, getTTFB } from 'web-vitals'
 import { ENV } from '../lib/config'
 
 interface WebVitalMetric {
@@ -32,38 +31,12 @@ function sendToAnalytics(metric: WebVitalMetric) {
       non_interaction: true,
     })
   }
-
-  // Send to custom analytics endpoint (disabled for now)
-  // if (typeof window !== 'undefined') {
-  //   fetch('/api/analytics', {
-  //     method: 'POST',
-  //     headers: {
-  //       'Content-Type': 'application/json',
-  //     },
-  //     body: JSON.stringify({
-  //       type: 'web-vital',
-  //       name: metric.name,
-  //       value: metric.value,
-  //       id: metric.id,
-  //       rating: metric.rating,
-  //       url: window.location.href,
-  //       timestamp: Date.now(),
-  //     }),
-  //   }).catch(console.error)
-  // }
 }
 
-// Observe performance metrics
+// Observe performance metrics - versão simplificada
 function observePerformance() {
-  // Web Vitals
-  getCLS(sendToAnalytics)
-  getFID(sendToAnalytics)
-  getFCP(sendToAnalytics)
-  getLCP(sendToAnalytics)
-  getTTFB(sendToAnalytics)
-
-  // Custom performance measurements
-  if (typeof window !== 'undefined' && 'performance' in window) {
+  // Custom performance measurements usando PerformanceObserver
+  if (typeof window !== 'undefined' && 'performance' in window && 'PerformanceObserver' in window) {
     // Time to Interactive (TTI) approximation
     const observer = new PerformanceObserver((list) => {
       for (const entry of list.getEntries()) {
@@ -77,14 +50,23 @@ function observePerformance() {
         }
       }
     })
-    observer.observe({ entryTypes: ['measure'] })
+    
+    try {
+      observer.observe({ entryTypes: ['measure'] })
+    } catch (e) {
+      console.warn('PerformanceObserver não suportado:', e)
+    }
 
     // Mark TTI when page becomes interactive
     window.addEventListener('load', () => {
       setTimeout(() => {
-        performance.mark('custom-tti-start')
-        performance.mark('custom-tti-end')
-        performance.measure('custom-tti', 'custom-tti-start', 'custom-tti-end')
+        try {
+          performance.mark('custom-tti-start')
+          performance.mark('custom-tti-end')
+          performance.measure('custom-tti', 'custom-tti-start', 'custom-tti-end')
+        } catch (e) {
+          console.warn('Performance API não suportada:', e)
+        }
       }, 0)
     })
   }
