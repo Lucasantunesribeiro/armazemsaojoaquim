@@ -24,6 +24,8 @@ export const useHeader = () => {
 
   // Prevenir scroll quando menu mobile estiver aberto
   useEffect(() => {
+    if (typeof document === 'undefined') return
+
     if (isMenuOpen) {
       document.body.style.overflow = 'hidden'
     } else {

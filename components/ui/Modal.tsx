@@ -26,6 +26,8 @@ const Modal: React.FC<ModalProps> = ({
   const modalRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
+    if (typeof document === 'undefined') return
+
     const handleEscape = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
         onClose()
@@ -56,7 +58,7 @@ const Modal: React.FC<ModalProps> = ({
     xl: 'max-w-4xl',
   }
 
-  if (!isOpen) return null
+  if (!isOpen || typeof document === 'undefined') return null
 
   return ReactDOM.createPortal(
     <div
