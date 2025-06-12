@@ -160,7 +160,7 @@ export default function ReservasPage() {
 
       if (error) {
         console.error('Erro ao criar reserva:', error)
-        toast.error('Erro ao criar reserva: ' + error.message)
+        toast.error('Erro ao criar reserva: ' + (error as any)?.message || 'Erro desconhecido')
         return
       }
 
@@ -180,7 +180,7 @@ export default function ReservasPage() {
             time: formData.time,
             guests: formData.guests,
             observations: formData.observations,
-            reservationId: data[0].id
+            reservationId: (data as any)?.[0]?.id || 'unknown'
           }
         })
       })
