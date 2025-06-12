@@ -1,40 +1,55 @@
 // Polyfills para compatibilidade com Supabase no Next.js
 // DEVE ser importado ANTES de qualquer outro código
 
-// Fix para 'globalThis is not defined'
-if (typeof globalThis === 'undefined') {
-  if (typeof global !== 'undefined') {
-    ;(global as any).globalThis = global
-  } else if (typeof window !== 'undefined') {
-    ;(window as any).globalThis = window
-  } else if (typeof self !== 'undefined') {
-    ;(self as any).globalThis = self
-  } else {
-    // Fallback para ambientes muito restritivos
-    ;(this as any).globalThis = this
+// Função para detectar ambiente de forma segura
+function getEnvironment() {
+  try {
+    if (typeof window !== 'undefined') return 'browser'
+    if (typeof global !== 'undefined') return 'server'
+    return 'unknown'
+  } catch {
+    return 'unknown'
   }
 }
 
-// Fix para 'self is not defined' - CRÍTICO para Supabase
-if (typeof self === 'undefined') {
-  if (typeof global !== 'undefined') {
-    ;(global as any).self = global
-  } else if (typeof window !== 'undefined') {
-    ;(global as any).self = window
-  } else {
-    // Criar um objeto self mínimo
-    ;(global as any).self = {
-      location: { href: '' },
-      navigator: { userAgent: 'Node.js' },
-      document: { title: '' },
-      addEventListener: () => {},
-      removeEventListener: () => {},
-      dispatchEvent: () => {},
-      setTimeout: (global as any).setTimeout || (() => {}),
-      clearTimeout: (global as any).clearTimeout || (() => {}),
-      setInterval: (global as any).setInterval || (() => {}),
-      clearInterval: (global as any).clearInterval || (() => {})
+const environment = getEnvironment()
+const isServer = environment === 'server'
+
+// Fix para 'globalThis is not defined'
+try {
+  if (typeof globalThis === 'undefined') {
+    if (typeof global !== 'undefined') {
+      ;(global as any).globalThis = global
+    } else if (typeof window !== 'undefined') {
+      ;(window as any).globalThis = window
     }
+  }
+} catch (error) {
+  // Ignorar erro silenciosamente
+}
+
+// Fix para 'self is not defined' - CRÍTICO para Supabase
+// Só aplicar no servidor de forma segura
+if (isServer) {
+  try {
+    if (typeof self === 'undefined' && typeof global !== 'undefined') {
+      // Criar um objeto self mínimo apenas no servidor
+      const mockSelf = {
+        location: { href: '', hostname: 'localhost', pathname: '/', search: '' },
+        navigator: { userAgent: 'Node.js' },
+        document: { title: '' },
+        addEventListener: () => {},
+        removeEventListener: () => {},
+        dispatchEvent: () => {},
+        setTimeout: (global as any).setTimeout || setTimeout,
+        clearTimeout: (global as any).clearTimeout || clearTimeout,
+        setInterval: (global as any).setInterval || setInterval,
+        clearInterval: (global as any).clearInterval || clearInterval
+      }
+      ;(global as any).self = mockSelf
+    }
+  } catch (error) {
+    // Ignorar erro silenciosamente durante o build
   }
 }
 
@@ -111,12 +126,19 @@ if (typeof localStorage === 'undefined' && typeof global !== 'undefined') {
   ;(global as any).sessionStorage = storage
 }
 
-// Garantir que o polyfill foi aplicado
-console.log('Polyfills aplicados:', {
-  globalThis: typeof globalThis !== 'undefined',
-  self: typeof self !== 'undefined',
-  global: typeof global !== 'undefined',
-  window: typeof window !== 'undefined'
-})
+// Garantir que o polyfill foi aplicado (apenas em desenvolvimento)
+if (process.env.NODE_ENV === 'development') {
+  try {
+    console.log('Polyfills aplicados:', {
+      environment,
+      globalThis: typeof globalThis !== 'undefined',
+      self: typeof self !== 'undefined',
+      global: typeof global !== 'undefined',
+      window: typeof window !== 'undefined'
+    })
+  } catch {
+    // Ignorar erro silenciosamente
+  }
+}
 
 export {} 

@@ -17,8 +17,8 @@
     "clean": "rmdir /s /q .next 2>nul & rmdir /s /q out 2>nul & rmdir /s /q node_modules\\.cache 2>nul & echo Limpeza concluida"
   },
   "engines": {
-    "node": ">=18.0.0",
-    "npm": ">=8.0.0"
+    "node": "20.x",
+    "npm": ">=10.0.0"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.3.2",

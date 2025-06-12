@@ -1,3 +1,6 @@
+// Carregar polyfills ANTES de qualquer coisa
+require('./lib/polyfills-minimal.js')
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // Configurações de performance
@@ -133,12 +136,19 @@ const nextConfig = {
       '@': require('path').resolve(__dirname),
     }
 
-    // Adicionar polyfill para self
+    // Prevenir problemas com Supabase no servidor
     if (isServer) {
-      config.externals = config.externals || []
-      config.externals.push({
-        '@supabase/supabase-js': '@supabase/supabase-js'
-      })
+      // Não externalizar completamente o Supabase, apenas configurar fallbacks
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        'self': false,
+        'window': false,
+        'document': false,
+        'navigator': false,
+        'location': false,
+        'localStorage': false,
+        'sessionStorage': false,
+      }
     }
 
     // Otimizações de produção

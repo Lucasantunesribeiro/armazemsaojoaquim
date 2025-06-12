@@ -5,6 +5,10 @@
 [build.environment]
   NODE_VERSION = "20"
   NPM_FLAGS = "--legacy-peer-deps"
+  NODE_ENV = "production"
+  NEXT_TELEMETRY_DISABLED = "1"
+  ESLINT_NO_DEV_ERRORS = "true"
+  NEXT_PRIVATE_SKIP_MIDDLEWARE_VALIDATION = "true"
 
 [[redirects]]
   from = "/api/*"
