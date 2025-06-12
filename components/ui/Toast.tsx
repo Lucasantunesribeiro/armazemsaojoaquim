@@ -165,7 +165,7 @@ export const ToastContainer: React.FC = () => {
     return unsubscribe
   }, [])
 
-  if (typeof window === 'undefined') {
+  if (typeof window === 'undefined' || typeof document === 'undefined') {
     return null
   }
 
