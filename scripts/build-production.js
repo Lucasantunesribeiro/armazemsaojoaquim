@@ -7,14 +7,21 @@ const path = require('path')
 console.log('🚀 Iniciando build de produção otimizado...\n')
 
 // Função para executar comandos
-const exec = (command, description) => {
+const exec = (command, description, optional = false) => {
   console.log(`📦 ${description}...`)
   try {
     execSync(command, { stdio: 'inherit' })
     console.log(`✅ ${description} concluído\n`)
+    return true
   } catch (error) {
-    console.error(`❌ Erro em ${description}:`, error.message)
-    process.exit(1)
+    if (optional) {
+      console.warn(`⚠️  ${description} falhou (opcional):`, error.message)
+      console.log(`ℹ️  Continuando sem ${description.toLowerCase()}...\n`)
+      return false
+    } else {
+      console.error(`❌ Erro em ${description}:`, error.message)
+      process.exit(1)
+    }
   }
 }
 
@@ -50,23 +57,32 @@ try {
   console.log('✅ Sharp encontrado')
 } catch (error) {
   console.log('📦 Instalando Sharp...')
-  exec('npm install sharp', 'Instalação do Sharp')
+  const sharpInstalled = exec('npm install sharp', 'Instalação do Sharp', true)
+  if (!sharpInstalled) {
+    console.log('ℹ️  Continuando sem Sharp - geração de ícones será pulada')
+  }
 }
 
 // Criar diretórios necessários
 ensureDir('public')
 ensureDir('scripts')
 
-// 1. Gerar ícones PWA
-if (fileExists('public/favicon.svg')) {
-  exec('node scripts/generate-icons.js', 'Geração de ícones PWA')
+// 1. Gerar ícones PWA (opcional)
+if (fileExists('scripts/generate-icons.js')) {
+  const iconGenerated = exec('node scripts/generate-icons.js', 'Geração de ícones PWA', true)
+  
+  // Se o script principal falhar, tentar fallback
+  if (!iconGenerated && fileExists('scripts/generate-icons-fallback.js')) {
+    console.log('🔄 Tentando script de fallback para ícones...')
+    exec('node scripts/generate-icons-fallback.js', 'Verificação básica de ícones', true)
+  }
 } else {
-  console.log('⚠️  favicon.svg não encontrado, pulando geração de ícones')
+  console.log('⚠️  Scripts de ícones não encontrados, pulando geração de ícones')
 }
 
-// 2. Otimizar imagens
+// 2. Otimizar imagens (opcional)
 if (fileExists('scripts/optimize-images.js')) {
-  exec('node scripts/optimize-images.js', 'Otimização de imagens')
+  exec('node scripts/optimize-images.js', 'Otimização de imagens', true)
 } else {
   console.log('⚠️  Script de otimização de imagens não encontrado')
 }

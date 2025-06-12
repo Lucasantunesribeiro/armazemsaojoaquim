@@ -1,8 +1,34 @@
 #!/usr/bin/env node
 
-const sharp = require('sharp')
 const fs = require('fs')
 const path = require('path')
+
+// Função para verificar e carregar sharp de forma segura
+function loadSharp() {
+  try {
+    return require('sharp')
+  } catch (error) {
+    console.warn('⚠️  Sharp não está disponível. Tentando instalar...')
+    
+    try {
+      const { execSync } = require('child_process')
+      execSync('npm install sharp', { stdio: 'inherit' })
+      return require('sharp')
+    } catch (installError) {
+      console.error('❌ Não foi possível instalar ou carregar Sharp:', installError.message)
+      console.log('ℹ️  Continuando sem geração de ícones...')
+      return null
+    }
+  }
+}
+
+const sharp = loadSharp()
+
+// Se sharp não estiver disponível, pular geração de ícones
+if (!sharp) {
+  console.log('ℹ️  Pulando geração de ícones (Sharp não disponível)')
+  process.exit(0)
+}
 
 console.log('🎨 Gerando ícones PWA - Preset Minimal 2023...\n')
 
