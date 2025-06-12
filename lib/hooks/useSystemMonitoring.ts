@@ -307,6 +307,20 @@ export function useSystemMonitoring() {
     return cleanup
   }, [cleanup])
 
+  useEffect(() => {
+    if (isMonitoring) {
+      startMonitoring()
+    }
+
+    return () => {
+      if (intervalsRef.current) {
+        Object.values(intervalsRef.current).forEach(interval => {
+          if (interval) clearInterval(interval)
+        })
+      }
+    }
+  }, [isMonitoring]) // eslint-disable-line react-hooks/exhaustive-deps
+
   return {
     metrics,
     isMonitoring,

@@ -1,62 +1,100 @@
 import type { Metadata, Viewport } from 'next'
-import { Inter, Playfair_Display } from 'next/font/google'
-import { Toaster } from 'react-hot-toast'
+import { Inter } from 'next/font/google'
 import './globals.css'
-import ClientHeader from '../components/layout/ClientHeader'
-import { ClientFooter } from '../components/ClientComponents'
-import SupabaseProvider from '../components/providers/SupabaseProvider'
-import { ThemeProvider } from '../components/providers/ThemeProvider'
-import SystemHealth from '../components/ui/SystemHealth'
+import '@/lib/polyfills'
+import { SupabaseProvider } from '@/components/providers/SupabaseProvider'
+import { ThemeProvider } from '@/components/providers/ThemeProvider'
+import Header from '@/components/layout/Header'
+import Analytics from '@/components/Analytics'
+import { Suspense } from 'react'
 
+// Otimizar fonte com display swap
 const inter = Inter({ 
   subsets: ['latin'],
   display: 'swap',
-  variable: '--font-inter',
-  preload: true
+  preload: true,
+  fallback: ['system-ui', 'arial'],
+  adjustFontFallback: true,
+  variable: '--font-inter'
 })
 
-const playfair = Playfair_Display({ 
-  subsets: ['latin'],
-  display: 'swap',
-  variable: '--font-playfair',
-  preload: true
-})
-
+// Configurações de viewport otimizadas
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   maximumScale: 5,
   userScalable: true,
   themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#FDF6E3' },
-    { media: '(prefers-color-scheme: dark)', color: '#0F172A' }
+    { media: '(prefers-color-scheme: light)', color: '#8B4513' },
+    { media: '(prefers-color-scheme: dark)', color: '#8B4513' }
   ],
-  colorScheme: 'light dark'
+  colorScheme: 'light dark',
+  viewportFit: 'cover'
 }
 
+// Metadata otimizada para SEO e PWA
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://armazemsaojoaquim.netlify.app'),
   title: {
-    default: 'Armazém São Joaquim - Tradição Gastronômica desde 1854 | Santa Teresa - Rio de Janeiro',
+    default: 'Armazém São Joaquim - Restaurante Histórico em Santa Teresa',
     template: '%s | Armazém São Joaquim'
   },
-  description: 'Descubra o Armazém São Joaquim, um patrimônio histórico de 1854 no coração de Santa Teresa. Culinária tradicional brasileira, drinks artesanais e 170 anos de história no Rio de Janeiro.',
+  description: 'Restaurante histórico em Santa Teresa com culinária tradicional brasileira, vista panorâmica do Rio de Janeiro e ambiente aconchegante. Reserve sua mesa!',
   keywords: [
-    'Armazém São Joaquim',
-    'Santa Teresa',
-    'Rio de Janeiro',
-    'Restaurante Histórico',
-    'Culinária Tradicional',
-    '1854',
-    'Patrimônio Histórico',
-    'Drinks Artesanais',
-    'Gastronomia Brasileira',
-    'Reservas',
-    'Bondinho Santa Teresa'
+    'restaurante santa teresa',
+    'culinária brasileira',
+    'vista panorâmica rio',
+    'restaurante histórico',
+    'gastronomia carioca',
+    'reserva mesa',
+    'armazém são joaquim'
   ],
   authors: [{ name: 'Armazém São Joaquim' }],
   creator: 'Armazém São Joaquim',
   publisher: 'Armazém São Joaquim',
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://armazemsaojoaquim.netlify.app'),
+  alternates: {
+    canonical: '/',
+    languages: {
+      'pt-BR': '/',
+    },
+  },
+  openGraph: {
+    type: 'website',
+    locale: 'pt_BR',
+    url: '/',
+    siteName: 'Armazém São Joaquim',
+    title: 'Armazém São Joaquim - Restaurante Histórico em Santa Teresa',
+    description: 'Restaurante histórico em Santa Teresa com culinária tradicional brasileira e vista panorâmica do Rio de Janeiro',
+    images: [
+      {
+        url: '/images/armazem-fachada-historica.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'Fachada histórica do Armazém São Joaquim em Santa Teresa',
+        type: 'image/jpeg',
+      },
+      {
+        url: '/images/santa-teresa-vista-panoramica.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'Vista panorâmica de Santa Teresa a partir do Armazém',
+        type: 'image/jpeg',
+      }
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Armazém São Joaquim - Restaurante Histórico',
+    description: 'Culinária tradicional brasileira com vista panorâmica em Santa Teresa',
+    images: ['/images/armazem-fachada-historica.jpg'],
+    creator: '@armazemsaojoaquim',
+    site: '@armazemsaojoaquim',
+  },
   robots: {
     index: true,
     follow: true,
@@ -70,266 +108,249 @@ export const metadata: Metadata = {
       'max-snippet': -1,
     },
   },
-  alternates: {
-    canonical: '/',
-  },
-  openGraph: {
-    type: 'website',
-    locale: 'pt_BR',
-    url: '/',
-    siteName: 'Armazém São Joaquim',
-    title: 'Armazém São Joaquim - Tradição Gastronômica desde 1854',
-    description: 'Patrimônio histórico de Santa Teresa com 170 anos de tradição. Culinária brasileira autêntica e drinks artesanais no Rio de Janeiro.',
-    images: [
-      {
-        url: '/images/armazem-fachada-historica.jpg',
-        width: 1200,
-        height: 630,
-        alt: 'Fachada histórica do Armazém São Joaquim - Construção de 1854 em Santa Teresa',
-        type: 'image/jpeg',
-      },
-      {
-        url: '/images/armazem-interior-aconchegante.jpg',
-        width: 1200,
-        height: 630,
-        alt: 'Interior aconchegante do Armazém São Joaquim',
-        type: 'image/jpeg',
-      }
-    ],
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'Armazém São Joaquim - Tradição desde 1854',
-    description: '170 anos de história gastronômica em Santa Teresa, Rio de Janeiro.',
-    images: ['/images/armazem-fachada-historica.jpg'],
-    creator: '@armazemsaojoaquim',
-    site: '@armazemsaojoaquim'
-  },
   verification: {
-    google: 'google-verification-code',
-    yandex: 'yandex-verification-code',
-    yahoo: 'yahoo-verification-code',
-    other: {
-      me: ['mailto:armazemsaojoaquimoficial@gmail.com']
-    }
+    google: process.env.GOOGLE_VERIFICATION,
+    yandex: process.env.YANDEX_VERIFICATION,
+    yahoo: process.env.YAHOO_VERIFICATION,
   },
-  category: 'Restaurant',
-  classification: 'Business',
+  category: 'restaurant',
+  classification: 'business',
   referrer: 'origin-when-cross-origin',
-  formatDetection: {
-    email: false,
-    address: false,
-    telephone: false,
-  },
   generator: 'Next.js',
   applicationName: 'Armazém São Joaquim',
   appleWebApp: {
     capable: true,
-    statusBarStyle: 'default',
     title: 'Armazém São Joaquim',
+    statusBarStyle: 'default',
+    startupImage: [
+      {
+        url: '/apple-startup-640x1136.png',
+        media: '(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2)',
+      },
+      {
+        url: '/apple-startup-750x1334.png',
+        media: '(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2)',
+      },
+      {
+        url: '/apple-startup-1242x2208.png',
+        media: '(device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3)',
+      },
+    ],
+  },
+  manifest: '/manifest.json',
+  icons: {
+    icon: [
+      { url: '/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
+      { url: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
+      { url: '/favicon-48x48.png', sizes: '48x48', type: 'image/png' },
+      { url: '/favicon.svg', type: 'image/svg+xml' },
+    ],
+    shortcut: '/favicon.ico',
+    apple: [
+      { url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
+    ],
+    other: [
+      {
+        rel: 'icon',
+        url: '/favicon.ico',
+      },
+      {
+        rel: 'mask-icon',
+        url: '/favicon.svg',
+        color: '#8B4513',
+      },
+    ],
   },
   other: {
     'mobile-web-app-capable': 'yes',
     'apple-mobile-web-app-capable': 'yes',
     'apple-mobile-web-app-status-bar-style': 'default',
-    'apple-mobile-web-app-title': 'Armazém São Joaquim',
+    'apple-mobile-web-app-title': 'Armazém SJ',
     'application-name': 'Armazém São Joaquim',
-    'msapplication-TileColor': '#D4AF37',
-    'msapplication-TileImage': '/icons/mstile-144x144.png',
-    'theme-color': '#FDF6E3'
-  }
+    'msapplication-TileColor': '#8B4513',
+    'msapplication-config': '/browserconfig.xml',
+    'theme-color': '#8B4513',
+  },
 }
 
-// Structured Data para SEO
-const jsonLd = {
-  '@context': 'https://schema.org',
-  '@type': 'Restaurant',
-  name: 'Armazém São Joaquim',
-  description: 'Restaurante histórico em Santa Teresa funcionando desde 1854, oferecendo culinária tradicional brasileira e drinks artesanais.',
-  image: [
-    'https://armazemsaojoaquim.netlify.app/images/armazem-fachada-historica.jpg',
-    'https://armazemsaojoaquim.netlify.app/images/armazem-interior-aconchegante.jpg'
-  ],
-  '@id': 'https://armazemsaojoaquim.netlify.app',
-  url: 'https://armazemsaojoaquim.netlify.app',
-  telephone: '+55-21-XXXX-XXXX',
-  priceRange: '$$',
-  servesCuisine: ['Brazilian', 'Traditional'],
-  address: {
-    '@type': 'PostalAddress',
-    streetAddress: 'Rua Áurea, 26',
-    addressLocality: 'Santa Teresa',
-    addressRegion: 'RJ',
-    postalCode: '20241-220',
-    addressCountry: 'BR'
-  },
-  geo: {
-    '@type': 'GeoCoordinates',
-    latitude: -22.9168,
-    longitude: -43.1890
-  },
-  openingHoursSpecification: [
-    {
-      '@type': 'OpeningHoursSpecification',
-      dayOfWeek: ['Tuesday', 'Wednesday', 'Thursday', 'Friday'],
-      opens: '12:00',
-      closes: '22:00'
-    },
-    {
-      '@type': 'OpeningHoursSpecification',
-      dayOfWeek: ['Saturday', 'Sunday'],
-      opens: '12:00',
-      closes: '23:00'
-    }
-  ],
-  menu: 'https://armazemsaojoaquim.netlify.app/menu',
-  acceptsReservations: true,
-  foundingDate: '1854',
-  awards: ['Patrimônio Histórico de Santa Teresa'],
-  aggregateRating: {
-    '@type': 'AggregateRating',
-    ratingValue: '4.8',
-    reviewCount: '1000',
-    bestRating: '5',
-    worstRating: '1'
-  },
-  sameAs: [
-    'https://www.instagram.com/armazemsaojoaquim',
-    'https://www.facebook.com/armazemsaojoaquim',
-    'https://www.tripadvisor.com.br/Restaurant_Review-g303506'
-  ]
-}
-
-interface RootLayoutProps {
-  children: React.ReactNode
-}
-
-export default function RootLayout({ children }: RootLayoutProps) {
+// Componente de preload crítico
+function CriticalResourcePreloader() {
   return (
-    <html 
-      lang="pt-BR" 
-      className={`${inter.variable} ${playfair.variable}`}
-      suppressHydrationWarning
-    >
+    <>
+      {/* Preload de recursos críticos */}
+      <link
+        rel="preload"
+        href="/images/armazem-fachada-historica.jpg"
+        as="image"
+        type="image/jpeg"
+        fetchPriority="high"
+      />
+      <link
+        rel="preload"
+        href="/images/santa-teresa-vista-panoramica.jpg"
+        as="image"
+        type="image/jpeg"
+        fetchPriority="high"
+      />
+      
+      {/* DNS prefetch para recursos externos */}
+      <link rel="dns-prefetch" href="//fonts.googleapis.com" />
+      <link rel="dns-prefetch" href="//fonts.gstatic.com" />
+      <link rel="dns-prefetch" href="//supabase.co" />
+      <link rel="dns-prefetch" href="//netlify.app" />
+      
+      {/* Preconnect para recursos críticos */}
+      <link rel="preconnect" href="https://fonts.googleapis.com" crossOrigin="anonymous" />
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+      <link rel="preconnect" href={process.env.NEXT_PUBLIC_SUPABASE_URL} crossOrigin="anonymous" />
+      
+      {/* Service Worker registration */}
+      <script
+        dangerouslySetInnerHTML={{
+          __html: `
+            if ('serviceWorker' in navigator) {
+              window.addEventListener('load', function() {
+                navigator.serviceWorker.register('/sw.js', { scope: '/' })
+                  .then(function(registration) {
+                    console.log('SW registered: ', registration);
+                  })
+                  .catch(function(registrationError) {
+                    console.log('SW registration failed: ', registrationError);
+                  });
+              });
+            }
+          `,
+        }}
+      />
+    </>
+  )
+}
+
+// Componente de fallback para loading
+function LoadingFallback() {
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-100 flex items-center justify-center">
+      <div className="text-center">
+        <div className="w-16 h-16 border-4 border-amber-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+        <p className="text-amber-800 font-medium">Carregando Armazém São Joaquim...</p>
+      </div>
+    </div>
+  )
+}
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
+  return (
+    <html lang="pt-BR" className={inter.variable} suppressHydrationWarning>
       <head>
-        {/* DNS Prefetch */}
-        <link rel="dns-prefetch" href="//fonts.googleapis.com" />
-        <link rel="dns-prefetch" href="//fonts.gstatic.com" />
+        <CriticalResourcePreloader />
         
-        {/* Preconnect */}
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        
-        {/* Critical Resources */}
-        <link
-          rel="preload"
-          href="/images/armazem-fachada-historica.jpg"
-          as="image"
-          type="image/jpeg"
-        />
-        <link
-          rel="preload"
-          href="/images/logo.jpg"
-          as="image"
-          type="image/jpeg"
-        />
-        
-        {/* Manifest */}
-        <link rel="manifest" href="/manifest.json" />
-        
-        {/* Icons */}
-        <link rel="icon" href="/images/favicon.ico" type="image/svg+xml" />
-        <link rel="apple-touch-icon" href="/images/apple-touch-icon.png" />
-        
-        {/* Structured Data */}
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-        />
-        
-        {/* Performance Hints */}
+        {/* Meta tags adicionais para performance */}
         <meta httpEquiv="x-dns-prefetch-control" content="on" />
+        <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
         <meta name="format-detection" content="telephone=no, date=no, email=no, address=no" />
         
-        {/* Security */}
-        <meta httpEquiv="X-Content-Type-Options" content="nosniff" />
-        <meta httpEquiv="Referrer-Policy" content="strict-origin-when-cross-origin" />
-        <meta httpEquiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=()" />
+        {/* Structured Data para SEO */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Restaurant",
+              "name": "Armazém São Joaquim",
+              "description": "Restaurante histórico em Santa Teresa com culinária tradicional brasileira",
+              "url": process.env.NEXT_PUBLIC_SITE_URL,
+              "telephone": "+55-21-XXXX-XXXX",
+              "address": {
+                "@type": "PostalAddress",
+                "streetAddress": "Santa Teresa",
+                "addressLocality": "Rio de Janeiro",
+                "addressRegion": "RJ",
+                "addressCountry": "BR"
+              },
+              "geo": {
+                "@type": "GeoCoordinates",
+                "latitude": "-22.9068",
+                "longitude": "-43.1729"
+              },
+              "openingHours": [
+                "Tu-Su 12:00-22:00"
+              ],
+              "servesCuisine": "Brazilian",
+              "priceRange": "$$",
+              "image": [
+                `${process.env.NEXT_PUBLIC_SITE_URL}/images/armazem-fachada-historica.jpg`,
+                `${process.env.NEXT_PUBLIC_SITE_URL}/images/santa-teresa-vista-panoramica.jpg`
+              ],
+              "sameAs": [
+                "https://www.instagram.com/armazemsaojoaquim",
+                "https://www.facebook.com/armazemsaojoaquim"
+              ]
+            })
+          }}
+        />
       </head>
-      <body className="min-h-screen bg-background text-foreground antialiased" suppressHydrationWarning>
-        <ThemeProvider>
-          <SupabaseProvider>
-            <div className="relative flex min-h-screen flex-col">
-              {/* Skip to main content for accessibility */}
-              <a 
-                href="#main-content" 
-                className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-amber-600 text-white px-4 py-2 rounded-md z-50"
-              >
-                Pular para o conteúdo principal
-              </a>
+      <body className={`${inter.className} antialiased`} suppressHydrationWarning>
+        <Suspense fallback={<LoadingFallback />}>
+          <ThemeProvider>
+            <SupabaseProvider>
+              <div className="min-h-screen bg-background text-foreground">
+                <Header />
+                <main className="flex-1">
+                  {children}
+                </main>
+              </div>
+              <Suspense fallback={null}>
+                <Analytics />
+              </Suspense>
+            </SupabaseProvider>
+          </ThemeProvider>
+        </Suspense>
+        
+        {/* Script de otimização de performance */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              // Otimizações de performance
+              if ('requestIdleCallback' in window) {
+                requestIdleCallback(() => {
+                  // Preload de rotas importantes
+                  if ('IntersectionObserver' in window) {
+                    const links = document.querySelectorAll('a[href^="/"]');
+                    const linkObserver = new IntersectionObserver((entries) => {
+                      entries.forEach((entry) => {
+                        if (entry.isIntersecting) {
+                          const link = entry.target;
+                          const href = link.getAttribute('href');
+                          if (href && !link.dataset.preloaded) {
+                            const linkEl = document.createElement('link');
+                            linkEl.rel = 'prefetch';
+                            linkEl.href = href;
+                            document.head.appendChild(linkEl);
+                            link.dataset.preloaded = 'true';
+                          }
+                        }
+                      });
+                    });
+                    links.forEach(link => linkObserver.observe(link));
+                  }
+                });
+              }
               
-              <ClientHeader />
-              
-              <main id="main-content" className="flex-1">
-                {children}
-              </main>
-              
-              <ClientFooter />
-            </div>
-            
-            {/* Toast Notifications */}
-            <Toaster
-              position="bottom-right"
-              toastOptions={{
-                duration: 5000,
-                style: {
-                  background: 'var(--surface)',
-                  color: 'var(--text-primary)',
-                  border: '1px solid var(--border)',
-                  borderRadius: '12px',
-                  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12)',
-                  backdropFilter: 'blur(8px)',
-                  fontSize: '14px',
-                  fontWeight: '500',
-                  padding: '16px',
-                  maxWidth: '400px'
-                },
-                success: {
-                  style: {
-                    borderLeft: '4px solid var(--dourado-colonial)',
-                    background: 'var(--surface)',
-                  },
-                  iconTheme: {
-                    primary: 'var(--dourado-colonial)',
-                    secondary: 'var(--surface)',
-                  },
-                },
-                error: {
-                  style: {
-                    borderLeft: '4px solid #EF4444',
-                    background: 'var(--surface)',
-                  },
-                  iconTheme: {
-                    primary: '#EF4444',
-                    secondary: 'var(--surface)',
-                  },
-                },
-                loading: {
-                  style: {
-                    borderLeft: '4px solid var(--terracota-santa-teresa)',
-                  },
-                  iconTheme: {
-                    primary: 'var(--terracota-santa-teresa)',
-                    secondary: 'var(--surface)',
-                  },
-                },
-              }}
-            />
-            
-            {/* System Health Monitor */}
-            <SystemHealth />
-          </SupabaseProvider>
-        </ThemeProvider>
+              // Lazy loading para imagens
+              if ('loading' in HTMLImageElement.prototype) {
+                const images = document.querySelectorAll('img[data-src]');
+                images.forEach(img => {
+                  img.src = img.dataset.src;
+                  img.removeAttribute('data-src');
+                });
+              }
+            `,
+          }}
+        />
       </body>
     </html>
   )

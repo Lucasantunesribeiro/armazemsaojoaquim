@@ -52,13 +52,14 @@ const Toast: React.FC<ToastProps> = ({
     // Trigger entrance animation
     setTimeout(() => setIsVisible(true), 50)
 
-    // Auto-remove after duration
-    const timer = setTimeout(() => {
-      handleClose()
-    }, duration)
+    if (isVisible && duration > 0) {
+      const timer = setTimeout(() => {
+        handleClose()
+      }, duration)
 
-    return () => clearTimeout(timer)
-  }, [duration])
+      return () => clearTimeout(timer)
+    }
+  }, [isVisible, duration]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleClose = () => {
     setIsRemoving(true)

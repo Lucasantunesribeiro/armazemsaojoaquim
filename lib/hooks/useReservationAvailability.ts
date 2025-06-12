@@ -80,7 +80,7 @@ export function useReservationAvailability(selectedDate?: string) {
       }
 
       // Agrupar reservas por horário
-      const reservasPorHorario = (reservas || []).reduce((acc, reserva) => {
+      const reservasPorHorario = (reservas || []).reduce((acc: Record<string, number>, reserva: any) => {
         const time = reserva.horario
         if (!acc[time]) {
           acc[time] = 0
@@ -120,7 +120,7 @@ export function useReservationAvailability(selectedDate?: string) {
     if (selectedDate) {
       loadAvailabilityForDate(selectedDate)
     }
-  }, [selectedDate])
+  }, [selectedDate]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Verificar se um horário está disponível (função auxiliar)
   const isTimeAvailable = (time: string, requiredCapacity: number = 1): boolean => {

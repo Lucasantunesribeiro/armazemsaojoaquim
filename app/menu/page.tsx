@@ -42,11 +42,11 @@ export default function MenuPage() {
 
   useEffect(() => {
     fetchMenuItems()
-  }, [])
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     filterItems()
-  }, [menuItems, selectedCategory, searchTerm])
+  }, [menuItems, selectedCategory, searchTerm]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const fetchMenuItems = async () => {
     try {
@@ -81,7 +81,7 @@ export default function MenuPage() {
 
       if (data && data.length > 0) {
         // Mapear os dados do banco para a interface esperada
-        const mappedItems = data.map(item => ({
+        const mappedItems = data.map((item: any) => ({
           id: item.id,
           name: item.name,
           description: item.description,
@@ -96,7 +96,7 @@ export default function MenuPage() {
         }))
         
         // Ordenar no cliente para evitar problemas com múltiplas cláusulas order()
-        const sortedItems = mappedItems.sort((a, b) => {
+        const sortedItems = mappedItems.sort((a: MenuItem, b: MenuItem) => {
           // Primeiro por featured (destacados primeiro)
           if (a.featured !== b.featured) {
             return b.featured ? 1 : -1

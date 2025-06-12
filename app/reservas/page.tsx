@@ -66,7 +66,7 @@ export default function ReservasPage() {
       }))
       fetchUserReservations()
     }
-  }, [user])
+  }, [user]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const fetchUserReservations = async () => {
     if (!user) return

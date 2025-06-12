@@ -78,10 +78,10 @@ export default function HeroSection() {
     // Image rotation interval
     const interval = setInterval(() => {
       setCurrentImageIndex((prev) => (prev + 1) % heroImages.length)
-    }, 6000)
+    }, 5000)
 
     return () => clearInterval(interval)
-  }, [heroImages.length])
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <section 

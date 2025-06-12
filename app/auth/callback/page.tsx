@@ -29,7 +29,10 @@ export default function AuthCallbackPage() {
           
           if (authError) {
             console.error('Auth Exchange Error:', authError)
-            router.push(`/auth?error=${encodeURIComponent(authError.message)}`)
+            const errorMessage = typeof authError === 'object' && authError && 'message' in authError 
+              ? (authError as any).message 
+              : 'Authentication failed'
+            router.push(`/auth?error=${encodeURIComponent(errorMessage)}`)
             return
           }
 

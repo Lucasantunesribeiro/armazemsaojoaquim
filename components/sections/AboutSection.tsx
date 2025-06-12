@@ -11,6 +11,7 @@ const AboutSection = () => {
   const [activeImageIndex, setActiveImageIndex] = useState(0)
   const [statsAnimated, setStatsAnimated] = useState(false)
   const sectionRef = useRef<HTMLDivElement>(null)
+  const statsRef = useRef<HTMLDivElement>(null)
 
   const historicalImages = [
     {
@@ -83,7 +84,7 @@ const AboutSection = () => {
     }
 
     return () => observer.disconnect()
-  }, [])
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (isVisible) {

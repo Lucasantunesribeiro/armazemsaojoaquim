@@ -1,49 +1,139 @@
 {
-  "name": "Armazém São Joaquim",
+  "name": "Armazém São Joaquim - Restaurante Histórico",
   "short_name": "Armazém SJ",
-  "description": "Restaurante histórico em Santa Teresa, Rio de Janeiro",
+  "description": "Restaurante histórico em Santa Teresa com culinária tradicional brasileira e vista panorâmica do Rio de Janeiro",
   "start_url": "/",
-  "display": "standalone",
-  "background_color": "#F4C430",
-  "theme_color": "#F4C430",
-  "orientation": "portrait-primary",
   "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "theme_color": "#8B4513",
+  "background_color": "#FFFFFF",
   "lang": "pt-BR",
+  "dir": "ltr",
+  "categories": [
+    "food",
+    "restaurant",
+    "lifestyle"
+  ],
   "icons": [
     {
-      "src": "/images/logo.jpg",
+      "src": "pwa-64x64.png",
+      "sizes": "64x64",
+      "type": "image/png"
+    },
+    {
+      "src": "pwa-192x192.png",
       "sizes": "192x192",
-      "type": "image/jpeg"
+      "type": "image/png"
+    },
+    {
+      "src": "pwa-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "maskable-icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ],
-  "categories": ["food", "restaurant", "business"],
-  "screenshots": [],
   "shortcuts": [
     {
       "name": "Fazer Reserva",
       "short_name": "Reserva",
-      "description": "Reserve sua mesa",
+      "description": "Faça sua reserva rapidamente",
       "url": "/reservas",
       "icons": [
         {
-          "src": "/images/logo.jpg",
+          "src": "/icon-96.png",
           "sizes": "96x96",
-          "type": "image/jpeg"
+          "type": "image/png"
         }
       ]
     },
     {
       "name": "Ver Cardápio",
       "short_name": "Cardápio",
-      "description": "Veja nosso cardápio",
+      "description": "Confira nosso cardápio completo",
       "url": "/menu",
       "icons": [
         {
-          "src": "/images/logo.jpg",
+          "src": "/icon-96.png",
           "sizes": "96x96",
-          "type": "image/jpeg"
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Blog",
+      "short_name": "Blog",
+      "description": "Leia nossas histórias e receitas",
+      "url": "/blog",
+      "icons": [
+        {
+          "src": "/icon-96.png",
+          "sizes": "96x96",
+          "type": "image/png"
         }
       ]
     }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshot-mobile-1.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Página inicial no mobile"
+    },
+    {
+      "src": "/screenshot-mobile-2.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Cardápio no mobile"
+    },
+    {
+      "src": "/screenshot-desktop-1.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Página inicial no desktop"
+    },
+    {
+      "src": "/screenshot-desktop-2.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Cardápio no desktop"
+    }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false,
+  "edge_side_panel": {
+    "preferred_width": 400
+  },
+  "launch_handler": {
+    "client_mode": "navigate-existing"
+  },
+  "handle_links": "preferred",
+  "capture_links": "existing-client-navigate",
+  "protocol_handlers": [
+    {
+      "protocol": "web+armazem",
+      "url": "/?action=%s"
+    }
+  ],
+  "file_handlers": [
+    {
+      "action": "/",
+      "accept": {
+        "text/calendar": [
+          ".ics"
+        ]
+      }
+    }
   ]
-} 
+}
