@@ -1,7 +1,8 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { blogApi, menuApi, reservasApi, analyticsApi, apiUtils } from '../api'
+import { useState, useEffect, useCallback } from 'react'
+import { useNotifications } from './useNotifications'
+import { blogApi, menuApi, reservasApi, analyticsApi, utils } from '../api'
 import type { BlogPost, MenuItem, Reserva } from '../api'
 
 // ============================
@@ -20,7 +21,7 @@ export function useBlogPosts() {
       setPosts(data)
       setError(null)
     } catch (err) {
-      setError(apiUtils.formatError(err))
+      setError(utils.formatError(err))
     } finally {
       setLoading(false)
     }
@@ -46,7 +47,7 @@ export function useBlogPost(slug: string) {
         setPost(data)
         setError(null)
       } catch (err) {
-        setError(apiUtils.formatError(err))
+        setError(utils.formatError(err))
       } finally {
         setLoading(false)
       }
@@ -77,7 +78,7 @@ export function useBlogSearch() {
       setResults(data)
       setError(null)
     } catch (err) {
-      setError(apiUtils.formatError(err))
+      setError(utils.formatError(err))
     } finally {
       setLoading(false)
     }
@@ -103,7 +104,7 @@ export function useMenuItems() {
         setItems(data)
         setError(null)
       } catch (err) {
-        setError(apiUtils.formatError(err))
+        setError(utils.formatError(err))
       } finally {
         setLoading(false)
       }
@@ -128,7 +129,7 @@ export function useMenuCategories() {
         setCategories(data)
         setError(null)
       } catch (err) {
-        setError(apiUtils.formatError(err))
+        setError(utils.formatError(err))
       } finally {
         setLoading(false)
       }
@@ -157,7 +158,7 @@ export function useMenuSearch() {
       setResults(data)
       setError(null)
     } catch (err) {
-      setError(apiUtils.formatError(err))
+      setError(utils.formatError(err))
     } finally {
       setLoading(false)
     }
@@ -189,7 +190,7 @@ export function useUserReservations(userId: string | undefined) {
         setReservations(data)
         setError(null)
       } catch (err) {
-        setError(apiUtils.formatError(err))
+        setError(utils.formatError(err))
       } finally {
         setLoading(false)
       }
@@ -207,7 +208,7 @@ export function useUserReservations(userId: string | undefined) {
       setReservations(data)
       setError(null)
     } catch (err) {
-      setError(apiUtils.formatError(err))
+      setError(utils.formatError(err))
     } finally {
       setLoading(false)
     }
@@ -227,7 +228,7 @@ export function useReservationMutations() {
       const data = await reservasApi.createReservation(reserva)
       return data
     } catch (err) {
-      const errorMessage = apiUtils.formatError(err)
+      const errorMessage = utils.formatError(err)
       setError(errorMessage)
       throw new Error(errorMessage)
     } finally {
@@ -242,7 +243,7 @@ export function useReservationMutations() {
       const data = await reservasApi.updateReservation(id, updates)
       return data
     } catch (err) {
-      const errorMessage = apiUtils.formatError(err)
+      const errorMessage = utils.formatError(err)
       setError(errorMessage)
       throw new Error(errorMessage)
     } finally {
@@ -256,7 +257,7 @@ export function useReservationMutations() {
       setError(null)
       await reservasApi.deleteReservation(id)
     } catch (err) {
-      const errorMessage = apiUtils.formatError(err)
+      const errorMessage = utils.formatError(err)
       setError(errorMessage)
       throw new Error(errorMessage)
     } finally {
@@ -268,7 +269,7 @@ export function useReservationMutations() {
     try {
       return await reservasApi.checkAvailability(data, horario)
     } catch (err) {
-      setError(apiUtils.formatError(err))
+      setError(utils.formatError(err))
       return false
     }
   }
@@ -300,7 +301,7 @@ export function useMenuStats() {
         setStats(data)
         setError(null)
       } catch (err) {
-        setError(apiUtils.formatError(err))
+        setError(utils.formatError(err))
       } finally {
         setLoading(false)
       }
@@ -312,32 +313,49 @@ export function useMenuStats() {
   return { stats, loading, error }
 }
 
-export function useReservationStats(userId?: string) {
+export const useReservationStats = (userId?: string) => {
   const [stats, setStats] = useState<{
     total: number
     confirmed: number
     pending: number
     cancelled: number
   } | null>(null)
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  useEffect(() => {
-    const fetchStats = async () => {
-      try {
-        setLoading(true)
-        const data = await analyticsApi.getReservationStats(userId)
-        setStats(data)
-        setError(null)
-      } catch (err) {
-        setError(apiUtils.formatError(err))
-      } finally {
-        setLoading(false)
+  const fetchStats = useCallback(async () => {
+    setLoading(true)
+    setError(null)
+    
+    try {
+      const data = await analyticsApi.getReservationStats(userId)
+      if (data) {
+        // Transform the data to match expected interface
+        const transformedStats = {
+          total: data.total || 0,
+          confirmed: data.confirmada || 0,
+          pending: data.pendente || 0,
+          cancelled: data.cancelada || 0
+        }
+        setStats(transformedStats)
+      } else {
+        setStats(null)
       }
+    } catch (err) {
+      setError(utils.formatError(err))
+    } finally {
+      setLoading(false)
     }
-
-    fetchStats()
   }, [userId])
 
-  return { stats, loading, error }
+  useEffect(() => {
+    fetchStats()
+  }, [fetchStats])
+
+  return {
+    stats,
+    loading,
+    error,
+    refetch: fetchStats
+  }
 } 

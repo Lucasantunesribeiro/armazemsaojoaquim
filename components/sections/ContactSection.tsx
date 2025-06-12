@@ -1,11 +1,12 @@
 'use client'
 
-import { MapPin, Phone, Mail, Clock, Instagram, Facebook, Send } from 'lucide-react'
-import { useState } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
+import { MapPin, Phone, Mail, Clock, Instagram, Send, Star, Calendar, Coffee, ExternalLink, Heart } from 'lucide-react'
 import Button from '../ui/Button'
 import Input from '../ui/Input'
-import { Card, CardContent } from '../ui/Card'
 import toast from 'react-hot-toast'
+import { cn } from '../../lib/utils'
+import Image from 'next/image'
 
 const ContactSection = () => {
   const [formData, setFormData] = useState({
@@ -15,16 +16,28 @@ const ContactSection = () => {
     message: ''
   })
   const [loading, setLoading] = useState(false)
+  const [isVisible, setIsVisible] = useState(false)
+  const sectionRef = useRef<HTMLDivElement>(null)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
     
     try {
-      // Simulação de envio (implementar integração real depois)
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      toast.success('Mensagem enviada com sucesso! Retornaremos em breve.')
-      setFormData({ name: '', email: '', phone: '', message: '' })
+      const response = await fetch('/api/send-email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData)
+      })
+      
+      if (response.ok) {
+        toast.success('Mensagem enviada com sucesso! Retornaremos em breve.')
+        setFormData({ name: '', email: '', phone: '', message: '' })
+      } else {
+        throw new Error('Erro ao enviar')
+      }
     } catch (error) {
       toast.error('Erro ao enviar mensagem. Tente novamente.')
     } finally {
@@ -39,259 +52,387 @@ const ContactSection = () => {
     }))
   }
 
-  const businessHours = [
-    { day: 'Segunda a Sexta', hours: '12:00 - 00:00' },
-    { day: 'Sábado', hours: '11:30 - 00:00' },
-    { day: 'Domingo', hours: '11:30 - 22:00' },
-    { day: 'Happy Hour (Seg-Qui)', hours: '17:00 - 20:00' },
-    { day: 'Happy Hour (Sex)', hours: '19:00 - 20:00' },
-    { day: 'Café da Manhã', hours: '08:00 - 20:00 (todos os dias)' }
+  const contactInfo = [
+    {
+      icon: MapPin,
+      title: 'Localização',
+      content: ['Rua Almirante Alexandrino, 470', 'Santa Teresa, Rio de Janeiro - RJ', 'CEP: 20241-262'],
+      gradient: 'from-red-500 to-pink-600',
+      action: () => window.open('https://maps.google.com/?q=Santa+Teresa+Rio+de+Janeiro', '_blank')
+    },
+    {
+      icon: Phone,
+      title: 'Telefone & WhatsApp',
+      content: ['+55 21 98565-8443'],
+      gradient: 'from-green-500 to-emerald-600',
+      action: () => window.open('tel:+5521985658443', '_blank')
+    },
+    {
+      icon: Mail,
+      title: 'E-mail',
+      content: ['armazemsaojoaquimoficial@gmail.com'],
+      gradient: 'from-blue-500 to-indigo-600',
+      action: () => window.open('mailto:armazemsaojoaquimoficial@gmail.com', '_blank')
+    },
+    {
+      icon: Clock,
+      title: 'Horário',
+      content: ['Segunda a Sábado: 8:00 - 20:00', 'Domingo: Fechado'],
+      gradient: 'from-amber-500 to-orange-600'
+    }
   ]
 
+  const socialLinks = [
+    {
+      name: 'Instagram',
+      icon: Instagram,
+      url: 'https://www.instagram.com/armazemsaojoaquim/',
+      gradient: 'from-purple-500 to-pink-600',
+      followers: '2.5K+'
+    },
+    {
+      name: 'Pousada',
+      icon: ExternalLink,
+      url: 'https://vivapp.bukly.com/d/hotel_view/5041',
+      gradient: 'from-blue-500 to-indigo-600',
+      followers: 'Reservas'
+    }
+  ]
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true)
+        }
+      },
+      { threshold: 0.2 }
+    )
+
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current)
+    }
+
+    return () => observer.disconnect()
+  }, [])
+
   return (
-    <section className="py-20 bg-white">
-      <div className="container mx-auto px-4">
-        <div className="max-w-6xl mx-auto">
+    <section 
+      ref={sectionRef}
+      className="relative py-24 overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-amber-900"
+    >
+      {/* Background Pattern */}
+      <div className="absolute inset-0 opacity-10">
+        <div className="absolute inset-0" style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23D4AF37' fill-opacity='0.6'%3E%3Cpath d='M30 0L35 25L60 30L35 35L30 60L25 35L0 30L25 25z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+          backgroundSize: '120px 120px'
+        }} />
+      </div>
+
+      <div className="container mx-auto px-4 relative z-10">
+        <div className="max-w-7xl mx-auto">
           {/* Header */}
-          <div className="text-center mb-16">
-            <h2 className="font-playfair text-4xl md:text-5xl font-bold text-madeira-escura mb-6">
-              Venha nos Visitar
+          <div className={cn(
+            "text-center mb-20",
+            "transition-all duration-1000 ease-out",
+            isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+          )}>
+            <div className="inline-flex items-center space-x-2 bg-amber-500/20 border border-amber-500/30 rounded-full px-6 py-2 mb-6">
+              <Heart className="w-4 h-4 text-amber-400 fill-amber-400" />
+              <span className="text-amber-200 text-sm font-semibold tracking-wide">VAMOS CONVERSAR</span>
+            </div>
+
+            <h2 className="font-playfair text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-8 leading-tight">
+              Venha nos <span className="text-amber-400">Visitar</span>
             </h2>
-            <p className="text-xl text-cinza-medio max-w-3xl mx-auto">
-              Estamos localizados no coração histórico de Santa Teresa, 
-              prontos para recebê-lo com o melhor da hospitalidade carioca
+            
+            <p className="text-xl md:text-2xl text-white/80 max-w-4xl mx-auto leading-relaxed">
+              Estamos no coração histórico de Santa Teresa, prontos para recebê-lo com a melhor hospitalidade carioca
             </p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-            {/* Contact Information */}
-            <div className="space-y-8">
-              <Card className="overflow-hidden">
-                <CardContent className="p-8">
-                  <h3 className="font-playfair text-2xl font-semibold text-madeira-escura mb-6">
-                    Informações de Contato
-                  </h3>
-                  
-                  <div className="space-y-6">
-                    <div className="flex items-start space-x-4">
-                      <div className="w-12 h-12 bg-amarelo-armazem rounded-lg flex items-center justify-center flex-shrink-0">
-                        <MapPin className="w-6 h-6 text-madeira-escura" />
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
+            {/* Contact Information & Social */}
+            <div className={cn(
+              "space-y-8",
+              "transition-all duration-1000 delay-300 ease-out",
+              isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+            )}>
+              {/* Contact Cards */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {contactInfo.map((info, index) => {
+                  const Icon = info.icon
+                  return (
+                    <div
+                      key={index}
+                      className={cn(
+                        "group relative bg-white/5 backdrop-blur-xl rounded-3xl p-6",
+                        "border border-white/10 hover:border-amber-400/50",
+                        "transition-all duration-500 hover:bg-white/10",
+                        "transform hover:scale-105 hover:-translate-y-2",
+                        "shadow-2xl hover:shadow-amber-500/20",
+                        info.action ? 'cursor-pointer' : ''
+                      )}
+                      onClick={info.action}
+                    >
+                      <div className="absolute -top-4 left-6">
+                        <div className={cn(
+                          "p-4 rounded-2xl shadow-xl",
+                          `bg-gradient-to-br ${info.gradient}`
+                        )}>
+                          <Icon className="w-6 h-6 text-white" />
+                        </div>
                       </div>
-                      <div>
-                        <h4 className="font-semibold text-madeira-escura mb-1">Endereço</h4>
-                        <p className="text-cinza-medio">
-                          Rua São Joaquim, 123<br />
-                          Santa Teresa, Rio de Janeiro - RJ<br />
-                          CEP: 20241-320
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="flex items-start space-x-4">
-                      <div className="w-12 h-12 bg-vermelho-portas rounded-lg flex items-center justify-center flex-shrink-0">
-                        <Phone className="w-6 h-6 text-white" />
-                      </div>
-                      <div>
-                        <h4 className="font-semibold text-madeira-escura mb-1">Telefone</h4>
-                        <p className="text-cinza-medio">
-                          <a href="tel:+552122457890" className="hover:text-amarelo-armazem transition-colors">
-                            (21) 2245-7890
-                          </a>
-                        </p>
-                        <p className="text-cinza-medio">
-                          <a href="tel:+5521987654321" className="hover:text-amarelo-armazem transition-colors">
-                            (21) 98765-4321
-                          </a>
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="flex items-start space-x-4">
-                      <div className="w-12 h-12 bg-pedra-natural rounded-lg flex items-center justify-center flex-shrink-0">
-                        <Mail className="w-6 h-6 text-white" />
-                      </div>
-                      <div>
-                        <h4 className="font-semibold text-madeira-escura mb-1">E-mail</h4>
-                        <p className="text-cinza-medio">
-                          <a href="mailto:contato@armazemsaojoaquim.com.br" className="hover:text-amarelo-armazem transition-colors">
-                            contato@armazemsaojoaquim.com.br
-                          </a>
-                        </p>
-                        <p className="text-cinza-medio">
-                          <a href="mailto:reservas@armazemsaojoaquim.com.br" className="hover:text-amarelo-armazem transition-colors">
-                            reservas@armazemsaojoaquim.com.br
-                          </a>
-                        </p>
+                      
+                      <div className="pt-8">
+                        <h3 className="font-bold text-lg text-amber-200 mb-3">
+                          {info.title}
+                        </h3>
+                        <div className="space-y-1">
+                          {info.content.map((line, lineIndex) => (
+                            <p key={lineIndex} className="text-white/80 text-sm leading-relaxed">
+                              {line}
+                            </p>
+                          ))}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Business Hours */}
-              <Card>
-                <CardContent className="p-8">
-                  <div className="flex items-center mb-6">
-                    <div className="w-12 h-12 bg-verde-natura rounded-lg flex items-center justify-center mr-4">
-                      <Clock className="w-6 h-6 text-white" />
-                    </div>
-                    <h3 className="font-playfair text-2xl font-semibold text-madeira-escura">
-                      Horário de Funcionamento
-                    </h3>
-                  </div>
-                  
-                  <div className="space-y-3">
-                    {businessHours.map((schedule, index) => (
-                      <div key={index} className="flex justify-between items-center py-2 border-b border-cinza-claro last:border-b-0">
-                        <span className="font-medium text-madeira-escura">{schedule.day}</span>
-                        <span className={`${schedule.hours === 'Fechado' ? 'text-red-600' : 'text-cinza-medio'}`}>
-                          {schedule.hours}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                  
-                  <div className="mt-6 p-4 bg-amarelo-armazem/10 rounded-lg border-l-4 border-amarelo-armazem">
-                    <p className="text-sm text-madeira-escura">
-                      <strong>Atenção:</strong> Recomendamos fazer reserva, especialmente nos fins de semana.
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
+                  )
+                })}
+              </div>
 
               {/* Social Media */}
-              <Card>
-                <CardContent className="p-8">
-                  <h3 className="font-playfair text-2xl font-semibold text-madeira-escura mb-6">
-                    Siga-nos nas Redes Sociais
+              <div className="bg-white/5 backdrop-blur-xl rounded-3xl p-8 border border-white/10">
+                <div className="flex items-center space-x-3 mb-6">
+                  <Star className="w-6 h-6 text-amber-400" />
+                  <h3 className="font-playfair text-2xl font-bold text-white">
+                    Siga-nos & Reserve
                   </h3>
-                  
-                  <div className="flex space-x-4">
-                    <a 
-                      href="https://instagram.com/armazemsaojoaquim" 
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="w-12 h-12 bg-gradient-to-br from-purple-600 to-pink-600 rounded-lg flex items-center justify-center text-white hover:scale-105 transition-transform"
-                    >
-                      <Instagram className="w-6 h-6" />
-                    </a>
-                    <a 
-                      href="https://facebook.com/armazemsaojoaquim" 
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center text-white hover:scale-105 transition-transform"
-                    >
-                      <Facebook className="w-6 h-6" />
-                    </a>
+                </div>
+                
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {socialLinks.map((social, index) => {
+                    const Icon = social.icon
+                    return (
+                      <a
+                        key={index}
+                        href={social.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={cn(
+                          "group flex items-center space-x-4 p-4 rounded-2xl",
+                          "bg-white/5 hover:bg-white/10 backdrop-blur-sm",
+                          "border border-white/10 hover:border-amber-400/50",
+                          "transition-all duration-300 hover:scale-105"
+                        )}
+                      >
+                        <div className={cn(
+                          "p-3 rounded-xl shadow-lg",
+                          `bg-gradient-to-br ${social.gradient}`
+                        )}>
+                          <Icon className="w-5 h-5 text-white" />
+                        </div>
+                        <div>
+                          <div className="font-semibold text-white group-hover:text-amber-300 transition-colors">
+                            {social.name}
+                          </div>
+                          <div className="text-sm text-white/60">
+                            {social.followers}
+                          </div>
+                        </div>
+                      </a>
+                    )
+                  })}
+                </div>
+                
+                <div className="mt-6 p-4 bg-amber-500/10 rounded-2xl border border-amber-500/20">
+                  <div className="flex items-center space-x-2 mb-2">
+                    <Coffee className="w-4 h-4 text-amber-400" />
+                    <span className="text-amber-200 font-semibold text-sm">Dica Especial</span>
                   </div>
-                  
-                  <p className="text-sm text-cinza-medio mt-4">
-                    Acompanhe nossos eventos especiais, novidades do cardápio e momentos únicos
+                  <p className="text-white/80 text-sm">
+                    Acompanhe nossas redes para eventos especiais, novidades do cardápio e promoções exclusivas
                   </p>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             </div>
 
             {/* Contact Form */}
-            <div>
-              <Card>
-                <CardContent className="p-8">
-                  <h3 className="font-playfair text-2xl font-semibold text-madeira-escura mb-6">
+            <div className={cn(
+              "transition-all duration-1000 delay-500 ease-out",
+              isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+            )}>
+              <div className="bg-white/5 backdrop-blur-xl rounded-3xl p-8 border border-white/10 shadow-2xl">
+                <div className="flex items-center space-x-3 mb-8">
+                  <Send className="w-6 h-6 text-amber-400" />
+                  <h3 className="font-playfair text-2xl font-bold text-white">
                     Envie uma Mensagem
                   </h3>
-                  
-                  <form onSubmit={handleSubmit} className="space-y-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <Input
-                        label="Nome completo"
+                </div>
+                
+                <form onSubmit={handleSubmit} className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-amber-200 text-sm font-semibold mb-2">
+                        Nome completo *
+                      </label>
+                      <input
                         type="text"
                         name="name"
                         value={formData.name}
                         onChange={handleChange}
                         placeholder="Seu nome"
                         required
+                        className={cn(
+                          "w-full px-4 py-3 rounded-xl",
+                          "bg-white/10 backdrop-blur-sm border border-white/20",
+                          "text-white placeholder-white/50",
+                          "focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20",
+                          "transition-all duration-200"
+                        )}
                       />
-                      <Input
-                        label="Telefone"
+                    </div>
+                    
+                    <div>
+                      <label className="block text-amber-200 text-sm font-semibold mb-2">
+                        Telefone
+                      </label>
+                      <input
                         type="tel"
                         name="phone"
                         value={formData.phone}
                         onChange={handleChange}
-                        placeholder="(11) 99999-9999"
+                        placeholder="(21) 99999-9999"
+                        className={cn(
+                          "w-full px-4 py-3 rounded-xl",
+                          "bg-white/10 backdrop-blur-sm border border-white/20",
+                          "text-white placeholder-white/50",
+                          "focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20",
+                          "transition-all duration-200"
+                        )}
                       />
                     </div>
-                    
-                    <Input
-                      label="E-mail"
+                  </div>
+                  
+                  <div>
+                    <label className="block text-amber-200 text-sm font-semibold mb-2">
+                      E-mail *
+                    </label>
+                    <input
                       type="email"
                       name="email"
                       value={formData.email}
                       onChange={handleChange}
                       placeholder="seu@email.com"
                       required
+                      className={cn(
+                        "w-full px-4 py-3 rounded-xl",
+                        "bg-white/10 backdrop-blur-sm border border-white/20",
+                        "text-white placeholder-white/50",
+                        "focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20",
+                        "transition-all duration-200"
+                      )}
                     />
-                    
-                    <div>
-                      <label htmlFor="message" className="block text-sm font-medium text-madeira-escura mb-2">
-                        Mensagem *
-                      </label>
-                      <textarea
-                        id="message"
-                        name="message"
-                        value={formData.message}
-                        onChange={handleChange}
-                        rows={5}
-                        className="w-full px-4 py-3 border border-cinza-medio rounded-lg focus:ring-2 focus:ring-amarelo-armazem focus:border-transparent resize-none"
-                        placeholder="Como podemos ajudá-lo? Conte-nos sobre sua dúvida, sugestão ou pedido especial..."
-                        required
-                      />
-                    </div>
-                    
-                    <Button
-                      type="submit"
-                      variant="primary"
-                      size="lg"
-                      className="w-full"
-                      loading={loading}
-                    >
-                      <Send className="w-5 h-5 mr-2" />
-                      Enviar Mensagem
-                    </Button>
-                    
-                    <p className="text-sm text-cinza-medio text-center">
-                      Responderemos sua mensagem dentro de 24 horas úteis
-                    </p>
-                  </form>
-                </CardContent>
-              </Card>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-amber-200 text-sm font-semibold mb-2">
+                      Mensagem *
+                    </label>
+                    <textarea
+                      name="message"
+                      value={formData.message}
+                      onChange={handleChange}
+                      rows={5}
+                      placeholder="Como podemos ajudá-lo? Conte-nos sobre sua dúvida, sugestão ou pedido especial..."
+                      required
+                      className={cn(
+                        "w-full px-4 py-3 rounded-xl",
+                        "bg-white/10 backdrop-blur-sm border border-white/20",
+                        "text-white placeholder-white/50",
+                        "focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20",
+                        "transition-all duration-200 resize-none"
+                      )}
+                    />
+                  </div>
+                  
+                  <Button
+                    type="submit"
+                    size="lg"
+                    disabled={loading}
+                    className={cn(
+                      "w-full bg-gradient-to-r from-amber-500 to-amber-600",
+                      "hover:from-amber-600 hover:to-amber-700",
+                      "text-white font-bold text-lg py-4 rounded-xl",
+                      "shadow-xl hover:shadow-amber-500/25",
+                      "transform hover:scale-105 hover:-translate-y-1",
+                      "transition-all duration-300",
+                      "disabled:opacity-50 disabled:cursor-not-allowed"
+                    )}
+                  >
+                    <span className="flex items-center justify-center space-x-2">
+                      <Send className="w-5 h-5" />
+                      <span>{loading ? 'Enviando...' : 'Enviar Mensagem'}</span>
+                    </span>
+                  </Button>
+                </form>
 
-              {/* Map */}
-              <Card className="mt-8">
-                <CardContent className="p-0">
-                  <div className="relative h-64 bg-cinza-claro rounded-lg overflow-hidden">
-                    <div className="absolute inset-0 bg-gradient-to-br from-amarelo-armazem/20 to-vermelho-portas/20 flex items-center justify-center">
-                      <div className="text-center">
-                        <MapPin className="w-12 h-12 text-madeira-escura mx-auto mb-4" />
-                        <h4 className="font-playfair text-xl font-semibold text-madeira-escura mb-2">
-                          Venha nos Visitar
-                        </h4>
-                        <p className="text-cinza-medio mb-4">
-                          Santa Teresa, Rio de Janeiro
+                <div className="mt-8 p-4 bg-green-500/10 rounded-2xl border border-green-500/20">
+                  <div className="flex items-center space-x-2 mb-2">
+                    <Calendar className="w-4 h-4 text-green-400" />
+                    <span className="text-green-200 font-semibold text-sm">Reservas Rápidas</span>
+                  </div>
+                  <p className="text-white/80 text-sm mb-3">
+                    Para reservas urgentes, ligue diretamente ou use nosso WhatsApp
+                  </p>
+                  <a
+                    href="tel:+5521985658443"
+                    className={cn(
+                      "inline-flex items-center space-x-2 px-4 py-2 rounded-lg",
+                      "bg-green-500 hover:bg-green-600 text-white",
+                      "text-sm font-semibold transition-colors duration-200"
+                    )}
+                  >
+                    <Phone className="w-4 h-4" />
+                    <span>Ligar Agora</span>
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            {/* Address Image */}
+            <div className="lg:col-span-2">
+              <div className="relative h-80 lg:h-[400px] rounded-2xl overflow-hidden shadow-2xl group">
+                <Image
+                  src="/images/endereco.jpg"
+                  alt="Localização do Armazém São Joaquim em Santa Teresa"
+                  fill
+                  className="object-cover transition-transform duration-700 group-hover:scale-110"
+                  quality={90}
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-transparent to-transparent" />
+                
+                {/* Location Info Overlay */}
+                <div className="absolute bottom-6 left-6 right-6">
+                  <div className="bg-white/95 dark:bg-slate-800/95 backdrop-blur-sm rounded-xl p-6 shadow-lg">
+                    <div className="flex items-start space-x-4">
+                      <div className="bg-amber-500 p-3 rounded-xl">
+                        <MapPin className="w-6 h-6 text-white" />
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-slate-900 dark:text-white mb-1">Nossa Localização</h4>
+                        <p className="text-slate-600 dark:text-slate-300 text-sm mb-2">
+                          Rua Áurea, 26 - Santa Teresa<br />
+                          Rio de Janeiro - RJ, 20241-220
                         </p>
-                        <a 
-                          href="https://maps.google.com/?q=Santa+Teresa,+Rio+de+Janeiro"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center px-4 py-2 bg-amarelo-armazem text-madeira-escura rounded-lg hover:bg-yellow-400 transition-colors"
-                        >
-                          <MapPin className="w-4 h-4 mr-2" />
-                          Ver no Google Maps
-                        </a>
+                        <p className="text-xs text-amber-600 dark:text-amber-400 font-medium">
+                          📍 No coração histórico de Santa Teresa
+                        </p>
                       </div>
                     </div>
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             </div>
           </div>
         </div>

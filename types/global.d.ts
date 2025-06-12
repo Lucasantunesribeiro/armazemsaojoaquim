@@ -4,7 +4,7 @@ import { Database } from './database.types'
 declare global {
   // Google Analytics gtag interface
   interface Window {
-    gtag: (
+    gtag?: (
       command: 'config' | 'event' | 'js' | 'set',
       targetId: string | Date,
       config?: {
@@ -24,10 +24,12 @@ declare global {
         fatal?: boolean
         error_component?: string
         visibility_state?: string
+        user_id?: string
+        custom_map?: { [key: string]: string }
         [key: string]: any
       }
     ) => void
-    dataLayer: any[]
+    dataLayer?: any[]
   }
 
   // Service Worker registration

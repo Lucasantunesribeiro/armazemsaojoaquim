@@ -1,20 +1,13 @@
 import { supabase } from './supabase'
+import { Tables } from '../types/database.types'
 
 // ============================
 // BLOG OPERATIONS
 // ============================
 
-export interface BlogPost {
-  id: string
-  titulo: string
-  conteudo: string
-  resumo: string
-  imagem: string | null
-  slug: string
-  created_at: string
-  author_id: string
-  publicado: boolean
-}
+export type BlogPost = Tables<'blog_posts'>
+export type MenuItem = Tables<'menu_items'>
+export type Reserva = Tables<'reservas'>
 
 export const blogApi = {
   // Buscar todos os posts publicados
@@ -60,40 +53,28 @@ export const blogApi = {
 // MENU OPERATIONS
 // ============================
 
-export interface MenuItem {
-  id: string
-  nome: string
-  descricao: string
-  preco: number
-  categoria: string
-  disponivel: boolean
-  imagem: string | null
-  ingredientes: string[] | null
-  alergenos: string[] | null
-}
-
 export const menuApi = {
   // Buscar todos os itens disponíveis
   async getAllItems(): Promise<MenuItem[]> {
     const { data, error } = await supabase
       .from('menu_items')
       .select('*')
-      .eq('disponivel', true)
-      .order('categoria')
-      .order('nome')
+      .eq('available', true)
+      .order('category')
+      .order('name')
 
     if (error) throw error
     return data || []
   },
 
   // Buscar itens por categoria
-  async getItemsByCategory(categoria: string): Promise<MenuItem[]> {
+  async getItemsByCategory(category: string): Promise<MenuItem[]> {
     const { data, error } = await supabase
       .from('menu_items')
       .select('*')
-      .eq('categoria', categoria)
-      .eq('disponivel', true)
-      .order('nome')
+      .eq('category', category)
+      .eq('available', true)
+      .order('name')
 
     if (error) throw error
     return data || []
@@ -104,10 +85,10 @@ export const menuApi = {
     const { data, error } = await supabase
       .from('menu_items')
       .select('*')
-      .eq('disponivel', true)
-      .or(`nome.ilike.%${searchTerm}%, descricao.ilike.%${searchTerm}%`)
-      .order('categoria')
-      .order('nome')
+      .eq('available', true)
+      .or(`name.ilike.%${searchTerm}%, description.ilike.%${searchTerm}%`)
+      .order('category')
+      .order('name')
 
     if (error) throw error
     return data || []
@@ -117,12 +98,12 @@ export const menuApi = {
   async getCategories(): Promise<string[]> {
     const { data, error } = await supabase
       .from('menu_items')
-      .select('categoria')
-      .eq('disponivel', true)
+      .select('category')
+      .eq('available', true)
 
     if (error) throw error
     
-    const uniqueCategories = new Set(data?.map(item => item.categoria) || [])
+    const uniqueCategories = new Set(data?.map(item => item.category) || [])
     const categories = Array.from(uniqueCategories)
     return categories.sort()
   }
@@ -131,18 +112,6 @@ export const menuApi = {
 // ============================
 // RESERVATIONS OPERATIONS
 // ============================
-
-export interface Reserva {
-  id: string
-  data: string
-  horario: string
-  pessoas: number
-  status: string
-  observacoes: string | null
-  user_id: string
-  created_at: string
-  updated_at: string
-}
 
 export const reservasApi = {
   // Buscar reservas do usuário
@@ -217,13 +186,13 @@ export const analyticsApi = {
   async getMenuStats() {
     const { data, error } = await supabase
       .from('menu_items')
-      .select('categoria, id')
-      .eq('disponivel', true)
+      .select('category, id')
+      .eq('available', true)
 
     if (error) return null
 
     const stats = data?.reduce((acc, item) => {
-      acc[item.categoria] = (acc[item.categoria] || 0) + 1
+      acc[item.category] = (acc[item.category] || 0) + 1
       return acc
     }, {} as Record<string, number>)
 
@@ -234,7 +203,7 @@ export const analyticsApi = {
   async getReservationStats(userId?: string) {
     let query = supabase
       .from('reservas')
-      .select('status, created_at')
+      .select('status, data, pessoas')
 
     if (userId) {
       query = query.eq('user_id', userId)
@@ -244,28 +213,27 @@ export const analyticsApi = {
 
     if (error) return null
 
-    const stats = {
-      total: data?.length || 0,
-      confirmed: data?.filter(r => r.status === 'confirmada').length || 0,
-      pending: data?.filter(r => r.status === 'pendente').length || 0,
-      cancelled: data?.filter(r => r.status === 'cancelada').length || 0,
-    }
+    const stats = data?.reduce((acc, reserva) => {
+      acc.total = (acc.total || 0) + 1
+      acc[reserva.status] = (acc[reserva.status] || 0) + 1
+      acc.totalPessoas = (acc.totalPessoas || 0) + reserva.pessoas
+      return acc
+    }, {} as Record<string, number>)
 
     return stats
   }
 }
 
 // ============================
-// UTILS
+// UTILITY FUNCTIONS
 // ============================
 
-export const apiUtils = {
-  // Formatar erro para o usuário
+export const utils = {
+  // Formatar erro para exibição
   formatError(error: any): string {
-    if (error?.message) {
-      return error.message
-    }
-    return 'Ocorreu um erro inesperado. Tente novamente.'
+    if (typeof error === 'string') return error
+    if (error?.message) return error.message
+    return 'Erro desconhecido'
   },
 
   // Validar formato de data
@@ -287,10 +255,10 @@ export const apiUtils = {
     return title
       .toLowerCase()
       .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '') // Remove acentos
-      .replace(/[^a-z0-9\s-]/g, '') // Remove caracteres especiais
-      .replace(/\s+/g, '-') // Substitui espaços por hífens
-      .replace(/-+/g, '-') // Remove hífens duplicados
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-z0-9\s-]/g, '')
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-')
       .trim()
   }
 } 

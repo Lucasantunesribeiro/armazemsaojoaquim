@@ -12,55 +12,37 @@ export type Database = {
       blog_posts: {
         Row: {
           id: string
-          title: string
+          titulo: string
+          conteudo: string
+          resumo: string | null
+          imagem: string | null
+          publicado: boolean
+          author_id: string | null
           slug: string
-          excerpt: string | null
-          content: string
-          author: string
-          published: boolean
-          featured: boolean
-          category: string | null
-          tags: string[] | null
-          meta_title: string | null
-          meta_description: string | null
-          image_url: string | null
-          read_time: number | null
           created_at: string
           updated_at: string
         }
         Insert: {
           id?: string
-          title: string
+          titulo: string
+          conteudo: string
+          resumo?: string | null
+          imagem?: string | null
+          publicado?: boolean
+          author_id?: string | null
           slug: string
-          excerpt?: string | null
-          content: string
-          author: string
-          published?: boolean
-          featured?: boolean
-          category?: string | null
-          tags?: string[] | null
-          meta_title?: string | null
-          meta_description?: string | null
-          image_url?: string | null
-          read_time?: number | null
           created_at?: string
           updated_at?: string
         }
         Update: {
           id?: string
-          title?: string
+          titulo?: string
+          conteudo?: string
+          resumo?: string | null
+          imagem?: string | null
+          publicado?: boolean
+          author_id?: string | null
           slug?: string
-          excerpt?: string | null
-          content?: string
-          author?: string
-          published?: boolean
-          featured?: boolean
-          category?: string | null
-          tags?: string[] | null
-          meta_title?: string | null
-          meta_description?: string | null
-          image_url?: string | null
-          read_time?: number | null
           created_at?: string
           updated_at?: string
         }
