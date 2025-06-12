@@ -86,7 +86,7 @@ const AboutSection = () => {
     }
 
     return () => observer.disconnect()
-  }, [])
+  }, [statsAnimated])
 
   useEffect(() => {
     if (isVisible) {
@@ -119,7 +119,7 @@ const AboutSection = () => {
 
         return () => clearInterval(timer)
       }
-    }, [statsAnimated, value])
+    }, [value]) // Removido statsAnimated da dependência pois é um ref/valor estático
 
     return (
       <span className="font-bold text-3xl md:text-4xl">
