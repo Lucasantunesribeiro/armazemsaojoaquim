@@ -19,6 +19,7 @@ module.exports = {
         'verde-natura': '#2F7D32',
         'rosa-suave': '#C2185B',
         'preto-suave': '#1A1A1A',
+        'creme-suave': '#FDF6E3',
         
         // Semantic colors
         'background': 'var(--background)',
