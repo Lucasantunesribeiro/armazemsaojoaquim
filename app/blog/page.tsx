@@ -95,7 +95,7 @@ async function getBlogPosts(): Promise<BlogPost[]> {
         .order('created_at', { ascending: false })
 
       if (!error && data && data.length > 0) {
-        return data.map(post => ({
+        return data.map((post: any) => ({
           id: post.id,
           title: post.titulo,
           excerpt: post.resumo || '',

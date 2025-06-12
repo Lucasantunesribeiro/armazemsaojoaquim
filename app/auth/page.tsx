@@ -67,17 +67,22 @@ export default function AuthPage() {
 
       if (error) {
         console.error('Login Error:', error)
-        if (error.message.includes('Email not confirmed')) {
+        const errorMessage = typeof error === 'object' && error && 'message' in error 
+          ? (error as any).message 
+          : 'Authentication failed'
+        
+        if (errorMessage.includes('Email not confirmed')) {
           toast.error('Email não confirmado! Verifique sua caixa de entrada e clique no link de confirmação enviado de armazemsaojoaquimoficial@gmail.com')
-        } else if (error.message.includes('Invalid login credentials')) {
+        } else if (errorMessage.includes('Invalid login credentials')) {
           toast.error('Email ou senha incorretos. Verifique suas credenciais e tente novamente.')
         } else {
-          toast.error('Erro ao fazer login: ' + error.message)
+          toast.error('Erro no login. Tente novamente.')
         }
-      } else {
-        toast.success('Login realizado com sucesso!')
-        router.push('/')
+        return
       }
+
+      toast.success('Login realizado com sucesso!')
+      router.push('/')
     } catch (error) {
       console.error('Unexpected Login Error:', error)
       toast.error('Erro inesperado ao fazer login')
@@ -106,9 +111,13 @@ export default function AuthPage() {
 
       if (error) {
         console.error('Registration Error:', error)
-        toast.error('Erro ao criar conta: ' + error.message)
+        const errorMessage = typeof error === 'object' && error && 'message' in error 
+          ? (error as any).message 
+          : 'Registration failed'
+        toast.error('Erro ao criar conta: ' + errorMessage)
       } else {
-        if (authData.user && !authData.user.email_confirmed_at) {
+        const userConfirmed = authData.user && 'email_confirmed_at' in authData.user && (authData.user as any).email_confirmed_at
+        if (authData.user && !userConfirmed) {
           toast.success('Conta criada! Verifique seu e-mail (armazemsaojoaquimoficial@gmail.com) para confirmar e ativar sua conta.')
         } else {
           toast.success('Conta criada e confirmada automaticamente!')
@@ -145,7 +154,10 @@ export default function AuthPage() {
 
       if (error) {
         console.error('Google OAuth Error:', error)
-        toast.error('Erro ao fazer login com Google: ' + error.message)
+        const errorMessage = typeof error === 'object' && error && 'message' in error 
+          ? (error as any).message 
+          : 'Google OAuth failed'
+        toast.error('Erro ao fazer login com Google: ' + errorMessage)
       }
     } catch (error) {
       console.error('Unexpected Google OAuth Error:', error)
@@ -178,7 +190,10 @@ export default function AuthPage() {
 
       if (error) {
         console.error('Resend Confirmation Error:', error)
-        toast.error('Erro ao reenviar confirmação: ' + error.message)
+        const errorMessage = typeof error === 'object' && error && 'message' in error 
+          ? (error as any).message 
+          : 'Resend failed'
+        toast.error('Erro ao reenviar confirmação: ' + errorMessage)
       } else {
         toast.success('Email de confirmação reenviado! Verifique sua caixa de entrada.')
       }

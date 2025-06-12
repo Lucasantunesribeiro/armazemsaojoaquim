@@ -103,8 +103,8 @@ export const menuApi = {
 
     if (error) throw error
     
-    const uniqueCategories = new Set(data?.map(item => item.category) || [])
-    const categories = Array.from(uniqueCategories)
+    const uniqueCategories = new Set(data?.map((item: any) => item.category as string) || [])
+    const categories = Array.from(uniqueCategories) as string[]
     return categories.sort()
   }
 }
@@ -191,7 +191,7 @@ export const analyticsApi = {
 
     if (error) return null
 
-    const stats = data?.reduce((acc, item) => {
+    const stats = data?.reduce((acc: Record<string, number>, item: any) => {
       acc[item.category] = (acc[item.category] || 0) + 1
       return acc
     }, {} as Record<string, number>)
@@ -213,7 +213,7 @@ export const analyticsApi = {
 
     if (error) return null
 
-    const stats = data?.reduce((acc, reserva) => {
+    const stats = data?.reduce((acc: Record<string, number>, reserva: any) => {
       acc.total = (acc.total || 0) + 1
       acc[reserva.status] = (acc[reserva.status] || 0) + 1
       acc.totalPessoas = (acc.totalPessoas || 0) + reserva.pessoas

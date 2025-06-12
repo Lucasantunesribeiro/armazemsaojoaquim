@@ -51,26 +51,9 @@ export function useAnalytics() {
   }, [user])
 
   // Track page views
-  const trackPageView = useCallback((event: PageViewEvent) => {
-    // Google Analytics
-    if (window.gtag) {
-      window.gtag('event', 'page_view', {
-        page_title: event.title,
-        page_location: window.location.href,
-        page_path: event.page,
-        custom_referrer: event.referrer
-      })
-    }
-
-    // Custom tracking para analytics próprio
-    trackCustomEvent('page_view', {
-      page: event.page,
-      title: event.title,
-      referrer: event.referrer,
-      user_id: user?.id,
-      timestamp: new Date().toISOString()
-    })
-  }, [user?.id])
+  const trackPageView = useCallback((path: string) => {
+    trackCustomEvent('page_view', { path })
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Track reservation events
   const trackReservation = useCallback((event: ReservationEvent) => {
@@ -159,60 +142,19 @@ export function useAnalytics() {
   }, [user?.id])
 
   // Track conversion events
-  const trackConversion = useCallback((conversionType: string, value?: number) => {
-    if (window.gtag) {
-      window.gtag('event', 'conversion', {
-        event_category: 'Conversions',
-        event_label: conversionType,
-        value: value,
-        user_id: user?.id
-      })
-    }
-
-    trackCustomEvent('conversion', {
-      type: conversionType,
-      value: value,
-      user_id: user?.id
-    })
-  }, [user?.id])
+  const trackConversion = useCallback((event: string, value?: number, context?: Record<string, any>) => {
+    trackCustomEvent('conversion', { event, value, ...context })
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Track errors
-  const trackError = useCallback((error: Error, context?: string) => {
-    if (window.gtag) {
-      window.gtag('event', 'exception', {
-        description: error.message,
-        fatal: false,
-        custom_context: context,
-        user_id: user?.id
-      })
-    }
-
-    trackCustomEvent('error', {
-      message: error.message,
-      stack: error.stack,
-      context: context,
-      user_id: user?.id
-    })
-  }, [user?.id])
+  const trackError = useCallback((error: string, context?: Record<string, any>) => {
+    trackCustomEvent('error', { error, ...context })
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Track performance metrics
-  const trackPerformance = useCallback((metric: string, value: number, unit?: string) => {
-    if (window.gtag) {
-      window.gtag('event', 'timing_complete', {
-        name: metric,
-        value: value,
-        event_category: 'Performance',
-        unit: unit
-      })
-    }
-
-    trackCustomEvent('performance', {
-      metric: metric,
-      value: value,
-      unit: unit,
-      timestamp: Date.now()
-    })
-  }, [])
+  const trackPerformance = useCallback((metric: string, value: number, context?: Record<string, any>) => {
+    trackCustomEvent('performance', { metric, value, ...context })
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Função auxiliar para tracking customizado
   const trackCustomEvent = useCallback(async (eventType: string, data: any) => {
@@ -295,6 +237,24 @@ export function useAnalytics() {
     })
   }, [trackBusinessEvent])
 
+  const trackUserAction = useCallback((action: string, details?: Record<string, any>) => {
+    trackCustomEvent('user_action', { action, ...details })
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+  const trackEngagement = useCallback((type: string, duration?: number, context?: Record<string, any>) => {
+    trackCustomEvent('engagement', { type, duration, ...context })
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+  const trackBusinessMetric = useCallback((metric: string, value: number, context?: Record<string, any>) => {
+    trackCustomEvent('business_metric', { metric, value, ...context })
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+  const startSession = useCallback(() => {
+    const sessionId = generateSessionId()
+    trackCustomEvent('session_start', { sessionId })
+    return sessionId
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
   return {
     // Core tracking functions
     trackPageView,
@@ -312,6 +272,10 @@ export function useAnalytics() {
     trackAvailabilityCheck,
     
     // Custom tracking
-    trackCustomEvent
+    trackCustomEvent,
+    trackUserAction,
+    trackEngagement,
+    trackBusinessMetric,
+    startSession
   }
 } 
