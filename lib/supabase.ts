@@ -6,10 +6,17 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder-key'
 
 // Verificar se as credenciais estão configuradas corretamente
-const isConfigured = supabaseUrl !== 'https://placeholder.supabase.co' && supabaseAnonKey !== 'placeholder-key'
+const isConfigured = supabaseUrl !== 'https://placeholder.supabase.co' && 
+                    supabaseAnonKey !== 'placeholder-key' &&
+                    supabaseUrl.includes('supabase.co')
 
 if (!isConfigured && typeof window !== 'undefined') {
   console.warn('⚠️ Supabase credentials not configured. Some features may not work properly.')
+}
+
+// Validar URL do Supabase durante o build
+if (process.env.NODE_ENV === 'production' && !isConfigured) {
+  console.warn('⚠️ Production build with invalid Supabase configuration')
 }
 
 export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
