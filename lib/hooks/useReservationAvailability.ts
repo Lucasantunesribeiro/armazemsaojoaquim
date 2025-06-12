@@ -9,21 +9,24 @@ const formatDate = (date: Date): string => {
 interface TimeSlot {
   time: string
   available: boolean
-  reservationCount: number
+  remainingCapacity: number
+  totalReserved: number
 }
 
-interface DateAvailability {
-  date: string
-  timeSlots: TimeSlot[]
-  isFullyBooked: boolean
+interface AvailabilityResponse {
+  available: boolean
+  totalReserved: number
+  remainingCapacity: number
+  maxCapacity: number
+  message: string
+  reservations: number
 }
 
-export function useReservationAvailability() {
-  const [availability, setAvailability] = useState<DateAvailability[]>([])
+export function useReservationAvailability(selectedDate?: string) {
+  const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  // Horários de funcionamento (segunda a sábado)
   const businessHours = [
     '12:00', '12:30', '13:00', '13:30', '14:00', '14:30',
     '15:00', '15:30', '16:00', '16:30', '17:00', '17:30',
@@ -31,191 +34,160 @@ export function useReservationAvailability() {
     '21:00', '21:30', '22:00', '22:30'
   ]
 
-  // Capacidade máxima por horário (ajustar conforme necessário)
-  const maxReservationsPerSlot = 8
+  // Verificar se uma data específica e horário estão disponíveis
+  const checkAvailability = async (date: string, time: string, guests: number = 1): Promise<AvailabilityResponse> => {
+    try {
+      const response = await fetch('/api/check-availability', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          data: date,
+          horario: time,
+          guests: guests
+        })
+      })
 
-  const fetchAvailability = async (startDate: Date, endDate: Date) => {
+      if (!response.ok) {
+        throw new Error('Erro ao verificar disponibilidade')
+      }
+
+      return await response.json()
+    } catch (err) {
+      console.error('Erro ao verificar disponibilidade:', err)
+      throw err
+    }
+  }
+
+  // Verificar disponibilidade para todos os horários de uma data
+  const loadAvailabilityForDate = async (date: string) => {
+    if (!date) return
+
     setLoading(true)
     setError(null)
 
     try {
-      // Buscar todas as reservas confirmadas no período
-      const { data: reservations, error: reservationError } = await supabase
+      // Buscar todas as reservas confirmadas para a data
+      const { data: reservas, error: reservasError } = await supabase
         .from('reservas')
-        .select('data, horario, pessoas, status')
+        .select('horario, pessoas')
+        .eq('data', date)
         .eq('status', 'confirmada')
-        .gte('data', formatDate(startDate))
-        .lte('data', formatDate(endDate))
 
-      if (reservationError) {
-        throw new Error(`Erro ao buscar reservas: ${reservationError.message}`)
+      if (reservasError) {
+        throw reservasError
       }
 
-      // Processar disponibilidade por data
-      const availabilityData: DateAvailability[] = []
-      const currentDate = new Date(startDate)
-
-      while (currentDate <= endDate) {
-        const dateString = formatDate(currentDate)
-        const dayOfWeek = currentDate.getDay()
-
-        // Verificar se não é domingo (fechado)
-        if (dayOfWeek === 0) {
-          currentDate.setDate(currentDate.getDate() + 1)
-          continue
+      // Agrupar reservas por horário
+      const reservasPorHorario = (reservas || []).reduce((acc, reserva) => {
+        const time = reserva.horario
+        if (!acc[time]) {
+          acc[time] = 0
         }
+        acc[time] += reserva.pessoas || 0
+        return acc
+      }, {} as Record<string, number>)
 
-        // Contar reservas por horário para esta data
-        const reservationsForDate = reservations?.filter(
-          (res: any) => res.data === dateString
-        ) || []
+      // Capacidade máxima por horário
+      const maxCapacity = 40
 
-        const timeSlots: TimeSlot[] = businessHours.map(time => {
-          const reservationsAtTime = reservationsForDate.filter(
-            (res: any) => res.horario === time
-          )
+      // Criar slots de tempo com disponibilidade
+      const slots: TimeSlot[] = businessHours.map(time => {
+        const totalReserved = reservasPorHorario[time] || 0
+        const remainingCapacity = maxCapacity - totalReserved
+        
+        return {
+          time,
+          available: remainingCapacity > 0,
+          remainingCapacity: Math.max(0, remainingCapacity),
+          totalReserved
+        }
+      })
 
-          const totalPeople = reservationsAtTime.reduce(
-            (sum: number, res: any) => sum + res.pessoas, 0
-          )
+      setTimeSlots(slots)
 
-          const available = totalPeople < maxReservationsPerSlot
-
-          return {
-            time,
-            available,
-            reservationCount: reservationsAtTime.length
-          }
-        })
-
-        const isFullyBooked = timeSlots.every(slot => !slot.available)
-
-        availabilityData.push({
-          date: dateString,
-          timeSlots,
-          isFullyBooked
-        })
-
-        currentDate.setDate(currentDate.getDate() + 1)
-      }
-
-      setAvailability(availabilityData)
-    } catch (err: any) {
-      console.error('Erro ao buscar disponibilidade:', err)
-      setError(err.message || 'Erro ao carregar disponibilidade')
+    } catch (err) {
+      console.error('Erro ao carregar disponibilidade:', err)
+      setError('Erro ao verificar disponibilidade dos horários')
     } finally {
       setLoading(false)
     }
   }
 
-  const getAvailabilityForDate = (date: string): DateAvailability | null => {
-    return availability.find(item => item.date === date) || null
+  // Carregar disponibilidade quando a data muda
+  useEffect(() => {
+    if (selectedDate) {
+      loadAvailabilityForDate(selectedDate)
+    }
+  }, [selectedDate])
+
+  // Verificar se um horário está disponível (função auxiliar)
+  const isTimeAvailable = (time: string, requiredCapacity: number = 1): boolean => {
+    const slot = timeSlots.find(slot => slot.time === time)
+    return slot ? slot.remainingCapacity >= requiredCapacity : false
   }
 
-  const getAvailableTimesForDate = (date: string): string[] => {
-    const dateAvailability = getAvailabilityForDate(date)
-    if (!dateAvailability) return []
+  // Obter slot específico
+  const getTimeSlot = (time: string): TimeSlot | undefined => {
+    return timeSlots.find(slot => slot.time === time)
+  }
 
-    return dateAvailability.timeSlots
+  // Obter próximos horários disponíveis
+  const getNextAvailableSlots = (count: number = 5): TimeSlot[] => {
+    return timeSlots
       .filter(slot => slot.available)
-      .map(slot => slot.time)
+      .slice(0, count)
   }
 
-  const getUnavailableTimesForDate = (date: string): string[] => {
-    const dateAvailability = getAvailabilityForDate(date)
-    if (!dateAvailability) return []
-
-    return dateAvailability.timeSlots
-      .filter(slot => !slot.available)
-      .map(slot => slot.time)
+  // Obter horários com pouca disponibilidade (alerta)
+  const getLimitedAvailabilitySlots = (): TimeSlot[] => {
+    return timeSlots.filter(slot => 
+      slot.available && slot.remainingCapacity <= 10 && slot.remainingCapacity > 0
+    )
   }
 
-  const isDateFullyBooked = (date: string): boolean => {
-    const dateAvailability = getAvailabilityForDate(date)
-    return dateAvailability?.isFullyBooked || false
+  // Obter horários esgotados
+  const getUnavailableSlots = (): TimeSlot[] => {
+    return timeSlots.filter(slot => !slot.available)
   }
 
-  const checkSpecificTimeAvailability = async (
-    date: string, 
-    time: string, 
-    guests: number
-  ): Promise<{ available: boolean; reason?: string }> => {
-    try {
-      // Verificar se é domingo
-      const reservationDate = new Date(date)
-      if (reservationDate.getDay() === 0) {
-        return { available: false, reason: 'Restaurante fechado aos domingos' }
-      }
+  // Verificar se é domingo (fechado)
+  const isSunday = (date: string): boolean => {
+    const day = new Date(date + 'T00:00:00').getDay()
+    return day === 0 // 0 = domingo
+  }
 
-      // Verificar se o horário está nos horários de funcionamento
-      if (!businessHours.includes(time)) {
-        return { available: false, reason: 'Horário fora do funcionamento' }
-      }
+  // Verificar se é um dia útil (segunda a sábado)
+  const isBusinessDay = (date: string): boolean => {
+    return !isSunday(date)
+  }
 
-      // Buscar reservas existentes para esta data e horário
-      const { data: existingReservations, error } = await supabase
-        .from('reservas')
-        .select('pessoas')
-        .eq('data', date)
-        .eq('horario', time)
-        .eq('status', 'confirmada')
-
-      if (error) {
-        throw new Error(`Erro ao verificar disponibilidade: ${error.message}`)
-      }
-
-      const totalPeopleAtTime = existingReservations?.reduce(
-        (sum: number, res: any) => sum + res.pessoas, 0
-      ) || 0
-
-      const availableCapacity = maxReservationsPerSlot - totalPeopleAtTime
-
-      if (guests > availableCapacity) {
-        return { 
-          available: false, 
-          reason: `Capacidade insuficiente. Disponível para ${availableCapacity} pessoas.`
-        }
-      }
-
-      return { available: true }
-    } catch (err: any) {
-      console.error('Erro ao verificar disponibilidade específica:', err)
-      return { available: false, reason: 'Erro ao verificar disponibilidade' }
+  // Formatar horário para exibição
+  const formatTimeSlot = (slot: TimeSlot): string => {
+    if (!slot.available) {
+      return `${slot.time} - Esgotado`
     }
-  }
-
-  const getNextAvailableDate = (): Date | null => {
-    const today = new Date()
-    today.setHours(0, 0, 0, 0)
-
-    for (const dateAvailability of availability) {
-      const date = new Date(dateAvailability.date)
-      if (date >= today && !dateAvailability.isFullyBooked) {
-        return date
-      }
+    if (slot.remainingCapacity <= 10) {
+      return `${slot.time} - ${slot.remainingCapacity} vagas restantes`
     }
-
-    return null
-  }
-
-  // Função para recarregar disponibilidade
-  const refreshAvailability = (startDate?: Date, endDate?: Date) => {
-    const start = startDate || new Date()
-    const end = endDate || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) // 30 dias
-    fetchAvailability(start, end)
+    return `${slot.time} - Disponível`
   }
 
   return {
-    availability,
+    timeSlots,
     loading,
     error,
-    fetchAvailability,
-    getAvailabilityForDate,
-    getAvailableTimesForDate,
-    getUnavailableTimesForDate,
-    isDateFullyBooked,
-    checkSpecificTimeAvailability,
-    getNextAvailableDate,
-    refreshAvailability
+    checkAvailability,
+    loadAvailabilityForDate,
+    isTimeAvailable,
+    getTimeSlot,
+    getNextAvailableSlots,
+    getLimitedAvailabilitySlots,
+    getUnavailableSlots,
+    isSunday,
+    isBusinessDay,
+    formatTimeSlot,
+    businessHours
   }
 } 

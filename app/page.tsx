@@ -1,17 +1,27 @@
-import HeroSection from '../components/sections/HeroSection'
-import AboutSection from '../components/sections/AboutSection'
-import MenuPreview from '../components/sections/MenuPreview'
-import BlogPreview from '../components/sections/BlogPreview'
-import ContactSection from '../components/sections/ContactSection'
+import { 
+  ClientHeroSection, 
+  ClientAboutSection, 
+  ClientMenuPreview, 
+  ClientBlogPreview, 
+  ClientContactSection 
+} from '../components/ClientComponents'
 
 export default function HomePage() {
   return (
-    <>
-      <HeroSection />
-      <AboutSection />
-      <MenuPreview />
-      <BlogPreview />
-      <ContactSection />
-    </>
+    <main className="main-content">
+      <ClientHeroSection />
+      <div className="section-spacing">
+        <ClientAboutSection />
+      </div>
+      <div className="section-spacing">
+        <ClientMenuPreview />
+      </div>
+      <div className="section-spacing">
+        <ClientBlogPreview />
+      </div>
+      <div className="section-spacing">
+        <ClientContactSection />
+      </div>
+    </main>
   )
 }

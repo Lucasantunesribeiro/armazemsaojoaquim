@@ -1,3 +1,5 @@
+'use client'
+
 import React from 'react'
 import { cn } from '../../lib/utils'
 
@@ -287,6 +289,84 @@ export const LoadingGrid: React.FC<LoadingGridProps> = ({
       ))}
     </div>
   )
+}
+
+interface LoadingProps {
+  size?: 'sm' | 'md' | 'lg' | 'xl'
+  text?: string
+  fullScreen?: boolean
+}
+
+export function Loading({ 
+  size = 'md', 
+  text = 'Carregando...', 
+  fullScreen = false 
+}: LoadingProps) {
+  const sizeClasses = {
+    sm: 'w-6 h-6',
+    md: 'w-8 h-8',
+    lg: 'w-12 h-12',
+    xl: 'w-16 h-16'
+  }
+
+  const iconSize = {
+    sm: 'text-2xl',
+    md: 'text-3xl',
+    lg: 'text-4xl',
+    xl: 'text-6xl'
+  }
+
+  const LoadingSpinner = () => (
+    <div className="flex flex-col items-center justify-center space-y-4">
+      {/* Animated Building Icon */}
+      <div className="relative">
+        <div className={`${iconSize[size]} animate-pulse`}>
+          🏛️
+        </div>
+        <div className="absolute inset-0 animate-spin">
+          <div className={`
+            ${sizeClasses[size]} 
+            border-2 border-amber-600/20 border-t-amber-600 
+            rounded-full
+          `} />
+        </div>
+      </div>
+      
+      {/* Loading Text */}
+      {text && (
+        <div className="text-center">
+          <p className="text-slate-600 dark:text-slate-400 font-medium">
+            {text}
+          </p>
+          <div className="flex items-center justify-center space-x-1 mt-2">
+            <div className="w-2 h-2 bg-amber-600 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+            <div className="w-2 h-2 bg-amber-600 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+            <div className="w-2 h-2 bg-amber-600 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+          </div>
+        </div>
+      )}
+    </div>
+  )
+
+  if (fullScreen) {
+    return (
+      <div className="fixed inset-0 bg-white/80 dark:bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center">
+        <div className="text-center">
+          <LoadingSpinner />
+          <div className="mt-6">
+            <h2 className="text-xl font-semibold text-slate-800 dark:text-slate-200 mb-2">
+              Armazém São Joaquim
+            </h2>
+            <p className="text-sm text-slate-600 dark:text-slate-400">
+              "En esta casa tenemos memoria"
+            </p>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  return <LoadingSpinner />
 }
 
 export default LoadingSpinner 
