@@ -1,51 +1,91 @@
 import { supabase } from './supabase'
-import { Tables } from '../types/database.types'
+import { Database } from '../types/database.types'
+
+// ============================
+// TYPE DEFINITIONS
+// ============================
+
+export type BlogPost = Database['public']['Tables']['blog_posts']['Row']
+export type MenuItem = Database['public']['Tables']['menu_items']['Row']
+export type Reserva = Database['public']['Tables']['reservas']['Row']
+
+// Helper function to check if data is valid
+function isValidData<T>(data: any): data is T[] {
+  return Array.isArray(data) && !data.some(item => item?.error === true)
+}
+
+function isValidSingleData<T>(data: any): data is T {
+  return data && typeof data === 'object' && !data.error
+}
 
 // ============================
 // BLOG OPERATIONS
 // ============================
 
-export type BlogPost = Tables<'blog_posts'>
-export type MenuItem = Tables<'menu_items'>
-export type Reserva = Tables<'reservas'>
-
 export const blogApi = {
   // Buscar todos os posts publicados
   async getAllPosts(): Promise<BlogPost[]> {
-    const { data, error } = await supabase
-      .from('blog_posts')
-      .select('*')
-      .eq('publicado', true)
-      .order('created_at', { ascending: false })
+    try {
+      const { data, error } = await (supabase as any)
+        .from('blog_posts')
+        .select('*')
+        .eq('published', true)
+        .order('created_at', { ascending: false })
 
-    if (error) throw error
-    return data || []
+      if (error) {
+        console.error('Erro ao buscar posts:', error)
+        return []
+      }
+      
+      return isValidData<BlogPost>(data) ? data : []
+    } catch (error) {
+      console.error('Erro ao buscar posts:', error)
+      return []
+    }
   },
 
   // Buscar post por slug
   async getPostBySlug(slug: string): Promise<BlogPost | null> {
-    const { data, error } = await supabase
-      .from('blog_posts')
-      .select('*')
-      .eq('slug', slug)
-      .eq('publicado', true)
-      .single()
+    try {
+      const { data, error } = await (supabase as any)
+        .from('blog_posts')
+        .select('*')
+        .eq('slug', slug)
+        .eq('published', true)
+        .single()
 
-    if (error) return null
-    return data
+      if (error) {
+        console.error('Erro ao buscar post por slug:', error)
+        return null
+      }
+      
+      return isValidSingleData<BlogPost>(data) ? data : null
+    } catch (error) {
+      console.error('Erro ao buscar post por slug:', error)
+      return null
+    }
   },
 
   // Buscar posts com busca por texto
   async searchPosts(searchTerm: string): Promise<BlogPost[]> {
-    const { data, error } = await supabase
-      .from('blog_posts')
-      .select('*')
-      .eq('publicado', true)
-      .or(`titulo.ilike.%${searchTerm}%, resumo.ilike.%${searchTerm}%`)
-      .order('created_at', { ascending: false })
+    try {
+      const { data, error } = await (supabase as any)
+        .from('blog_posts')
+        .select('*')
+        .eq('published', true)
+        .or(`title.ilike.%${searchTerm}%, excerpt.ilike.%${searchTerm}%`)
+        .order('created_at', { ascending: false })
 
-    if (error) throw error
-    return data || []
+      if (error) {
+        console.error('Erro ao buscar posts:', error)
+        return []
+      }
+      
+      return isValidData<BlogPost>(data) ? data : []
+    } catch (error) {
+      console.error('Erro ao buscar posts:', error)
+      return []
+    }
   }
 }
 
@@ -56,56 +96,92 @@ export const blogApi = {
 export const menuApi = {
   // Buscar todos os itens disponíveis
   async getAllItems(): Promise<MenuItem[]> {
-    const { data, error } = await supabase
-      .from('menu_items')
-      .select('*')
-      .eq('available', true)
-      .order('category')
-      .order('name')
+    try {
+      const { data, error } = await (supabase as any)
+        .from('menu_items')
+        .select('*')
+        .eq('available', true)
+        .order('category')
+        .order('name')
 
-    if (error) throw error
-    return data || []
+      if (error) {
+        console.error('Erro ao buscar itens do menu:', error)
+        return []
+      }
+      
+      return isValidData<MenuItem>(data) ? data : []
+    } catch (error) {
+      console.error('Erro ao buscar itens do menu:', error)
+      return []
+    }
   },
 
   // Buscar itens por categoria
   async getItemsByCategory(category: string): Promise<MenuItem[]> {
-    const { data, error } = await supabase
-      .from('menu_items')
-      .select('*')
-      .eq('category', category)
-      .eq('available', true)
-      .order('name')
+    try {
+      const { data, error } = await (supabase as any)
+        .from('menu_items')
+        .select('*')
+        .eq('category', category)
+        .eq('available', true)
+        .order('name')
 
-    if (error) throw error
-    return data || []
+      if (error) {
+        console.error('Erro ao buscar itens por categoria:', error)
+        return []
+      }
+      
+      return isValidData<MenuItem>(data) ? data : []
+    } catch (error) {
+      console.error('Erro ao buscar itens por categoria:', error)
+      return []
+    }
   },
 
   // Buscar itens com filtro de texto
   async searchItems(searchTerm: string): Promise<MenuItem[]> {
-    const { data, error } = await supabase
-      .from('menu_items')
-      .select('*')
-      .eq('available', true)
-      .or(`name.ilike.%${searchTerm}%, description.ilike.%${searchTerm}%`)
-      .order('category')
-      .order('name')
+    try {
+      const { data, error } = await (supabase as any)
+        .from('menu_items')
+        .select('*')
+        .eq('available', true)
+        .or(`name.ilike.%${searchTerm}%, description.ilike.%${searchTerm}%`)
+        .order('category')
+        .order('name')
 
-    if (error) throw error
-    return data || []
+      if (error) {
+        console.error('Erro ao buscar itens:', error)
+        return []
+      }
+      
+      return isValidData<MenuItem>(data) ? data : []
+    } catch (error) {
+      console.error('Erro ao buscar itens:', error)
+      return []
+    }
   },
 
   // Buscar categorias disponíveis
   async getCategories(): Promise<string[]> {
-    const { data, error } = await supabase
-      .from('menu_items')
-      .select('category')
-      .eq('available', true)
+    try {
+      const { data, error } = await (supabase as any)
+        .from('menu_items')
+        .select('category')
+        .eq('available', true)
 
-    if (error) throw error
-    
-    const uniqueCategories = new Set(data?.map((item: any) => item.category as string) || [])
-    const categories = Array.from(uniqueCategories) as string[]
-    return categories.sort()
+      if (error) {
+        console.error('Erro ao buscar categorias:', error)
+        return []
+      }
+      
+      if (!isValidData(data)) return []
+      
+      const uniqueCategories = new Set(data.map((item: any) => item.category as string))
+      return Array.from(uniqueCategories).sort()
+    } catch (error) {
+      console.error('Erro ao buscar categorias:', error)
+      return []
+    }
   }
 }
 
@@ -116,66 +192,109 @@ export const menuApi = {
 export const reservasApi = {
   // Buscar reservas do usuário
   async getUserReservations(userId: string): Promise<Reserva[]> {
-    const { data, error } = await supabase
-      .from('reservas')
-      .select('*')
-      .eq('user_id', userId)
-      .order('data', { ascending: true })
+    try {
+      const { data, error } = await (supabase as any)
+        .from('reservas')
+        .select('*')
+        .eq('user_id', userId)
+        .order('data', { ascending: true })
 
-    if (error) throw error
-    return data || []
+      if (error) {
+        console.error('Erro ao buscar reservas do usuário:', error)
+        return []
+      }
+      
+      return isValidData<Reserva>(data) ? data : []
+    } catch (error) {
+      console.error('Erro ao buscar reservas do usuário:', error)
+      return []
+    }
   },
 
   // Criar nova reserva
-  async createReservation(reserva: Omit<Reserva, 'id' | 'created_at' | 'updated_at'>): Promise<Reserva> {
-    const { data, error } = await supabase
-      .from('reservas')
-      .insert(reserva)
-      .select()
-      .single()
+  async createReservation(reserva: Database['public']['Tables']['reservas']['Insert']): Promise<Reserva | null> {
+    try {
+      const { data, error } = await (supabase as any)
+        .from('reservas')
+        .insert(reserva)
+        .select()
+        .single()
 
-    if (error) throw error
-    if (!data) throw new Error('Falha ao criar reserva')
-    return data
+      if (error) {
+        console.error('Erro ao criar reserva:', error)
+        throw error
+      }
+
+      return isValidSingleData<Reserva>(data) ? data : null
+    } catch (error) {
+      console.error('Erro ao criar reserva:', error)
+      throw error
+    }
   },
 
   // Atualizar reserva
-  async updateReservation(id: string, updates: Partial<Reserva>): Promise<Reserva> {
-    const { data, error } = await supabase
-      .from('reservas')
-      .update(updates)
-      .eq('id', id)
-      .select()
-      .single()
+  async updateReservation(id: string, updates: Database['public']['Tables']['reservas']['Update']): Promise<Reserva | null> {
+    try {
+      const { data, error } = await (supabase as any)
+        .from('reservas')
+        .update(updates)
+        .eq('id', id)
+        .select()
+        .single()
 
-    if (error) throw error
-    if (!data) throw new Error('Falha ao atualizar reserva')
-    return data
+      if (error) {
+        console.error('Erro ao atualizar reserva:', error)
+        throw error
+      }
+
+      return isValidSingleData<Reserva>(data) ? data : null
+    } catch (error) {
+      console.error('Erro ao atualizar reserva:', error)
+      throw error
+    }
   },
 
   // Deletar reserva
   async deleteReservation(id: string): Promise<void> {
-    const { error } = await supabase
-      .from('reservas')
-      .delete()
-      .eq('id', id)
+    try {
+      const { error } = await (supabase as any)
+        .from('reservas')
+        .delete()
+        .eq('id', id)
 
-    if (error) throw error
+      if (error) {
+        console.error('Erro ao deletar reserva:', error)
+        throw error
+      }
+    } catch (error) {
+      console.error('Erro ao deletar reserva:', error)
+      throw error
+    }
   },
 
   // Verificar disponibilidade
   async checkAvailability(data: string, horario: string): Promise<boolean> {
-    const { data: reservas, error } = await supabase
-      .from('reservas')
-      .select('id')
-      .eq('data', data)
-      .eq('horario', horario)
-      .neq('status', 'cancelada')
+    try {
+      const { data: reservas, error } = await (supabase as any)
+        .from('reservas')
+        .select('id')
+        .eq('data', data)
+        .eq('horario', horario)
+        .neq('status', 'cancelada')
 
-    if (error) return false
-    
-    // Assumindo limite de 10 reservas por horário
-    return (reservas?.length || 0) < 10
+      if (error) {
+        console.error('Erro ao verificar disponibilidade:', error)
+        return false
+      }
+      
+      if (!isValidData(reservas)) return true
+      
+      // Assumindo limite de 10 reservas por horário
+      return reservas.length < 10
+    } catch (error) {
+      console.error('Erro ao verificar disponibilidade:', error)
+      return false
+    }
   }
 }
 
@@ -186,43 +305,67 @@ export const reservasApi = {
 export const analyticsApi = {
   // Estatísticas do menu
   async getMenuStats() {
-    const { data, error } = await supabase
-      .from('menu_items')
-      .select('category, id')
-      .eq('available', true)
+    try {
+      const { data, error } = await (supabase as any)
+        .from('menu_items')
+        .select('category, id')
+        .eq('available', true)
 
-    if (error) return null
+      if (error) {
+        console.error('Erro ao buscar estatísticas do menu:', error)
+        return null
+      }
 
-    const stats = data?.reduce((acc: Record<string, number>, item: any) => {
-      acc[item.category] = (acc[item.category] || 0) + 1
-      return acc
-    }, {} as Record<string, number>)
+      if (!isValidData(data)) return null
 
-    return stats
+      const stats = data.reduce((acc: Record<string, number>, item: any) => {
+        acc[item.category] = (acc[item.category] || 0) + 1
+        return acc
+      }, {} as Record<string, number>)
+
+      return {
+        totalItems: data.length,
+        byCategory: stats
+      }
+    } catch (error) {
+      console.error('Erro ao buscar estatísticas do menu:', error)
+      return null
+    }
   },
 
   // Estatísticas de reservas
   async getReservationStats(userId?: string) {
-    let query = supabase
-      .from('reservas')
-      .select('status, data, pessoas')
+    try {
+      let query = (supabase as any)
+        .from('reservas')
+        .select('status, data, pessoas')
 
-    if (userId) {
-      query = query.eq('user_id', userId)
+      if (userId) {
+        query = query.eq('user_id', userId)
+      }
+
+      const { data, error } = await query
+
+      if (error) {
+        console.error('Erro ao buscar estatísticas de reservas:', error)
+        return null
+      }
+
+      if (!isValidData(data)) return { total: 0, byStatus: {}, totalPessoas: 0 }
+
+      const stats = data.reduce((acc: any, reserva: any) => {
+        acc.total = (acc.total || 0) + 1
+        acc.byStatus = acc.byStatus || {}
+        acc.byStatus[reserva.status] = (acc.byStatus[reserva.status] || 0) + 1
+        acc.totalPessoas = (acc.totalPessoas || 0) + reserva.pessoas
+        return acc
+      }, {})
+
+      return stats || { total: 0, byStatus: {}, totalPessoas: 0 }
+    } catch (error) {
+      console.error('Erro ao buscar estatísticas de reservas:', error)
+      return null
     }
-
-    const { data, error } = await query
-
-    if (error) return null
-
-    const stats = data?.reduce((acc: Record<string, number>, reserva: any) => {
-      acc.total = (acc.total || 0) + 1
-      acc[reserva.status] = (acc[reserva.status] || 0) + 1
-      acc.totalPessoas = (acc.totalPessoas || 0) + reserva.pessoas
-      return acc
-    }, {} as Record<string, number>)
-
-    return stats
   }
 }
 
@@ -247,9 +390,8 @@ export const utils = {
   // Verificar se a data é futura
   isFutureDate(dateString: string): boolean {
     const date = new Date(dateString)
-    const today = new Date()
-    today.setHours(0, 0, 0, 0)
-    return date >= today
+    const now = new Date()
+    return date > now
   },
 
   // Gerar slug a partir do título

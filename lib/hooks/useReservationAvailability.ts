@@ -43,8 +43,8 @@ export function useReservationAvailability(selectedDate?: string) {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          data: date,
-          horario: time,
+          date: date,
+          time: time,
           guests: guests
         })
       })

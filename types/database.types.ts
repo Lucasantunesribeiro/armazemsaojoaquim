@@ -12,37 +12,67 @@ export type Database = {
       blog_posts: {
         Row: {
           id: string
-          titulo: string
-          conteudo: string
-          resumo: string | null
-          imagem: string | null
-          publicado: boolean
+          title: string
+          content: string
+          excerpt: string | null
+          featured_image: string | null
+          published: boolean
           author_id: string | null
           slug: string
+          published_at: string | null
           created_at: string
           updated_at: string
         }
         Insert: {
           id?: string
-          titulo: string
-          conteudo: string
-          resumo?: string | null
-          imagem?: string | null
-          publicado?: boolean
+          title: string
+          content: string
+          excerpt?: string | null
+          featured_image?: string | null
+          published?: boolean
           author_id?: string | null
           slug: string
+          published_at?: string | null
           created_at?: string
           updated_at?: string
         }
         Update: {
           id?: string
-          titulo?: string
-          conteudo?: string
-          resumo?: string | null
-          imagem?: string | null
-          publicado?: boolean
+          title?: string
+          content?: string
+          excerpt?: string | null
+          featured_image?: string | null
+          published?: boolean
           author_id?: string | null
           slug?: string
+          published_at?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      menu_categories: {
+        Row: {
+          id: string
+          name: string
+          description: string | null
+          display_order: number
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          name: string
+          description?: string | null
+          display_order?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          name?: string
+          description?: string | null
+          display_order?: number
           created_at?: string
           updated_at?: string
         }
@@ -167,6 +197,105 @@ export type Database = {
             referencedColumns: ["id"]
           }
         ]
+      }
+      profiles: {
+        Row: {
+          id: string
+          email: string | null
+          name: string | null
+          phone: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id: string
+          email?: string | null
+          name?: string | null
+          phone?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          email?: string | null
+          name?: string | null
+          phone?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      availability_settings: {
+        Row: {
+          id: string
+          day_of_week: number
+          opening_time: string
+          closing_time: string
+          max_capacity: number
+          is_closed: boolean
+          special_hours: Json | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          day_of_week: number
+          opening_time: string
+          closing_time: string
+          max_capacity?: number
+          is_closed?: boolean
+          special_hours?: Json | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          day_of_week?: number
+          opening_time?: string
+          closing_time?: string
+          max_capacity?: number
+          is_closed?: boolean
+          special_hours?: Json | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      contact_messages: {
+        Row: {
+          id: string
+          name: string
+          email: string
+          phone: string | null
+          subject: string | null
+          message: string
+          status: string
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          name: string
+          email: string
+          phone?: string | null
+          subject?: string | null
+          message: string
+          status?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          name?: string
+          email?: string
+          phone?: string | null
+          subject?: string | null
+          message?: string
+          status?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
     }
     Views: {

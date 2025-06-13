@@ -70,11 +70,10 @@ export default function ReservasPage() {
 
   const fetchUserReservations = async () => {
     if (!user) return
-    
-    setLoadingReservations(true)
+
     try {
       const { supabase } = await import('../../lib/supabase')
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('reservas')
         .select('*')
         .eq('user_id', user.id)
@@ -83,14 +82,13 @@ export default function ReservasPage() {
       if (error) {
         console.error('Erro ao buscar reservas:', error)
         toast.error('Erro ao carregar suas reservas')
-      } else {
-        setUserReservations(data || [])
+        return
       }
+
+      setUserReservations(data || [])
     } catch (error) {
-      console.error('Erro inesperado:', error)
-      toast.error('Erro ao conectar com o servidor')
-    } finally {
-      setLoadingReservations(false)
+      console.error('Erro ao buscar reservas:', error)
+      toast.error('Erro ao carregar suas reservas')
     }
   }
 
@@ -108,6 +106,60 @@ export default function ReservasPage() {
     if (!user) {
       toast.error('Você precisa estar logado para fazer uma reserva')
       router.push('/auth')
+      return
+    }
+
+    // Validação dos dados do formulário
+    if (!formData.name.trim()) {
+      toast.error('Nome é obrigatório')
+      return
+    }
+
+    if (!formData.email.trim()) {
+      toast.error('Email é obrigatório')
+      return
+    }
+
+    if (!formData.phone.trim()) {
+      toast.error('Telefone é obrigatório')
+      return
+    }
+
+    if (!formData.date) {
+      toast.error('Data é obrigatória')
+      return
+    }
+
+    if (!formData.time) {
+      toast.error('Horário é obrigatório')
+      return
+    }
+
+    if (formData.guests < 1 || formData.guests > 12) {
+      toast.error('Número de pessoas deve ser entre 1 e 12')
+      return
+    }
+
+    // Verificar se a data é no futuro
+    const selectedDate = new Date(`${formData.date}T${formData.time}`)
+    const now = new Date()
+    
+    if (selectedDate <= now) {
+      toast.error('Data e horário devem ser no futuro')
+      return
+    }
+
+    // Verificar se é segunda-feira (restaurante fechado)
+    const dayOfWeek = selectedDate.getDay()
+    if (dayOfWeek === 1) {
+      toast.error('Restaurante fechado às segundas-feiras')
+      return
+    }
+
+    // Verificar horário de funcionamento (18h às 23h)
+    const hour = parseInt(formData.time.split(':')[0])
+    if (hour < 18 || hour >= 23) {
+      toast.error('Horário de funcionamento: 18h às 23h')
       return
     }
 
@@ -130,18 +182,18 @@ export default function ReservasPage() {
       const availabilityData = await availabilityResponse.json()
 
       if (!availabilityResponse.ok) {
-        toast.error(availabilityData.message || 'Erro ao verificar disponibilidade')
+        toast.error(availabilityData.error || availabilityData.message || 'Erro ao verificar disponibilidade')
         return
       }
 
       if (!availabilityData.available) {
-        toast.error('Horário não disponível. Tente outro horário.')
+        toast.error(availabilityData.message || 'Horário não disponível. Tente outro horário.')
         return
       }
 
       // Create reservation
       const { supabase } = await import('../../lib/supabase')
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('reservas')
         .insert([
           {
