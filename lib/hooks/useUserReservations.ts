@@ -32,8 +32,9 @@ export const useUserReservations = () => {
 
       if (error) {
         console.error('Erro ao buscar reservas:', error)
+        setUserReservations([])
       } else {
-        setUserReservations(data || [])
+        setUserReservations((data as UserReservation[]) || [])
       }
     } catch (error) {
       console.error('Erro inesperado ao buscar reservas:', error)
