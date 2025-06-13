@@ -288,29 +288,42 @@ export function useReservationMutations() {
 // ANALYTICS HOOKS
 // ============================
 
-export function useMenuStats() {
-  const [stats, setStats] = useState<Record<string, number> | null>(null)
-  const [loading, setLoading] = useState(true)
+interface MenuStats {
+  totalItems: number
+  byCategory: Record<string, number>
+}
+
+export const useMenuStats = () => {
+  const [stats, setStats] = useState<MenuStats | null>(null)
+  const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  useEffect(() => {
-    const fetchStats = async () => {
-      try {
-        setLoading(true)
-        const data = await analyticsApi.getMenuStats()
-        setStats(data)
-        setError(null)
-      } catch (err) {
-        setError(utils.formatError(err))
-      } finally {
-        setLoading(false)
-      }
+  const fetchStats = async () => {
+    try {
+      setLoading(true)
+      const data = await analyticsApi.getMenuStats()
+      setStats(data)
+      setError(null)
+    } catch (err) {
+      setError(utils.formatError(err))
+    } finally {
+      setLoading(false)
     }
+  }
 
-    fetchStats()
-  }, [])
+  return {
+    stats,
+    loading,
+    error,
+    fetchStats,
+    refetch: fetchStats
+  }
+}
 
-  return { stats, loading, error }
+interface ReservationStatsData {
+  total: number
+  byStatus: Record<string, number>
+  totalPessoas: number
 }
 
 export const useReservationStats = (userId?: string) => {
@@ -328,14 +341,15 @@ export const useReservationStats = (userId?: string) => {
     setError(null)
     
     try {
-      const data = await analyticsApi.getReservationStats(userId)
+      const data = await analyticsApi.getReservationStats(userId) as ReservationStatsData | null
       if (data) {
         // Transform the data to match expected interface
+        const byStatus = data.byStatus || {}
         const transformedStats = {
           total: data.total || 0,
-          confirmed: data.confirmada || 0,
-          pending: data.pendente || 0,
-          cancelled: data.cancelada || 0
+          confirmed: byStatus.confirmada || 0,
+          pending: byStatus.pendente || 0,
+          cancelled: byStatus.cancelada || 0
         }
         setStats(transformedStats)
       } else {
