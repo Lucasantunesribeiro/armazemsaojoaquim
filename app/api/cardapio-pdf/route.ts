@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { readFile } from 'fs/promises'
+import { join } from 'path'
 
 // Simulando dados do cardápio - em produção, você buscaria do Supabase
 const menuData = {
@@ -26,24 +28,28 @@ const menuData = {
 
 export async function GET(request: NextRequest) {
   try {
-    // Em produção, você geraria um PDF real usando bibliotecas como jsPDF, Puppeteer, etc.
-    // Por enquanto, vamos retornar o HTML formatado que pode ser convertido em PDF
+    // Caminho para o arquivo PDF
+    const pdfPath = join(process.cwd(), 'public', 'images', 'Cardapio.pdf')
     
-    const htmlContent = generateMenuHTML()
+    // Ler o arquivo PDF
+    const pdfBuffer = await readFile(pdfPath)
     
-    // Para desenvolvimento, retornamos o HTML
-    // Em produção, você converteria para PDF e retornaria o buffer
-    return new NextResponse(htmlContent, {
+    // Retornar o PDF com headers corretos
+    return new NextResponse(pdfBuffer, {
       headers: {
-        'Content-Type': 'text/html; charset=utf-8',
-        'Content-Disposition': 'inline; filename="cardapio-armazem-sao-joaquim.html"'
+        'Content-Type': 'application/pdf',
+        'Content-Disposition': 'attachment; filename="cardapio-armazem-sao-joaquim.pdf"',
+        'Content-Length': pdfBuffer.length.toString(),
       }
     })
 
   } catch (error) {
-    console.error('PDF generation error:', error)
+    console.error('Erro ao servir PDF:', error)
     return NextResponse.json(
-      { error: 'Erro ao gerar PDF do cardápio' },
+      { 
+        error: 'Erro ao baixar cardápio',
+        message: 'Arquivo PDF não encontrado ou erro interno do servidor'
+      },
       { status: 500 }
     )
   }

@@ -1,11 +1,13 @@
+import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
-import { ArrowLeft, Calendar, User, Clock } from 'lucide-react'
+import { ArrowLeft, Calendar, User, Clock, Share2, BookOpen, Tag } from 'lucide-react'
 import { formatDate } from '../../../lib/utils'
 import { trackDatabaseError, trackApiError } from '../../../lib/error-tracking'
 import { supabase } from '../../../lib/supabase'
 import { blogCache } from '../../../lib/cache-manager'
+import { blogApi } from '@/lib/api'
 
 interface BlogPost {
   id: string
@@ -87,7 +89,7 @@ async function getBlogPost(slug: string): Promise<BlogPost | null> {
         .from('blog_posts')
         .select('*')
         .eq('slug', slug)
-        .eq('publicado', true)
+        .eq('published', true)
         .single()
 
       if (error) {
@@ -102,14 +104,14 @@ async function getBlogPost(slug: string): Promise<BlogPost | null> {
       if (data) {
         const post = {
           id: (data as any).id || 'mock-id',
-          title: (data as any).titulo || 'Mock Title',
-          content: (data as any).conteudo || 'Mock content',
-          excerpt: (data as any).resumo || null,
-          image_url: (data as any).imagem || null,
+          title: (data as any).title || 'Mock Title',
+          content: (data as any).content || 'Mock content',
+          excerpt: (data as any).excerpt || null,
+          image_url: (data as any).featured_image || null,
           slug: (data as any).slug || slug,
           created_at: (data as any).created_at || new Date().toISOString(),
           author: (data as any).author_id || 'Armazém São Joaquim',
-          published: (data as any).publicado || true
+          published: (data as any).published || true
         }
         
         // Cache do resultado
@@ -144,141 +146,272 @@ async function getBlogPost(slug: string): Promise<BlogPost | null> {
   }
 }
 
-export default async function BlogPostPage({ params }: BlogPostPageProps) {
-  const post = await getBlogPost(params.slug)
+export async function generateMetadata({ params }: BlogPostPageProps): Promise<Metadata> {
+  try {
+    const post = await blogApi.getPostBySlug(params.slug)
+    
+    if (!post) {
+      return {
+        title: 'Post não encontrado - Armazém São Joaquim',
+        description: 'O post solicitado não foi encontrado.'
+      }
+    }
 
-  if (!post) {
-    notFound()
+    return {
+      title: `${post.title} - Armazém São Joaquim`,
+      description: post.excerpt || 'Blog do Armazém São Joaquim',
+      openGraph: {
+        title: post.title,
+        description: post.excerpt || '',
+        images: post.featured_image ? [post.featured_image] : [],
+        type: 'article',
+        publishedTime: post.published_at || undefined,
+      },
+    }
+  } catch (error) {
+    console.error('Erro ao gerar metadata:', error)
+    return {
+      title: 'Erro - Armazém São Joaquim',
+      description: 'Erro ao carregar o post.'
+    }
   }
+}
 
-  return (
-    <article className="min-h-screen pt-32 bg-cinza-claro">
-      <div className="container mx-auto px-4 py-12">
-        <div className="max-w-4xl mx-auto">
-          {/* Back Button */}
-          <Link 
-            href="/blog"
-            className="inline-flex items-center text-amarelo-armazem font-semibold hover:text-vermelho-portas transition-colors mb-8"
-          >
-            <ArrowLeft className="w-5 h-5 mr-2" />
-            Voltar para o blog
-          </Link>
+export default async function BlogPostPage({ params }: BlogPostPageProps) {
+  try {
+    const post = await blogApi.getPostBySlug(params.slug)
+    
+    if (!post) {
+      notFound()
+    }
 
-          {/* Featured Image */}
-          {post.image_url && (
-            <div className="relative h-96 rounded-lg overflow-hidden shadow-xl mb-8">
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-amber-50 via-white to-orange-50">
+        {/* Hero Section com Imagem */}
+        <section className="relative h-[60vh] min-h-[400px] overflow-hidden">
+          {/* Background Image */}
+          <div className="absolute inset-0">
+            {post.featured_image ? (
               <Image
-                src={post.image_url}
+                src={post.featured_image}
                 alt={post.title}
                 fill
                 className="object-cover"
+                priority
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
-            </div>
-          )}
-
-          {/* Article Header */}
-          <header className="mb-8">
-            <h1 className="font-playfair text-4xl md:text-5xl font-bold text-madeira-escura mb-6">
-              {post.title}
-            </h1>
-            
-            <div className="flex flex-wrap items-center gap-6 text-cinza-medio">
-              <div className="flex items-center">
-                <Calendar className="w-5 h-5 mr-2" />
-                <span>{formatDate(post.created_at)}</span>
-              </div>
-              <div className="flex items-center">
-                <User className="w-5 h-5 mr-2" />
-                <span>{post.author}</span>
-              </div>
-              <div className="flex items-center">
-                <Clock className="w-5 h-5 mr-2" />
-                <span>5 min de leitura</span>
-              </div>
-            </div>
-          </header>
-
-          {/* Article Content */}
-          <div className="bg-white rounded-lg shadow-sm p-8 mb-8">
-            {/* Resumo */}
-            {post.excerpt && (
-              <div className="text-xl text-cinza-medio mb-8 p-6 bg-amarelo-armazem/10 rounded-lg border-l-4 border-amarelo-armazem">
-                {post.excerpt}
-              </div>
+            ) : (
+              <div className="w-full h-full bg-gradient-to-br from-amber-200 via-orange-200 to-red-200" />
             )}
-
-            {/* Conteúdo */}
-            <div 
-              className="prose prose-lg max-w-none prose-headings:font-playfair prose-headings:text-madeira-escura prose-p:text-cinza-medio prose-a:text-amarelo-armazem hover:prose-a:text-vermelho-portas"
-              dangerouslySetInnerHTML={{ __html: post.content }}
-            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/20" />
           </div>
 
-          {/* Call to Action */}
-          <div className="bg-gradient-to-r from-amarelo-armazem to-vermelho-portas rounded-lg p-8 text-center">
-            <h3 className="font-playfair text-2xl font-bold text-white mb-4">
-              Venha viver essa história conosco
-            </h3>
-            <p className="text-white/90 mb-6">
-              Faça uma reserva e desfrute da autenticidade de Santa Teresa
-            </p>
-            <Link href="/reservas">
-              <button className="bg-white text-madeira-escura px-8 py-3 rounded-lg font-semibold hover:bg-cinza-claro transition-colors">
-                Fazer Reserva
-              </button>
-            </Link>
+          {/* Content Overlay */}
+          <div className="relative z-10 h-full flex items-end">
+            <div className="container mx-auto px-4 pb-16">
+              {/* Breadcrumb */}
+              <nav className="mb-6">
+                <ol className="flex items-center space-x-2 text-sm text-white/80">
+                  <li>
+                    <Link href="/" className="hover:text-amber-300 transition-colors flex items-center">
+                      <ArrowLeft className="w-4 h-4 mr-1" />
+                      Início
+                    </Link>
+                  </li>
+                  <li className="text-white/60">/</li>
+                  <li>
+                    <Link href="/blog" className="hover:text-amber-300 transition-colors">
+                      Blog
+                    </Link>
+                  </li>
+                  <li className="text-white/60">/</li>
+                  <li className="text-amber-300 font-medium">
+                    {post.title}
+                  </li>
+                </ol>
+              </nav>
+
+              {/* Title and Meta */}
+              <div className="max-w-4xl">
+                <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 font-playfair leading-tight">
+                  {post.title}
+                </h1>
+                
+                {post.excerpt && (
+                  <p className="text-xl text-white/90 mb-8 leading-relaxed max-w-3xl">
+                    {post.excerpt}
+                  </p>
+                )}
+
+                {/* Meta Information */}
+                <div className="flex flex-wrap items-center gap-6 text-white/80">
+                  <div className="flex items-center space-x-2">
+                    <User className="w-5 h-5" />
+                    <span className="font-medium">{'Armazém São Joaquim'}</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Calendar className="w-5 h-5" />
+                    <time dateTime={post.created_at}>
+                      {formatDate(post.created_at)}
+                    </time>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Clock className="w-5 h-5" />
+                    <span>5 min de leitura</span>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
+        </section>
+
+        {/* Article Content */}
+        <section className="py-16">
+          <div className="container mx-auto px-4">
+            <div className="max-w-4xl mx-auto">
+              {/* Article Body */}
+              <article className="prose prose-lg prose-amber max-w-none">
+                <div 
+                  className="text-gray-700 leading-relaxed"
+                  dangerouslySetInnerHTML={{ __html: formatContent(post.content) }}
+                />
+              </article>
+
+              {/* Share Section */}
+              <div className="mt-16 pt-8 border-t border-gray-200">
+                <div className="flex items-center justify-between flex-wrap gap-4">
+                  <div className="flex items-center space-x-2 text-gray-600">
+                    <Share2 className="w-5 h-5" />
+                    <span className="font-medium">Compartilhe este artigo</span>
+                  </div>
+                  
+                  <div className="flex items-center space-x-3">
+                    <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors">
+                      Facebook
+                    </button>
+                    <button className="bg-blue-400 hover:bg-blue-500 text-white px-4 py-2 rounded-lg transition-colors">
+                      Twitter
+                    </button>
+                    <button className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors">
+                      WhatsApp
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Navigation */}
+              <div className="mt-16 pt-8 border-t border-gray-200">
+                <div className="flex items-center justify-between">
+                  <Link 
+                    href="/blog"
+                    className="inline-flex items-center space-x-2 bg-amber-600 hover:bg-amber-700 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl"
+                  >
+                    <BookOpen className="w-5 h-5" />
+                    <span>Ver Todos os Posts</span>
+                  </Link>
+
+                  <div className="flex items-center space-x-2 text-gray-600">
+                    <Tag className="w-5 h-5" />
+                    <span className="text-sm">Categoria: Cultura & História</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Related Posts Section */}
+        <section className="py-16 bg-gradient-to-br from-amber-50 to-orange-50">
+          <div className="container mx-auto px-4">
+            <div className="max-w-6xl mx-auto">
+              <h2 className="text-3xl font-bold text-center text-gray-800 mb-12 font-playfair">
+                Outros Artigos do Blog
+              </h2>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {mockPosts.filter(p => p.slug !== post.slug).slice(0, 3).map((relatedPost) => (
+                  <Link 
+                    key={relatedPost.id}
+                    href={`/blog/${relatedPost.slug}`}
+                    className="group bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden"
+                  >
+                    <div className="relative h-48 bg-gradient-to-br from-amber-200 to-orange-200">
+                      {relatedPost.image_url ? (
+                        <Image
+                          src={relatedPost.image_url}
+                          alt={relatedPost.title}
+                          fill
+                          className="object-cover group-hover:scale-105 transition-transform duration-300"
+                        />
+                      ) : (
+                        <div className="flex items-center justify-center h-full">
+                          <BookOpen className="w-12 h-12 text-amber-600" />
+                        </div>
+                      )}
+                    </div>
+                    
+                    <div className="p-6">
+                      <h3 className="text-xl font-bold text-gray-800 mb-3 group-hover:text-amber-600 transition-colors font-playfair">
+                        {relatedPost.title}
+                      </h3>
+                      
+                      {relatedPost.excerpt && (
+                        <p className="text-gray-600 text-sm leading-relaxed mb-4">
+                          {relatedPost.excerpt}
+                        </p>
+                      )}
+                      
+                      <div className="flex items-center text-sm text-gray-500">
+                        <Calendar className="w-4 h-4 mr-2" />
+                        <time dateTime={relatedPost.created_at}>
+                          {formatDate(relatedPost.created_at)}
+                        </time>
+                      </div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
       </div>
-    </article>
-  )
+    )
+  } catch (error) {
+    console.error('Erro ao renderizar página do blog:', error)
+    notFound()
+  }
+}
+
+function formatContent(content: string): string {
+  // Converter quebras de linha simples em parágrafos se não houver HTML
+  if (!content.includes('<p>') && !content.includes('<div>')) {
+    return content
+      .split('\n\n')
+      .map(paragraph => paragraph.trim())
+      .filter(paragraph => paragraph.length > 0)
+      .map(paragraph => `<p class="mb-6">${paragraph}</p>`)
+      .join('')
+  }
+  
+  // Se já tem HTML, apenas adicionar classes para estilização
+  return content
+    .replace(/<p>/g, '<p class="mb-6">')
+    .replace(/<h1>/g, '<h1 class="text-3xl font-bold mb-6 mt-8">')
+    .replace(/<h2>/g, '<h2 class="text-2xl font-bold mb-4 mt-6">')
+    .replace(/<h3>/g, '<h3 class="text-xl font-bold mb-3 mt-4">')
+    .replace(/<ul>/g, '<ul class="list-disc list-inside mb-6">')
+    .replace(/<ol>/g, '<ol class="list-decimal list-inside mb-6">')
+    .replace(/<li>/g, '<li class="mb-2">')
 }
 
 export async function generateStaticParams() {
   try {
-    // Tentar carregar do Supabase primeiro
-    try {
-      const { supabase } = await import('../../../lib/supabase')
-      
-      const { data: posts, error } = await supabase
-        .from('blog_posts')
-        .select('slug')
-        .eq('publicado', true)
-
-      if (error) {
-        trackDatabaseError(error, {
-          component: 'BlogPostPage',
-          action: 'Generate Static Params',
-          additionalData: { query: 'blog_posts_slugs' }
-        })
-        throw error
-      }
-
-      if (posts && posts.length > 0) {
-        return (posts as any[]).map((post: any) => ({
-          slug: post.slug || 'mock-slug',
-        }))
-      }
-    } catch (supabaseError) {
-      trackApiError(supabaseError, {
-        component: 'BlogPostPage',
-        action: 'Generate Static Params - Supabase Error',
-        additionalData: { fallback: 'mock_data' }
-      })
-    }
-
-    // Fallback para dados mock
-    return mockPosts.map(post => ({
+    const posts = await blogApi.getAllPosts()
+    return posts.map((post) => ({
       slug: post.slug,
     }))
   } catch (error) {
-    trackApiError(error, {
-      component: 'BlogPostPage',
-      action: 'Generate Static Params - Unexpected Error',
-      additionalData: { errorType: 'unexpected' }
-    })
-    return mockPosts.map(post => ({
+    console.error('Erro ao gerar parâmetros estáticos:', error)
+    return mockPosts.map((post) => ({
       slug: post.slug,
     }))
   }
