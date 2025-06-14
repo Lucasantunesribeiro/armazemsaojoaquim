@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { emailService } from '../../../lib/email-service'
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
-import { cookies } from 'next/headers'
+import { createClient } from '@supabase/supabase-js'
 import crypto from 'crypto'
+
+// Configuração do Supabase com service role para operações administrativas
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
 
 // Função para criar resposta JSON com headers CORS obrigatórios
 function createJsonResponse(data: any, status: number = 200) {
@@ -29,12 +32,23 @@ export async function OPTIONS() {
 // GET - Buscar reservas do usuário
 export async function GET(request: NextRequest) {
   try {
+    // Verificar se as variáveis de ambiente estão configuradas
+    if (!supabaseUrl || !supabaseServiceKey) {
+      console.error('❌ Supabase não configurado:', { 
+        hasUrl: !!supabaseUrl, 
+        hasServiceKey: !!supabaseServiceKey 
+      })
+      return createJsonResponse({
+        error: 'Configuração do servidor incompleta',
+        details: 'Supabase não está configurado corretamente'
+      }, 500)
+    }
+
     const { searchParams } = new URL(request.url)
     const userId = searchParams.get('user_id')
 
-    // Criar cliente Supabase
-    const cookieStore = cookies()
-    const supabase = createRouteHandlerClient({ cookies: () => cookieStore })
+    // Criar cliente Supabase com service role key
+    const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
     // Se não há user_id, retorna lista vazia
     if (!userId) {
@@ -55,10 +69,11 @@ export async function GET(request: NextRequest) {
       .order('created_at', { ascending: false })
 
     if (error) {
-      console.error('Erro ao buscar reservas:', error)
+      console.error('❌ Erro ao buscar reservas:', error)
       return createJsonResponse({
         error: 'Erro ao buscar reservas',
-        details: error.message
+        details: error.message,
+        code: error.code
       }, 500)
     }
 
@@ -85,10 +100,11 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('Erro no GET reservas:', error)
+    console.error('❌ Erro no GET reservas:', error)
     return createJsonResponse({
       error: 'Erro interno do servidor',
-      details: error instanceof Error ? error.message : 'Erro desconhecido'
+      details: error instanceof Error ? error.message : 'Erro desconhecido',
+      timestamp: new Date().toISOString()
     }, 500)
   }
 }
@@ -96,7 +112,30 @@ export async function GET(request: NextRequest) {
 // POST - Criar nova reserva
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json()
+    // Verificar se as variáveis de ambiente estão configuradas
+    if (!supabaseUrl || !supabaseServiceKey) {
+      console.error('❌ Supabase não configurado:', { 
+        hasUrl: !!supabaseUrl, 
+        hasServiceKey: !!supabaseServiceKey 
+      })
+      return createJsonResponse({
+        error: 'Configuração do servidor incompleta',
+        details: 'Supabase não está configurado corretamente'
+      }, 500)
+    }
+
+    // Parse do body dentro do try-catch conforme recomendação
+    let body
+    try {
+      body = await request.json()
+    } catch (parseError) {
+      console.error('❌ Erro ao fazer parse do JSON:', parseError)
+      return createJsonResponse({
+        error: 'JSON inválido no corpo da requisição',
+        details: parseError instanceof Error ? parseError.message : 'Erro de parse'
+      }, 400)
+    }
+
     const { user_id, nome, email, telefone, data, horario, pessoas, observacoes } = body
 
     // Validação básica
@@ -157,9 +196,13 @@ export async function POST(request: NextRequest) {
     // Gerar token de confirmação único
     const confirmationToken = crypto.randomBytes(32).toString('hex')
 
-    // Criar cliente Supabase
-    const cookieStore = cookies()
-    const supabase = createRouteHandlerClient({ cookies: () => cookieStore })
+    // Criar cliente Supabase com service role key
+    const supabase = createClient(supabaseUrl, supabaseServiceKey)
+
+    // Log para debugging
+    console.log('🔍 Tentando criar reserva:', { 
+      user_id, nome, email, data, horario, pessoas 
+    })
 
     // Inserir reserva no banco de dados
     const { data: newReservation, error } = await supabase
@@ -180,12 +223,16 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (error) {
-      console.error('Erro ao criar reserva:', error)
+      console.error('❌ Erro ao criar reserva:', error)
       return createJsonResponse({
         error: 'Erro ao criar reserva',
-        details: error.message
+        details: error.message,
+        code: error.code,
+        hint: error.hint
       }, 500)
     }
+
+    console.log('✅ Reserva criada com sucesso:', newReservation.id)
 
     // Enviar email de confirmação para o usuário
     try {
@@ -198,30 +245,40 @@ export async function POST(request: NextRequest) {
         horario,
         pessoas,
         observacoes,
-        confirmationToken
+        confirmationToken: confirmationToken
       })
 
-      if (!emailResult.success) {
-        console.warn('Falha ao enviar email de confirmação:', emailResult.error)
-        // Não falhar a criação da reserva por causa do email
-      }
+      console.log('✅ Email enviado:', emailResult.success)
     } catch (emailError) {
-      console.error('Erro ao enviar email de confirmação:', emailError)
-      // Não falhar a criação da reserva por causa do email
+      console.warn('⚠️  Erro ao enviar email:', emailError)
+      // Não falhamos a operação por causa do email
     }
 
+    // Retornar reserva criada
     return createJsonResponse({
       success: true,
-      data: newReservation,
-      message: 'Reserva criada com sucesso. Verifique seu email para confirmar.',
-      emailSent: emailService.isConfigured()
+      data: {
+        id: newReservation.id,
+        user_id: newReservation.user_id,
+        nome: newReservation.nome,
+        email: newReservation.email,
+        telefone: newReservation.telefone,
+        data: newReservation.data,
+        horario: newReservation.horario,
+        pessoas: newReservation.pessoas,
+        status: newReservation.status,
+        observacoes: newReservation.observacoes,
+        created_at: newReservation.created_at
+      },
+      message: 'Reserva criada com sucesso'
     }, 201)
 
   } catch (error) {
-    console.error('Erro no POST reservas:', error)
+    console.error('❌ Erro no POST reservas:', error)
     return createJsonResponse({
       error: 'Erro interno do servidor',
-      details: error instanceof Error ? error.message : 'Erro desconhecido'
+      details: error instanceof Error ? error.message : 'Erro desconhecido',
+      timestamp: new Date().toISOString()
     }, 500)
   }
 }
@@ -247,8 +304,7 @@ export async function PUT(request: NextRequest) {
     }
 
     // Criar cliente Supabase
-    const cookieStore = cookies()
-    const supabase = createRouteHandlerClient({ cookies: () => cookieStore })
+    const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
     // Construir condições de atualização
     let query = supabase
@@ -322,8 +378,7 @@ export async function DELETE(request: NextRequest) {
     }
 
     // Criar cliente Supabase
-    const cookieStore = cookies()
-    const supabase = createRouteHandlerClient({ cookies: () => cookieStore })
+    const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
     // Construir query de delete
     let query = supabase
