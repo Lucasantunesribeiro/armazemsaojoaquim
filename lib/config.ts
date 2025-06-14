@@ -33,6 +33,7 @@ export const ENV = {
   SUPABASE_ANON_KEY: getEnvVar('NEXT_PUBLIC_SUPABASE_ANON_KEY'),
   GA_ID: getEnvVar('NEXT_PUBLIC_GA_ID'),
   APP_VERSION: getEnvVar('NEXT_PUBLIC_APP_VERSION', '1.0.0'),
+  RESEND_API_KEY: getEnvVar('RESEND_API_KEY'),
   IS_PRODUCTION: getEnvVar('NODE_ENV') === 'production',
   IS_DEVELOPMENT: getEnvVar('NODE_ENV') === 'development',
 }
@@ -56,7 +57,7 @@ export const config = {
     },
     contact: {
       phone: '+55 21 98565-8443',
-      email: 'armazemjoaquimoficial@gmail.com',
+      email: 'armazemsaojoaquimoficial@gmail.com',
       whatsapp: '+5521985658443'
     },
     social: {
