@@ -43,12 +43,35 @@ const ContactSection = () => {
         toast.success('Mensagem enviada com sucesso! Retornaremos em breve.')
         setFormData({ name: '', email: '', phone: '', message: '' })
       } else {
-        const errorData = await response.json()
-        throw new Error(errorData.error || 'Erro ao enviar')
+        // Check if response is JSON before parsing
+        const contentType = response.headers.get('content-type')
+        
+        if (contentType && contentType.includes('application/json')) {
+          try {
+            const errorData = await response.json()
+            throw new Error(errorData.error || 'Erro ao enviar mensagem')
+          } catch (jsonError) {
+            console.error('Error parsing JSON error response:', jsonError)
+            throw new Error(`Erro ${response.status}: Falha no envio da mensagem`)
+          }
+        } else {
+          // Response is not JSON (probably HTML error page)
+          const errorText = await response.text()
+          console.error('Non-JSON error response:', errorText)
+          throw new Error(`Erro ${response.status}: Serviço temporariamente indisponível`)
+        }
       }
     } catch (error) {
       console.error('Contact form error:', error)
-      toast.error('Erro ao enviar mensagem. Tente novamente.')
+      
+      // Check if it's a network error
+      if (error instanceof TypeError && error.message.includes('fetch')) {
+        toast.error('Erro de conexão. Verifique sua internet e tente novamente.')
+      } else if (error instanceof Error) {
+        toast.error(error.message)
+      } else {
+        toast.error('Erro inesperado ao enviar mensagem. Tente novamente.')
+      }
     } finally {
       setLoading(false)
     }

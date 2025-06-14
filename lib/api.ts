@@ -405,4 +405,63 @@ export const utils = {
       .replace(/-+/g, '-')
       .trim()
   }
+}
+
+/**
+ * Safely handles API responses, checking content-type before parsing JSON
+ * Prevents "Unexpected token '<'" errors when server returns HTML instead of JSON
+ */
+export async function handleApiResponse<T = any>(response: Response): Promise<T> {
+  const contentType = response.headers.get('content-type')
+  
+  if (!response.ok) {
+    // Handle error responses
+    if (contentType && contentType.includes('application/json')) {
+      try {
+        const errorData = await response.json()
+        throw new Error(errorData.error || errorData.message || `Erro ${response.status}`)
+      } catch (jsonError) {
+        console.error('Error parsing JSON error response:', jsonError)
+        throw new Error(`Erro ${response.status}: Falha na comunicação com o servidor`)
+      }
+    } else {
+      // Response is not JSON (probably HTML error page)
+      const errorText = await response.text()
+      console.error('Non-JSON error response:', errorText)
+      throw new Error(`Erro ${response.status}: Serviço temporariamente indisponível`)
+    }
+  }
+
+  // Handle successful responses
+  if (!contentType || !contentType.includes('application/json')) {
+    throw new Error('Resposta inválida do servidor (não é JSON)')
+  }
+
+  try {
+    return await response.json()
+  } catch (jsonError) {
+    console.error('Error parsing JSON success response:', jsonError)
+    throw new Error('Erro ao processar resposta do servidor')
+  }
+}
+
+/**
+ * Makes a safe API request with proper error handling
+ */
+export async function safeApiRequest<T = any>(
+  url: string, 
+  options?: RequestInit
+): Promise<T> {
+  try {
+    const response = await fetch(url, options)
+    return await handleApiResponse<T>(response)
+  } catch (error) {
+    // Handle network errors
+    if (error instanceof TypeError && error.message.includes('fetch')) {
+      throw new Error('Erro de conexão. Verifique sua internet e tente novamente.')
+    }
+    
+    // Re-throw other errors
+    throw error
+  }
 } 

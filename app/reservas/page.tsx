@@ -102,61 +102,21 @@ export default function ReservasPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    
+
+    // Verificar se o usuário está logado
     if (!user) {
       toast.error('Você precisa estar logado para fazer uma reserva')
       router.push('/auth')
       return
     }
 
-    // Validação dos dados do formulário
-    if (!formData.name.trim()) {
-      toast.error('Nome é obrigatório')
+    // Validações básicas
+    if (!formData.name || !formData.email || !formData.phone || !formData.date || !formData.time) {
+      toast.error('Por favor, preencha todos os campos obrigatórios')
       return
     }
 
-    if (!formData.email.trim()) {
-      toast.error('Email é obrigatório')
-      return
-    }
-
-    if (!formData.phone.trim()) {
-      toast.error('Telefone é obrigatório')
-      return
-    }
-
-    if (!formData.date) {
-      toast.error('Data é obrigatória')
-      return
-    }
-
-    if (!formData.time) {
-      toast.error('Horário é obrigatório')
-      return
-    }
-
-    if (formData.guests < 1 || formData.guests > 12) {
-      toast.error('Número de pessoas deve ser entre 1 e 12')
-      return
-    }
-
-    // Verificar se a data é no futuro
-    const selectedDate = new Date(`${formData.date}T${formData.time}`)
-    const now = new Date()
-    
-    if (selectedDate <= now) {
-      toast.error('Data e horário devem ser no futuro')
-      return
-    }
-
-    // Verificar se é segunda-feira (restaurante fechado)
-    const dayOfWeek = selectedDate.getDay()
-    if (dayOfWeek === 1) {
-      toast.error('Restaurante fechado às segundas-feiras')
-      return
-    }
-
-    // Verificar horário de funcionamento (18h às 23h)
+    // Validar horário de funcionamento
     const hour = parseInt(formData.time.split(':')[0])
     if (hour < 18 || hour >= 23) {
       toast.error('Horário de funcionamento: 18h às 23h')
@@ -166,7 +126,7 @@ export default function ReservasPage() {
     setIsSubmitting(true)
 
     try {
-      // Check availability
+      // Check availability with improved error handling
       const availabilityResponse = await fetch('/api/check-availability', {
         method: 'POST',
         headers: {
@@ -179,10 +139,38 @@ export default function ReservasPage() {
         })
       })
 
-      const availabilityData = await availabilityResponse.json()
-
+      // Check if response is ok and content-type is JSON
       if (!availabilityResponse.ok) {
-        toast.error(availabilityData.error || availabilityData.message || 'Erro ao verificar disponibilidade')
+        const contentType = availabilityResponse.headers.get('content-type')
+        
+        if (contentType && contentType.includes('application/json')) {
+          try {
+            const errorData = await availabilityResponse.json()
+            toast.error(errorData.error || errorData.message || 'Erro ao verificar disponibilidade')
+          } catch (jsonError) {
+            console.error('Error parsing JSON error response:', jsonError)
+            toast.error(`Erro ${availabilityResponse.status}: Falha na verificação de disponibilidade`)
+          }
+        } else {
+          // Response is not JSON (probably HTML error page)
+          const errorText = await availabilityResponse.text()
+          console.error('Non-JSON error response:', errorText)
+          toast.error(`Erro ${availabilityResponse.status}: Serviço temporariamente indisponível`)
+        }
+        return
+      }
+
+      // Parse JSON response safely
+      let availabilityData
+      try {
+        const contentType = availabilityResponse.headers.get('content-type')
+        if (!contentType || !contentType.includes('application/json')) {
+          throw new Error('Response is not JSON')
+        }
+        availabilityData = await availabilityResponse.json()
+      } catch (jsonError) {
+        console.error('Error parsing availability JSON response:', jsonError)
+        toast.error('Erro na comunicação com o servidor. Tente novamente.')
         return
       }
 
@@ -216,28 +204,43 @@ export default function ReservasPage() {
         return
       }
 
-      // Send confirmation email
-      const emailResponse = await fetch('/api/send-email', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          type: 'reservation',
-          subject: `Confirmação de Reserva - ${formData.name}`,
-          message: `Nova reserva realizada:\n\nNome: ${formData.name}\nEmail: ${formData.email}\nTelefone: ${formData.phone}\nData: ${formData.date}\nHorário: ${formData.time}\nPessoas: ${formData.guests}\nObservações: ${formData.observations || 'Nenhuma'}\n\nID da Reserva: ${(data as any)?.[0]?.id || 'unknown'}`,
-          name: formData.name,
-          email: formData.email,
-          phone: formData.phone,
-          date: formData.date,
-          time: formData.time,
-          people: formData.guests
+      // Send confirmation email with improved error handling
+      try {
+        const emailResponse = await fetch('/api/send-email', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            type: 'reservation',
+            subject: `Confirmação de Reserva - ${formData.name}`,
+            message: `Nova reserva realizada:\n\nNome: ${formData.name}\nEmail: ${formData.email}\nTelefone: ${formData.phone}\nData: ${formData.date}\nHorário: ${formData.time}\nPessoas: ${formData.guests}\nObservações: ${formData.observations || 'Nenhuma'}\n\nID da Reserva: ${(data as any)?.[0]?.id || 'unknown'}`,
+            name: formData.name,
+            email: formData.email,
+            phone: formData.phone,
+            date: formData.date,
+            time: formData.time,
+            people: formData.guests
+          })
         })
-      })
 
-      if (emailResponse.ok) {
-        toast.success('Reserva criada com sucesso! Verifique seu email para confirmação.')
-      } else {
+        if (emailResponse.ok) {
+          toast.success('Reserva criada com sucesso! Verifique seu email para confirmação.')
+        } else {
+          // Try to get error details if possible
+          const contentType = emailResponse.headers.get('content-type')
+          if (contentType && contentType.includes('application/json')) {
+            try {
+              const emailError = await emailResponse.json()
+              console.warn('Email sending failed:', emailError)
+            } catch (e) {
+              console.warn('Could not parse email error response')
+            }
+          }
+          toast.success('Reserva criada, mas houve um problema ao enviar o email de confirmação.')
+        }
+      } catch (emailError) {
+        console.error('Email sending error:', emailError)
         toast.success('Reserva criada, mas houve um problema ao enviar o email de confirmação.')
       }
 
@@ -255,7 +258,13 @@ export default function ReservasPage() {
 
     } catch (error) {
       console.error('Erro ao fazer reserva:', error)
-      toast.error('Erro inesperado ao fazer reserva')
+      
+      // Check if it's a network error
+      if (error instanceof TypeError && error.message.includes('fetch')) {
+        toast.error('Erro de conexão. Verifique sua internet e tente novamente.')
+      } else {
+        toast.error('Erro inesperado ao fazer reserva. Tente novamente.')
+      }
     } finally {
       setIsSubmitting(false)
     }
