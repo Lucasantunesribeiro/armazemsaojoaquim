@@ -1,27 +1,26 @@
-import { 
-  ClientHeroSection, 
-  ClientAboutSection, 
-  ClientMenuPreview, 
-  ClientBlogPreview, 
-  ClientContactSection 
-} from '../components/ClientComponents'
+import {
+  ClientHeroSection,
+  ClientAboutSection,
+  ClientMenuPreview,
+  ClientBlogPreview,
+  ClientContactSection,
+} from '@/components/ClientComponents'
+import SEO from '@/components/SEO'
 
 export default function HomePage() {
   return (
-    <main className="main-content">
+    <>
+      <SEO 
+        title="Armazém São Joaquim - Restaurante Histórico em Santa Teresa"
+        description="Desde 1854 preservando a tradição gastronômica de Santa Teresa. Desfrute de pratos únicos em um ambiente histórico no coração do Rio de Janeiro."
+        canonical="https://armazemsaojoaquim.netlify.app"
+      />
+      
       <ClientHeroSection />
-      <div className="section-spacing">
-        <ClientAboutSection />
-      </div>
-      <div className="section-spacing">
-        <ClientMenuPreview />
-      </div>
-      <div className="section-spacing">
-        <ClientBlogPreview />
-      </div>
-      <div className="section-spacing">
-        <ClientContactSection />
-      </div>
-    </main>
+      <ClientAboutSection />
+      <ClientMenuPreview />
+      <ClientBlogPreview />
+      <ClientContactSection />
+    </>
   )
 }

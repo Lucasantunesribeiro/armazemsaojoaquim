@@ -16,12 +16,29 @@ interface EmailRequest {
 
 export async function POST(request: NextRequest) {
   try {
-    const data: EmailRequest = await request.json()
+    console.log('📧 Send Email API called')
+    console.log('Headers:', Object.fromEntries(request.headers.entries()))
+    
+    const rawBody = await request.text()
+    console.log('Raw body:', rawBody)
+    
+    let data: EmailRequest
+    try {
+      data = JSON.parse(rawBody)
+      console.log('Parsed data:', data)
+    } catch (parseError) {
+      console.error('JSON parse error:', parseError)
+      return NextResponse.json(
+        { error: 'Invalid JSON in request body' },
+        { status: 400 }
+      )
+    }
 
     // Validar dados básicos
     if (!data.subject || !data.message) {
+      console.log('Validation failed:', { subject: !!data.subject, message: !!data.message })
       return NextResponse.json(
-        { error: 'Subject and message are required' },
+        { error: 'Subject and message are required', received: { subject: data.subject, message: data.message } },
         { status: 400 }
       )
     }

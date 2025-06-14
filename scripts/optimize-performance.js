@@ -2,327 +2,259 @@
 
 const fs = require('fs')
 const path = require('path')
-const os = require('os')
 const { execSync } = require('child_process')
 
 console.log('🚀 Iniciando otimização de performance...\n')
 
+// Configurações
+const config = {
+  imageDir: path.join(__dirname, '../public/images'),
+  maxImageSize: 500 * 1024, // 500KB
+  targetFormats: ['webp', 'avif'],
+  compressionQuality: 85
+}
+
 // Função para verificar se um comando existe
 function commandExists(command) {
   try {
-    execSync(`where ${command}`, { stdio: 'ignore' })
+    execSync(`which ${command}`, { stdio: 'ignore' })
     return true
   } catch {
-    try {
-      execSync(`which ${command}`, { stdio: 'ignore' })
-      return true
-    } catch {
-      return false
-    }
+    return false
   }
+}
+
+// Função para obter tamanho do arquivo
+function getFileSize(filePath) {
+  try {
+    const stats = fs.statSync(filePath)
+    return stats.size
+  } catch {
+    return 0
+  }
+}
+
+// Função para formatar tamanho em bytes
+function formatBytes(bytes) {
+  if (bytes === 0) return '0 Bytes'
+  const k = 1024
+  const sizes = ['Bytes', 'KB', 'MB', 'GB']
+  const i = Math.floor(Math.log(bytes) / Math.log(k))
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
 }
 
 // Função para otimizar imagens
-function optimizeImages() {
-  console.log('📸 Otimizando imagens...')
-  
-  const imageDir = path.join(__dirname, '../public/images')
-  
-  if (!fs.existsSync(imageDir)) {
-    console.log('❌ Diretório de imagens não encontrado')
-    return
-  }
-
-  // Verificar se imagemin está disponível
-  if (!commandExists('npx')) {
-    console.log('❌ NPX não encontrado. Pulando otimização de imagens.')
-    return
-  }
-
-  try {
-    // Instalar imagemin se não estiver instalado
-    console.log('📦 Verificando dependências...')
-    
-    const packageJson = JSON.parse(fs.readFileSync(path.join(__dirname, '../package.json'), 'utf8'))
-    
-    if (!packageJson.devDependencies?.['imagemin'] && !packageJson.dependencies?.['imagemin']) {
-      console.log('📦 Instalando imagemin...')
-      execSync('npm install --save-dev imagemin imagemin-mozjpeg imagemin-pngquant imagemin-webp', { stdio: 'inherit' })
-    }
-
-    // Script de otimização de imagens
-    const optimizeScript = `
-const imagemin = require('imagemin');
-const imageminMozjpeg = require('imagemin-mozjpeg');
-const imageminPngquant = require('imagemin-pngquant');
-const imageminWebp = require('imagemin-webp');
-const path = require('path');
-
-(async () => {
-  console.log('🔄 Processando imagens...');
-  
-  // Otimizar JPEGs
-  await imagemin(['public/images/*.jpg'], {
-    destination: 'public/images/optimized',
-    plugins: [
-      imageminMozjpeg({ quality: 85 })
-    ]
-  });
-  
-  // Otimizar PNGs
-  await imagemin(['public/images/*.png'], {
-    destination: 'public/images/optimized',
-    plugins: [
-      imageminPngquant({ quality: [0.6, 0.8] })
-    ]
-  });
-  
-  // Gerar versões WebP
-  await imagemin(['public/images/*.{jpg,png}'], {
-    destination: 'public/images/webp',
-    plugins: [
-      imageminWebp({ quality: 80 })
-    ]
-  });
-  
-  console.log('✅ Imagens otimizadas com sucesso!');
-})();
-`
-
-    fs.writeFileSync('/tmp/optimize-images.js', optimizeScript)
-    execSync('node /tmp/optimize-images.js', { stdio: 'inherit' })
-    fs.unlinkSync('/tmp/optimize-images.js')
-    
-  } catch (error) {
-    console.log('⚠️ Erro na otimização de imagens:', error.message)
-    console.log('💡 Continuando sem otimização de imagens...')
-  }
-}
-
-// Função para gerar placeholders de imagem
-function generateImagePlaceholders() {
-  console.log('🖼️ Gerando placeholders de imagem...')
-  
-  try {
-    const placeholderPath = path.join(__dirname, '../public/images/placeholder.jpg')
-    
-    if (!fs.existsSync(placeholderPath)) {
-      // Criar um placeholder simples usando base64
-      const placeholderBase64 = 'data:image/svg+xml;base64,' + Buffer.from(`
-        <svg width="800" height="600" xmlns="http://www.w3.org/2000/svg">
-          <rect width="100%" height="100%" fill="#f3f4f6"/>
-          <text x="50%" y="50%" font-family="Arial, sans-serif" font-size="24" fill="#6b7280" text-anchor="middle" dy=".3em">
-            Armazém São Joaquim
-          </text>
-          <text x="50%" y="60%" font-family="Arial, sans-serif" font-size="16" fill="#9ca3af" text-anchor="middle" dy=".3em">
-            Imagem não disponível
-          </text>
-        </svg>
-      `).toString('base64')
-      
-      console.log('✅ Placeholder base64 gerado')
-    }
-    
-    console.log('✅ Placeholders verificados')
-    
-  } catch (error) {
-    console.log('⚠️ Erro ao gerar placeholders:', error.message)
-  }
-}
-
-// Função para verificar performance
-function checkPerformance() {
-  console.log('⚡ Verificando configurações de performance...')
-  
-  const nextConfigPath = path.join(__dirname, '../next.config.js')
-  
-  if (fs.existsSync(nextConfigPath)) {
-    const nextConfig = fs.readFileSync(nextConfigPath, 'utf8')
-    
-    const checks = [
-      { name: 'Compressão', check: nextConfig.includes('compress') },
-      { name: 'Otimização de imagens', check: nextConfig.includes('images') },
-      { name: 'Experimental features', check: nextConfig.includes('experimental') },
-      { name: 'Headers de cache', check: nextConfig.includes('headers') }
-    ]
-    
-    console.log('\n📋 Status das otimizações:')
-    checks.forEach(({ name, check }) => {
-      console.log(`${check ? '✅' : '❌'} ${name}`)
-    })
-    
-  } else {
-    console.log('❌ next.config.js não encontrado')
-  }
-}
-
-// Função para criar service worker básico
-function createServiceWorker() {
-  console.log('🔧 Verificando Service Worker...')
-  
-  const swPath = path.join(__dirname, '../public/sw.js')
-  
-  if (fs.existsSync(swPath)) {
-    console.log('✅ Service Worker já existe')
-    return
-  }
-
-  try {
-    const serviceWorkerContent = `// Service Worker básico para cache
-const CACHE_NAME = 'armazem-sao-joaquim-v1';
-const urlsToCache = [
-  '/',
-  '/menu',
-  '/reservas',
-  '/blog',
-  '/images/armazem-fachada-historica.jpg',
-  '/images/armazem-interior-aconchegante.jpg',
-  '/images/santa-teresa-vista-panoramica.jpg'
-];
-
-self.addEventListener('install', (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then((cache) => cache.addAll(urlsToCache))
-  );
-});
-
-self.addEventListener('fetch', (event) => {
-  event.respondWith(
-    caches.match(event.request)
-      .then((response) => {
-        if (response) {
-          return response;
-        }
-        return fetch(event.request);
-      }
-    )
-  );
-});
-`
-    
-    fs.writeFileSync(swPath, serviceWorkerContent)
-    console.log('✅ Service Worker criado')
-    
-  } catch (error) {
-    console.log('⚠️ Erro ao criar Service Worker:', error.message)
-  }
-}
-
-// Função para otimizar CSS
-function optimizeCSS() {
-  console.log('🎨 Verificando otimizações de CSS...')
-  
-  const tailwindConfigPath = path.join(__dirname, '../tailwind.config.js')
-  
-  if (fs.existsSync(tailwindConfigPath)) {
-    const tailwindConfig = fs.readFileSync(tailwindConfigPath, 'utf8')
-    
-    if (!tailwindConfig.includes('purge') && !tailwindConfig.includes('content')) {
-      console.log('⚠️ Configuração de purge/content não encontrada no Tailwind')
-      console.log('💡 Adicione a configuração de content para reduzir o CSS não utilizado')
-    } else {
-      console.log('✅ Configuração de purge/content encontrada')
-    }
-  }
-}
-
-// Função para verificar imagens
-function checkImages() {
+async function optimizeImages() {
   console.log('📸 Verificando imagens...')
   
-  const imageDir = path.join(__dirname, '../public/images')
-  
-  if (!fs.existsSync(imageDir)) {
+  if (!fs.existsSync(config.imageDir)) {
     console.log('❌ Diretório de imagens não encontrado')
     return
   }
 
-  const images = fs.readdirSync(imageDir).filter(file => 
-    /\.(jpg|jpeg|png|webp|svg)$/i.test(file)
-  )
-  
-  console.log(`📊 Encontradas ${images.length} imagens:`)
-  images.forEach(img => {
-    const imgPath = path.join(imageDir, img)
-    const stats = fs.statSync(imgPath)
-    const sizeKB = Math.round(stats.size / 1024)
-    const status = sizeKB > 500 ? '⚠️' : '✅'
-    console.log(`  ${status} ${img} (${sizeKB}KB)`)
-  })
-  
-  const largeImages = images.filter(img => {
-    const imgPath = path.join(imageDir, img)
-    const stats = fs.statSync(imgPath)
-    return stats.size > 500 * 1024 // > 500KB
-  })
-  
+  const imageExtensions = ['.jpg', '.jpeg', '.png', '.webp']
+  const files = fs.readdirSync(config.imageDir, { recursive: true })
+    .filter(file => {
+      const ext = path.extname(file).toLowerCase()
+      return imageExtensions.includes(ext)
+    })
+
+  console.log(`📊 Encontradas ${files.length} imagens`)
+
+  let totalSavings = 0
+  let optimizedCount = 0
+  const largeImages = []
+
+  for (const file of files) {
+    const filePath = path.join(config.imageDir, file)
+    const fileSize = getFileSize(filePath)
+    
+    if (fileSize > config.maxImageSize) {
+      largeImages.push({
+        path: file,
+        size: fileSize,
+        formattedSize: formatBytes(fileSize)
+      })
+    }
+
+    // Verificar se já existe versão WebP
+    const baseName = path.parse(file).name
+    const webpPath = path.join(config.imageDir, `${baseName}.webp`)
+    
+    if (!fs.existsSync(webpPath) && !file.endsWith('.webp')) {
+      // Criar versão WebP se possível
+      if (commandExists('cwebp')) {
+        try {
+          execSync(`cwebp -q ${config.compressionQuality} "${filePath}" -o "${webpPath}"`, { stdio: 'ignore' })
+          const webpSize = getFileSize(webpPath)
+          const savings = fileSize - webpSize
+          if (savings > 0) {
+            totalSavings += savings
+            optimizedCount++
+            console.log(`✅ ${file} → ${baseName}.webp (${formatBytes(savings)} economizados)`)
+          }
+        } catch (error) {
+          console.log(`⚠️  Erro ao otimizar ${file}`)
+        }
+      }
+    }
+  }
+
   if (largeImages.length > 0) {
-    console.log(`\n⚠️ ${largeImages.length} imagens grandes encontradas (>500KB)`)
-    console.log('💡 Considere otimizar essas imagens para melhorar a performance')
+    console.log('\n⚠️  Imagens grandes encontradas (>500KB):')
+    largeImages.forEach(img => {
+      console.log(`   ${img.path} - ${img.formattedSize}`)
+    })
+  }
+
+  console.log(`\n📈 Resumo da otimização:`)
+  console.log(`   Imagens otimizadas: ${optimizedCount}`)
+  console.log(`   Economia total: ${formatBytes(totalSavings)}`)
+  
+  if (!commandExists('cwebp')) {
+    console.log('\n💡 Dica: Instale webp-tools para otimização automática:')
+    console.log('   sudo apt-get install webp (Ubuntu/Debian)')
+    console.log('   brew install webp (macOS)')
   }
 }
 
 // Função para verificar bundle size
-function checkBundleSize() {
-  console.log('📦 Verificando configuração do bundle...')
+function analyzeBundleSize() {
+  console.log('\n📦 Analisando tamanho do bundle...')
   
-  const packageJsonPath = path.join(__dirname, '../package.json')
-  
-  if (fs.existsSync(packageJsonPath)) {
-    const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'))
-    
-    const heavyDeps = [
-      'framer-motion',
-      'recharts',
-      '@supabase/supabase-js'
-    ]
-    
-    const foundHeavyDeps = heavyDeps.filter(dep => 
-      packageJson.dependencies?.[dep] || packageJson.devDependencies?.[dep]
-    )
-    
-    if (foundHeavyDeps.length > 0) {
-      console.log('📊 Dependências pesadas encontradas:')
-      foundHeavyDeps.forEach(dep => {
-        console.log(`  📦 ${dep}`)
-      })
-      console.log('💡 Considere lazy loading para essas dependências')
-    }
-    
-    if (packageJson.devDependencies?.['@next/bundle-analyzer']) {
-      console.log('✅ Bundle analyzer configurado')
-    } else {
-      console.log('💡 Para análise detalhada: npm install --save-dev @next/bundle-analyzer')
-    }
+  const nextDir = path.join(__dirname, '../.next')
+  if (!fs.existsSync(nextDir)) {
+    console.log('❌ Build não encontrado. Execute "npm run build" primeiro.')
+    return
   }
+
+  try {
+    // Verificar tamanho dos chunks principais
+    const staticDir = path.join(nextDir, 'static')
+    if (fs.existsSync(staticDir)) {
+      const chunks = []
+      
+      function scanDirectory(dir, prefix = '') {
+        const items = fs.readdirSync(dir)
+        for (const item of items) {
+          const itemPath = path.join(dir, item)
+          const stat = fs.statSync(itemPath)
+          
+          if (stat.isDirectory()) {
+            scanDirectory(itemPath, `${prefix}${item}/`)
+          } else if (item.endsWith('.js')) {
+            chunks.push({
+              name: `${prefix}${item}`,
+              size: stat.size,
+              formattedSize: formatBytes(stat.size)
+            })
+          }
+        }
+      }
+      
+      scanDirectory(staticDir)
+      
+      // Ordenar por tamanho
+      chunks.sort((a, b) => b.size - a.size)
+      
+      console.log('📊 Top 10 maiores chunks JavaScript:')
+      chunks.slice(0, 10).forEach((chunk, index) => {
+        console.log(`   ${index + 1}. ${chunk.name} - ${chunk.formattedSize}`)
+      })
+      
+      const totalSize = chunks.reduce((sum, chunk) => sum + chunk.size, 0)
+      console.log(`\n📈 Tamanho total do JavaScript: ${formatBytes(totalSize)}`)
+    }
+  } catch (error) {
+    console.log('❌ Erro ao analisar bundle:', error.message)
+  }
+}
+
+// Função para verificar configurações de performance
+function checkPerformanceConfig() {
+  console.log('\n⚙️  Verificando configurações de performance...')
+  
+  const checks = [
+    {
+      name: 'next.config.js otimizado',
+      check: () => {
+        const configPath = path.join(__dirname, '../next.config.js')
+        if (!fs.existsSync(configPath)) return false
+        const config = fs.readFileSync(configPath, 'utf8')
+        return config.includes('swcMinify') && config.includes('optimizeCss')
+      }
+    },
+    {
+      name: 'Compressão habilitada',
+      check: () => {
+        const configPath = path.join(__dirname, '../next.config.js')
+        if (!fs.existsSync(configPath)) return false
+        const config = fs.readFileSync(configPath, 'utf8')
+        return config.includes('compress: true')
+      }
+    },
+    {
+      name: 'Headers de cache configurados',
+      check: () => {
+        const configPath = path.join(__dirname, '../next.config.js')
+        if (!fs.existsSync(configPath)) return false
+        const config = fs.readFileSync(configPath, 'utf8')
+        return config.includes('Cache-Control')
+      }
+    },
+    {
+      name: 'Otimização de imagens configurada',
+      check: () => {
+        const configPath = path.join(__dirname, '../next.config.js')
+        if (!fs.existsSync(configPath)) return false
+        const config = fs.readFileSync(configPath, 'utf8')
+        return config.includes('formats:') && config.includes('webp')
+      }
+    }
+  ]
+
+  checks.forEach(check => {
+    const status = check.check() ? '✅' : '❌'
+    console.log(`   ${status} ${check.name}`)
+  })
+}
+
+// Função para gerar recomendações
+function generateRecommendations() {
+  console.log('\n💡 Recomendações de performance:')
+  
+  const recommendations = [
+    '1. Use OptimizedImage em vez de <img> tags',
+    '2. Implemente lazy loading para imagens below-the-fold',
+    '3. Minimize o uso de useEffect desnecessários',
+    '4. Use React.memo para componentes que não mudam frequentemente',
+    '5. Implemente code splitting para rotas',
+    '6. Use dynamic imports para componentes pesados',
+    '7. Otimize fontes com font-display: swap',
+    '8. Minimize o JavaScript não utilizado',
+    '9. Use service workers para cache',
+    '10. Implemente preloading para recursos críticos'
+  ]
+
+  recommendations.forEach(rec => console.log(`   ${rec}`))
 }
 
 // Função principal
 async function main() {
   try {
-    checkPerformance()
-    generateImagePlaceholders()
-    checkImages()
-    createServiceWorker()
-    optimizeCSS()
-    checkBundleSize()
+    await optimizeImages()
+    analyzeBundleSize()
+    checkPerformanceConfig()
+    generateRecommendations()
     
-    console.log('\n🎉 Verificação de performance concluída!')
-    console.log('\n📝 Próximos passos recomendados:')
-    console.log('1. Execute "npm run build" para verificar o tamanho do bundle')
-    console.log('2. Use "npm run start" para testar em produção')
-    console.log('3. Execute um audit do Lighthouse para verificar melhorias')
-    console.log('4. Configure CDN para assets estáticos')
-    console.log('5. Implemente lazy loading para componentes pesados')
-    
-    console.log('\n🔧 Comandos úteis:')
-    console.log('- npm run perf:check - Verificar performance completa')
-    console.log('- npm run analyze - Analisar bundle size')
-    console.log('- npm run lighthouse - Executar audit do Lighthouse')
+    console.log('\n🎉 Otimização de performance concluída!')
+    console.log('\n📋 Próximos passos:')
+    console.log('   1. Execute "npm run build" para aplicar otimizações')
+    console.log('   2. Teste com "npm run lighthouse" para verificar melhorias')
+    console.log('   3. Deploy e monitore as métricas Core Web Vitals')
     
   } catch (error) {
-    console.error('❌ Erro durante a verificação:', error.message)
+    console.error('❌ Erro durante otimização:', error.message)
     process.exit(1)
   }
 }
@@ -334,10 +266,7 @@ if (require.main === module) {
 
 module.exports = {
   optimizeImages,
-  generateImagePlaceholders,
-  checkPerformance,
-  createServiceWorker,
-  optimizeCSS,
-  checkImages,
-  checkBundleSize
+  analyzeBundleSize,
+  checkPerformanceConfig,
+  generateRecommendations
 } 

@@ -12,12 +12,16 @@ interface AvailabilityRequest {
 
 export async function POST(request: NextRequest) {
   try {
-    const { date, time, guests }: AvailabilityRequest = await request.json()
+    const body = await request.json()
+    console.log('Check availability request:', body)
+
+    const { date, time, guests }: AvailabilityRequest = body
 
     // Validar dados básicos
     if (!date || !time || !guests) {
+      console.log('Missing required fields:', { date: !!date, time: !!time, guests: !!guests })
       return NextResponse.json(
-        { error: 'Date, time, and guests are required' },
+        { error: 'Date, time, and guests are required', received: { date, time, guests } },
         { status: 400 }
       )
     }
@@ -25,8 +29,9 @@ export async function POST(request: NextRequest) {
     // Validar formato da data
     const dateRegex = /^\d{4}-\d{2}-\d{2}$/
     if (!dateRegex.test(date)) {
+      console.log('Invalid date format:', date)
       return NextResponse.json(
-        { error: 'Invalid date format. Use YYYY-MM-DD' },
+        { error: 'Invalid date format. Use YYYY-MM-DD', received: date },
         { status: 400 }
       )
     }
@@ -34,16 +39,19 @@ export async function POST(request: NextRequest) {
     // Validar formato do horário
     const timeRegex = /^\d{2}:\d{2}$/
     if (!timeRegex.test(time)) {
+      console.log('Invalid time format:', time)
       return NextResponse.json(
-        { error: 'Invalid time format. Use HH:MM' },
+        { error: 'Invalid time format. Use HH:MM', received: time },
         { status: 400 }
       )
     }
 
     // Validar número de convidados
-    if (guests < 1 || guests > 20) {
+    const guestsNum = Number(guests)
+    if (isNaN(guestsNum) || guestsNum < 1 || guestsNum > 20) {
+      console.log('Invalid guests number:', guests)
       return NextResponse.json(
-        { error: 'Number of guests must be between 1 and 20' },
+        { error: 'Number of guests must be between 1 and 20', received: guests },
         { status: 400 }
       )
     }

@@ -223,17 +223,15 @@ export default function ReservasPage() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          type: 'reservation_confirmation',
-          data: {
-            email: formData.email,
-            name: formData.name,
-            phone: formData.phone,
-            date: formData.date,
-            time: formData.time,
-            guests: formData.guests,
-            observations: formData.observations,
-            reservationId: (data as any)?.[0]?.id || 'unknown'
-          }
+          type: 'reservation',
+          subject: `Confirmação de Reserva - ${formData.name}`,
+          message: `Nova reserva realizada:\n\nNome: ${formData.name}\nEmail: ${formData.email}\nTelefone: ${formData.phone}\nData: ${formData.date}\nHorário: ${formData.time}\nPessoas: ${formData.guests}\nObservações: ${formData.observations || 'Nenhuma'}\n\nID da Reserva: ${(data as any)?.[0]?.id || 'unknown'}`,
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+          date: formData.date,
+          time: formData.time,
+          people: formData.guests
         })
       })
 

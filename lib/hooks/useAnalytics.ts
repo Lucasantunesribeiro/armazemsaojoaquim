@@ -52,18 +52,22 @@ export function useAnalytics() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          event_type: eventType,
-          data: data,
+          event: eventType,
           timestamp: new Date().toISOString(),
-          session_id: typeof window !== 'undefined' ? (sessionStorage.getItem('session_id') || generateSessionId()) : 'server',
-          user_agent: typeof window !== 'undefined' ? navigator.userAgent : 'server',
-          page_url: typeof window !== 'undefined' ? window.location.href : ''
+          sessionId: typeof window !== 'undefined' ? (sessionStorage.getItem('session_id') || generateSessionId()) : 'server',
+          userId: user?.id,
+          page: typeof window !== 'undefined' ? window.location.pathname : '',
+          properties: {
+            ...data,
+            user_agent: typeof window !== 'undefined' ? navigator.userAgent : 'server',
+            page_url: typeof window !== 'undefined' ? window.location.href : ''
+          }
         })
       })
     } catch (error) {
       console.error('Erro ao enviar evento de analytics:', error)
     }
-  }, [generateSessionId])
+  }, [generateSessionId, user?.id])
 
   // Configurar Google Analytics
   useEffect(() => {
