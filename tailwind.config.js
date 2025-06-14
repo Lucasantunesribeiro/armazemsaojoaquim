@@ -15,6 +15,7 @@ module.exports = {
         'vermelho-portas': '#B22222',
         'cinza-claro': '#F8F9FA',
         'cinza-medio': '#4A5568',
+        'cinza-escuro': '#2D3748',
         'pedra-natural': '#8B7355',
         'verde-natura': '#2F7D32',
         'rosa-suave': '#C2185B',

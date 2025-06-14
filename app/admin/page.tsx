@@ -75,15 +75,6 @@ export default function AdminDashboard() {
   const [activities, setActivities] = useState<RecentActivity[]>([])
   const [refreshing, setRefreshing] = useState(false)
 
-  useEffect(() => {
-    checkAuth()
-    loadDashboardData()
-    
-    // Atualizar dados a cada 30 segundos
-    const interval = setInterval(loadDashboardData, 30000)
-    return () => clearInterval(interval)
-  }, [])
-
   const checkAuth = async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser()
@@ -222,6 +213,16 @@ export default function AdminDashboard() {
 
     setActivities(activities)
   }
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    checkAuth()
+    loadDashboardData()
+    
+    // Atualizar dados a cada 30 segundos
+    const interval = setInterval(loadDashboardData, 30000)
+    return () => clearInterval(interval)
+  }, [])
 
   const handleRefresh = () => {
     loadDashboardData()
