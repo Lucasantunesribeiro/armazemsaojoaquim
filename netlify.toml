@@ -25,7 +25,7 @@
 [functions]
   node_bundler = "esbuild"
 
-# Headers de segurança e performance
+# Headers básicos de segurança apenas
 [[headers]]
   for = "/*"
   [headers.values]
@@ -33,7 +33,6 @@
     X-Content-Type-Options = "nosniff"
     X-XSS-Protection = "1; mode=block"
     Referrer-Policy = "strict-origin-when-cross-origin"
-    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
 
 # Headers para API routes
 [[headers]]
@@ -42,120 +41,5 @@
     Access-Control-Allow-Origin = "*"
     Access-Control-Allow-Methods = "GET, POST, PUT, DELETE, OPTIONS"
     Access-Control-Allow-Headers = "Content-Type, Authorization"
-    Cache-Control = "no-cache"
 
-# Headers para assets estáticos do Next.js - CRÍTICO
-[[headers]]
-  for = "/_next/static/*"
-  [headers.values]
-    Cache-Control = "public, max-age=31536000, immutable"
-    Content-Type = "text/javascript; charset=utf-8"
-
-# Headers específicos para CSS
-[[headers]]
-  for = "/_next/static/css/*"
-  [headers.values]
-    Content-Type = "text/css; charset=utf-8"
-    Cache-Control = "public, max-age=31536000, immutable"
-
-# Headers específicos para JS
-[[headers]]
-  for = "/_next/static/chunks/*"
-  [headers.values]
-    Content-Type = "text/javascript; charset=utf-8"
-    Cache-Control = "public, max-age=31536000, immutable"
-
-# Headers para fontes
-[[headers]]
-  for = "/**/*.woff2"
-  [headers.values]
-    Content-Type = "font/woff2"
-    Cache-Control = "public, max-age=31536000, immutable"
-    Access-Control-Allow-Origin = "*"
-
-[[headers]]
-  for = "/**/*.woff"
-  [headers.values]
-    Content-Type = "font/woff"
-    Cache-Control = "public, max-age=31536000, immutable"
-    Access-Control-Allow-Origin = "*"
-
-# Headers para imagens
-[[headers]]
-  for = "/images/*"
-  [headers.values]
-    Cache-Control = "public, max-age=86400"
-    Vary = "Accept"
-    Access-Control-Allow-Origin = "*"
-
-[[headers]]
-  for = "/**/*.jpg"
-  [headers.values]
-    Content-Type = "image/jpeg"
-    Cache-Control = "public, max-age=86400"
-    
-[[headers]]
-  for = "/**/*.jpeg"  
-  [headers.values]
-    Content-Type = "image/jpeg"
-    Cache-Control = "public, max-age=86400"
-    
-[[headers]]
-  for = "/**/*.png"
-  [headers.values]
-    Content-Type = "image/png"
-    Cache-Control = "public, max-age=86400"
-    
-[[headers]]
-  for = "/**/*.webp"
-  [headers.values]
-    Content-Type = "image/webp"
-    Cache-Control = "public, max-age=86400"
-    
-[[headers]]
-  for = "/**/*.avif"
-  [headers.values]
-    Content-Type = "image/avif"
-    Cache-Control = "public, max-age=86400"
-
-[[headers]]
-  for = "/**/*.svg"
-  [headers.values]
-    Content-Type = "image/svg+xml"
-    Cache-Control = "public, max-age=86400"
-
-# Headers para ícones
-[[headers]]
-  for = "/*.ico"
-  [headers.values]
-    Content-Type = "image/x-icon"
-    Cache-Control = "public, max-age=31536000"
-
-# Headers para manifest
-[[headers]]
-  for = "/manifest.json"
-  [headers.values]
-    Content-Type = "application/json"
-    Cache-Control = "public, max-age=86400"
-
-# Headers para service worker
-[[headers]]
-  for = "/sw.js"
-  [headers.values]
-    Content-Type = "text/javascript"
-    Cache-Control = "public, max-age=0, must-revalidate"
-
-# Configurações de processamento
-[build.processing]
-  skip_processing = false
-
-[build.processing.css]
-  bundle = true
-  minify = true
-
-[build.processing.js]
-  bundle = true
-  minify = true
-
-[build.processing.html]
-  pretty_urls = true 
+ 
