@@ -71,24 +71,45 @@ export default function ReservasPage() {
   const fetchUserReservations = async () => {
     if (!user) return
 
+    setLoadingReservations(true)
+    
     try {
-      const { supabase } = await import('../../lib/supabase')
-      const { data, error } = await (supabase as any)
-        .from('reservas')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('data', { ascending: true })
+      const response = await fetch(`/api/reservas?user_id=${user.id}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
 
-      if (error) {
-        console.error('Erro ao buscar reservas:', error)
-        toast.error('Erro ao carregar suas reservas')
+      if (!response.ok) {
+        const contentType = response.headers.get('content-type')
+        
+        if (contentType && contentType.includes('application/json')) {
+          try {
+            const errorData = await response.json()
+            toast.error(errorData.error || 'Erro ao carregar reservas')
+          } catch (jsonError) {
+            console.error('Error parsing JSON error response:', jsonError)
+            toast.error(`Erro ${response.status}: Falha ao carregar reservas`)
+          }
+        } else {
+          toast.error('Erro ao carregar suas reservas')
+        }
         return
       }
 
-      setUserReservations(data || [])
+      const data = await response.json()
+      
+      if (data.success) {
+        setUserReservations(data.data.reservations || [])
+      } else {
+        toast.error(data.error || 'Erro ao carregar reservas')
+      }
     } catch (error) {
       console.error('Erro ao buscar reservas:', error)
       toast.error('Erro ao carregar suas reservas')
+    } finally {
+      setLoadingReservations(false)
     }
   }
 
@@ -126,122 +147,64 @@ export default function ReservasPage() {
     setIsSubmitting(true)
 
     try {
-      // Check availability with improved error handling
-      const availabilityResponse = await fetch('/api/check-availability', {
+      // Create reservation using the new API
+      const reservationResponse = await fetch('/api/reservas', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          date: formData.date,
-          time: formData.time,
-          guests: formData.guests
+          user_id: user.id,
+          nome: formData.name,
+          email: formData.email,
+          telefone: formData.phone,
+          data: formData.date,
+          horario: formData.time,
+          pessoas: formData.guests,
+          observacoes: formData.observations
         })
       })
 
-      // Check if response is ok and content-type is JSON
-      if (!availabilityResponse.ok) {
-        const contentType = availabilityResponse.headers.get('content-type')
+      // Handle response with improved error handling
+      if (!reservationResponse.ok) {
+        const contentType = reservationResponse.headers.get('content-type')
         
         if (contentType && contentType.includes('application/json')) {
           try {
-            const errorData = await availabilityResponse.json()
-            toast.error(errorData.error || errorData.message || 'Erro ao verificar disponibilidade')
+            const errorData = await reservationResponse.json()
+            toast.error(errorData.error || 'Erro ao criar reserva')
           } catch (jsonError) {
             console.error('Error parsing JSON error response:', jsonError)
-            toast.error(`Erro ${availabilityResponse.status}: Falha na verificação de disponibilidade`)
+            toast.error(`Erro ${reservationResponse.status}: Falha ao criar reserva`)
           }
         } else {
           // Response is not JSON (probably HTML error page)
-          const errorText = await availabilityResponse.text()
+          const errorText = await reservationResponse.text()
           console.error('Non-JSON error response:', errorText)
-          toast.error(`Erro ${availabilityResponse.status}: Serviço temporariamente indisponível`)
+          toast.error(`Erro ${reservationResponse.status}: Serviço temporariamente indisponível`)
         }
         return
       }
 
-      // Parse JSON response safely
-      let availabilityData
+      // Parse successful response
+      let reservationData
       try {
-        const contentType = availabilityResponse.headers.get('content-type')
+        const contentType = reservationResponse.headers.get('content-type')
         if (!contentType || !contentType.includes('application/json')) {
           throw new Error('Response is not JSON')
         }
-        availabilityData = await availabilityResponse.json()
+        reservationData = await reservationResponse.json()
       } catch (jsonError) {
-        console.error('Error parsing availability JSON response:', jsonError)
+        console.error('Error parsing reservation JSON response:', jsonError)
         toast.error('Erro na comunicação com o servidor. Tente novamente.')
         return
       }
 
-      if (!availabilityData.available) {
-        toast.error(availabilityData.message || 'Horário não disponível. Tente outro horário.')
+      if (reservationData.success) {
+        toast.success(reservationData.message || 'Reserva criada com sucesso!')
+      } else {
+        toast.error(reservationData.error || 'Erro ao criar reserva')
         return
-      }
-
-      // Create reservation
-      const { supabase } = await import('../../lib/supabase')
-      const { data, error } = await (supabase as any)
-        .from('reservas')
-        .insert([
-          {
-            user_id: user.id,
-            nome: formData.name,
-            email: formData.email,
-            telefone: formData.phone,
-            data: formData.date,
-            horario: formData.time,
-            pessoas: formData.guests,
-            observacoes: formData.observations,
-            status: 'pendente'
-          }
-        ])
-        .select()
-
-      if (error) {
-        console.error('Erro ao criar reserva:', error)
-        toast.error('Erro ao criar reserva: ' + (error as any)?.message || 'Erro desconhecido')
-        return
-      }
-
-      // Send confirmation email with improved error handling
-      try {
-        const emailResponse = await fetch('/api/send-email', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            type: 'reservation',
-            subject: `Confirmação de Reserva - ${formData.name}`,
-            message: `Nova reserva realizada:\n\nNome: ${formData.name}\nEmail: ${formData.email}\nTelefone: ${formData.phone}\nData: ${formData.date}\nHorário: ${formData.time}\nPessoas: ${formData.guests}\nObservações: ${formData.observations || 'Nenhuma'}\n\nID da Reserva: ${(data as any)?.[0]?.id || 'unknown'}`,
-            name: formData.name,
-            email: formData.email,
-            phone: formData.phone,
-            date: formData.date,
-            time: formData.time,
-            people: formData.guests
-          })
-        })
-
-        if (emailResponse.ok) {
-          toast.success('Reserva criada com sucesso! Verifique seu email para confirmação.')
-        } else {
-          // Try to get error details if possible
-          const contentType = emailResponse.headers.get('content-type')
-          if (contentType && contentType.includes('application/json')) {
-            try {
-              const emailError = await emailResponse.json()
-              console.warn('Email sending failed:', emailError)
-            } catch (e) {
-              console.warn('Could not parse email error response')
-            }
-          }
-          toast.success('Reserva criada, mas houve um problema ao enviar o email de confirmação.')
-        }
-      } catch (emailError) {
-        console.error('Email sending error:', emailError)
-        toast.success('Reserva criada, mas houve um problema ao enviar o email de confirmação.')
       }
 
       // Reset form
