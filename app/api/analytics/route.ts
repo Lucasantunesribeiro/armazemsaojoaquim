@@ -60,7 +60,8 @@ export async function POST(request: NextRequest) {
 
 export async function GET() {
   return NextResponse.json({ 
-    message: 'Analytics endpoint is working',
+    error: 'Method not allowed',
+    message: 'Use POST to send analytics data',
     timestamp: new Date().toISOString()
-  })
+  }, { status: 405 })
 } 

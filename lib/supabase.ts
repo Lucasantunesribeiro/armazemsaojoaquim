@@ -1,10 +1,11 @@
 import { createClient } from '@supabase/supabase-js'
 import { Database } from '../types/database.types'
 
+// Temporariamente comentado para debug
 // Importar polyfills apenas no servidor
-if (typeof window === 'undefined') {
-  require('./polyfills-minimal.js')
-}
+// if (typeof window === 'undefined') {
+//   require('./polyfills-minimal.js')
+// }
 
 // Verificar se as variáveis de ambiente estão configuradas
 export const isSupabaseConfigured = () => {

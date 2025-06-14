@@ -9,19 +9,24 @@ interface LogoProps {
   priority?: boolean
   width?: number
   height?: number
+  isScrolled?: boolean
+  onClick?: () => void
 }
 
 const Logo = memo(({ 
   className = "h-12 w-auto", 
   priority = false,
   width = 120,
-  height = 48
+  height = 48,
+  isScrolled = false,
+  onClick
 }: LogoProps) => {
   return (
     <Link 
       href="/" 
       className="flex items-center space-x-2 hover:opacity-80 transition-opacity"
       aria-label="Armazém São Joaquim - Página inicial"
+      onClick={onClick}
     >
       <Image
         src="/images/logo.jpg"

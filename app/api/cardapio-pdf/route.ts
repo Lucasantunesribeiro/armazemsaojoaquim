@@ -28,6 +28,19 @@ const menuData = {
 
 export async function GET(request: NextRequest) {
   try {
+    const { searchParams } = new URL(request.url)
+    const format = searchParams.get('format')
+    
+    // Se format=json, retorna dados JSON para testes
+    if (format === 'json') {
+      return NextResponse.json({
+        success: true,
+        message: 'Cardápio disponível',
+        data: menuData,
+        timestamp: new Date().toISOString()
+      })
+    }
+    
     // Caminho para o arquivo PDF
     const pdfPath = join(process.cwd(), 'public', 'images', 'Cardapio.pdf')
     

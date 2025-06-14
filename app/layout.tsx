@@ -6,6 +6,9 @@ import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
 import { Toaster } from '@/components/ui/toaster'
 
+// Importar utilitário para suprimir warnings do Grammarly
+import '@/lib/suppress-warnings'
+
 // Fontes otimizadas com display swap
 const inter = Inter({
   subsets: ['latin'],

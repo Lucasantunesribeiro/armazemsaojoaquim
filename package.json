@@ -9,6 +9,13 @@
     "build:static": "next build && node scripts/copy-static-assets.js",
     "start": "next start",
     "lint": "next lint",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "test:e2e": "playwright test",
+    "test:all": "npm run test && npm run test:e2e",
+    "test:suite": "node scripts/test-suite.js",
+    "test:simple": "node scripts/test-simple.js",
     "optimize-images": "node scripts/optimize-images.js",
     "generate-icons": "node scripts/generate-icons.js",
     "optimize:performance": "node scripts/optimize-performance.js",
@@ -19,7 +26,10 @@
     "perf:check": "npm run optimize:performance && npm run build",
     "type-check": "tsc --noEmit",
     "build:check": "npm run type-check && npm run build",
-    "clean": "rimraf .next out node_modules/.cache && echo 'Limpeza concluida'"
+    "clean": "rimraf .next out node_modules/.cache && echo 'Limpeza concluida'",
+    "backup": "node scripts/backup-system.js create",
+    "backup:restore": "node scripts/backup-system.js restore",
+    "backup:list": "node scripts/backup-system.js list"
   },
   "engines": {
     "node": "20.x",
@@ -64,8 +74,15 @@
     "zod": "3.22.4"
   },
   "devDependencies": {
+    "@playwright/test": "^1.53.0",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^14.3.1",
+    "@testing-library/user-event": "^14.6.1",
+    "@types/jest": "^29.5.14",
     "eslint": "8.55.0",
-    "eslint-config-next": "14.0.4"
+    "eslint-config-next": "14.0.4",
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0"
   },
   "optionalDependencies": {
     "sharp": "0.33.1"

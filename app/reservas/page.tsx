@@ -37,6 +37,7 @@ export default function ReservasPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [userReservations, setUserReservations] = useState<UserReservation[]>([])
   const [loadingReservations, setLoadingReservations] = useState(false)
+  const [actionLoading, setActionLoading] = useState<{ [key: string]: boolean }>({})
   
   const [formData, setFormData] = useState<ReservationForm>({
     name: '',
@@ -256,6 +257,89 @@ export default function ReservasPage() {
       case 'pendente': return 'Pendente'
       case 'cancelada': return 'Cancelada'
       default: return status
+    }
+  }
+
+  // Confirmar reserva
+  const handleConfirmReservation = async (reservationId: string) => {
+    setActionLoading(prev => ({ ...prev, [reservationId]: true }))
+    
+    try {
+      const response = await fetch('/api/reservas', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          id: reservationId,
+          status: 'confirmada'
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error('Erro ao confirmar reserva')
+      }
+
+      const result = await response.json()
+      
+      if (result.success) {
+        // Atualizar a lista de reservas
+        setUserReservations(prev => 
+          prev.map(reservation => 
+            reservation.id === reservationId 
+              ? { ...reservation, status: 'confirmada' }
+              : reservation
+          )
+        )
+        
+        // Mostrar mensagem de sucesso
+        toast.success('Reserva confirmada com sucesso!')
+      } else {
+        throw new Error(result.error || 'Erro ao confirmar reserva')
+      }
+    } catch (error) {
+      console.error('Erro ao confirmar reserva:', error)
+      toast.error('Erro ao confirmar reserva. Tente novamente.')
+    } finally {
+      setActionLoading(prev => ({ ...prev, [reservationId]: false }))
+    }
+  }
+
+  // Cancelar reserva
+  const handleCancelReservation = async (reservationId: string) => {
+    if (!confirm('Tem certeza que deseja cancelar esta reserva?')) {
+      return
+    }
+
+    setActionLoading(prev => ({ ...prev, [`cancel_${reservationId}`]: true }))
+
+    try {
+      const response = await fetch(`/api/reservas?id=${reservationId}`, {
+        method: 'DELETE',
+      })
+
+      if (!response.ok) {
+        throw new Error('Erro ao cancelar reserva')
+      }
+
+      const result = await response.json()
+      
+      if (result.success) {
+        // Remover a reserva da lista
+        setUserReservations(prev => 
+          prev.filter(reservation => reservation.id !== reservationId)
+        )
+        
+        // Mostrar mensagem de sucesso
+        toast.success('Reserva cancelada com sucesso!')
+      } else {
+        throw new Error(result.error || 'Erro ao cancelar reserva')
+      }
+    } catch (error) {
+      console.error('Erro ao cancelar reserva:', error)
+      toast.error('Erro ao cancelar reserva. Tente novamente.')
+    } finally {
+      setActionLoading(prev => ({ ...prev, [`cancel_${reservationId}`]: false }))
     }
   }
 
@@ -602,6 +686,41 @@ export default function ReservasPage() {
                             <p className="text-sm text-madeira-escura dark:text-white font-inter">
                               <strong>Observações:</strong> {reservation.observacoes}
                             </p>
+                          </div>
+                        )}
+                        
+                        {/* Ações da Reserva */}
+                        {reservation.status === 'pendente' && (
+                          <div className="mt-4 flex flex-wrap gap-2">
+                            <Button
+                              onClick={() => handleConfirmReservation(reservation.id)}
+                              disabled={actionLoading[reservation.id]}
+                              className="bg-green-600 hover:bg-green-700 disabled:bg-green-400 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                            >
+                              {actionLoading[reservation.id] ? (
+                                <div className="flex items-center space-x-2">
+                                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                  <span>Confirmando...</span>
+                                </div>
+                              ) : (
+                                'Confirmar Reserva'
+                              )}
+                            </Button>
+                            <Button
+                              onClick={() => handleCancelReservation(reservation.id)}
+                              disabled={actionLoading[`cancel_${reservation.id}`]}
+                              variant="outline"
+                              className="border-red-500 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 disabled:opacity-50 px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                            >
+                              {actionLoading[`cancel_${reservation.id}`] ? (
+                                <div className="flex items-center space-x-2">
+                                  <div className="w-4 h-4 border-2 border-red-500 border-t-transparent rounded-full animate-spin"></div>
+                                  <span>Cancelando...</span>
+                                </div>
+                              ) : (
+                                'Cancelar'
+                              )}
+                            </Button>
                           </div>
                         )}
                       </div>
