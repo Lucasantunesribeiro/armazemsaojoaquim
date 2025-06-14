@@ -7,7 +7,7 @@ const http = require('http');
 const BASE_URL = process.env.SITE_URL || 'https://armazemsaojoaquim.netlify.app';
 const API_ENDPOINTS = [
   '/api/health',
-  '/api/hello', 
+  '/api/test-simple', 
   '/api/reservas'
 ];
 
@@ -69,10 +69,16 @@ async function testApiJsonResponse(endpoint) {
     const isJson = response.contentType.includes('application/json');
     console.log(`   Content-Type: ${response.contentType} ${isJson ? '✅' : '❌'}`);
     
+    // Se não for JSON, mostra o início da resposta para debug
+    if (!isJson) {
+      console.log(`   Resposta (primeiros 200 chars): ${response.body.substring(0, 200)}`);
+    }
+    
     // Verifica se o corpo é JSON válido
     let isValidJson = false;
+    let responseData = null;
     try {
-      JSON.parse(response.body);
+      responseData = JSON.parse(response.body);
       isValidJson = true;
     } catch (e) {
       console.log(`   JSON inválido: ${e.message}`);
@@ -82,6 +88,11 @@ async function testApiJsonResponse(endpoint) {
     // Verifica headers CORS
     const hasCorsCHeaders = response.headers['access-control-allow-origin'];
     console.log(`   CORS headers: ${hasCorsCHeaders ? '✅' : '❌'}`);
+    
+    // Se for JSON válido, mostra alguns dados
+    if (isValidJson && responseData) {
+      console.log(`   Dados: ${JSON.stringify(responseData).substring(0, 100)}...`);
+    }
     
     return {
       endpoint,
@@ -132,6 +143,11 @@ async function testReservasPost() {
     const isJson = response.contentType.includes('application/json');
     console.log(`   Content-Type: ${response.contentType} ${isJson ? '✅' : '❌'}`);
     
+    // Se não for JSON, mostra o início da resposta
+    if (!isJson) {
+      console.log(`   Resposta (primeiros 200 chars): ${response.body.substring(0, 200)}`);
+    }
+    
     let isValidJson = false;
     let responseData = null;
     try {
@@ -145,6 +161,7 @@ async function testReservasPost() {
     if (responseData) {
       const hasExpectedFields = responseData.success !== undefined || responseData.error !== undefined;
       console.log(`   Estrutura esperada: ${hasExpectedFields ? '✅' : '❌'}`);
+      console.log(`   Dados: ${JSON.stringify(responseData).substring(0, 150)}...`);
     }
     
     return {
@@ -169,6 +186,7 @@ async function testReservasPost() {
 async function runTests() {
   console.log('🚀 Iniciando testes de produção...');
   console.log(`📍 URL base: ${BASE_URL}`);
+  console.log('=' .repeat(60));
   
   const results = [];
   
@@ -184,33 +202,37 @@ async function runTests() {
   
   // Resumo dos resultados
   console.log('\n📊 RESUMO DOS TESTES:');
-  console.log('=' .repeat(50));
+  console.log('=' .repeat(60));
   
   const passed = results.filter(r => r.passed).length;
   const total = results.length;
   
   results.forEach(result => {
     const status = result.passed ? '✅ PASSOU' : '❌ FALHOU';
-    console.log(`${result.endpoint}: ${status}`);
+    console.log(`${result.endpoint.padEnd(25)}: ${status}`);
     if (result.error) {
-      console.log(`   Erro: ${result.error}`);
+      console.log(`   └─ Erro: ${result.error}`);
     }
   });
   
-  console.log('=' .repeat(50));
-  console.log(`Resultados: ${passed}/${total} testes passaram`);
+  console.log('=' .repeat(60));
+  console.log(`📈 Resultados: ${passed}/${total} testes passaram (${Math.round(passed/total*100)}%)`);
   
   if (passed === total) {
     console.log('🎉 Todos os testes passaram! As correções estão funcionando.');
     process.exit(0);
   } else {
     console.log('⚠️  Alguns testes falharam. Verifique as configurações.');
+    console.log('\n💡 Dicas para debug:');
+    console.log('   - Verifique se o deploy foi concluído');
+    console.log('   - Teste manualmente: curl -v ' + BASE_URL + '/api/health');
+    console.log('   - Verifique os logs do Netlify');
     process.exit(1);
   }
 }
 
 // Executa os testes
 runTests().catch(error => {
-  console.error('Erro fatal:', error);
+  console.error('❌ Erro fatal:', error);
   process.exit(1);
 }); 

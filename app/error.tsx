@@ -1,9 +1,6 @@
 'use client'
 
 import { useEffect } from 'react'
-import Link from 'next/link'
-import { AlertTriangle, Home, RefreshCw } from 'lucide-react'
-import Button from '../components/ui/Button'
 
 export default function Error({
   error,
@@ -13,51 +10,34 @@ export default function Error({
   reset: () => void
 }) {
   useEffect(() => {
-    console.error('Application error:', error)
+    console.error(error)
   }, [error])
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-cinza-claro px-4">
-      <div className="text-center max-w-md">
-        <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
-          <AlertTriangle className="w-10 h-10 text-red-600" />
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+      <div className="max-w-md w-full space-y-8 p-8 bg-white dark:bg-gray-800 rounded-lg shadow-lg">
+        <div className="text-center">
+          <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
+            Algo deu errado!
+          </h2>
+          <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">
+            Ocorreu um erro inesperado. Por favor, tente novamente.
+          </p>
         </div>
-        
-        <h1 className="font-playfair text-3xl font-bold text-madeira-escura mb-4">
-          Oops! Algo deu errado
-        </h1>
-        
-        <p className="text-cinza-medio mb-6">
-          Ocorreu um erro inesperado. Nossa equipe foi notificada e está trabalhando para resolver o problema.
-        </p>
-        
-        <div className="space-y-3">
-          <button 
-            onClick={reset} 
-            className="w-full bg-amarelo-armazem text-madeira-escura px-6 py-3 rounded-lg font-semibold hover:bg-yellow-400 transition-colors flex items-center justify-center"
+        <div className="flex flex-col space-y-4">
+          <button
+            onClick={() => reset()}
+            className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-amber-600 hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500"
           >
-            <RefreshCw className="w-4 h-4 mr-2" />
             Tentar novamente
           </button>
-          
-          <Link href="/" className="block">
-            <Button variant="outline" className="w-full">
-              <Home className="w-4 h-4 mr-2" />
-              Voltar para o início
-            </Button>
-          </Link>
+          <button
+            onClick={() => window.location.href = '/'}
+            className="w-full flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500"
+          >
+            Voltar ao início
+          </button>
         </div>
-        
-        {typeof window !== 'undefined' && window.location.hostname === 'localhost' && (
-          <details className="mt-8 p-4 bg-gray-100 rounded-lg">
-            <summary className="cursor-pointer font-medium text-gray-700 mb-2">
-              Detalhes técnicos (desenvolvimento)
-            </summary>
-            <pre className="text-sm text-gray-600 whitespace-pre-wrap">
-              {error.stack}
-            </pre>
-          </details>
-        )}
       </div>
     </div>
   )

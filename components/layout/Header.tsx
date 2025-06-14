@@ -97,6 +97,7 @@ const Header = memo(() => {
               isScrolled={isScrolled} 
               onClick={closeMenu}
               className="flex-shrink-0"
+              priority={true}
             />
 
             {/* Desktop Navigation */}

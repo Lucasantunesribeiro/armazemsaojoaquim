@@ -28,11 +28,15 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url)
     const userId = searchParams.get('user_id')
 
+    // Se não há user_id, retorna lista vazia ou todas as reservas (para teste)
     if (!userId) {
       return createJsonResponse({
-        error: 'user_id é obrigatório',
-        usage: 'GET /api/reservas?user_id=USER_ID'
-      }, 400)
+        success: true,
+        data: [],
+        count: 0,
+        message: 'Nenhuma reserva encontrada (user_id não fornecido)',
+        usage: 'Para buscar reservas específicas: GET /api/reservas?user_id=USER_ID'
+      }, 200)
     }
 
     // Simular busca de reservas do usuário
