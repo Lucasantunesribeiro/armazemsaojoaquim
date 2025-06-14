@@ -9,8 +9,19 @@ module.exports = {
             removeAll: true,
           },
           normalizeUrl: false,
+          mergeLonghand: false,
+          mergeRules: false,
+          minifySelectors: false,
+          discardDuplicates: true,
+          discardEmpty: true,
+          cssDeclarationSorter: false,
         }]
       } 
+    } : {}),
+    ...(process.env.NODE_ENV === 'production' ? {
+      'postcss-custom-properties': {
+        preserve: true,
+      }
     } : {})
   },
 }

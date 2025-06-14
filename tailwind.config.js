@@ -124,29 +124,43 @@ module.exports = {
     },
   },
   plugins: [
-    // Custom utilities
-    function({ addUtilities, theme }) {
+    // Plugin oficial do Tailwind para formulários
+    require('@tailwindcss/forms'),
+    require('@tailwindcss/typography'),
+    
+    // Custom utilities com configuração mais robusta
+    function({ addUtilities, theme, addComponents }) {
+      // Utilities customizadas
       const newUtilities = {
         '.text-gradient': {
           background: `linear-gradient(135deg, ${theme('colors.amarelo-armazem')} 0%, ${theme('colors.vermelho-portas')} 100%)`,
           '-webkit-background-clip': 'text',
           '-webkit-text-fill-color': 'transparent',
           'background-clip': 'text',
+          // Fallback para navegadores que não suportam
+          'color': theme('colors.amarelo-armazem'),
+          '@supports (background-clip: text)': {
+            'color': 'transparent',
+          },
         },
         '.gpu-accelerated': {
           transform: 'translateZ(0)',
           'will-change': 'transform',
+          'backface-visibility': 'hidden',
         },
         '.content-visibility-auto': {
           'content-visibility': 'auto',
+          'contain-intrinsic-size': '0 500px', // Altura estimada para melhor performance
         },
         '.touch-target': {
           'min-height': theme('minHeight.44'),
           'min-width': theme('minWidth.44'),
+          'touch-action': 'manipulation', // Melhor responsividade ao toque
         },
         '.touch-target-lg': {
           'min-height': theme('minHeight.48'),
           'min-width': theme('minWidth.48'),
+          'touch-action': 'manipulation',
         },
         '.scroll-smooth': {
           'scroll-behavior': 'smooth',
@@ -165,14 +179,91 @@ module.exports = {
             'border-radius': theme('borderRadius.DEFAULT'),
           },
         },
+        // Utilities para melhor performance
+        '.will-change-auto': {
+          'will-change': 'auto',
+        },
+        '.will-change-scroll': {
+          'will-change': 'scroll-position',
+        },
+        '.will-change-contents': {
+          'will-change': 'contents',
+        },
       }
-      addUtilities(newUtilities, ['responsive', 'hover', 'focus'])
+      
+      // Componentes base para consistência
+      const newComponents = {
+        '.btn-base': {
+          'display': 'inline-flex',
+          'align-items': 'center',
+          'justify-content': 'center',
+          'padding': `${theme('spacing.2')} ${theme('spacing.4')}`,
+          'border-radius': theme('borderRadius.lg'),
+          'font-weight': theme('fontWeight.medium'),
+          'transition': 'all 0.2s ease-in-out',
+          'cursor': 'pointer',
+          '&:focus': {
+            'outline': 'none',
+          },
+          '&:focus-visible': {
+            'outline': `2px solid ${theme('colors.amarelo-armazem')}`,
+            'outline-offset': '2px',
+          },
+          '&:disabled': {
+            'opacity': '0.5',
+            'cursor': 'not-allowed',
+          },
+        },
+        '.card-base': {
+          'background-color': theme('colors.white'),
+          'border-radius': theme('borderRadius.xl'),
+          'box-shadow': theme('boxShadow.soft'),
+          'border': `1px solid ${theme('colors.gray.200')}`,
+          'overflow': 'hidden',
+          '@media (prefers-color-scheme: dark)': {
+            'background-color': theme('colors.gray.800'),
+            'border-color': theme('colors.gray.700'),
+          },
+        },
+      }
+      
+      addUtilities(newUtilities, {
+        respectPrefix: true,
+        respectImportant: true,
+      })
+      
+      addComponents(newComponents)
     },
   ],
+  // Configurações avançadas para produção
   future: {
     hoverOnlyWhenSupported: true,
+    respectDefaultRingColorOpacity: true,
   },
   experimental: {
     optimizeUniversalDefaults: true,
+    matchVariant: true,
   },
+  // Configuração para garantir que estilos sejam aplicados corretamente
+  corePlugins: {
+    preflight: true, // Manter preflight para consistência
+  },
+  // Configuração de purge mais robusta
+  safelist: [
+    // Classes que podem ser geradas dinamicamente
+    'text-amarelo-armazem',
+    'bg-amarelo-armazem',
+    'border-amarelo-armazem',
+    'text-vermelho-portas',
+    'bg-vermelho-portas',
+    'border-vermelho-portas',
+    // Classes de animação
+    'animate-fade-in',
+    'animate-slide-up',
+    'animate-bounce-gentle',
+    // Classes críticas para funcionalidade
+    'focus-ring',
+    'touch-target',
+    'gpu-accelerated',
+  ],
 }

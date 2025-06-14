@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { emailService } from '../../../lib/email-service'
+import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
+import { cookies } from 'next/headers'
 import crypto from 'crypto'
 
 // Função para criar resposta JSON com headers CORS obrigatórios
@@ -30,7 +32,11 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url)
     const userId = searchParams.get('user_id')
 
-    // Se não há user_id, retorna lista vazia ou todas as reservas (para teste)
+    // Criar cliente Supabase
+    const cookieStore = cookies()
+    const supabase = createRouteHandlerClient({ cookies: () => cookieStore })
+
+    // Se não há user_id, retorna lista vazia
     if (!userId) {
       return createJsonResponse({
         success: true,
@@ -41,41 +47,40 @@ export async function GET(request: NextRequest) {
       }, 200)
     }
 
-    // Simular busca de reservas do usuário
-    // Em produção, aqui você consultaria o banco de dados
-    const mockReservations = [
-      {
-        id: '1',
-        user_id: userId,
-        nome: 'João Silva',
-        email: 'joao@email.com',
-        telefone: '(21) 99999-9999',
-        data: '2024-12-25',
-        horario: '19:00',
-        pessoas: 4,
-        status: 'confirmada',
-        observacoes: 'Mesa próxima à janela',
-        created_at: '2024-12-20T10:00:00Z'
-      },
-      {
-        id: '2',
-        user_id: userId,
-        nome: 'João Silva',
-        email: 'joao@email.com',
-        telefone: '(21) 99999-9999',
-        data: '2024-12-30',
-        horario: '20:30',
-        pessoas: 2,
-        status: 'pendente',
-        observacoes: null,
-        created_at: '2024-12-20T15:30:00Z'
-      }
-    ]
+    // Buscar reservas do usuário no Supabase
+    const { data: reservations, error } = await supabase
+      .from('reservations')
+      .select('*')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false })
+
+    if (error) {
+      console.error('Erro ao buscar reservas:', error)
+      return createJsonResponse({
+        error: 'Erro ao buscar reservas',
+        details: error.message
+      }, 500)
+    }
+
+    // Mapear dados para formato esperado pelo frontend
+    const formattedReservations = reservations.map(reservation => ({
+      id: reservation.id,
+      user_id: reservation.user_id,
+      nome: reservation.nome,
+      email: reservation.email,
+      telefone: reservation.telefone,
+      data: reservation.data,
+      horario: reservation.horario,
+      pessoas: reservation.pessoas,
+      status: reservation.status,
+      observacoes: reservation.observacoes,
+      created_at: reservation.created_at
+    }))
 
     return createJsonResponse({
       success: true,
-      data: mockReservations,
-      count: mockReservations.length,
+      data: formattedReservations,
+      count: formattedReservations.length,
       message: 'Reservas encontradas com sucesso'
     })
 
@@ -137,36 +142,49 @@ export async function POST(request: NextRequest) {
       }, 400)
     }
 
-         // Verificar se a data não é no passado
-     const requestDate = new Date(data + 'T00:00:00')
-     const today = new Date()
-     today.setHours(0, 0, 0, 0)
-     
-     if (requestDate < today) {
-       return createJsonResponse({
-         error: 'Não é possível fazer reservas para datas passadas',
-         received: data
-       }, 400)
-     }
+    // Verificar se a data não é no passado
+    const requestDate = new Date(data + 'T00:00:00')
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    
+    if (requestDate < today) {
+      return createJsonResponse({
+        error: 'Não é possível fazer reservas para datas passadas',
+        received: data
+      }, 400)
+    }
 
     // Gerar token de confirmação único
     const confirmationToken = crypto.randomBytes(32).toString('hex')
 
-    // Simular criação da reserva
-    // Em produção, aqui você salvaria no banco de dados
-    const newReservation = {
-      id: Math.random().toString(36).substr(2, 9),
-      user_id,
-      nome,
-      email,
-      telefone,
-      data,
-      horario,
-      pessoas,
-      observacoes: observacoes || null,
-      status: 'pendente',
-      confirmation_token: confirmationToken,
-      created_at: new Date().toISOString()
+    // Criar cliente Supabase
+    const cookieStore = cookies()
+    const supabase = createRouteHandlerClient({ cookies: () => cookieStore })
+
+    // Inserir reserva no banco de dados
+    const { data: newReservation, error } = await supabase
+      .from('reservations')
+      .insert({
+        user_id,
+        nome,
+        email,
+        telefone,
+        data,
+        horario,
+        pessoas,
+        observacoes: observacoes || null,
+        status: 'pendente',
+        confirmation_token: confirmationToken
+      })
+      .select()
+      .single()
+
+    if (error) {
+      console.error('Erro ao criar reserva:', error)
+      return createJsonResponse({
+        error: 'Erro ao criar reserva',
+        details: error.message
+      }, 500)
     }
 
     // Enviar email de confirmação para o usuário
@@ -201,15 +219,6 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     console.error('Erro no POST reservas:', error)
-    
-    // Se o erro for de parsing JSON
-    if (error instanceof SyntaxError) {
-      return createJsonResponse({
-        error: 'JSON inválido no corpo da requisição',
-        details: error.message
-      }, 400)
-    }
-
     return createJsonResponse({
       error: 'Erro interno do servidor',
       details: error instanceof Error ? error.message : 'Erro desconhecido'
@@ -217,31 +226,77 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// PUT - Atualizar reserva
+// PUT - Atualizar status da reserva
 export async function PUT(request: NextRequest) {
   try {
     const body = await request.json()
-    const { id, status, ...updateData } = body
+    const { id, status, confirmation_token } = body
 
-    if (!id) {
+    if (!id || !status) {
       return createJsonResponse({
-        error: 'ID da reserva é obrigatório',
-        usage: 'PUT /api/reservas com { id: "RESERVATION_ID", ... }'
+        error: 'Campos obrigatórios: id, status'
       }, 400)
     }
 
-    // Simular atualização da reserva
-    const updatedReservation = {
-      id,
-      ...updateData,
-      status: status || 'pendente',
-      updated_at: new Date().toISOString()
+    // Validar status
+    const validStatuses = ['pendente', 'confirmada', 'cancelada']
+    if (!validStatuses.includes(status)) {
+      return createJsonResponse({
+        error: 'Status inválido. Use: ' + validStatuses.join(', ')
+      }, 400)
+    }
+
+    // Criar cliente Supabase
+    const cookieStore = cookies()
+    const supabase = createRouteHandlerClient({ cookies: () => cookieStore })
+
+    // Construir condições de atualização
+    let query = supabase
+      .from('reservations')
+      .update({ status })
+      .eq('id', id)
+
+    // Se for confirmação por token, validar token
+    if (status === 'confirmada' && confirmation_token) {
+      query = query.eq('confirmation_token', confirmation_token)
+    }
+
+    const { data: updatedReservation, error } = await query
+      .select()
+      .single()
+
+    if (error) {
+      console.error('Erro ao atualizar reserva:', error)
+      return createJsonResponse({
+        error: 'Erro ao atualizar reserva ou token inválido',
+        details: error.message
+      }, 500)
+    }
+
+    // Se foi confirmada, enviar notificação para admin
+    if (status === 'confirmada') {
+      try {
+        await emailService.sendAdminNotification({
+          id: updatedReservation.id,
+          nome: updatedReservation.nome,
+          email: updatedReservation.email,
+          telefone: updatedReservation.telefone,
+          data: updatedReservation.data,
+          horario: updatedReservation.horario,
+          pessoas: updatedReservation.pessoas,
+          observacoes: updatedReservation.observacoes,
+          confirmationToken: updatedReservation.confirmation_token
+        })
+      } catch (emailError) {
+        console.error('Erro ao enviar notificação para admin:', emailError)
+        // Não falhar a confirmação por causa do email
+      }
     }
 
     return createJsonResponse({
       success: true,
       data: updatedReservation,
-      message: 'Reserva atualizada com sucesso'
+      message: `Reserva ${status} com sucesso`
     })
 
   } catch (error) {
@@ -253,24 +308,47 @@ export async function PUT(request: NextRequest) {
   }
 }
 
-// DELETE - Cancelar reserva
+// DELETE - Deletar reserva
 export async function DELETE(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
     const id = searchParams.get('id')
+    const userId = searchParams.get('user_id')
 
     if (!id) {
       return createJsonResponse({
-        error: 'ID da reserva é obrigatório',
-        usage: 'DELETE /api/reservas?id=RESERVATION_ID'
+        error: 'ID da reserva é obrigatório'
       }, 400)
     }
 
-    // Simular cancelamento da reserva
+    // Criar cliente Supabase
+    const cookieStore = cookies()
+    const supabase = createRouteHandlerClient({ cookies: () => cookieStore })
+
+    // Construir query de delete
+    let query = supabase
+      .from('reservations')
+      .delete()
+      .eq('id', id)
+
+    // Se user_id fornecido, garantir que usuário só delete suas próprias reservas
+    if (userId) {
+      query = query.eq('user_id', userId)
+    }
+
+    const { error } = await query
+
+    if (error) {
+      console.error('Erro ao deletar reserva:', error)
+      return createJsonResponse({
+        error: 'Erro ao deletar reserva ou reserva não encontrada',
+        details: error.message
+      }, 500)
+    }
+
     return createJsonResponse({
       success: true,
-      message: 'Reserva cancelada com sucesso',
-      id
+      message: 'Reserva deletada com sucesso'
     })
 
   } catch (error) {

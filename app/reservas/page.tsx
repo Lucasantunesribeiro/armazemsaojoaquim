@@ -102,7 +102,7 @@ export default function ReservasPage() {
       const data = await response.json()
       
       if (data.success) {
-        setUserReservations(data.data.reservations || [])
+        setUserReservations(data.data || [])
       } else {
         toast.error(data.error || 'Erro ao carregar reservas')
       }
