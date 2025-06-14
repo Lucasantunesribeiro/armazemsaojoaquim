@@ -18,9 +18,9 @@ const MenuPreview = () => {
       title: 'Aperitivos Especiais',
       description: 'Entradas que despertam os sentidos com sabores únicos',
       items: [
-        { name: 'Patatas Bravas Armazém', price: 'R$ 28', description: 'Com molho especial da casa' },
-        { name: 'Croqueta de Costela 12h', price: 'R$ 32', description: 'Costela desfiada com redução' },
-        { name: 'Ceviche Carioca', price: 'R$ 38', description: 'Peixe fresco com toque tropical' }
+        { name: 'Patatas Bravas Armazém', price: 'R$ 25', description: 'Batatas douradas com aioli de páprica levemente picante' },
+        { name: 'Croqueta de Costela 12h', price: 'R$ 29', description: 'Costela bovina cozida lentamente, temperada e frita' },
+        { name: 'Ceviche Carioca', price: 'R$ 49', description: 'Tilápia marinada no limão com leite de coco, cebola roxa, pimenta dedo de moça, milho peruano, chips de batata' }
       ],
       gradient: 'from-red-500 to-pink-600',
       bgColor: 'bg-red-50',
@@ -31,8 +31,8 @@ const MenuPreview = () => {
       title: 'Pratos Principais',
       description: 'Gastronomia brasileira com técnicas contemporâneas',
       items: [
-        { name: 'Bife Ancho Premium', price: 'R$ 89', description: '400g com chimichurri caseiro' },
-        { name: 'Atum em Crosta Pistache', price: 'R$ 76', description: 'Selado com risotto de limão' },
+        { name: 'Bife Ancho', price: 'R$ 130', description: 'Corte argentino com legumes grelhados e batatas bravas.' },
+        { name: 'Atum em Crosta', price: 'R$ 89', description: 'Selado com risotto de limão' },
         { name: 'Polvo Grelhado Mediterrâneo', price: 'R$ 68', description: 'Com batatas confitadas' }
       ],
       gradient: 'from-amber-500 to-orange-600',
