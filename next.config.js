@@ -6,6 +6,11 @@ const nextConfig = {
   // Configuração básica
   reactStrictMode: true,
   
+  // IMPORTANTE: Para Netlify, precisamos de static export
+  output: 'export',
+  trailingSlash: true,
+  distDir: 'out',
+  
   // Configurações experimentais básicas
   experimental: {
     optimizeCss: false, // Manter desabilitado por enquanto
@@ -33,9 +38,10 @@ const nextConfig = {
     return config
   },
 
-  // Configuração básica de imagens
+  // Configuração de imagens para Netlify - DESABILITAR otimização automática
   images: {
-    formats: ['image/webp'],
+    unoptimized: true, // CRUCIAL para Netlify
+    formats: ['image/webp', 'image/avif'],
     remotePatterns: [
       {
         protocol: 'https',
@@ -74,6 +80,15 @@ const nextConfig = {
   // Configurações de ESLint
   eslint: {
     ignoreDuringBuilds: false
+  },
+
+  // IMPORTANTE: Para static export, precisamos desabilitar certas features
+  async rewrites() {
+    return []
+  },
+
+  async redirects() {
+    return []
   }
 }
 

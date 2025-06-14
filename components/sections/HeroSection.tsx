@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { ChevronLeft, ChevronRight, MapPin, Clock, Phone } from 'lucide-react'
-import OptimizedImage from '../ui/OptimizedImage'
+import NetlifyImage from '../ui/NetlifyImage'
 
 const heroImages = [
   {
@@ -86,15 +86,12 @@ export default function HeroSection() {
               index === currentSlide ? 'opacity-100' : 'opacity-0'
             }`}
           >
-            <OptimizedImage
+            <NetlifyImage
               src={image.src}
               alt={image.alt}
-              fill
               priority={index === 0}
-              quality={85}
               sizes="100vw"
-              className="object-cover will-change-transform"
-              placeholder="blur"
+              className="object-cover will-change-transform absolute inset-0 w-full h-full"
               onLoad={() => index === 0 && setIsLoaded(true)}
             />
           </div>

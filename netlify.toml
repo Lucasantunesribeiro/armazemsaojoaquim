@@ -1,6 +1,6 @@
 [build]
-  command = "npm ci --prefer-offline --no-audit --no-fund --fetch-timeout=600000 --fetch-retry-mintimeout=10000 --fetch-retry-maxtimeout=60000 --fetch-retries=5 && npm run build:production"
-  publish = ".next"
+  command = "npm ci --prefer-offline --no-audit --no-fund --fetch-timeout=600000 --fetch-retry-mintimeout=10000 --fetch-retry-maxtimeout=60000 --fetch-retries=5 && npm run build:netlify"
+  publish = "out"
 
 [build.environment]
   NODE_VERSION = "20"
@@ -46,18 +46,45 @@
     Permissions-Policy = "camera=(), microphone=(), geolocation=()"
     Strict-Transport-Security = "max-age=31536000; includeSubDomains"
 
-# Cache para assets estáticos
+# Cache para assets estáticos do Next.js
 [[headers]]
   for = "/_next/static/*"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
 
-# Cache para imagens
+# Cache para imagens - IMPORTANTE
 [[headers]]
   for = "/images/*"
   [headers.values]
     Cache-Control = "public, max-age=86400"
     Vary = "Accept"
+    Access-Control-Allow-Origin = "*"
+
+# Cache para imagens otimizadas
+[[headers]]
+  for = "/**/*.jpg"
+  [headers.values]
+    Cache-Control = "public, max-age=86400"
+    
+[[headers]]
+  for = "/**/*.jpeg"  
+  [headers.values]
+    Cache-Control = "public, max-age=86400"
+    
+[[headers]]
+  for = "/**/*.png"
+  [headers.values]
+    Cache-Control = "public, max-age=86400"
+    
+[[headers]]
+  for = "/**/*.webp"
+  [headers.values]
+    Cache-Control = "public, max-age=86400"
+    
+[[headers]]
+  for = "/**/*.avif"
+  [headers.values]
+    Cache-Control = "public, max-age=86400"
 
 # Cache para ícones
 [[headers]]
