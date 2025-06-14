@@ -1,6 +1,5 @@
 [build]
   command = "npm ci --prefer-offline --no-audit --no-fund --fetch-timeout=600000 --fetch-retry-mintimeout=10000 --fetch-retry-maxtimeout=60000 --fetch-retries=5 && npm run build"
-  publish = "out"
 
 [build.environment]
   NODE_VERSION = "20"

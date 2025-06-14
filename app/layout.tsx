@@ -1,4 +1,4 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import { Inter, Playfair_Display } from 'next/font/google'
 import './globals.css'
 import { Providers } from '@/components/providers/Providers'
@@ -23,7 +23,14 @@ const playfair = Playfair_Display({
   fallback: ['Georgia', 'serif']
 })
 
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+}
+
 export const metadata: Metadata = {
+  metadataBase: new URL('https://armazemsaojoaquim.netlify.app'),
   title: 'Armazém São Joaquim - Restaurante Histórico em Santa Teresa',
   description: 'Desde 1854 preservando a tradição gastronômica de Santa Teresa. Desfrute de pratos únicos em um ambiente histórico no coração do Rio de Janeiro.',
   keywords: 'restaurante, Santa Teresa, Rio de Janeiro, gastronomia, história, armazém',
@@ -63,8 +70,7 @@ export const metadata: Metadata = {
       { url: '/apple-icon.png', sizes: '180x180', type: 'image/png' }
     ]
   },
-  manifest: '/manifest.json',
-  viewport: 'width=device-width, initial-scale=1, maximum-scale=5'
+  manifest: '/manifest.json'
 }
 
 export default function RootLayout({
