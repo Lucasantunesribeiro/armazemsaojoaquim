@@ -15,6 +15,8 @@ const getEnvVar = (key: string, defaultValue?: string): string => {
         return process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
       case 'NEXT_PUBLIC_GA_ID':
         return process.env.NEXT_PUBLIC_GA_ID || ''
+      case 'NEXT_PUBLIC_APP_VERSION':
+        return process.env.NEXT_PUBLIC_APP_VERSION || '1.0.0'
       default:
         return defaultValue || ''
     }
@@ -30,6 +32,7 @@ export const ENV = {
   SUPABASE_URL: getEnvVar('NEXT_PUBLIC_SUPABASE_URL'),
   SUPABASE_ANON_KEY: getEnvVar('NEXT_PUBLIC_SUPABASE_ANON_KEY'),
   GA_ID: getEnvVar('NEXT_PUBLIC_GA_ID'),
+  APP_VERSION: getEnvVar('NEXT_PUBLIC_APP_VERSION', '1.0.0'),
   IS_PRODUCTION: getEnvVar('NODE_ENV') === 'production',
   IS_DEVELOPMENT: getEnvVar('NODE_ENV') === 'development',
 }

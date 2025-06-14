@@ -257,7 +257,9 @@ class AdvancedCacheManager {
 
   public invalidateByTag(tag: string): number {
     let count = 0
-    for (const [key, item] of this.memoryCache.entries()) {
+    const entries = Array.from(this.memoryCache.entries())
+    for (let i = 0; i < entries.length; i++) {
+      const [key, item] = entries[i]
       if (item.tags.includes(tag)) {
         this.delete(key)
         count++
@@ -273,7 +275,9 @@ class AdvancedCacheManager {
 
   public invalidateByPattern(pattern: RegExp): number {
     let count = 0
-    for (const key of this.memoryCache.keys()) {
+    const keys = Array.from(this.memoryCache.keys())
+    for (let i = 0; i < keys.length; i++) {
+      const key = keys[i]
       if (pattern.test(key)) {
         this.delete(key)
         count++
@@ -338,7 +342,9 @@ class AdvancedCacheManager {
     let cleaned = 0
     const now = Date.now()
 
-    for (const [key, item] of this.memoryCache.entries()) {
+    const entries = Array.from(this.memoryCache.entries())
+    for (let i = 0; i < entries.length; i++) {
+      const [key, item] = entries[i]
       if (this.isExpired(item) || item.version !== this.version) {
         this.delete(key)
         cleaned++
@@ -424,7 +430,8 @@ class AdvancedCacheManager {
       }
 
       // Carregar itens válidos
-      for (const [key, item] of cacheData.items) {
+      for (let i = 0; i < cacheData.items.length; i++) {
+        const [key, item] = cacheData.items[i]
         if (!this.isExpired(item)) {
           this.memoryCache.set(key, item)
           this.updateStats('set', item.size)
@@ -441,14 +448,13 @@ class AdvancedCacheManager {
   }
 
   // Métodos públicos para estatísticas e debug
-  public getStats(): CacheStats & { hitRate: number; config: CacheConfig } {
+  public getStats(): CacheStats & { hitRate: number } {
     const total = this.stats.hits + this.stats.misses
     const hitRate = total > 0 ? (this.stats.hits / total) * 100 : 0
 
     return {
       ...this.stats,
-      hitRate: Math.round(hitRate * 100) / 100,
-      config: this.config
+      hitRate: Math.round(hitRate * 100) / 100
     }
   }
 
@@ -465,7 +471,9 @@ class AdvancedCacheManager {
     let oldestKey = null
     let newestKey = null
 
-    for (const [key, item] of this.memoryCache.entries()) {
+    const entries = Array.from(this.memoryCache.entries())
+    for (let i = 0; i < entries.length; i++) {
+      const [key, item] = entries[i]
       if (item.timestamp < oldestTimestamp) {
         oldestTimestamp = item.timestamp
         oldestKey = key
@@ -554,19 +562,22 @@ class MenuCache extends AdvancedCacheManager {
 }
 
 class APICache extends AdvancedCacheManager {
+  private defaultTTL: number
+
   constructor() {
     super({
       maxItems: 1000,
       defaultTTL: 5 * 60 * 1000, // 5 minutos
       persistenceKey: 'armazem_api_cache'
     })
+    this.defaultTTL = 5 * 60 * 1000 // 5 minutos
   }
 
   setAPIResponse(endpoint: string, params: any, response: any, ttl?: number) {
     const key = this.generateAPIKey(endpoint, params)
     return this.set(key, response, {
       tags: ['api', endpoint],
-      ttl: ttl || this.config.defaultTTL
+      ttl: ttl || this.defaultTTL
     })
   }
 

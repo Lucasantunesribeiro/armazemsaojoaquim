@@ -5,6 +5,14 @@ interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode
 }
 
+interface CardTitleProps extends React.HTMLAttributes<HTMLHeadingElement> {
+  children: React.ReactNode
+}
+
+interface CardDescriptionProps extends React.HTMLAttributes<HTMLParagraphElement> {
+  children: React.ReactNode
+}
+
 const Card = React.forwardRef<HTMLDivElement, CardProps>(
   ({ className, children, ...props }, ref) => {
     return (
@@ -32,6 +40,34 @@ const CardHeader = React.forwardRef<HTMLDivElement, CardProps>(
       >
         {children}
       </div>
+    )
+  }
+)
+
+const CardTitle = React.forwardRef<HTMLHeadingElement, CardTitleProps>(
+  ({ className, children, ...props }, ref) => {
+    return (
+      <h3
+        ref={ref}
+        className={cn('text-lg font-semibold leading-none tracking-tight text-cinza-escuro', className)}
+        {...props}
+      >
+        {children}
+      </h3>
+    )
+  }
+)
+
+const CardDescription = React.forwardRef<HTMLParagraphElement, CardDescriptionProps>(
+  ({ className, children, ...props }, ref) => {
+    return (
+      <p
+        ref={ref}
+        className={cn('text-sm text-cinza-medio mt-1.5', className)}
+        {...props}
+      >
+        {children}
+      </p>
     )
   }
 )
@@ -66,7 +102,9 @@ const CardFooter = React.forwardRef<HTMLDivElement, CardProps>(
 
 Card.displayName = 'Card'
 CardHeader.displayName = 'CardHeader'
+CardTitle.displayName = 'CardTitle'
+CardDescription.displayName = 'CardDescription'
 CardContent.displayName = 'CardContent'
 CardFooter.displayName = 'CardFooter'
 
-export { Card, CardHeader, CardContent, CardFooter }
+export { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter }
