@@ -29,16 +29,25 @@ const ContactSection = () => {
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(formData)
+        body: JSON.stringify({
+          type: 'contact',
+          subject: `Nova mensagem de contato - ${formData.name}`,
+          message: formData.message,
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone
+        })
       })
       
       if (response.ok) {
         toast.success('Mensagem enviada com sucesso! Retornaremos em breve.')
         setFormData({ name: '', email: '', phone: '', message: '' })
       } else {
-        throw new Error('Erro ao enviar')
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Erro ao enviar')
       }
     } catch (error) {
+      console.error('Contact form error:', error)
       toast.error('Erro ao enviar mensagem. Tente novamente.')
     } finally {
       setLoading(false)
@@ -403,34 +412,63 @@ const ContactSection = () => {
             {/* Address Image */}
             <div className="lg:col-span-2">
               <div className="relative h-80 lg:h-[400px] rounded-2xl overflow-hidden shadow-2xl group">
-                <Image
-                  src="/images/endereco.jpg"
-                  alt="Localização do Armazém São Joaquim em Santa Teresa"
-                  fill
-                  className="object-cover transition-transform duration-700 group-hover:scale-110"
-                  quality={90}
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-transparent to-transparent" />
-                
-                {/* Location Info Overlay */}
-                <div className="absolute bottom-6 left-6 right-6">
-                  <div className="bg-white/95 dark:bg-slate-800/95 backdrop-blur-sm rounded-xl p-6 shadow-lg">
-                    <div className="flex items-start space-x-4">
-                      <div className="bg-amber-500 p-3 rounded-xl">
-                        <MapPin className="w-6 h-6 text-white" />
-                      </div>
-                      <div>
-                        <h4 className="font-bold text-slate-900 dark:text-white mb-1">Nossa Localização</h4>
-                        <p className="text-slate-600 dark:text-slate-300 text-sm mb-2">
-                          Rua Áurea, 26 - Santa Teresa<br />
-                          Rio de Janeiro - RJ, 20241-220
-                        </p>
-                        <p className="text-xs text-amber-600 dark:text-amber-400 font-medium">
-                          📍 No coração histórico de Santa Teresa
-                        </p>
+                {/* Mapa Interativo do Google Maps */}
+                <div className="relative w-full h-full">
+                  <iframe
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3675.2234567890123!2d-43.1897!3d-22.9133!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x997e58a085b7af%3A0x4d11c63743e5a5a5!2sR.%20%C3%81urea%2C%2026%20-%20Santa%20Teresa%2C%20Rio%20de%20Janeiro%20-%20RJ%2C%2020241-220!5e0!3m2!1spt-BR!2sbr!4v1234567890123!5m2!1spt-BR!2sbr"
+                    width="100%"
+                    height="100%"
+                    style={{ border: 0 }}
+                    allowFullScreen
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                    title="Localização do Armazém São Joaquim"
+                    className="rounded-2xl"
+                  />
+                  
+                  {/* Overlay com informações - aparece no hover */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
+                    <div className="absolute bottom-6 left-6 right-6">
+                      <div className="bg-white/95 dark:bg-slate-800/95 backdrop-blur-sm rounded-xl p-6 shadow-lg transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+                        <div className="flex items-start space-x-4">
+                          <div className="bg-amber-500 p-3 rounded-xl">
+                            <MapPin className="w-6 h-6 text-white" />
+                          </div>
+                          <div>
+                            <h4 className="font-bold text-slate-900 dark:text-white mb-1">Nossa Localização</h4>
+                            <p className="text-slate-600 dark:text-slate-300 text-sm mb-2">
+                              Rua Áurea, 26 - Santa Teresa<br />
+                              Rio de Janeiro - RJ, 20241-220
+                            </p>
+                            <div className="flex items-center space-x-4 text-xs">
+                              <span className="text-amber-600 dark:text-amber-400 font-medium">
+                                📍 No coração histórico de Santa Teresa
+                              </span>
+                              <a
+                                href="https://maps.google.com/?q=Rua+Áurea,+26+-+Santa+Teresa,+Rio+de+Janeiro+-+RJ"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="bg-amber-500 hover:bg-amber-600 text-white px-3 py-1 rounded-lg transition-colors duration-200 pointer-events-auto"
+                              >
+                                Ver no Maps
+                              </a>
+                            </div>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
+                </div>
+
+                {/* Fallback Image (caso o iframe não carregue) */}
+                <div className="absolute inset-0 -z-10">
+                  <Image
+                    src="/images/endereco.jpg"
+                    alt="Localização do Armazém São Joaquim em Santa Teresa"
+                    fill
+                    className="object-cover"
+                    quality={90}
+                  />
                 </div>
               </div>
             </div>

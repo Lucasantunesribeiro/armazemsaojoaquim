@@ -1,155 +1,80 @@
-// Carregar polyfills ANTES de qualquer coisa
+// Carregar polyfills ANTES de qualquer coisa (corrigidos)
 require('./lib/polyfills-minimal.js')
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Otimizações de performance
+  // Configuração básica
+  reactStrictMode: true,
+  
+  // Configurações experimentais básicas
   experimental: {
-    optimizeCss: true,
-    optimizePackageImports: ['lucide-react', '@supabase/supabase-js'],
+    optimizeCss: false, // Manter desabilitado por enquanto
+    serverComponentsExternalPackages: ['@supabase/supabase-js']
   },
 
-  // Otimização de imagens
-  images: {
-    formats: ['image/webp', 'image/avif'],
-    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
-    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
-    minimumCacheTTL: 31536000, // 1 ano
-    dangerouslyAllowSVG: true,
-    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
-    domains: ['684b8c5129d9f2000857f936--armazemsaojoaquim.netlify.app'],
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: '*.netlify.app',
-        port: '',
-        pathname: '/images/**',
-      },
-      {
-        protocol: 'https',
-        hostname: 'armazemsaojoaquim.netlify.app',
-        port: '',
-        pathname: '/images/**',
-      }
-    ],
-  },
+  // Configuração mínima do webpack
+  webpack: (config, { isServer }) => {
+    // Configuração para SVG
+    config.module.rules.push({
+      test: /\.svg$/,
+      use: ['@svgr/webpack'],
+    })
 
-  // Otimizações de bundle
-  webpack: (config, { dev, isServer }) => {
-    // Otimizações de produção
-    if (!dev && !isServer) {
-      config.optimization = {
-        ...config.optimization,
-        splitChunks: {
-          chunks: 'all',
-          cacheGroups: {
-            vendor: {
-              test: /[\\/]node_modules[\\/]/,
-              name: 'vendors',
-              chunks: 'all',
-              priority: 10,
-            },
-            common: {
-              name: 'common',
-              minChunks: 2,
-              chunks: 'all',
-              priority: 5,
-              reuseExistingChunk: true,
-            },
-          },
-        },
+    // Resolver problema "self is not defined" do Supabase apenas no servidor
+    if (isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+        net: false,
+        tls: false,
       }
     }
 
     return config
   },
 
-  // Headers para cache e performance
+  // Configuração básica de imagens
+  images: {
+    formats: ['image/webp'],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '**',
+      }
+    ]
+  },
+
+  // Headers básicos de segurança
   async headers() {
     return [
-      {
-        source: '/images/:path*',
-        headers: [
-          {
-            key: 'Cache-Control',
-            value: 'public, max-age=31536000, immutable',
-          },
-          {
-            key: 'X-Content-Type-Options',
-            value: 'nosniff',
-          },
-        ],
-      },
-      {
-        source: '/_next/static/:path*',
-        headers: [
-          {
-            key: 'Cache-Control',
-            value: 'public, max-age=31536000, immutable',
-          },
-        ],
-      },
-      {
-        source: '/_next/image:path*',
-        headers: [
-          {
-            key: 'Cache-Control',
-            value: 'public, max-age=31536000, immutable',
-          },
-        ],
-      },
-      {
-        source: '/favicon.ico',
-        headers: [
-          {
-            key: 'Cache-Control',
-            value: 'public, max-age=31536000, immutable',
-          },
-        ],
-      },
-      {
-        source: '/manifest.json',
-        headers: [
-          {
-            key: 'Cache-Control',
-            value: 'public, max-age=86400',
-          },
-        ],
-      },
       {
         source: '/(.*)',
         headers: [
           {
             key: 'X-Frame-Options',
-            value: 'DENY',
+            value: 'DENY'
           },
           {
             key: 'X-Content-Type-Options',
-            value: 'nosniff',
-          },
-          {
-            key: 'Referrer-Policy',
-            value: 'strict-origin-when-cross-origin',
-          },
-        ],
-      },
+            value: 'nosniff'
+          }
+        ]
+      }
     ]
   },
 
-  // Compressão
-  compress: true,
-
-  // Otimizações de produção
-  swcMinify: true,
-  
-  // Configurações de build
-  output: 'standalone',
-  
-  // Configurações do Netlify
-  trailingSlash: false,
-  
-  // Configurações de runtime
   poweredByHeader: false,
+  compress: true,
+  
+  // Configurações de TypeScript
+  typescript: {
+    ignoreBuildErrors: false
+  },
+
+  // Configurações de ESLint
+  eslint: {
+    ignoreDuringBuilds: false
+  }
 }
 
 module.exports = nextConfig

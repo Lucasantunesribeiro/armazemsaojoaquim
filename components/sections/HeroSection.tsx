@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { ChevronLeft, ChevronRight, MapPin, Clock, Phone } from 'lucide-react'
 import OptimizedImage from '../ui/OptimizedImage'
 
@@ -28,41 +28,61 @@ const heroImages = [
 export default function HeroSection() {
   const [currentSlide, setCurrentSlide] = useState(0)
   const [isAutoPlaying, setIsAutoPlaying] = useState(true)
+  const [isLoaded, setIsLoaded] = useState(false)
 
-  // Auto-play do carousel
+  // Auto-play otimizado do carousel
   useEffect(() => {
     if (!isAutoPlaying) return
 
     const interval = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % heroImages.length)
-    }, 5000)
+    }, 6000) // Aumentado para 6s para melhor UX
 
     return () => clearInterval(interval)
   }, [isAutoPlaying])
 
-  const nextSlide = () => {
+  // Preload das imagens para melhor performance
+  useEffect(() => {
+    const preloadImages = async () => {
+      const imagePromises = heroImages.map((image) => {
+        return new Promise((resolve) => {
+          const img = new Image()
+          img.onload = resolve
+          img.onerror = resolve
+          img.src = image.src
+        })
+      })
+      
+      await Promise.all(imagePromises)
+      setIsLoaded(true)
+    }
+
+    preloadImages()
+  }, [])
+
+  const nextSlide = useCallback(() => {
     setCurrentSlide((prev) => (prev + 1) % heroImages.length)
     setIsAutoPlaying(false)
-  }
+  }, [])
 
-  const prevSlide = () => {
+  const prevSlide = useCallback(() => {
     setCurrentSlide((prev) => (prev - 1 + heroImages.length) % heroImages.length)
     setIsAutoPlaying(false)
-  }
+  }, [])
 
-  const goToSlide = (index: number) => {
+  const goToSlide = useCallback((index: number) => {
     setCurrentSlide(index)
     setIsAutoPlaying(false)
-  }
+  }, [])
 
   return (
     <section className="relative h-screen min-h-[600px] max-h-[900px] overflow-hidden">
-      {/* Background Images */}
+      {/* Background Images - Otimizado */}
       <div className="absolute inset-0">
         {heroImages.map((image, index) => (
           <div
             key={index}
-            className={`absolute inset-0 transition-opacity duration-1000 ${
+            className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
               index === currentSlide ? 'opacity-100' : 'opacity-0'
             }`}
           >
@@ -70,88 +90,81 @@ export default function HeroSection() {
               src={image.src}
               alt={image.alt}
               fill
-              priority={index === 0} // Prioridade apenas para a primeira imagem
-              quality={90}
+              priority={index === 0}
+              quality={85}
               sizes="100vw"
-              className="object-cover"
+              className="object-cover will-change-transform"
               placeholder="blur"
+              onLoad={() => index === 0 && setIsLoaded(true)}
             />
           </div>
         ))}
       </div>
 
-      {/* Overlay escuro */}
-      <div className="absolute inset-0 bg-black/50" />
+      {/* Overlay gradiente otimizado */}
+      <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/40 to-black/60" />
 
-      {/* Conteúdo principal */}
+      {/* Conteúdo principal - Layout clássico melhorado */}
       <div className="relative z-10 h-full flex items-center justify-center">
         <div className="container mx-auto px-4 text-center text-white">
-          {/* Logo/Título principal - otimizado para LCP */}
-          <h1 className="font-playfair text-4xl md:text-6xl lg:text-8xl font-bold mb-6 bg-gradient-to-r from-amber-200 via-yellow-300 to-amber-200 bg-clip-text text-transparent leading-tight">
-            Armazém São Joaquim
-          </h1>
-          
-          {/* Subtítulo */}
-          <p className="text-xl md:text-2xl lg:text-3xl mb-8 font-light italic">
-            "En esta casa tenemos memoria"
-          </p>
-
-          {/* Informações dinâmicas baseadas no slide */}
-          <div className="mb-12 space-y-4">
-            <h2 className="text-2xl md:text-3xl font-semibold text-amber-300">
-              {heroImages[currentSlide].title}
-            </h2>
-            <p className="text-lg md:text-xl text-gray-200 max-w-2xl mx-auto">
-              {heroImages[currentSlide].subtitle}
+          {/* Logo/Título principal - Otimizado para LCP */}
+          <div className={`transition-all duration-1000 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+            <h1 className="font-playfair text-5xl md:text-7xl lg:text-8xl font-bold mb-6 leading-tight">
+              <span className="block text-amber-300 drop-shadow-lg">Armazém</span>
+              <span className="block text-white drop-shadow-lg">São Joaquim</span>
+            </h1>
+            
+            {/* Subtítulo icônico */}
+            <p className="text-xl md:text-2xl lg:text-3xl mb-8 font-light italic text-amber-200 drop-shadow-md">
+              "En esta casa tenemos memoria"
             </p>
-          </div>
 
-          {/* Informações de contato */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12 max-w-4xl mx-auto">
-            <div className="flex items-center justify-center space-x-3 bg-black/30 backdrop-blur-sm rounded-lg p-4">
-              <MapPin className="w-6 h-6 text-amber-400 flex-shrink-0" />
-              <div className="text-left">
-                <p className="font-semibold">Localização</p>
-                <p className="text-sm text-gray-300">Santa Teresa, RJ</p>
-              </div>
+            {/* Informações dinâmicas baseadas no slide */}
+            <div className="mb-12 space-y-4">
+              <h2 className="text-2xl md:text-3xl font-semibold text-amber-300 drop-shadow-md">
+                {heroImages[currentSlide].title}
+              </h2>
+              <p className="text-lg md:text-xl text-gray-200 max-w-2xl mx-auto drop-shadow-sm">
+                {heroImages[currentSlide].subtitle}
+              </p>
             </div>
-            
-            <div className="flex items-center justify-center space-x-3 bg-black/30 backdrop-blur-sm rounded-lg p-4">
-              <Clock className="w-6 h-6 text-amber-400 flex-shrink-0" />
-              <div className="text-left">
-                <p className="font-semibold">Funcionamento</p>
-                <p className="text-sm text-gray-300">8h às 20h</p>
-              </div>
-            </div>
-            
-            <div className="flex items-center justify-center space-x-3 bg-black/30 backdrop-blur-sm rounded-lg p-4">
-              <Phone className="w-6 h-6 text-amber-400 flex-shrink-0" />
-              <div className="text-left">
-                <p className="font-semibold">Contato</p>
-                <p className="text-sm text-gray-300">(21) 98565-8443</p>
-              </div>
-            </div>
-          </div>
 
-          {/* Botões de ação */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <a
-              href="/menu"
-              className="bg-amber-600 hover:bg-amber-700 text-white px-8 py-4 rounded-lg font-semibold text-lg transition-all duration-300 transform hover:scale-105 shadow-lg"
-            >
-              Ver Cardápio
-            </a>
-            <a
-              href="/reservas"
-              className="bg-transparent border-2 border-white hover:bg-white hover:text-gray-900 text-white px-8 py-4 rounded-lg font-semibold text-lg transition-all duration-300 transform hover:scale-105"
-            >
-              Fazer Reserva
-            </a>
+            {/* Informações de contato rápido */}
+            <div className="flex flex-wrap justify-center items-center gap-6 mb-12 text-sm md:text-base">
+              <div className="flex items-center space-x-2 bg-black/30 backdrop-blur-sm px-4 py-2 rounded-full">
+                <MapPin className="w-4 h-4 text-amber-400" />
+                <span>Santa Teresa, RJ</span>
+              </div>
+              <div className="flex items-center space-x-2 bg-black/30 backdrop-blur-sm px-4 py-2 rounded-full">
+                <Clock className="w-4 h-4 text-amber-400" />
+                <span>Seg-Sáb: 8h-20h</span>
+              </div>
+              <div className="flex items-center space-x-2 bg-black/30 backdrop-blur-sm px-4 py-2 rounded-full">
+                <Phone className="w-4 h-4 text-amber-400" />
+                <span>(21) 98565-8443</span>
+              </div>
+            </div>
+
+            {/* Botões de ação */}
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+              <a
+                href="/menu"
+                className="bg-amber-600 hover:bg-amber-700 text-white px-8 py-4 rounded-lg font-semibold text-lg transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
+              >
+                Ver Cardápio
+              </a>
+              <a
+                href="/reservas"
+                className="bg-transparent border-2 border-white hover:bg-white hover:text-gray-900 text-white px-8 py-4 rounded-lg font-semibold text-lg transition-all duration-300 transform hover:scale-105"
+              >
+                Fazer Reserva
+              </a>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Controles do carousel */}
+      {/* Controles do carousel - Simplificados */}
       <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-20">
         <div className="flex space-x-3">
           {heroImages.map((_, index) => (
@@ -169,7 +182,7 @@ export default function HeroSection() {
         </div>
       </div>
 
-      {/* Botões de navegação */}
+      {/* Botões de navegação - Otimizados */}
       <button
         onClick={prevSlide}
         className="absolute left-4 top-1/2 transform -translate-y-1/2 z-20 bg-black/30 hover:bg-black/50 text-white p-3 rounded-full transition-all duration-300 backdrop-blur-sm"
@@ -186,10 +199,10 @@ export default function HeroSection() {
         <ChevronRight className="w-6 h-6" />
       </button>
 
-      {/* Indicador de progresso */}
+      {/* Indicador de progresso simplificado */}
       <div className="absolute bottom-0 left-0 w-full h-1 bg-black/30">
         <div 
-          className="h-full bg-amber-400 transition-all duration-300"
+          className="h-full bg-amber-400 transition-all duration-300 ease-out"
           style={{ width: `${((currentSlide + 1) / heroImages.length) * 100}%` }}
         />
       </div>
