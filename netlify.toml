@@ -1,6 +1,6 @@
 [build]
-  command = "npm ci --prefer-offline --no-audit --no-fund --fetch-timeout=600000 --fetch-retry-mintimeout=10000 --fetch-retry-maxtimeout=60000 --fetch-retries=5 && npm run build:netlify"
-  publish = "out"
+  command = "npm ci --prefer-offline --no-audit --no-fund --fetch-timeout=600000 --fetch-retry-mintimeout=10000 --fetch-retry-maxtimeout=60000 --fetch-retries=5 && npm run build"
+  publish = ".next"
 
 [build.environment]
   NODE_VERSION = "20"
@@ -17,23 +17,30 @@
   NEXT_PRIVATE_SKIP_MIDDLEWARE_VALIDATION = "true"
   CI = "true"
   DISABLE_ESLINT_PLUGIN = "true"
-  SKIP_VALIDATION = "true"
-  NODE_OPTIONS = "--max-old-space-size=4096"
 
-# Função para API routes
-[functions]
-  directory = "netlify/functions"
-  node_bundler = "nft"
+# Configuração para Next.js com API routes
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
 
-[[redirects]]
-  from = "/api/*"
-  to = "/.netlify/functions/:splat"
-  status = 200
+# Headers para CORS e segurança
+[[headers]]
+  for = "/api/*"
+  [headers.values]
+    Access-Control-Allow-Origin = "*"
+    Access-Control-Allow-Methods = "GET, POST, PUT, DELETE, OPTIONS"
+    Access-Control-Allow-Headers = "Content-Type, Authorization"
+    Cache-Control = "no-cache"
 
+# Redirects para SPA
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
+  conditions = {Role = ["admin"]}
+
+# Configuração de timeout para funções
+[functions]
+  node_bundler = "esbuild"
 
 # Headers de segurança e performance
 [[headers]]

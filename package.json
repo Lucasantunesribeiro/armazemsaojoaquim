@@ -4,8 +4,9 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build && node scripts/copy-static-assets.js",
-    "build:netlify": "next build && node scripts/copy-static-assets.js",
+    "build": "next build",
+    "build:netlify": "next build",
+    "build:static": "next build && node scripts/copy-static-assets.js",
     "start": "next start",
     "lint": "next lint",
     "optimize-images": "node scripts/optimize-images.js",
