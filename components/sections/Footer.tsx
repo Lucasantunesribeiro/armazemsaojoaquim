@@ -2,8 +2,19 @@
 
 import React from 'react'
 import Link from 'next/link'
-import Image from 'next/image'
-import { MapPin, Phone, Mail, Clock, Instagram, Facebook, Heart } from 'lucide-react'
+import { 
+  Heart, 
+  MapPin, 
+  Phone, 
+  Mail, 
+  Clock,
+  Instagram,
+  Facebook,
+  Youtube,
+  Utensils,
+  Wine
+} from 'lucide-react'
+import Logo from '../atoms/Logo'
 
 export const Footer = () => {
   const currentYear = new Date().getFullYear()
@@ -49,13 +60,7 @@ export const Footer = () => {
               {/* Brand Section */}
               <div className="lg:col-span-2 space-y-6">
                 <div className="flex items-center space-x-4">
-                  <Image 
-                    src="/images/logo.jpg" 
-                    alt="Armazém São Joaquim" 
-                    width={60} 
-                    height={60} 
-                    className="rounded-full ring-2 ring-amarelo-armazem/30"
-                  />
+                  <Logo />
                   <div>
                     <h3 className="text-2xl font-bold font-playfair text-amarelo-armazem">
                       Armazém São Joaquim

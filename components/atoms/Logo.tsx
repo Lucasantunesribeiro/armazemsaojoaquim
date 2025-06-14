@@ -5,49 +5,36 @@ import Link from 'next/link'
 import { memo } from 'react'
 
 interface LogoProps {
-  isScrolled?: boolean
-  onClick?: () => void
   className?: string
+  priority?: boolean
+  width?: number
+  height?: number
 }
 
-const Logo = memo(({ isScrolled = false, onClick, className = '' }: LogoProps) => {
+const Logo = memo(({ 
+  className = "h-12 w-auto", 
+  priority = false,
+  width = 120,
+  height = 48
+}: LogoProps) => {
   return (
     <Link 
       href="/" 
-      className={`flex items-center space-x-3 group transition-all duration-200 ${className}`}
-      onClick={onClick}
+      className="flex items-center space-x-2 hover:opacity-80 transition-opacity"
       aria-label="Armazém São Joaquim - Página inicial"
     >
-      <Image 
-        src="/images/logo.jpg" 
-        alt="Logo Armazém São Joaquim" 
-        width={50} 
-        height={50} 
-        className="rounded-full transition-transform duration-200 group-hover:scale-105" 
-        priority
+      <Image
+        src="/images/logo.jpg"
+        alt="Armazém São Joaquim - Logo"
+        width={width}
+        height={height}
+        className={className}
+        priority={priority}
+        sizes="(max-width: 768px) 100px, 120px"
+        style={{
+          objectFit: 'contain',
+        }}
       />
-      <div className="flex flex-col">
-        <span className={`
-          text-xl font-bold transition-colors duration-200 font-playfair
-          ${isScrolled 
-            ? 'text-amarelo-armazem dark:text-amarelo-armazem' 
-            : 'text-white dark:text-amarelo-armazem'
-          }
-          group-hover:text-vermelho-portas dark:group-hover:text-vermelho-portas
-        `}>
-          Armazém São Joaquim
-        </span>
-        <span className={`
-          text-xs transition-colors duration-200 font-inter italic
-          ${isScrolled 
-            ? 'text-madeira-escura dark:text-cinza-medio' 
-            : 'text-white/90 dark:text-cinza-claro'
-          }
-          group-hover:text-madeira-clara dark:group-hover:text-cinza-claro
-        `}>
-          "En esta casa tenemos memoria"
-        </span>
-      </div>
     </Link>
   )
 })

@@ -1,29 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-// Função para criar resposta JSON com headers CORS
+// Função para criar resposta JSON com headers CORS obrigatórios
 function createJsonResponse(data: any, status: number = 200) {
-  return NextResponse.json(data, {
+  // Garante que sempre retornamos JSON válido
+  const jsonData = typeof data === 'string' ? { message: data } : data
+  
+  return new NextResponse(JSON.stringify(jsonData), {
     status,
     headers: {
-      'Content-Type': 'application/json',
+      'Content-Type': 'application/json; charset=utf-8',
       'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
       'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+      'Cache-Control': 'no-store, no-cache, must-revalidate',
     },
   })
 }
 
 // Handle OPTIONS requests for CORS
 export async function OPTIONS() {
-  return new NextResponse(null, {
-    status: 200,
-    headers: {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-      'Access-Control-Max-Age': '86400',
-    },
-  })
+  return createJsonResponse({ message: 'CORS preflight successful' }, 200)
 }
 
 // GET - Buscar reservas do usuário
