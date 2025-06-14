@@ -260,50 +260,7 @@ export default function ReservasPage() {
     }
   }
 
-  // Confirmar reserva
-  const handleConfirmReservation = async (reservationId: string) => {
-    setActionLoading(prev => ({ ...prev, [reservationId]: true }))
-    
-    try {
-      const response = await fetch('/api/reservas', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          id: reservationId,
-          status: 'confirmada'
-        }),
-      })
 
-      if (!response.ok) {
-        throw new Error('Erro ao confirmar reserva')
-      }
-
-      const result = await response.json()
-      
-      if (result.success) {
-        // Atualizar a lista de reservas
-        setUserReservations(prev => 
-          prev.map(reservation => 
-            reservation.id === reservationId 
-              ? { ...reservation, status: 'confirmada' }
-              : reservation
-          )
-        )
-        
-        // Mostrar mensagem de sucesso
-        toast.success('Reserva confirmada com sucesso!')
-      } else {
-        throw new Error(result.error || 'Erro ao confirmar reserva')
-      }
-    } catch (error) {
-      console.error('Erro ao confirmar reserva:', error)
-      toast.error('Erro ao confirmar reserva. Tente novamente.')
-    } finally {
-      setActionLoading(prev => ({ ...prev, [reservationId]: false }))
-    }
-  }
 
   // Cancelar reserva
   const handleCancelReservation = async (reservationId: string) => {
@@ -691,36 +648,41 @@ export default function ReservasPage() {
                         
                         {/* Ações da Reserva */}
                         {reservation.status === 'pendente' && (
-                          <div className="mt-4 flex flex-wrap gap-2">
-                            <Button
-                              onClick={() => handleConfirmReservation(reservation.id)}
-                              disabled={actionLoading[reservation.id]}
-                              className="bg-green-600 hover:bg-green-700 disabled:bg-green-400 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
-                            >
-                              {actionLoading[reservation.id] ? (
-                                <div className="flex items-center space-x-2">
-                                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                                  <span>Confirmando...</span>
+                          <div className="mt-4 space-y-3">
+                            {/* Aviso sobre confirmação por email */}
+                            <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3">
+                              <div className="flex items-start space-x-2">
+                                <Mail className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
+                                <div className="text-sm">
+                                  <p className="text-blue-800 dark:text-blue-200 font-medium font-inter">
+                                    📧 Confirmação Necessária
+                                  </p>
+                                  <p className="text-blue-700 dark:text-blue-300 mt-1 font-inter">
+                                    Para confirmar sua reserva, clique no link enviado para seu email. 
+                                    Verifique também a pasta de spam.
+                                  </p>
                                 </div>
-                              ) : (
-                                'Confirmar Reserva'
-                              )}
-                            </Button>
-                            <Button
-                              onClick={() => handleCancelReservation(reservation.id)}
-                              disabled={actionLoading[`cancel_${reservation.id}`]}
-                              variant="outline"
-                              className="border-red-500 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 disabled:opacity-50 px-4 py-2 rounded-lg text-sm font-medium transition-colors"
-                            >
-                              {actionLoading[`cancel_${reservation.id}`] ? (
-                                <div className="flex items-center space-x-2">
-                                  <div className="w-4 h-4 border-2 border-red-500 border-t-transparent rounded-full animate-spin"></div>
-                                  <span>Cancelando...</span>
-                                </div>
-                              ) : (
-                                'Cancelar'
-                              )}
-                            </Button>
+                              </div>
+                            </div>
+                            
+                            {/* Botão de cancelar */}
+                            <div className="flex gap-2">
+                              <Button
+                                onClick={() => handleCancelReservation(reservation.id)}
+                                disabled={actionLoading[`cancel_${reservation.id}`]}
+                                variant="outline"
+                                className="border-red-500 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 disabled:opacity-50 px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                              >
+                                {actionLoading[`cancel_${reservation.id}`] ? (
+                                  <div className="flex items-center space-x-2">
+                                    <div className="w-4 h-4 border-2 border-red-500 border-t-transparent rounded-full animate-spin"></div>
+                                    <span>Cancelando...</span>
+                                  </div>
+                                ) : (
+                                  'Cancelar Reserva'
+                                )}
+                              </Button>
+                            </div>
                           </div>
                         )}
                       </div>

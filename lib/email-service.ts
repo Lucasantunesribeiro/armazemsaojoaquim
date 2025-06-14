@@ -49,7 +49,7 @@ export class EmailService {
         from: this.fromEmail,
         reply_to: this.replyToEmail, // Permite resposta para o email real
         to: [reservationData.email],
-        subject: `✅ Reserva Confirmada - Armazém São Joaquim`,
+        subject: `📧 Confirme sua Reserva - Armazém São Joaquim`,
         react: ReservationConfirmation({
           nome: reservationData.nome,
           data: reservationData.data,
