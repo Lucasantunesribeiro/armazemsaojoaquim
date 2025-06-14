@@ -1,5 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { createClient } from '@supabase/supabase-js'
 import { emailService } from '../../../../lib/email-service'
+import { ENV } from '../../../../lib/config'
+
+// Configuração do Supabase
+const supabaseUrl = ENV.SUPABASE_URL
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+
+if (!supabaseUrl || !supabaseServiceKey) {
+  console.error('❌ Configuração do Supabase está incompleta')
+  throw new Error('Configuração do Supabase está incompleta')
+}
 
 // Função para criar resposta JSON com headers CORS obrigatórios
 function createJsonResponse(data: any, status: number = 200) {
@@ -22,10 +33,6 @@ export async function OPTIONS() {
   return createJsonResponse({ message: 'CORS preflight successful' }, 200)
 }
 
-// Simulação de banco de dados em memória para demonstração
-// Em produção, isso seria substituído por consultas reais ao banco
-const reservationsDB = new Map<string, any>()
-
 // GET - Confirmar reserva via token
 export async function GET(request: NextRequest) {
   try {
@@ -39,75 +46,114 @@ export async function GET(request: NextRequest) {
       }, 400)
     }
 
-    // Em produção, você buscaria a reserva no banco de dados pelo token
-    // Por enquanto, vamos simular uma reserva encontrada
-    const mockReservation = {
-      id: 'res_' + Math.random().toString(36).substr(2, 9),
-      nome: 'Cliente Exemplo',
-      email: 'cliente@email.com',
-      telefone: '(21) 99999-9999',
-      data: '2024-12-25',
-      horario: '19:00',
-      pessoas: 4,
-      observacoes: 'Mesa próxima à janela',
-      status: 'pendente',
-      confirmation_token: token,
-      created_at: new Date().toISOString()
-    }
+    // Criar cliente Supabase com service role key
+    const supabase = createClient(supabaseUrl!, supabaseServiceKey!)
 
-    // Verificar se o token é válido (em produção, consultar banco)
-    if (!mockReservation || mockReservation.confirmation_token !== token) {
+    console.log('🔍 Buscando reserva com token:', token)
+
+    // Buscar reserva pelo token de confirmação
+    const { data: reservation, error: fetchError } = await supabase
+      .from('reservations')
+      .select('*')
+      .eq('confirmation_token', token)
+      .single()
+
+    if (fetchError || !reservation) {
+      console.error('❌ Erro ao buscar reserva:', fetchError)
       return createJsonResponse({
         error: 'Token de confirmação inválido ou expirado',
-        message: 'Por favor, solicite uma nova reserva ou entre em contato conosco.'
+        message: 'Por favor, solicite uma nova reserva ou entre em contato conosco.',
+        details: fetchError?.message
       }, 404)
     }
 
+    console.log('✅ Reserva encontrada:', reservation.id)
+
     // Verificar se a reserva já foi confirmada
-    if (mockReservation.status === 'confirmada') {
-      return createJsonResponse({
-        success: true,
-        message: 'Esta reserva já foi confirmada anteriormente.',
-        data: {
-          ...mockReservation,
-          status: 'confirmada'
-        }
+    if (reservation.status === 'confirmada') {
+      console.log('ℹ️ Reserva já estava confirmada')
+      
+      const successHtml = generateSuccessPage(reservation, true)
+      return new NextResponse(successHtml, {
+        status: 200,
+        headers: {
+          'Content-Type': 'text/html; charset=utf-8',
+        },
       })
     }
 
     // Atualizar status para confirmada
-    const confirmedReservation = {
-      ...mockReservation,
-      status: 'confirmada',
-      confirmed_at: new Date().toISOString()
+    const { data: updatedReservation, error: updateError } = await supabase
+      .from('reservations')
+      .update({ 
+        status: 'confirmada',
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', reservation.id)
+      .select()
+      .single()
+
+    if (updateError) {
+      console.error('❌ Erro ao confirmar reserva:', updateError)
+      return createJsonResponse({
+        error: 'Erro ao confirmar reserva',
+        details: updateError.message
+      }, 500)
     }
 
-    // Salvar no "banco" (em produção, UPDATE no banco real)
-    reservationsDB.set(confirmedReservation.id, confirmedReservation)
+    console.log('✅ Reserva confirmada com sucesso:', updatedReservation.id)
 
     // Enviar notificação para o admin
     try {
+      console.log('📧 Enviando notificação para o restaurante...')
+      
       const adminEmailResult = await emailService.sendAdminNotification({
-        id: confirmedReservation.id,
-        nome: confirmedReservation.nome,
-        email: confirmedReservation.email,
-        telefone: confirmedReservation.telefone,
-        data: confirmedReservation.data,
-        horario: confirmedReservation.horario,
-        pessoas: confirmedReservation.pessoas,
-        observacoes: confirmedReservation.observacoes,
+        id: updatedReservation.id,
+        nome: updatedReservation.nome,
+        email: updatedReservation.email,
+        telefone: updatedReservation.telefone,
+        data: updatedReservation.data,
+        horario: updatedReservation.horario,
+        pessoas: updatedReservation.pessoas,
+        observacoes: updatedReservation.observacoes,
         confirmationToken: token
       })
 
-      if (!adminEmailResult.success) {
-        console.warn('Falha ao enviar notificação para admin:', adminEmailResult.error)
+      if (adminEmailResult.success) {
+        console.log('✅ Notificação enviada para o restaurante!')
+      } else {
+        console.warn('⚠️ Falha ao enviar notificação para admin:', adminEmailResult.error)
       }
     } catch (emailError) {
-      console.error('Erro ao enviar notificação para admin:', emailError)
+      console.error('❌ Erro ao enviar notificação para admin:', emailError)
     }
 
     // Retornar página de sucesso (HTML)
-    const successHtml = `
+    const successHtml = generateSuccessPage(updatedReservation, false)
+    return new NextResponse(successHtml, {
+      status: 200,
+      headers: {
+        'Content-Type': 'text/html; charset=utf-8',
+      },
+    })
+
+  } catch (error) {
+    console.error('❌ Erro no GET confirm:', error)
+    return createJsonResponse({
+      error: 'Erro interno do servidor',
+      details: error instanceof Error ? error.message : 'Erro desconhecido',
+      timestamp: new Date().toISOString()
+    }, 500)
+  }
+}
+
+// Função para gerar página de sucesso
+function generateSuccessPage(reservation: any, alreadyConfirmed: boolean = false) {
+  const message = alreadyConfirmed 
+    ? 'Esta reserva já foi confirmada anteriormente.' 
+    : 'Sua reserva foi confirmada e nossa equipe foi notificada.';
+
+  return `
     <!DOCTYPE html>
     <html lang="pt-BR">
     <head>
@@ -175,18 +221,18 @@ export async function GET(request: NextRequest) {
             <div style="text-align: center;">
                 <div class="success-icon">✅</div>
                 <h2 style="color: #28a745;">Reserva Confirmada com Sucesso!</h2>
-                <p>Olá, <strong>${confirmedReservation.nome}</strong>!</p>
-                <p>Sua reserva foi confirmada e nossa equipe foi notificada.</p>
+                <p>Olá, <strong>${reservation.nome}</strong>!</p>
+                <p>${message}</p>
             </div>
 
             <div class="details">
                 <h3>Detalhes da sua Reserva:</h3>
                 <ul style="list-style: none; padding: 0;">
-                    <li><strong>📅 Data:</strong> ${new Date(confirmedReservation.data).toLocaleDateString('pt-BR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</li>
-                    <li><strong>🕐 Horário:</strong> ${confirmedReservation.horario}</li>
-                    <li><strong>👥 Pessoas:</strong> ${confirmedReservation.pessoas} ${confirmedReservation.pessoas === 1 ? 'pessoa' : 'pessoas'}</li>
-                    <li><strong>🆔 Código:</strong> ${confirmedReservation.id}</li>
-                    ${confirmedReservation.observacoes ? `<li><strong>📝 Observações:</strong> ${confirmedReservation.observacoes}</li>` : ''}
+                    <li><strong>📅 Data:</strong> ${new Date(reservation.data).toLocaleDateString('pt-BR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</li>
+                    <li><strong>🕐 Horário:</strong> ${reservation.horario}</li>
+                    <li><strong>👥 Pessoas:</strong> ${reservation.pessoas} ${reservation.pessoas === 1 ? 'pessoa' : 'pessoas'}</li>
+                    <li><strong>🆔 Código:</strong> ${reservation.id}</li>
+                    ${reservation.observacoes ? `<li><strong>📝 Observações:</strong> ${reservation.observacoes}</li>` : ''}
                 </ul>
             </div>
 
@@ -194,64 +240,17 @@ export async function GET(request: NextRequest) {
                 <p><strong>O que acontece agora?</strong></p>
                 <p>Nossa equipe irá preparar tudo para recebê-lo(a). Se precisar de alguma alteração, entre em contato conosco.</p>
                 
-                <a href="https://armazemsaojoaquim.netlify.app" class="btn">🏠 Voltar ao Site</a>
+                <a href="${ENV.SITE_URL}" class="btn">🏠 Voltar ao Site</a>
                 <a href="https://wa.me/5521985658443" class="btn">💬 WhatsApp</a>
             </div>
 
             <div class="footer">
-                <p><strong>Armazém São Joaquim</strong><br>
-                Rua Almirante Alexandrino, 470 - Santa Teresa, Rio de Janeiro - RJ<br>
+                <p><strong>Armazém São Joaquim</strong><br/>
+                Rua Almirante Alexandrino, 470 - Santa Teresa, Rio de Janeiro - RJ<br/>
                 📞 (21) 98565-8443 | 📧 armazemsaojoaquimoficial@gmail.com</p>
             </div>
         </div>
     </body>
     </html>
     `
-
-    return new NextResponse(successHtml, {
-      status: 200,
-      headers: {
-        'Content-Type': 'text/html; charset=utf-8',
-        'Cache-Control': 'no-store, no-cache, must-revalidate',
-      },
-    })
-
-  } catch (error) {
-    console.error('Erro na confirmação de reserva:', error)
-    
-    const errorHtml = `
-    <!DOCTYPE html>
-    <html lang="pt-BR">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Erro na Confirmação - Armazém São Joaquim</title>
-        <style>
-            body { font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f8f9fa; }
-            .container { background: white; border-radius: 8px; padding: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); text-align: center; }
-            .error-icon { font-size: 48px; color: #dc3545; margin-bottom: 20px; }
-            .btn { display: inline-block; background: #8B4513; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; margin: 10px 5px; }
-        </style>
-    </head>
-    <body>
-        <div class="container">
-            <div class="error-icon">❌</div>
-            <h2 style="color: #dc3545;">Erro na Confirmação</h2>
-            <p>Ocorreu um erro ao processar sua confirmação de reserva.</p>
-            <p>Por favor, entre em contato conosco para resolver esta situação.</p>
-            <a href="https://armazemsaojoaquim.netlify.app" class="btn">🏠 Voltar ao Site</a>
-            <a href="https://wa.me/5521985658443" class="btn">💬 Contato</a>
-        </div>
-    </body>
-    </html>
-    `
-
-    return new NextResponse(errorHtml, {
-      status: 500,
-      headers: {
-        'Content-Type': 'text/html; charset=utf-8',
-        'Cache-Control': 'no-store, no-cache, must-revalidate',
-      },
-    })
-  }
 } 
