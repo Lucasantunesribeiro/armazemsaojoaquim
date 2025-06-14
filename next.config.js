@@ -1,50 +1,48 @@
-// Carregar polyfills ANTES de qualquer coisa (corrigidos)
-require('./lib/polyfills-minimal.js')
+// Polyfills temporariamente desabilitados para debug
+// require('./lib/polyfills-minimal.js')
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Configuração básica
-  reactStrictMode: false, // Desabilitar em produção para evitar double-render
+  // Configuração mínima para desenvolvimento
+  reactStrictMode: false,
   
-  // IMPORTANTE: Para Netlify, precisamos de static export
-  output: 'export',
-  trailingSlash: true,
-  distDir: 'out',
+  // Não usar static export em desenvolvimento
+  // output: 'export', // Comentado para permitir APIs
   
-  // ESLint menos rigoroso
+  // ESLint e TypeScript menos rigorosos
   eslint: {
     ignoreDuringBuilds: true,
   },
-  
-  // TypeScript menos rigoroso  
   typescript: {
     ignoreBuildErrors: true,
   },
 
-  // Configuração de imagens para static export
+  // Configuração de imagens
   images: {
-    unoptimized: true, // CRUCIAL para static export
-    remotePatterns: [
+    unoptimized: true,
+  },
+
+  // Headers CORS para APIs
+  async headers() {
+    return [
       {
-        protocol: 'https',
-        hostname: 'fonts.gstatic.com',
+        source: '/api/:path*',
+        headers: [
+          { key: 'Access-Control-Allow-Origin', value: '*' },
+          { key: 'Access-Control-Allow-Methods', value: 'GET, POST, PUT, DELETE, OPTIONS' },
+          { key: 'Access-Control-Allow-Headers', value: 'Content-Type, Authorization' },
+        ],
       },
-      {
-        protocol: 'https',
-        hostname: 'fonts.googleapis.com',
-      }
     ]
   },
 
-  // Configuração mínima do webpack
-  webpack: (config, { isServer }) => {
-    // Configuração para SVG
-    config.module.rules.push({
-      test: /\.svg$/,
-      use: ['@svgr/webpack'],
-    })
+  // Configuração experimental
+  experimental: {
+    serverComponentsExternalPackages: ['@supabase/supabase-js'],
+  },
 
-    // Resolver problema "self is not defined" durante build
+  // Webpack config para polyfills
+  webpack: (config, { isServer }) => {
     if (!isServer) {
       config.resolve.fallback = {
         ...config.resolve.fallback,
@@ -53,18 +51,7 @@ const nextConfig = {
         tls: false,
       }
     }
-
     return config
-  },
-
-  // Variables de ambiente públicas
-  env: {
-    CUSTOM_KEY: 'netlify-production',
-  },
-
-  // Experimental features (mínimo necessário)
-  experimental: {
-    serverComponentsExternalPackages: ['@supabase/supabase-js'],
   },
 }
 
