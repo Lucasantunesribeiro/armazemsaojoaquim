@@ -50,13 +50,43 @@ export function useReservationAvailability(selectedDate?: string) {
       })
 
       if (!response.ok) {
-        throw new Error('Erro ao verificar disponibilidade')
+        // Check if response is JSON before parsing
+        const contentType = response.headers.get('content-type')
+        
+        if (contentType && contentType.includes('application/json')) {
+          try {
+            const errorData = await response.json()
+            throw new Error(errorData.error || errorData.message || 'Erro ao verificar disponibilidade')
+          } catch (jsonError) {
+            console.error('Error parsing JSON error response:', jsonError)
+            throw new Error(`Erro ${response.status}: Falha na verificação de disponibilidade`)
+          }
+        } else {
+          // Response is not JSON (probably HTML error page)
+          const errorText = await response.text()
+          console.error('Non-JSON error response:', errorText)
+          throw new Error(`Erro ${response.status}: Serviço temporariamente indisponível`)
+        }
+      }
+
+      // Parse JSON response safely
+      const contentType = response.headers.get('content-type')
+      if (!contentType || !contentType.includes('application/json')) {
+        throw new Error('Resposta inválida do servidor')
       }
 
       return await response.json()
     } catch (err) {
       console.error('Erro ao verificar disponibilidade:', err)
-      throw err
+      
+      // Re-throw with more specific error message
+      if (err instanceof TypeError && err.message.includes('fetch')) {
+        throw new Error('Erro de conexão. Verifique sua internet e tente novamente.')
+      } else if (err instanceof Error) {
+        throw err
+      } else {
+        throw new Error('Erro inesperado ao verificar disponibilidade')
+      }
     }
   }
 
