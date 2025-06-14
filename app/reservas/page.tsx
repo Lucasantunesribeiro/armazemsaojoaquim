@@ -10,6 +10,7 @@ import Button from '../../components/ui/Button'
 import Input from '../../components/ui/Input'
 import { Label } from '../../components/ui/Label'
 import { toast } from 'react-hot-toast'
+import { emailJSService, ReservationData } from '../../lib/emailjs-service'
 
 interface ReservationForm {
   name: string
@@ -201,8 +202,34 @@ export default function ReservasPage() {
         return
       }
 
-      if (reservationData.success) {
-        toast.success(reservationData.message || 'Reserva criada com sucesso!')
+      if (reservationData.success && reservationData.data) {
+        const reservationInfo: ReservationData = {
+          id: reservationData.data.id,
+          nome: reservationData.data.nome,
+          email: reservationData.data.email,
+          telefone: reservationData.data.telefone,
+          data: reservationData.data.data,
+          horario: reservationData.data.horario,
+          pessoas: reservationData.data.pessoas,
+          observacoes: reservationData.data.observacoes,
+          tokenConfirmacao: reservationData.data.tokenConfirmacao
+        }
+
+        // Enviar email de confirmação via EmailJS
+        try {
+          console.log('📧 Enviando email de confirmação...')
+          const emailResult = await emailJSService.enviarEmailConfirmacao(reservationInfo)
+          
+          if (emailResult.success) {
+            toast.success('Reserva criada! Verifique seu email para confirmação.')
+          } else {
+            console.error('Erro no email:', emailResult.error)
+            toast.success('Reserva criada! Erro ao enviar email de confirmação.')
+          }
+        } catch (emailError) {
+          console.error('Erro ao enviar email:', emailError)
+          toast.success('Reserva criada! Erro ao enviar email de confirmação.')
+        }
       } else {
         toast.error(reservationData.error || 'Erro ao criar reserva')
         return
@@ -410,9 +437,25 @@ export default function ReservasPage() {
                 <h2 className="text-3xl font-bold text-madeira-escura dark:text-white font-playfair mb-2">
                   Nova Reserva
                 </h2>
-                <p className="text-cinza-medio dark:text-slate-400 font-inter">
+                <p className="text-cinza-medio dark:text-slate-400 font-inter mb-4">
                   Preencha os dados para garantir sua mesa
                 </p>
+                
+                {/* Informações sobre o processo de confirmação */}
+                <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+                  <div className="flex items-start space-x-3">
+                    <CheckCircle className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
+                    <div>
+                      <h3 className="font-semibold text-blue-900 dark:text-blue-300 mb-2">Como funciona a confirmação:</h3>
+                      <ul className="text-sm text-blue-800 dark:text-blue-300 space-y-1">
+                        <li>• Após criar sua reserva, você receberá um email de confirmação</li>
+                        <li>• Clique no link do email para confirmar sua presença</li>
+                        <li>• Após a confirmação, o restaurante será notificado automaticamente</li>
+                        <li>• Sua reserva só será válida após a confirmação por email</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-6">

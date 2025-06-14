@@ -1,11 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
-import { emailService } from '../../../../lib/email-service'
-import { ENV } from '../../../../lib/config'
 
 // Configuração do Supabase
-const supabaseUrl = ENV.SUPABASE_URL
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
 
 if (!supabaseUrl || !supabaseServiceKey) {
   console.error('❌ Configuração do Supabase está incompleta')
@@ -47,7 +45,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Criar cliente Supabase com service role key
-    const supabase = createClient(supabaseUrl!, supabaseServiceKey!)
+    const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
     console.log('🔍 Buscando reserva com token:', token)
 
@@ -82,11 +80,12 @@ export async function GET(request: NextRequest) {
       })
     }
 
-    // Atualizar status para confirmada
+    // Atualizar status para confirmada e definir data de confirmação
     const { data: updatedReservation, error: updateError } = await supabase
       .from('reservations')
       .update({ 
         status: 'confirmada',
+        confirmado_em: new Date().toISOString(),
         updated_at: new Date().toISOString()
       })
       .eq('id', reservation.id)
@@ -103,32 +102,7 @@ export async function GET(request: NextRequest) {
 
     console.log('✅ Reserva confirmada com sucesso:', updatedReservation.id)
 
-    // Enviar notificação para o admin
-    try {
-      console.log('📧 Enviando notificação para o restaurante...')
-      
-      const adminEmailResult = await emailService.sendAdminNotification({
-        id: updatedReservation.id,
-        nome: updatedReservation.nome,
-        email: updatedReservation.email,
-        telefone: updatedReservation.telefone,
-        data: updatedReservation.data,
-        horario: updatedReservation.horario,
-        pessoas: updatedReservation.pessoas,
-        observacoes: updatedReservation.observacoes,
-        confirmationToken: token
-      })
-
-      if (adminEmailResult.success) {
-        console.log('✅ Notificação enviada para o restaurante!')
-      } else {
-        console.warn('⚠️ Falha ao enviar notificação para admin:', adminEmailResult.error)
-      }
-    } catch (emailError) {
-      console.error('❌ Erro ao enviar notificação para admin:', emailError)
-    }
-
-    // Retornar página de sucesso (HTML)
+    // Retornar página de sucesso (HTML) com dados para envio de notificação
     const successHtml = generateSuccessPage(updatedReservation, false)
     return new NextResponse(successHtml, {
       status: 200,
@@ -152,6 +126,8 @@ function generateSuccessPage(reservation: any, alreadyConfirmed: boolean = false
   const message = alreadyConfirmed 
     ? 'Esta reserva já foi confirmada anteriormente.' 
     : 'Sua reserva foi confirmada e nossa equipe foi notificada.';
+
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
 
   return `
     <!DOCTYPE html>
@@ -198,59 +174,86 @@ function generateSuccessPage(reservation: any, alreadyConfirmed: boolean = false
                 padding: 12px 24px;
                 text-decoration: none;
                 border-radius: 5px;
-                margin: 10px 5px;
+                margin-top: 20px;
             }
             .btn:hover {
                 background: #6d3410;
             }
-            .footer {
-                text-align: center;
-                margin-top: 30px;
-                font-size: 14px;
-                color: #666;
-            }
         </style>
+        <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     </head>
     <body>
         <div class="container">
             <div class="header">
-                <h1>Armazém São Joaquim</h1>
-                <p>"En esta casa tenemos memoria"</p>
+                <div class="success-icon">✅</div>
+                <h1>Reserva Confirmada!</h1>
+                <p>${message}</p>
+            </div>
+            
+            <div class="details">
+                <h3>Detalhes da sua reserva:</h3>
+                <p><strong>Nome:</strong> ${reservation.nome}</p>
+                <p><strong>Data:</strong> ${new Date(reservation.data).toLocaleDateString('pt-BR', {
+                  weekday: 'long',
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric'
+                })}</p>
+                <p><strong>Horário:</strong> ${reservation.horario}</p>
+                <p><strong>Pessoas:</strong> ${reservation.pessoas}</p>
+                <p><strong>Email:</strong> ${reservation.email}</p>
+                <p><strong>Telefone:</strong> ${reservation.telefone}</p>
+                ${reservation.observacoes ? `<p><strong>Observações:</strong> ${reservation.observacoes}</p>` : ''}
             </div>
             
             <div style="text-align: center;">
-                <div class="success-icon">✅</div>
-                <h2 style="color: #28a745;">Reserva Confirmada com Sucesso!</h2>
-                <p>Olá, <strong>${reservation.nome}</strong>!</p>
-                <p>${message}</p>
+                <a href="${baseUrl}" class="btn">Voltar ao site</a>
             </div>
-
-            <div class="details">
-                <h3>Detalhes da sua Reserva:</h3>
-                <ul style="list-style: none; padding: 0;">
-                    <li><strong>📅 Data:</strong> ${new Date(reservation.data).toLocaleDateString('pt-BR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</li>
-                    <li><strong>🕐 Horário:</strong> ${reservation.horario}</li>
-                    <li><strong>👥 Pessoas:</strong> ${reservation.pessoas} ${reservation.pessoas === 1 ? 'pessoa' : 'pessoas'}</li>
-                    <li><strong>🆔 Código:</strong> ${reservation.id}</li>
-                    ${reservation.observacoes ? `<li><strong>📝 Observações:</strong> ${reservation.observacoes}</li>` : ''}
-                </ul>
-            </div>
-
-            <div style="text-align: center;">
-                <p><strong>O que acontece agora?</strong></p>
-                <p>Nossa equipe irá preparar tudo para recebê-lo(a). Se precisar de alguma alteração, entre em contato conosco.</p>
-                
-                <a href="${ENV.SITE_URL}" class="btn">🏠 Voltar ao Site</a>
-                <a href="https://wa.me/5521985658443" class="btn">💬 WhatsApp</a>
-            </div>
-
-            <div class="footer">
-                <p><strong>Armazém São Joaquim</strong><br/>
-                Rua Almirante Alexandrino, 470 - Santa Teresa, Rio de Janeiro - RJ<br/>
-                📞 (21) 98565-8443 | 📧 armazemsaojoaquimoficial@gmail.com</p>
+            
+            <div style="margin-top: 30px; padding: 20px; background: #e3f2fd; border-radius: 5px;">
+                <h4 style="color: #1976d2; margin-top: 0;">Importante:</h4>
+                <p style="margin-bottom: 0;">• Chegue com 10 minutos de antecedência</p>
+                <p style="margin-bottom: 0;">• Confirme sua presença por WhatsApp: (11) 9999-9999</p>
+                <p style="margin-bottom: 0;">• Em caso de cancelamento, avise com até 2 horas de antecedência</p>
             </div>
         </div>
+        
+        ${!alreadyConfirmed ? `
+        <script>
+            // Enviar notificação para o restaurante via EmailJS
+            (function() {
+                emailjs.init('g-gdzBLucmE8eoUlq');
+                
+                const templateParams = {
+                    to_email: 'armazemsaojoaquimoficial@gmail.com',
+                    reservation_id: '${reservation.id}',
+                    customer_name: '${reservation.nome}',
+                    customer_email: '${reservation.email}',
+                    customer_phone: '${reservation.telefone}',
+                    reservation_date: '${new Date(reservation.data).toLocaleDateString('pt-BR', {
+                      weekday: 'long',
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric'
+                    })}',
+                    reservation_time: '${reservation.horario}',
+                    guest_count: '${reservation.pessoas}',
+                    special_requests: '${reservation.observacoes || 'Nenhuma observação especial'}',
+                    created_at: '${new Date().toLocaleString('pt-BR')}',
+                    restaurant_name: 'Armazém São Joaquim'
+                };
+                
+                emailjs.send('service_gxo49v9', 'template_pnnqpyf', templateParams)
+                    .then(function(response) {
+                        console.log('✅ Notificação enviada para o restaurante:', response.status, response.text);
+                    })
+                    .catch(function(error) {
+                        console.error('❌ Erro ao enviar notificação para o restaurante:', error);
+                    });
+            })();
+        </script>
+        ` : ''}
     </body>
     </html>
-    `
+  `
 } 
