@@ -25,7 +25,24 @@
 [functions]
   node_bundler = "esbuild"
 
-# Headers básicos de segurança apenas
+# Redirects para garantir que APIs funcionem corretamente
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/__api__"
+  status = 200
+  force = false
+
+# Headers para API routes - ordem importa
+[[headers]]
+  for = "/api/*"
+  [headers.values]
+    Content-Type = "application/json"
+    Access-Control-Allow-Origin = "*"
+    Access-Control-Allow-Methods = "GET, POST, PUT, DELETE, OPTIONS"
+    Access-Control-Allow-Headers = "Content-Type, Authorization"
+    Cache-Control = "no-store, no-cache, must-revalidate"
+
+# Headers básicos de segurança
 [[headers]]
   for = "/*"
   [headers.values]
@@ -34,12 +51,10 @@
     X-XSS-Protection = "1; mode=block"
     Referrer-Policy = "strict-origin-when-cross-origin"
 
-# Headers para API routes
+# Headers para imagens para resolver warning de preload
 [[headers]]
-  for = "/api/*"
+  for = "/images/*"
   [headers.values]
-    Access-Control-Allow-Origin = "*"
-    Access-Control-Allow-Methods = "GET, POST, PUT, DELETE, OPTIONS"
-    Access-Control-Allow-Headers = "Content-Type, Authorization"
+    Cache-Control = "public, max-age=31536000, immutable"
 
  
