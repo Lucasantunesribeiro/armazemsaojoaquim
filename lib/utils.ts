@@ -8,8 +8,36 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function formatDate(date: string | Date): string {
-  const dateObj = typeof date === 'string' ? parseISO(date) : date
-  return format(dateObj, "dd 'de' MMMM 'de' yyyy", { locale: ptBR })
+  try {
+    // Se for string, garantir que não haja conversão de timezone
+    let dateObj: Date
+    
+    if (typeof date === 'string') {
+      // Verificar se a string não está vazia ou inválida
+      if (!date || date === 'null' || date === 'undefined') {
+        return 'Data não disponível'
+      }
+      
+      // Tentar diferentes formatos de data
+      if (date.includes('T')) {
+        dateObj = new Date(date)
+      } else {
+        dateObj = new Date(date + 'T00:00:00')
+      }
+    } else {
+      dateObj = date
+    }
+    
+    // Verificar se a data é válida
+    if (isNaN(dateObj.getTime())) {
+      return 'Data inválida'
+    }
+    
+    return format(dateObj, "dd 'de' MMMM 'de' yyyy", { locale: ptBR })
+  } catch (error) {
+    console.error('Erro ao formatar data:', error, 'Data original:', date)
+    return 'Erro na formatação da data'
+  }
 }
 
 export function formatTime(time: string): string {

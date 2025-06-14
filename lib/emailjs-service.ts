@@ -91,10 +91,18 @@ export class EmailJSService {
       this.verificarClienteSide()
 
       const templateParams = {
-        to_name: reserva.nome,
+        // CAMPOS PRINCIPAIS PARA DESTINATÁRIO (EmailJS requer estes)
+        to: reserva.email,
+        email: reserva.email,
         to_email: reserva.email,
-        reservation_id: reserva.id,
+        recipient_email: reserva.email,
+        
+        // INFORMAÇÕES DO DESTINATÁRIO
+        to_name: reserva.nome,
         customer_name: reserva.nome,
+        
+        // DADOS DA RESERVA
+        reservation_id: reserva.id,
         customer_email: reserva.email,
         customer_phone: reserva.telefone,
         reservation_date: this.formatarData(reserva.data),
@@ -102,12 +110,21 @@ export class EmailJSService {
         guest_count: reserva.pessoas.toString(),
         special_requests: reserva.observacoes || 'Nenhuma observação especial',
         confirmation_link: this.gerarUrlConfirmacao(reserva.tokenConfirmacao),
+        
+        // DADOS DO RESTAURANTE
         restaurant_name: 'Armazém São Joaquim',
         restaurant_address: 'Rua São Joaquim, 123 - Centro',
         restaurant_phone: '(11) 9999-9999'
       }
 
       console.log('📧 Enviando email de confirmação para:', reserva.email)
+      console.log('📋 Parâmetros do template:', {
+        to: templateParams.to,
+        email: templateParams.email,
+        to_email: templateParams.to_email,
+        recipient_email: templateParams.recipient_email,
+        to_name: templateParams.to_name
+      })
 
       const result = await emailjs.send(
         EMAILJS_CONFIG.SERVICE_ID,
@@ -118,8 +135,31 @@ export class EmailJSService {
       console.log('✅ Email de confirmação enviado:', result.status, result.text)
       return { success: true }
 
-    } catch (error) {
+    } catch (error: any) {
       console.error('❌ Erro ao enviar email de confirmação:', error)
+      
+      // TRATAMENTO ESPECÍFICO PARA ERRO 422 DO EMAILJS
+      if (error?.status === 422 || (error?.text && error.text.includes('422'))) {
+        console.error('🚨 EMAILJS RETORNOU ERRO 422 - DETALHES:', {
+          status: error.status,
+          text: error.text,
+          serviceId: EMAILJS_CONFIG.SERVICE_ID,
+          templateId: EMAILJS_CONFIG.TEMPLATE_CLIENT,
+          publicKey: EMAILJS_CONFIG.PUBLIC_KEY?.substring(0, 10) + '***',
+          reservaInfo: {
+            nome: reserva.nome,
+            email: reserva.email,
+            data: reserva.data,
+            horario: reserva.horario
+          }
+        })
+        
+        return {
+          success: false,
+          error: 'Erro 422 - Dados inválidos para o serviço de email (EmailJS)'
+        }
+      }
+      
       return { 
         success: false, 
         error: error instanceof Error ? error.message : 'Erro desconhecido ao enviar email'
@@ -132,7 +172,16 @@ export class EmailJSService {
       this.verificarClienteSide()
 
       const templateParams = {
+        // CAMPOS PRINCIPAIS PARA DESTINATÁRIO (EmailJS requer estes)
+        to: EMAILJS_CONFIG.CORPORATE_EMAIL,
+        email: EMAILJS_CONFIG.CORPORATE_EMAIL,
         to_email: EMAILJS_CONFIG.CORPORATE_EMAIL,
+        recipient_email: EMAILJS_CONFIG.CORPORATE_EMAIL,
+        
+        // INFORMAÇÕES DO DESTINATÁRIO
+        to_name: 'Armazém São Joaquim',
+        
+        // DADOS DA RESERVA
         reservation_id: reserva.id,
         customer_name: reserva.nome,
         customer_email: reserva.email,
@@ -142,6 +191,8 @@ export class EmailJSService {
         guest_count: reserva.pessoas.toString(),
         special_requests: reserva.observacoes || 'Nenhuma observação especial',
         created_at: new Date().toLocaleString('pt-BR'),
+        
+        // DADOS DO RESTAURANTE
         restaurant_name: 'Armazém São Joaquim'
       }
 
@@ -172,7 +223,8 @@ export class EmailJSService {
         weekday: 'long',
         year: 'numeric',
         month: 'long',
-        day: 'numeric'
+        day: 'numeric',
+        timeZone: 'America/Sao_Paulo'
       })
     } catch (error) {
       console.error('Erro ao formatar data:', error)
