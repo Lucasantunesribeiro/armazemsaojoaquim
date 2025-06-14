@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { ChevronLeft, ChevronRight, MapPin, Clock, Phone } from 'lucide-react'
-import NetlifyImage from '../ui/NetlifyImage'
+// import NetlifyImage from '../ui/NetlifyImage' // Removido para evitar problemas com static export
 
 const heroImages = [
   {
@@ -86,12 +86,11 @@ export default function HeroSection() {
               index === currentSlide ? 'opacity-100' : 'opacity-0'
             }`}
           >
-            <NetlifyImage
+            <img
               src={image.src}
               alt={image.alt}
-              priority={index === 0}
-              sizes="100vw"
               className="object-cover will-change-transform absolute inset-0 w-full h-full"
+              loading={index === 0 ? 'eager' : 'lazy'}
               onLoad={() => index === 0 && setIsLoaded(true)}
             />
           </div>
