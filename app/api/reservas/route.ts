@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { emailService } from '../../../lib/email-service'
 import { createClient } from '@supabase/supabase-js'
 import crypto from 'crypto'
 
@@ -234,27 +233,7 @@ export async function POST(request: NextRequest) {
 
     console.log('✅ Reserva criada com sucesso:', newReservation.id)
 
-    // Enviar email de confirmação para o usuário
-    try {
-      const emailResult = await emailService.sendReservationConfirmation({
-        id: newReservation.id,
-        nome,
-        email,
-        telefone,
-        data,
-        horario,
-        pessoas,
-        observacoes,
-        confirmationToken: confirmationToken
-      })
-
-      console.log('✅ Email enviado:', emailResult.success)
-    } catch (emailError) {
-      console.warn('⚠️  Erro ao enviar email:', emailError)
-      // Não falhamos a operação por causa do email
-    }
-
-    // Retornar reserva criada
+    // Retornar reserva criada com token para o frontend enviar email
     return createJsonResponse({
       success: true,
       data: {
@@ -268,7 +247,8 @@ export async function POST(request: NextRequest) {
         pessoas: newReservation.pessoas,
         status: newReservation.status,
         observacoes: newReservation.observacoes,
-        created_at: newReservation.created_at
+        created_at: newReservation.created_at,
+        tokenConfirmacao: confirmationToken
       },
       message: 'Reserva criada com sucesso'
     }, 201)
@@ -329,23 +309,15 @@ export async function PUT(request: NextRequest) {
       }, 500)
     }
 
-    // Se foi confirmada, enviar notificação para admin
+    // Atualizar campo confirmado_em se foi confirmada
     if (status === 'confirmada') {
-      try {
-        await emailService.sendAdminNotification({
-          id: updatedReservation.id,
-          nome: updatedReservation.nome,
-          email: updatedReservation.email,
-          telefone: updatedReservation.telefone,
-          data: updatedReservation.data,
-          horario: updatedReservation.horario,
-          pessoas: updatedReservation.pessoas,
-          observacoes: updatedReservation.observacoes,
-          confirmationToken: updatedReservation.confirmation_token
-        })
-      } catch (emailError) {
-        console.error('Erro ao enviar notificação para admin:', emailError)
-        // Não falhar a confirmação por causa do email
+      const { error: updateTimeError } = await supabase
+        .from('reservations')
+        .update({ confirmado_em: new Date().toISOString() })
+        .eq('id', id)
+      
+      if (updateTimeError) {
+        console.warn('Erro ao atualizar confirmado_em:', updateTimeError)
       }
     }
 
