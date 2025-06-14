@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
@@ -75,7 +75,7 @@ export default function AdminDashboard() {
   const [activities, setActivities] = useState<RecentActivity[]>([])
   const [refreshing, setRefreshing] = useState(false)
 
-  const checkAuth = async () => {
+  const checkAuth = useCallback(async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser()
       
@@ -101,9 +101,90 @@ export default function AdminDashboard() {
       console.error('Auth check failed:', error)
       router.push('/auth')
     }
-  }
+  }, [supabase, router])
 
-  const loadDashboardData = async () => {
+  const loadReservationStats = useCallback(async () => {
+    const { data: reservations } = await supabase
+      .from('reservas')
+      .select('*')
+      .gte('created_at', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString())
+
+    const today = new Date().toISOString().split('T')[0]
+    const todayReservations = reservations?.filter(r => 
+      r.data_reserva === today
+    ) || []
+
+    return {
+      total: reservations?.length || 0,
+      today: todayReservations.length,
+      pending: reservations?.filter(r => r.status === 'pendente').length || 0,
+      confirmed: reservations?.filter(r => r.status === 'confirmada').length || 0,
+      cancelled: reservations?.filter(r => r.status === 'cancelada').length || 0,
+      revenue: reservations?.reduce((sum, r) => sum + (r.valor_estimado || 0), 0) || 0
+    }
+  }, [supabase])
+
+  const loadPerformanceStats = useCallback(async () => {
+    // Obter métricas de monitoramento
+    const monitoringStats = getStats()
+    const cacheStats = cache.getStats()
+
+    // Simular métricas de performance (em produção, vir de APM)
+    return {
+      avgResponseTime: Math.random() * 200 + 100, // 100-300ms
+      uptime: 99.8,
+      errorRate: Math.random() * 2, // 0-2%
+      cacheHitRate: cacheStats.hitRate
+    }
+  }, [getStats, cache])
+
+  const loadUserStats = useCallback(async () => {
+    const { data: profiles } = await supabase
+      .from('profiles')
+      .select('*')
+
+    const lastWeek = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+    const newUsers = profiles?.filter(p => 
+      new Date(p.created_at) > lastWeek
+    ) || []
+
+    return {
+      total: profiles?.length || 0,
+      active: Math.floor((profiles?.length || 0) * 0.7), // Simular usuários ativos
+      new: newUsers.length
+    }
+  }, [supabase])
+
+  const loadSystemStats = useCallback(async () => {
+    // Em produção, estas métricas viriam de monitoramento de infraestrutura
+    return {
+      memoryUsage: Math.random() * 30 + 40, // 40-70%
+      cpuUsage: Math.random() * 20 + 10, // 10-30%
+      diskUsage: Math.random() * 15 + 25, // 25-40%
+      dbConnections: Math.floor(Math.random() * 20 + 5) // 5-25
+    }
+  }, [])
+
+  const loadRecentActivities = useCallback(async () => {
+    // Carregar atividades recentes do banco
+    const { data: recentReservations } = await supabase
+      .from('reservas')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(10)
+
+    const activities: RecentActivity[] = recentReservations?.map(r => ({
+      id: r.id,
+      type: 'reservation' as const,
+      message: `Nova reserva para ${r.data_reserva} às ${r.horario} - ${r.numero_pessoas} pessoas`,
+      timestamp: new Date(r.created_at),
+      severity: 'low' as const
+    })) || []
+
+    setActivities(activities)
+  }, [supabase])
+
+  const loadDashboardData = useCallback(async () => {
     try {
       setRefreshing(true)
       
@@ -131,90 +212,8 @@ export default function AdminDashboard() {
       setRefreshing(false)
       setLoading(false)
     }
-  }
+  }, [loadReservationStats, loadPerformanceStats, loadUserStats, loadSystemStats, loadRecentActivities])
 
-  const loadReservationStats = async () => {
-    const { data: reservations } = await supabase
-      .from('reservas')
-      .select('*')
-      .gte('created_at', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString())
-
-    const today = new Date().toISOString().split('T')[0]
-    const todayReservations = reservations?.filter(r => 
-      r.data_reserva === today
-    ) || []
-
-    return {
-      total: reservations?.length || 0,
-      today: todayReservations.length,
-      pending: reservations?.filter(r => r.status === 'pendente').length || 0,
-      confirmed: reservations?.filter(r => r.status === 'confirmada').length || 0,
-      cancelled: reservations?.filter(r => r.status === 'cancelada').length || 0,
-      revenue: reservations?.reduce((sum, r) => sum + (r.valor_estimado || 0), 0) || 0
-    }
-  }
-
-  const loadPerformanceStats = async () => {
-    // Obter métricas de monitoramento
-    const monitoringStats = getStats()
-    const cacheStats = cache.getStats()
-
-    // Simular métricas de performance (em produção, vir de APM)
-    return {
-      avgResponseTime: Math.random() * 200 + 100, // 100-300ms
-      uptime: 99.8,
-      errorRate: Math.random() * 2, // 0-2%
-      cacheHitRate: cacheStats.hitRate
-    }
-  }
-
-  const loadUserStats = async () => {
-    const { data: profiles } = await supabase
-      .from('profiles')
-      .select('*')
-
-    const lastWeek = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
-    const newUsers = profiles?.filter(p => 
-      new Date(p.created_at) > lastWeek
-    ) || []
-
-    return {
-      total: profiles?.length || 0,
-      active: Math.floor((profiles?.length || 0) * 0.7), // Simular usuários ativos
-      new: newUsers.length
-    }
-  }
-
-  const loadSystemStats = async () => {
-    // Em produção, estas métricas viriam de monitoramento de infraestrutura
-    return {
-      memoryUsage: Math.random() * 30 + 40, // 40-70%
-      cpuUsage: Math.random() * 20 + 10, // 10-30%
-      diskUsage: Math.random() * 15 + 25, // 25-40%
-      dbConnections: Math.floor(Math.random() * 20 + 5) // 5-25
-    }
-  }
-
-  const loadRecentActivities = async () => {
-    // Carregar atividades recentes do banco
-    const { data: recentReservations } = await supabase
-      .from('reservas')
-      .select('*')
-      .order('created_at', { ascending: false })
-      .limit(10)
-
-    const activities: RecentActivity[] = recentReservations?.map(r => ({
-      id: r.id,
-      type: 'reservation' as const,
-      message: `Nova reserva para ${r.data_reserva} às ${r.horario} - ${r.numero_pessoas} pessoas`,
-      timestamp: new Date(r.created_at),
-      severity: 'low' as const
-    })) || []
-
-    setActivities(activities)
-  }
-
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     checkAuth()
     loadDashboardData()
@@ -222,7 +221,7 @@ export default function AdminDashboard() {
     // Atualizar dados a cada 30 segundos
     const interval = setInterval(loadDashboardData, 30000)
     return () => clearInterval(interval)
-  }, [])
+  }, [checkAuth, loadDashboardData])
 
   const handleRefresh = () => {
     loadDashboardData()

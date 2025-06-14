@@ -1,12 +1,12 @@
 import '@testing-library/jest-dom'
 
-// Mock do Next.js router
-jest.mock('next/navigation', () => ({
+// Mock do next/router
+jest.mock('next/router', () => ({
   useRouter() {
     return {
       route: '/',
       pathname: '/',
-      query: '',
+      query: {},
       asPath: '/',
       push: jest.fn(),
       pop: jest.fn(),
@@ -19,6 +19,21 @@ jest.mock('next/navigation', () => ({
         off: jest.fn(),
         emit: jest.fn(),
       },
+      isFallback: false,
+    }
+  },
+}))
+
+// Mock do next/navigation
+jest.mock('next/navigation', () => ({
+  useRouter() {
+    return {
+      push: jest.fn(),
+      replace: jest.fn(),
+      prefetch: jest.fn(),
+      back: jest.fn(),
+      forward: jest.fn(),
+      refresh: jest.fn(),
     }
   },
   useSearchParams() {
@@ -29,92 +44,29 @@ jest.mock('next/navigation', () => ({
   },
 }))
 
-// Mock do Supabase
-jest.mock('@supabase/auth-helpers-nextjs', () => ({
-  createClientComponentClient: () => ({
-    auth: {
-      getUser: jest.fn().mockResolvedValue({ data: { user: null } }),
-      signInWithPassword: jest.fn(),
-      signOut: jest.fn(),
-      onAuthStateChange: jest.fn(() => ({ data: { subscription: { unsubscribe: jest.fn() } } })),
-    },
-    from: jest.fn(() => ({
-      select: jest.fn().mockReturnThis(),
-      insert: jest.fn().mockReturnThis(),
-      update: jest.fn().mockReturnThis(),
-      delete: jest.fn().mockReturnThis(),
-      eq: jest.fn().mockReturnThis(),
-      single: jest.fn().mockResolvedValue({ data: null }),
-      order: jest.fn().mockReturnThis(),
-      limit: jest.fn().mockReturnThis(),
-    })),
-  }),
-  createServerComponentClient: () => ({
-    auth: {
-      getUser: jest.fn().mockResolvedValue({ data: { user: null } }),
-    },
-    from: jest.fn(() => ({
-      select: jest.fn().mockReturnThis(),
-      insert: jest.fn().mockReturnThis(),
-      update: jest.fn().mockReturnThis(),
-      delete: jest.fn().mockReturnThis(),
-      eq: jest.fn().mockReturnThis(),
-      single: jest.fn().mockResolvedValue({ data: null }),
-      order: jest.fn().mockReturnThis(),
-      limit: jest.fn().mockReturnThis(),
-    })),
-  }),
+// Mock do next/image
+jest.mock('next/image', () => ({
+  __esModule: true,
+  default: (props) => {
+    // eslint-disable-next-line @next/next/no-img-element
+    return <img {...props} />
+  },
 }))
 
-// Mock do Resend
-jest.mock('resend', () => ({
-  Resend: jest.fn().mockImplementation(() => ({
-    emails: {
-      send: jest.fn().mockResolvedValue({ id: 'test-email-id' }),
-    },
-  })),
-}))
-
-// Mock de fetch global
-global.fetch = jest.fn()
-
-// Mock de window.matchMedia
-Object.defineProperty(window, 'matchMedia', {
-  writable: true,
-  value: jest.fn().mockImplementation(query => ({
-    matches: false,
-    media: query,
-    onchange: null,
-    addListener: jest.fn(), // deprecated
-    removeListener: jest.fn(), // deprecated
-    addEventListener: jest.fn(),
-    removeEventListener: jest.fn(),
-    dispatchEvent: jest.fn(),
-  })),
+// Mock do next/head
+jest.mock('next/head', () => {
+  return function Head({ children }) {
+    return <>{children}</>
+  }
 })
 
-// Mock de IntersectionObserver
-global.IntersectionObserver = jest.fn().mockImplementation(() => ({
-  observe: jest.fn(),
-  unobserve: jest.fn(),
-  disconnect: jest.fn(),
-}))
-
-// Mock de ResizeObserver
-global.ResizeObserver = jest.fn().mockImplementation(() => ({
-  observe: jest.fn(),
-  unobserve: jest.fn(),
-  disconnect: jest.fn(),
-}))
-
-// Suprimir warnings específicos durante testes
+// Suppress console warnings during tests
 const originalError = console.error
 beforeAll(() => {
   console.error = (...args) => {
     if (
       typeof args[0] === 'string' &&
-      (args[0].includes('Warning: ReactDOM.render is no longer supported') ||
-       args[0].includes('Warning: An invalid form control'))
+      args[0].includes('Warning: ReactDOM.render is no longer supported')
     ) {
       return
     }
@@ -124,4 +76,4 @@ beforeAll(() => {
 
 afterAll(() => {
   console.error = originalError
-})
+}) 

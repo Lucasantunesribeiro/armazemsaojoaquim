@@ -14,29 +14,37 @@ export default function Error({
   }, [error])
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
-      <div className="max-w-md w-full space-y-8 p-8 bg-white dark:bg-gray-800 rounded-lg shadow-lg">
-        <div className="text-center">
-          <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
-            Algo deu errado!
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-red-50 to-orange-100">
+      <div className="max-w-md w-full mx-auto text-center p-8">
+        <div className="mb-8">
+          <h1 className="text-6xl font-bold text-red-600 mb-4">⚠️</h1>
+          <h2 className="text-2xl font-semibold text-gray-800 mb-4">
+            Algo deu errado
           </h2>
-          <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">
-            Ocorreu um erro inesperado. Por favor, tente novamente.
+          <p className="text-gray-600 mb-8">
+            Ocorreu um erro inesperado. Nossa equipe foi notificada.
           </p>
         </div>
-        <div className="flex flex-col space-y-4">
+
+        <div className="space-y-4">
           <button
-            onClick={() => reset()}
-            className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-amber-600 hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500"
+            onClick={reset}
+            className="inline-block bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200 mr-4"
           >
-            Tentar novamente
+            🔄 Tentar Novamente
           </button>
-          <button
-            onClick={() => window.location.href = '/'}
-            className="w-full flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500"
+          
+          <a
+            href="/"
+            className="inline-block bg-gray-600 hover:bg-gray-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200"
           >
-            Voltar ao início
-          </button>
+            🏠 Voltar ao Início
+          </a>
+        </div>
+
+        <div className="mt-12 text-sm text-gray-500">
+          <p>Armazém São Joaquim</p>
+          <p>"En esta casa tenemos memoria"</p>
         </div>
       </div>
     </div>

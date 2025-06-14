@@ -16,8 +16,8 @@ interface LogoProps {
 const Logo = memo(({ 
   className = "h-12 w-auto", 
   priority = false,
-  width = 120,
-  height = 48,
+  width = 70,
+  height = 70,
   isScrolled = false,
   onClick
 }: LogoProps) => {

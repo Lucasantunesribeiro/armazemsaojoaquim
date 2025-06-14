@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { emailService } from '../../../lib/email-service'
+import crypto from 'crypto'
 
 // Função para criar resposta JSON com headers CORS obrigatórios
 function createJsonResponse(data: any, status: number = 200) {
@@ -147,6 +149,9 @@ export async function POST(request: NextRequest) {
        }, 400)
      }
 
+    // Gerar token de confirmação único
+    const confirmationToken = crypto.randomBytes(32).toString('hex')
+
     // Simular criação da reserva
     // Em produção, aqui você salvaria no banco de dados
     const newReservation = {
@@ -160,13 +165,38 @@ export async function POST(request: NextRequest) {
       pessoas,
       observacoes: observacoes || null,
       status: 'pendente',
+      confirmation_token: confirmationToken,
       created_at: new Date().toISOString()
+    }
+
+    // Enviar email de confirmação para o usuário
+    try {
+      const emailResult = await emailService.sendReservationConfirmation({
+        id: newReservation.id,
+        nome,
+        email,
+        telefone,
+        data,
+        horario,
+        pessoas,
+        observacoes,
+        confirmationToken
+      })
+
+      if (!emailResult.success) {
+        console.warn('Falha ao enviar email de confirmação:', emailResult.error)
+        // Não falhar a criação da reserva por causa do email
+      }
+    } catch (emailError) {
+      console.error('Erro ao enviar email de confirmação:', emailError)
+      // Não falhar a criação da reserva por causa do email
     }
 
     return createJsonResponse({
       success: true,
       data: newReservation,
-      message: 'Reserva criada com sucesso'
+      message: 'Reserva criada com sucesso. Verifique seu email para confirmar.',
+      emailSent: emailService.isConfigured()
     }, 201)
 
   } catch (error) {
