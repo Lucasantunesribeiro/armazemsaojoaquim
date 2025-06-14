@@ -171,6 +171,38 @@ export default function ReservasPage() {
       if (!reservationResponse.ok) {
         const contentType = reservationResponse.headers.get('content-type')
         
+        // TRATAMENTO ESPECÍFICO PARA ERRO 422
+        if (reservationResponse.status === 422) {
+          console.error('🚨 ERRO 422 DETECTADO - DADOS DETALHADOS:', {
+            url: reservationResponse.url,
+            status: reservationResponse.status,
+            statusText: reservationResponse.statusText,
+            headers: Object.fromEntries(reservationResponse.headers.entries()),
+            requestData: {
+              user_id: user.id,
+              nome: formData.name,
+              email: formData.email,
+              telefone: formData.phone,
+              data: formData.date,
+              horario: formData.time,
+              pessoas: formData.guests,
+              observacoes: formData.observations
+            }
+          })
+          
+          try {
+            const errorData = await reservationResponse.json()
+            console.error('📄 Resposta 422:', errorData)
+            toast.error(`Erro 422 - Dados inválidos: ${errorData.error || 'Validação falhou no servidor'}`)
+          } catch (jsonError) {
+            console.error('❌ Erro ao parsear resposta 422:', jsonError)
+            const errorText = await reservationResponse.text()
+            console.error('📄 Resposta 422 como texto:', errorText)
+            toast.error('Erro 422 - Dados inválidos enviados para o servidor')
+          }
+          return
+        }
+        
         if (contentType && contentType.includes('application/json')) {
           try {
             const errorData = await reservationResponse.json()
@@ -262,10 +294,13 @@ export default function ReservasPage() {
   }
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('pt-BR', {
+    // Adicionar timezone local para evitar conversão UTC
+    const date = new Date(dateString + 'T00:00:00')
+    return date.toLocaleDateString('pt-BR', {
       day: '2-digit',
       month: '2-digit',
-      year: 'numeric'
+      year: 'numeric',
+      timeZone: 'America/Sao_Paulo'
     })
   }
 
