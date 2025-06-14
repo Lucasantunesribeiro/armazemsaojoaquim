@@ -34,7 +34,8 @@
     "backup:list": "node scripts/backup-system.js list",
     "test:api": "node scripts/test-api.js",
     "diagnose": "node scripts/test-api.js",
-    "test:supabase": "node scripts/test-supabase.js"
+    "test:supabase": "node scripts/test-supabase.js",
+    "test:email": "node scripts/test-email.js"
   },
   "engines": {
     "node": "20.x",
