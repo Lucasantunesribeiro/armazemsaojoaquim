@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   },
 }
 
-// Mock data para fallback
+// Mock data para fallback - usando slugs para navegação
 const mockPosts = [
   {
     id: 'a0dbcfb7-aa55-4b7f-b081-4525b57f54c8',
@@ -25,12 +25,12 @@ const mockPosts = [
     content: 'O Armazém São Joaquim tem uma rica história de 170 anos...',
     excerpt: 'Conheça a fascinante história de 170 anos do nosso restaurante histórico no coração de Santa Teresa.',
     featured_image: '/images/armazem-fachada-historica.jpg',
-    slug: 'historia-do-armazem-sao-joaquim',
+    slug: 'historia-do-armazem-sao-joaquim', // Slug usado para URLs amigáveis
     published_at: '2024-01-15T10:00:00Z',
     created_at: '2024-01-15T10:00:00Z',
     updated_at: '2024-01-15T10:00:00Z',
     published: true,
-    author_id: 'armazem'
+    author_id: 'armazem-sao-joaquim'
   },
   {
     id: '0049d04f-ad1c-4299-9986-8bc39e06fa8c',
@@ -38,12 +38,12 @@ const mockPosts = [
     content: 'Nossa feijoada é preparada seguindo uma receita tradicional...',
     excerpt: 'Descubra os segredos por trás da nossa famosa feijoada tradicional',
     featured_image: '/images/armazem-interior-aconchegante.jpg',
-    slug: 'segredos-da-nossa-feijoada',
+    slug: 'segredos-da-nossa-feijoada', // Slug usado para URLs amigáveis
     published_at: '2025-06-08T20:51:57.634362+00:00',
     created_at: '2025-06-08T20:51:57.634362+00:00',
     updated_at: '2025-06-08T20:51:57.634362+00:00',
     published: true,
-    author_id: 'armazem'
+    author_id: 'armazem-sao-joaquim'
   },
   {
     id: '5ea5f6d7-589e-4135-a5c2-a493f93c7eb5',
@@ -51,12 +51,12 @@ const mockPosts = [
     content: 'Nossos drinks são muito mais que simples coquetéis...',
     excerpt: 'Conheça o cuidado e a paixão por trás de cada drink servido no Armazém São Joaquim.',
     featured_image: '/images/santa-teresa-vista-panoramica.jpg',
-    slug: 'arte-da-mixologia-no-armazem',
+    slug: 'arte-da-mixologia-no-armazem', // Slug usado para URLs amigáveis
     published_at: '2025-06-09T02:14:03.040244+00:00',
     created_at: '2025-06-09T02:14:03.040244+00:00',
     updated_at: '2025-06-09T02:14:03.040244+00:00',
     published: true,
-    author_id: 'armazem'
+    author_id: 'armazem-sao-joaquim'
   }
 ]
 

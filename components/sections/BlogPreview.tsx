@@ -36,6 +36,7 @@ const BlogPreview = () => {
       date: "2024-01-15",
       author: "Equipe Armazém",
       image: "/images/historia.jpg",
+      slug: "historia-santa-teresa-berco-boemia-carioca",
       featured: true
     },
     {
@@ -47,6 +48,7 @@ const BlogPreview = () => {
       date: "2024-01-10",
       author: "Chef Tradicional",
       image: "/images/armazem-interior-aconchegante.jpg",
+      slug: "receitas-centenarias-segredos-culinaria-colonial",
       featured: false
     },
     {
@@ -58,6 +60,7 @@ const BlogPreview = () => {
       date: "2024-01-05",
       author: "Historiador Local",
       image: "/images/bondinho.jpg",
+      slug: "bondinho-santa-teresa-viagem-tempo",
       featured: false
     }
   ]
@@ -253,7 +256,7 @@ const BlogPreview = () => {
                       {formatDate(post.date)} • {post.author}
                     </div>
                     
-                    <Link href={`/blog/${post.id}`}>
+                    <Link href={`/blog/${post.slug}`}>
                       <Button 
                         variant="outline"
                         className="group text-amber-600 dark:text-amber-400 border-amber-600 dark:border-amber-400 hover:bg-amber-600 hover:text-white"
@@ -313,7 +316,7 @@ const BlogPreview = () => {
                 
                 <div className="flex items-center justify-between">
                   <span className="text-slate-500 dark:text-slate-400 text-sm">{post.author}</span>
-                  <Link href={`/blog/${post.id}`}>
+                  <Link href={`/blog/${post.slug}`}>
                     <Button 
                       size="sm"
                       variant="ghost" 
