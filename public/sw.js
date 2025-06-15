@@ -284,10 +284,18 @@ self.addEventListener('notificationclick', (event) => {
 self.addEventListener('message', (event) => {
   if (event.data && event.data.type === 'SKIP_WAITING') {
     self.skipWaiting()
+    return
   }
   
   if (event.data && event.data.type === 'GET_VERSION') {
-    event.ports[0].postMessage({ version: CACHE_NAME })
+    // Verificar se ports existe antes de usar
+    if (event.ports && event.ports[0]) {
+      event.ports[0].postMessage({ version: CACHE_NAME })
+    } else if (event.source) {
+      // Fallback para usar event.source se ports não estiver disponível
+      event.source.postMessage({ version: CACHE_NAME })
+    }
+    return
   }
 })
 
