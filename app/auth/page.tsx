@@ -102,6 +102,10 @@ export default function AuthPage() {
         environment: window.location.hostname !== 'localhost' ? 'production' : 'development'
       })
 
+      // Log detalhado para debug
+      console.log('🔍 Supabase URL:', supabase.supabaseUrl)
+      console.log('🔍 Auth endpoint:', `${supabase.supabaseUrl}/auth/v1/signup`)
+
       // Primeira tentativa: registro com confirmação de email
       let { data: authData, error } = await supabase.auth.signUp({
         email: data.email,
@@ -119,9 +123,17 @@ export default function AuthPage() {
         error.message?.includes('Error sending confirmation email') ||
         error.message?.includes('Internal Server Error') ||
         error.message?.includes('500') ||
-        error.status === 500
+        error.status === 500 ||
+        error.code === 500 ||
+        (typeof error === 'object' && error.toString().includes('500'))
       )) {
-        console.log('⚠️ Erro de servidor/email detectado, tentando registro alternativo...')
+        console.log('⚠️ Erro de servidor/email detectado:', {
+          message: error.message,
+          status: error.status,
+          code: error.code,
+          errorString: error.toString()
+        })
+        console.log('🔄 Tentando registro alternativo...')
         
         // Fallback: tentar novamente sem opções de email e com configurações mínimas
         const { data: fallbackData, error: fallbackError } = await supabase.auth.signUp({
@@ -137,7 +149,12 @@ export default function AuthPage() {
         })
 
         if (fallbackError) {
-          console.error('❌ Fallback Registration Error:', fallbackError)
+          console.error('❌ Fallback Registration Error:', {
+            message: fallbackError.message,
+            status: fallbackError.status,
+            code: fallbackError.code,
+            details: fallbackError
+          })
           
           // Se ainda houver erro, informar que a conta pode ter sido criada
           if (fallbackError.message?.includes('User already registered')) {
@@ -171,7 +188,12 @@ export default function AuthPage() {
 
       // Se houver outros tipos de erro
       if (error) {
-        console.error('❌ Registration Error:', error)
+        console.error('❌ Registration Error:', {
+          message: error.message,
+          status: error.status,
+          code: error.code,
+          details: error
+        })
         
         // Tratar diferentes tipos de erro
         if (error.message?.includes('User already registered')) {
@@ -213,7 +235,14 @@ export default function AuthPage() {
       // Tratar erros de rede ou outros erros inesperados
       if (error.name === 'NetworkError' || error.message?.includes('fetch')) {
         toast.error('Erro de conexão. Verifique sua internet e tente novamente.')
-      } else if (error.message?.includes('500')) {
+      } else if (
+        error.message?.includes('500') ||
+        error.status === 500 ||
+        error.code === 500 ||
+        error.toString().includes('500') ||
+        error.toString().includes('Internal Server Error')
+      ) {
+        console.log('🎯 Erro 500 capturado no catch - assumindo conta criada')
         toast.success('🎉 Sua conta pode ter sido criada com sucesso! Tente fazer login ou verifique seu email.')
         setIsLogin(true)
         registerForm.reset()
