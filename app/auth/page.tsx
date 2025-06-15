@@ -340,7 +340,6 @@ export default function AuthPage() {
                     alt="Armazém São Joaquim"
                     fill
                     className="object-contain rounded-full shadow-lg"
-                    priority
                     fallbackSrc="/images/placeholder.svg"
                   />
                 </div>
