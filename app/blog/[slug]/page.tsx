@@ -1,3 +1,17 @@
+/**
+ * Página de Post Individual do Blog
+ * 
+ * Este arquivo implementa o sistema de roteamento baseado em slugs para o blog.
+ * URLs seguem o padrão: /blog/[slug] onde slug é uma string amigável como "historia-do-armazem"
+ * 
+ * Principais funcionalidades:
+ * - Busca posts por slug (não por ID)
+ * - Geração de metadata dinâmica
+ * - Cache inteligente usando slugs como chave
+ * - Fallback para dados mockados
+ * - Geração estática de parâmetros
+ */
+
 import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
@@ -14,10 +28,12 @@ interface BlogPost {
   title: string
   content: string
   excerpt: string | null
-  image_url: string | null
+  featured_image: string | null
   slug: string
+  published_at: string | null
   created_at: string
-  author: string
+  updated_at: string
+  author_id: string | null
   published: boolean
 }
 
@@ -34,10 +50,12 @@ const mockPosts: BlogPost[] = [
     title: 'Os Segredos da Nossa Feijoada',
     content: 'Nossa feijoada é preparada seguindo uma receita tradicional passada de geração em geração. O segredo está no tempo de cozimento e na seleção dos ingredientes...',
     excerpt: 'Descubra os segredos por trás da nossa famosa feijoada tradicional',
-    image_url: '/images/blog/segredos-feijoada.jpg',
+    featured_image: '/images/blog/segredos-feijoada.jpg',
     slug: 'segredos-da-nossa-feijoada',
+    published_at: '2025-06-08T20:51:57.634362+00:00',
     created_at: '2025-06-08T20:51:57.634362+00:00',
-    author: 'Armazém São Joaquim',
+    updated_at: '2025-06-08T20:51:57.634362+00:00',
+    author_id: 'Armazém São Joaquim',
     published: true
   },
   {
@@ -45,10 +63,12 @@ const mockPosts: BlogPost[] = [
     title: 'A Arte da Mixologia no Armazém',
     content: '<p>Nossos drinks são muito mais que simples coquetéis - são obras de arte líquidas que contam histórias. Cada receita é cuidadosamente desenvolvida pela nossa equipe de bartenders, combinando técnicas tradicionais com inovação.</p><p>Utilizamos apenas ingredientes premium: cachaças artesanais, frutas frescas da estação e especiarias selecionadas. Nosso gin tônica, por exemplo, é preparado com gin importado e água tônica premium, finalizado com especiarias que realçam os sabores únicos.</p><p>A caipirinha de jabuticaba, nossa especialidade da casa, utiliza a fruta fresca e cachaça envelhecida, criando uma experiência sensorial única que representa a essência brasileira.</p>',
     excerpt: 'Conheça o cuidado e a paixão por trás de cada drink servido no Armazém São Joaquim.',
-    image_url: '/images/blog/drinks.jpg',
+    featured_image: '/images/blog/drinks.jpg',
     slug: 'arte-da-mixologia-no-armazem',
+    published_at: '2025-06-09T02:14:03.040244+00:00',
     created_at: '2025-06-09T02:14:03.040244+00:00',
-    author: 'Armazém São Joaquim',
+    updated_at: '2025-06-09T02:14:03.040244+00:00',
+    author_id: 'Armazém São Joaquim',
     published: true
   },
   {
@@ -56,10 +76,12 @@ const mockPosts: BlogPost[] = [
     title: 'Eventos e Celebrações no Armazém',
     content: '<p>O Armazém São Joaquim é o lugar perfeito para celebrar momentos especiais. Nossa atmosfera única, combinada com a hospitalidade carioca, cria o ambiente ideal para aniversários, encontros de amigos e celebrações familiares.</p><p>Oferecemos opções personalizadas para grupos, desde menus especiais até decoração temática. Nossa equipe trabalha junto com você para tornar cada evento uma experiência memorável.</p><p>Aos finais de semana, frequentemente recebemos apresentações de música ao vivo, fortalecendo nossa conexão com a cultura boêmia de Santa Teresa.</p>',
     excerpt: 'Descubra como transformar seus momentos especiais em memórias inesquecíveis no Armazém.',
-    image_url: '/images/blog/eventos.jpg',
+    featured_image: '/images/blog/eventos.jpg',
     slug: 'eventos-e-celebracoes-no-armazem',
+    published_at: '2025-06-09T02:14:03.040244+00:00',
     created_at: '2025-06-09T02:14:03.040244+00:00',
-    author: 'Armazém São Joaquim',
+    updated_at: '2025-06-09T02:14:03.040244+00:00',
+    author_id: 'Armazém São Joaquim',
     published: true
   },
   {
@@ -67,10 +89,12 @@ const mockPosts: BlogPost[] = [
     title: 'A História do Armazém São Joaquim',
     content: '<p>O Armazém São Joaquim tem uma rica história de 170 anos no coração de Santa Teresa. Desde 1854, este espaço histórico tem sido um ponto de encontro para moradores e visitantes, preservando a autenticidade e o charme do bairro mais boêmio do Rio de Janeiro.</p><p>Nossa jornada começou como um simples armazém, servindo a comunidade local com produtos essenciais. Com o passar dos anos, evoluímos para nos tornar um restaurante e bar que celebra as tradições culinárias brasileiras com um toque contemporâneo.</p>',
     excerpt: 'Conheça a fascinante história de 170 anos do nosso restaurante histórico no coração de Santa Teresa.',
-    image_url: '/images/armazem-historia.jpg',
+    featured_image: '/images/armazem-historia.jpg',
     slug: 'historia-do-armazem-sao-joaquim',
+    published_at: '2024-01-15T10:00:00Z',
     created_at: '2024-01-15T10:00:00Z',
-    author: 'Armazém São Joaquim',
+    updated_at: '2024-01-15T10:00:00Z',
+    author_id: 'Armazém São Joaquim',
     published: true
   }
 ]
@@ -107,10 +131,12 @@ async function getBlogPost(slug: string): Promise<BlogPost | null> {
           title: (data as any).title || 'Mock Title',
           content: (data as any).content || 'Mock content',
           excerpt: (data as any).excerpt || null,
-          image_url: (data as any).featured_image || null,
+          featured_image: (data as any).featured_image || null,
           slug: (data as any).slug || slug,
+          published_at: (data as any).published_at || null,
           created_at: (data as any).created_at || new Date().toISOString(),
-          author: (data as any).author_id || 'Armazém São Joaquim',
+          updated_at: (data as any).updated_at || new Date().toISOString(),
+          author_id: (data as any).author_id || null,
           published: (data as any).published || true
         }
         
@@ -246,7 +272,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
                 <div className="flex flex-wrap items-center gap-6 text-white/80">
                   <div className="flex items-center space-x-2">
                     <User className="w-5 h-5" />
-                    <span className="font-medium">{'Armazém São Joaquim'}</span>
+                    <span className="font-medium">{post.author_id || 'Armazém São Joaquim'}</span>
                   </div>
                   <div className="flex items-center space-x-2">
                     <Calendar className="w-5 h-5" />
@@ -335,9 +361,9 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
                     className="group bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden"
                   >
                     <div className="relative h-48 bg-gradient-to-br from-amber-200 to-orange-200">
-                      {relatedPost.image_url ? (
+                      {relatedPost.featured_image ? (
                         <Image
-                          src={relatedPost.image_url}
+                          src={relatedPost.featured_image}
                           alt={relatedPost.title}
                           fill
                           className="object-cover group-hover:scale-105 transition-transform duration-300"
