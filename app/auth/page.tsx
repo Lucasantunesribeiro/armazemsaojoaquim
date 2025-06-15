@@ -11,7 +11,6 @@ import Button from '../../components/ui/Button'
 import Input from '../../components/ui/Input'
 import { Card, CardContent, CardHeader } from '../../components/ui/Card'
 import { Mail, User, Eye, EyeOff, Shield, CheckCircle } from 'lucide-react'
-import AuthHeader from '../../components/ui/AuthHeader'
 import OptimizedImage from '@/components/ui/OptimizedImage'
 
 const loginSchema = z.object({
@@ -295,19 +294,14 @@ export default function AuthPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-red-50">
-      <AuthHeader 
-        title="Armazém São Joaquim"
-        subtitle={isLogin ? "Faça login em sua conta" : "Crie sua conta"}
-      />
-      
       {/* Background pattern com z-index baixo */}
       <div className="fixed inset-0 opacity-20 pointer-events-none" style={{
         backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23f59e0b' fill-opacity='0.05'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
       }}></div>
       
-      {/* Container principal com padding adequado para evitar sobreposição */}
-      <div className="relative z-10 pt-24 pb-8 px-4 min-h-screen">
-        <div className="flex items-center justify-center min-h-[calc(100vh-6rem)]">
+      {/* Container principal com padding adequado para compensar header fixo */}
+      <div className="relative z-10 pt-28 pb-8 px-4 min-h-screen">
+        <div className="flex items-center justify-center min-h-[calc(100vh-8rem)]">
           <div className="w-full max-w-md">
             <Card className="shadow-2xl border-0 bg-white/95 backdrop-blur-sm">
               <CardHeader className="text-center pb-6 pt-8">
@@ -323,8 +317,11 @@ export default function AuthPage() {
                 </div>
                 
                 <h1 className="font-playfair text-3xl font-bold text-amber-900 mb-2">
-                  {isLogin ? 'Bem-vindo de volta!' : 'Junte-se a nós'}
+                  Armazém São Joaquim
                 </h1>
+                <h2 className="font-playfair text-xl font-semibold text-amber-800 mb-3">
+                  {isLogin ? 'Bem-vindo de volta!' : 'Junte-se a nós'}
+                </h2>
                 <p className="text-amber-700/80 text-sm leading-relaxed">
                   {isLogin 
                     ? 'Acesse sua conta para fazer reservas e acompanhar seu histórico' 
