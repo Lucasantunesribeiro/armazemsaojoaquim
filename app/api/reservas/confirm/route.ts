@@ -189,7 +189,7 @@ function generateSuccessPage(reservation: any, alreadyConfirmed: boolean = false
                 <h1>Reserva Confirmada!</h1>
                 <p>${message}</p>
             </div>
-            
+
             <div class="details">
                 <h3>Detalhes da sua reserva:</h3>
                 <p><strong>Nome:</strong> ${reservation.nome}</p>
@@ -205,11 +205,11 @@ function generateSuccessPage(reservation: any, alreadyConfirmed: boolean = false
                 <p><strong>Telefone:</strong> ${reservation.telefone}</p>
                 ${reservation.observacoes ? `<p><strong>Observações:</strong> ${reservation.observacoes}</p>` : ''}
             </div>
-            
+
             <div style="text-align: center;">
                 <a href="${baseUrl}" class="btn">Voltar ao site</a>
             </div>
-            
+
             <div style="margin-top: 30px; padding: 20px; background: #e3f2fd; border-radius: 5px;">
                 <h4 style="color: #1976d2; margin-top: 0;">Importante:</h4>
                 <p style="margin-bottom: 0;">• Chegue com 10 minutos de antecedência</p>
@@ -255,5 +255,5 @@ function generateSuccessPage(reservation: any, alreadyConfirmed: boolean = false
         ` : ''}
     </body>
     </html>
-  `
+    `
 } 

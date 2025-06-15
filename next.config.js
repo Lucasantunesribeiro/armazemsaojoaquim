@@ -18,19 +18,19 @@ const nextConfig = {
     minimumCacheTTL: 60,
     dangerouslyAllowSVG: true,
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
-    // Configuração mais robusta para imagens locais
-    unoptimized: false,
-    loader: 'default',
-    // Timeout mais longo para imagens grandes
-    loaderFile: undefined,
-    // Configurações de domínios permitidos
-    domains: [],
     remotePatterns: [
       {
         protocol: 'https',
         hostname: '**',
       },
     ],
+    // Configurações para resolver erros 400
+    loader: 'default',
+    path: '/_next/image',
+    domains: [],
+    unoptimized: false,
+    // Configurações para Netlify
+    loaderFile: undefined,
   },
 
   // Configurações experimentais otimizadas
@@ -55,19 +55,15 @@ const nextConfig = {
   async headers() {
     return [
       {
-        source: '/(.*)',
+        source: '/_next/image(.*)',
         headers: [
           {
-            key: 'X-Frame-Options',
-            value: 'DENY',
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
           },
           {
             key: 'X-Content-Type-Options',
             value: 'nosniff',
-          },
-          {
-            key: 'Referrer-Policy',
-            value: 'origin-when-cross-origin',
           },
         ],
       },
@@ -81,23 +77,19 @@ const nextConfig = {
         ],
       },
       {
-        source: '/api/:path*',
+        source: '/(.*)',
         headers: [
           {
-            key: 'Access-Control-Allow-Origin',
-            value: '*',
+            key: 'X-Frame-Options',
+            value: 'DENY',
           },
           {
-            key: 'Access-Control-Allow-Methods',
-            value: 'GET, POST, PUT, DELETE, OPTIONS',
+            key: 'X-Content-Type-Options',
+            value: 'nosniff',
           },
           {
-            key: 'Access-Control-Allow-Headers',
-            value: 'Content-Type, Authorization',
-          },
-          {
-            key: 'Content-Type',
-            value: 'application/json; charset=utf-8',
+            key: 'Referrer-Policy',
+            value: 'origin-when-cross-origin',
           },
         ],
       },
@@ -134,6 +126,16 @@ const nextConfig = {
   // Configurações para Netlify
   trailingSlash: false,
   output: 'standalone',
+
+  // Configurações para geração de build ID
+  generateBuildId: async () => {
+    return 'armazem-sao-joaquim-' + Date.now()
+  },
+
+  // Configurações de ambiente
+  env: {
+    CUSTOM_KEY: 'armazem-sao-joaquim',
+  },
 }
 
 module.exports = nextConfig
