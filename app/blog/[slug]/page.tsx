@@ -59,6 +59,19 @@ const mockPosts: BlogPost[] = [
     published: true
   },
   {
+    id: '0049d04f-ad1c-4299-9986-8bc39e06fa8d',
+    title: 'Os Segredos da Feijoada',
+    content: 'Nossa feijoada é preparada seguindo uma receita tradicional passada de geração em geração. O segredo está no tempo de cozimento e na seleção dos ingredientes premium que utilizamos. Cada grão de feijão é selecionado à mão, e as carnes são curadas com especiarias especiais que realçam o sabor único do prato.',
+    excerpt: 'Descubra os segredos por trás da nossa famosa feijoada tradicional',
+    featured_image: '/images/blog/segredos-feijoada.jpg',
+    slug: 'segredos-da-feijoada',
+    published_at: '2025-06-08T20:51:57.634362+00:00',
+    created_at: '2025-06-08T20:51:57.634362+00:00',
+    updated_at: '2025-06-08T20:51:57.634362+00:00',
+    author_id: 'Armazém São Joaquim',
+    published: true
+  },
+  {
     id: '5ea5f6d7-589e-4135-a5c2-a493f93c7eb5',
     title: 'A Arte da Mixologia no Armazém',
     content: '<p>Nossos drinks são muito mais que simples coquetéis - são obras de arte líquidas que contam histórias. Cada receita é cuidadosamente desenvolvida pela nossa equipe de bartenders, combinando técnicas tradicionais com inovação.</p><p>Utilizamos apenas ingredientes premium: cachaças artesanais, frutas frescas da estação e especiarias selecionadas. Nosso gin tônica, por exemplo, é preparado com gin importado e água tônica premium, finalizado com especiarias que realçam os sabores únicos.</p><p>A caipirinha de jabuticaba, nossa especialidade da casa, utiliza a fruta fresca e cachaça envelhecida, criando uma experiência sensorial única que representa a essência brasileira.</p>',
@@ -94,6 +107,45 @@ const mockPosts: BlogPost[] = [
     published_at: '2024-01-15T10:00:00Z',
     created_at: '2024-01-15T10:00:00Z',
     updated_at: '2024-01-15T10:00:00Z',
+    author_id: 'Armazém São Joaquim',
+    published: true
+  },
+  {
+    id: 'b1dbcfb7-aa55-4b7f-b081-4525b57f54c9',
+    title: 'A História de Santa Teresa: Berço da Boemia Carioca',
+    content: '<p>Santa Teresa é um dos bairros mais charmosos e históricos do Rio de Janeiro, conhecido por sua arquitetura colonial preservada, ruas de paralelepípedo e atmosfera boêmia única. Localizado no alto de uma colina, o bairro oferece vistas deslumbrantes da cidade e da Baía de Guanabara.</p><p>Desde o século XIX, Santa Teresa tem sido um refúgio para artistas, intelectuais e boêmios. Suas casas coloniais, muitas transformadas em ateliês e galerias de arte, contam a história de um Rio de Janeiro mais intimista e cultural.</p><p>O famoso bondinho de Santa Teresa, que conecta o bairro ao centro da cidade, é um símbolo da preservação histórica e um dos passeios mais românticos do Rio.</p>',
+    excerpt: 'Descubra como o bairro se tornou um dos mais charmosos do Rio de Janeiro, preservando suas tradições e cultura secular.',
+    featured_image: '/images/blog/santa-teresa-historia.jpg',
+    slug: 'historia-santa-teresa-berco-boemia-carioca',
+    published_at: '2024-01-15T10:00:00Z',
+    created_at: '2024-01-15T10:00:00Z',
+    updated_at: '2024-01-15T10:00:00Z',
+    author_id: 'Armazém São Joaquim',
+    published: true
+  },
+  {
+    id: 'c2dbcfb7-aa55-4b7f-b081-4525b57f54ca',
+    title: 'Receitas Centenárias: Os Segredos da Culinária Colonial',
+    content: '<p>A culinária colonial brasileira é um tesouro de sabores e técnicas que atravessaram séculos. No Armazém São Joaquim, preservamos essas receitas tradicionais, passadas de geração em geração, mantendo viva a autenticidade dos sabores de nossa terra.</p><p>Nossos pratos são preparados seguindo métodos tradicionais: o feijão tropeiro é refogado em panela de ferro, a linguiça é defumada artesanalmente, e nossos doces seguem receitas que datam do período colonial.</p><p>Cada ingrediente é cuidadosamente selecionado, priorizando produtores locais e orgânicos que mantêm a qualidade e o sabor autêntico que nossos antepassados conheciam.</p>',
+    excerpt: 'Conheça as receitas tradicionais que atravessaram gerações e continuam encantando nossos clientes.',
+    featured_image: '/images/blog/receitas-centenarias.jpg',
+    slug: 'receitas-centenarias-segredos-culinaria-colonial',
+    published_at: '2024-01-10T10:00:00Z',
+    created_at: '2024-01-10T10:00:00Z',
+    updated_at: '2024-01-10T10:00:00Z',
+    author_id: 'Armazém São Joaquim',
+    published: true
+  },
+  {
+    id: 'd3dbcfb7-aa55-4b7f-b081-4525b57f54cb',
+    title: 'Bondinho de Santa Teresa: Uma Viagem no Tempo',
+    content: '<p>O bondinho de Santa Teresa é muito mais que um meio de transporte - é uma viagem no tempo que conecta o presente ao passado glorioso do Rio de Janeiro. Inaugurado em 1896, este sistema de bondes é um dos últimos do mundo ainda em funcionamento.</p><p>A linha do bondinho serpenteia pelas ruas estreitas de Santa Teresa, passando por casarões históricos, ateliês de artistas e oferecendo vistas espetaculares da cidade. É uma experiência única que permite aos visitantes sentir a atmosfera romântica e nostálgica do bairro.</p><p>Para nós do Armazém São Joaquim, o bondinho representa a conexão entre tradição e modernidade, valores que também guiam nossa filosofia culinária.</p>',
+    excerpt: 'A história do transporte mais charmoso do Rio e sua importância para o desenvolvimento do bairro.',
+    featured_image: '/images/blog/bondinho-santa-teresa.jpg',
+    slug: 'bondinho-santa-teresa-viagem-tempo',
+    published_at: '2024-01-05T10:00:00Z',
+    created_at: '2024-01-05T10:00:00Z',
+    updated_at: '2024-01-05T10:00:00Z',
     author_id: 'Armazém São Joaquim',
     published: true
   }
@@ -431,12 +483,29 @@ function formatContent(content: string): string {
 
 export async function generateStaticParams() {
   try {
-    const posts = await blogApi.getAllPosts()
-    return posts.map((post) => ({
+    // Tentar carregar posts da API primeiro
+    const apiPosts = await blogApi.getAllPosts()
+    
+    // Combinar posts da API com dados mockados, removendo duplicatas por slug
+    const allPosts = [...mockPosts]
+    
+    // Adicionar posts da API que não existem nos dados mockados
+    if (apiPosts && apiPosts.length > 0) {
+      apiPosts.forEach(apiPost => {
+        if (!allPosts.some(mockPost => mockPost.slug === apiPost.slug)) {
+          allPosts.push(apiPost)
+        }
+      })
+    }
+    
+    console.log('Gerando páginas estáticas para slugs:', allPosts.map(p => p.slug))
+    
+    return allPosts.map((post) => ({
       slug: post.slug,
     }))
   } catch (error) {
-    console.error('Erro ao gerar parâmetros estáticos:', error)
+    console.error('Erro ao gerar parâmetros estáticos, usando apenas dados mockados:', error)
+    // Sempre retornar pelo menos os dados mockados
     return mockPosts.map((post) => ({
       slug: post.slug,
     }))
