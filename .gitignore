@@ -40,3 +40,5 @@ next-env.d.ts
 
 #Cursor 
 .cursor
+# Local Netlify folder
+.netlify

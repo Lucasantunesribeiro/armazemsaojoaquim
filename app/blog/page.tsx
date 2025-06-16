@@ -46,6 +46,19 @@ const mockPosts = [
     author_id: 'armazem-sao-joaquim'
   },
   {
+    id: '0049d04f-ad1c-4299-9986-8bc39e06fa8d',
+    title: 'Os Segredos da Feijoada',
+    content: 'Nossa feijoada é preparada seguindo uma receita tradicional...',
+    excerpt: 'Descubra os segredos por trás da nossa famosa feijoada tradicional',
+    featured_image: '/images/armazem-interior-aconchegante.jpg',
+    slug: 'segredos-da-feijoada', // Slug usado para URLs amigáveis
+    published_at: '2025-06-08T20:51:57.634362+00:00',
+    created_at: '2025-06-08T20:51:57.634362+00:00',
+    updated_at: '2025-06-08T20:51:57.634362+00:00',
+    published: true,
+    author_id: 'armazem-sao-joaquim'
+  },
+  {
     id: '5ea5f6d7-589e-4135-a5c2-a493f93c7eb5',
     title: 'A Arte da Mixologia no Armazém',
     content: 'Nossos drinks são muito mais que simples coquetéis...',
@@ -55,6 +68,45 @@ const mockPosts = [
     published_at: '2025-06-09T02:14:03.040244+00:00',
     created_at: '2025-06-09T02:14:03.040244+00:00',
     updated_at: '2025-06-09T02:14:03.040244+00:00',
+    published: true,
+    author_id: 'armazem-sao-joaquim'
+  },
+  {
+    id: 'b1dbcfb7-aa55-4b7f-b081-4525b57f54c9',
+    title: 'A História de Santa Teresa: Berço da Boemia Carioca',
+    content: 'Santa Teresa é um dos bairros mais charmosos e históricos do Rio de Janeiro...',
+    excerpt: 'Descubra como o bairro se tornou um dos mais charmosos do Rio de Janeiro, preservando suas tradições e cultura secular.',
+    featured_image: '/images/blog/santa-teresa-historia.jpg',
+    slug: 'historia-santa-teresa-berco-boemia-carioca', // Slug usado para URLs amigáveis
+    published_at: '2024-01-15T10:00:00Z',
+    created_at: '2024-01-15T10:00:00Z',
+    updated_at: '2024-01-15T10:00:00Z',
+    published: true,
+    author_id: 'armazem-sao-joaquim'
+  },
+  {
+    id: 'c2dbcfb7-aa55-4b7f-b081-4525b57f54ca',
+    title: 'Receitas Centenárias: Os Segredos da Culinária Colonial',
+    content: 'A culinária colonial brasileira é um tesouro de sabores e técnicas...',
+    excerpt: 'Conheça as receitas tradicionais que atravessaram gerações e continuam encantando nossos clientes.',
+    featured_image: '/images/blog/receitas-centenarias.jpg',
+    slug: 'receitas-centenarias-segredos-culinaria-colonial', // Slug usado para URLs amigáveis
+    published_at: '2024-01-10T10:00:00Z',
+    created_at: '2024-01-10T10:00:00Z',
+    updated_at: '2024-01-10T10:00:00Z',
+    published: true,
+    author_id: 'armazem-sao-joaquim'
+  },
+  {
+    id: 'd3dbcfb7-aa55-4b7f-b081-4525b57f54cb',
+    title: 'Bondinho de Santa Teresa: Uma Viagem no Tempo',
+    content: 'O bondinho de Santa Teresa é muito mais que um meio de transporte...',
+    excerpt: 'A história do transporte mais charmoso do Rio e sua importância para o desenvolvimento do bairro.',
+    featured_image: '/images/blog/bondinho-santa-teresa.jpg',
+    slug: 'bondinho-santa-teresa-viagem-tempo', // Slug usado para URLs amigáveis
+    published_at: '2024-01-05T10:00:00Z',
+    created_at: '2024-01-05T10:00:00Z',
+    updated_at: '2024-01-05T10:00:00Z',
     published: true,
     author_id: 'armazem-sao-joaquim'
   }

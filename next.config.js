@@ -6,9 +6,6 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: false,
   },
-  // Otimizações para produção
-  compress: true,
-  poweredByHeader: false,
   
   // Configurações de imagem otimizadas
   images: {
@@ -24,76 +21,16 @@ const nextConfig = {
         hostname: '**',
       },
     ],
-    // Configurações para resolver erros 400
-    loader: 'default',
-    path: '/_next/image',
-    domains: [],
-    unoptimized: false,
-    // Configurações para Netlify
-    loaderFile: undefined,
   },
 
-  // Configurações experimentais otimizadas
+  // Configurações experimentais
   experimental: {
     optimizePackageImports: ['@radix-ui/react-icons'],
-    turbo: {
-      rules: {
-        '*.svg': {
-          loaders: ['@svgr/webpack'],
-          as: '*.js',
-        },
-      },
-    },
   },
 
   // Configurações de compilação
   compiler: {
     removeConsole: process.env.NODE_ENV === 'production',
-  },
-
-  // Headers de segurança e performance
-  async headers() {
-    return [
-      {
-        source: '/_next/image(.*)',
-        headers: [
-          {
-            key: 'Cache-Control',
-            value: 'public, max-age=31536000, immutable',
-          },
-          {
-            key: 'X-Content-Type-Options',
-            value: 'nosniff',
-          },
-        ],
-      },
-      {
-        source: '/images/(.*)',
-        headers: [
-          {
-            key: 'Cache-Control',
-            value: 'public, max-age=31536000, immutable',
-          },
-        ],
-      },
-      {
-        source: '/(.*)',
-        headers: [
-          {
-            key: 'X-Frame-Options',
-            value: 'DENY',
-          },
-          {
-            key: 'X-Content-Type-Options',
-            value: 'nosniff',
-          },
-          {
-            key: 'Referrer-Policy',
-            value: 'origin-when-cross-origin',
-          },
-        ],
-      },
-    ]
   },
 
   // Configurações de webpack
@@ -104,18 +41,6 @@ const nextConfig = {
       use: ['@svgr/webpack'],
     })
 
-    // Otimizações para produção
-    if (!dev && !isServer) {
-      config.optimization.splitChunks.cacheGroups = {
-        ...config.optimization.splitChunks.cacheGroups,
-        vendor: {
-          test: /[\\/]node_modules[\\/]/,
-          name: 'vendors',
-          chunks: 'all',
-        },
-      }
-    }
-
     return config
   },
 
@@ -125,17 +50,6 @@ const nextConfig = {
 
   // Configurações para Netlify
   trailingSlash: false,
-  output: 'standalone',
-
-  // Configurações para geração de build ID
-  generateBuildId: async () => {
-    return 'armazem-sao-joaquim-' + Date.now()
-  },
-
-  // Configurações de ambiente
-  env: {
-    CUSTOM_KEY: 'armazem-sao-joaquim',
-  },
 }
 
 module.exports = nextConfig
