@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react'
 import { ChevronLeft, ChevronRight, MapPin, Clock, Phone } from 'lucide-react'
+import ImageWithFallback from '../ImageWithFallback'
 
 const heroImages = [
   {
@@ -28,6 +29,7 @@ export default function HeroSection() {
   const [currentSlide, setCurrentSlide] = useState(0)
   const [isAutoPlaying, setIsAutoPlaying] = useState(true)
   const [isLoaded, setIsLoaded] = useState(false)
+  const [imageLoadCount, setImageLoadCount] = useState(0)
 
   // Auto-play otimizado do carousel
   useEffect(() => {
@@ -40,23 +42,15 @@ export default function HeroSection() {
     return () => clearInterval(interval)
   }, [isAutoPlaying])
 
-  // Preload das imagens para melhor performance
-  useEffect(() => {
-    const preloadImages = async () => {
-      const imagePromises = heroImages.map((image) => {
-        return new Promise((resolve) => {
-          const img = new Image()
-          img.onload = resolve
-          img.onerror = resolve
-          img.src = image.src
-        })
-      })
-      
-      await Promise.all(imagePromises)
-      setIsLoaded(true)
-    }
-
-    preloadImages()
+  // Track image loading
+  const handleImageLoad = useCallback(() => {
+    setImageLoadCount(prev => {
+      const newCount = prev + 1
+      if (newCount >= heroImages.length) {
+        setIsLoaded(true)
+      }
+      return newCount
+    })
   }, [])
 
   const nextSlide = useCallback(() => {
@@ -76,7 +70,7 @@ export default function HeroSection() {
 
   return (
     <section className="relative h-screen min-h-[600px] max-h-[900px] overflow-hidden">
-      {/* Background Images - Otimizado */}
+      {/* Background Images - Otimizado com componente adequado */}
       <div className="absolute inset-0">
         {heroImages.map((image, index) => (
           <div
@@ -85,12 +79,15 @@ export default function HeroSection() {
               index === currentSlide ? 'opacity-100' : 'opacity-0'
             }`}
           >
-            <img
+            <ImageWithFallback
               src={image.src}
               alt={image.alt}
-              className="object-cover will-change-transform absolute inset-0 w-full h-full"
+              className="object-cover absolute inset-0 w-full h-full"
               loading={index === 0 ? 'eager' : 'lazy'}
-              onLoad={() => index === 0 && setIsLoaded(true)}
+              priority={index === 0}
+              sizes="100vw"
+              onLoad={index === 0 ? handleImageLoad : undefined}
+              fallbackSrc="/images/placeholder.jpg"
             />
           </div>
         ))}
@@ -99,58 +96,58 @@ export default function HeroSection() {
       {/* Overlay gradiente otimizado */}
       <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/40 to-black/60" />
 
-      {/* Conteúdo principal - Layout clássico melhorado */}
+      {/* Conteúdo principal - Layout otimizado para mobile */}
       <div className="relative z-10 h-full flex items-center justify-center">
-        <div className="container mx-auto px-4 text-center text-white">
-          {/* Logo/Título principal - Otimizado para LCP */}
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center text-white">
+          {/* Logo/Título principal - Otimizado para mobile */}
           <div className={`transition-all duration-1000 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
-            <h1 className="font-playfair text-5xl md:text-7xl lg:text-8xl font-bold mb-6 leading-tight">
+            <h1 className="font-playfair text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-bold mb-4 md:mb-6 leading-tight">
               <span className="block text-amber-300 drop-shadow-lg">Armazém</span>
               <span className="block text-white drop-shadow-lg">São Joaquim</span>
             </h1>
             
-            {/* Subtítulo icônico */}
-            <p className="text-xl md:text-2xl lg:text-3xl mb-8 font-light italic text-amber-200 drop-shadow-md">
+            {/* Subtítulo icônico - Responsivo */}
+            <p className="text-lg sm:text-xl md:text-2xl lg:text-3xl mb-6 md:mb-8 font-light italic text-amber-200 drop-shadow-md">
               "En esta casa tenemos memoria"
             </p>
 
-            {/* Informações dinâmicas baseadas no slide */}
-            <div className="mb-12 space-y-4">
-              <h2 className="text-2xl md:text-3xl font-semibold text-amber-300 drop-shadow-md">
+            {/* Informações dinâmicas baseadas no slide - Mobile first */}
+            <div className="mb-8 md:mb-12 space-y-2 md:space-y-4">
+              <h2 className="text-xl sm:text-2xl md:text-3xl font-semibold text-amber-300 drop-shadow-md">
                 {heroImages[currentSlide].title}
               </h2>
-              <p className="text-lg md:text-xl text-gray-200 max-w-2xl mx-auto drop-shadow-sm">
+              <p className="text-base sm:text-lg md:text-xl text-gray-200 max-w-2xl mx-auto drop-shadow-sm px-4">
                 {heroImages[currentSlide].subtitle}
               </p>
             </div>
 
-            {/* Informações de contato rápido */}
-            <div className="flex flex-wrap justify-center items-center gap-6 mb-12 text-sm md:text-base">
-              <div className="flex items-center space-x-2 bg-black/30 backdrop-blur-sm px-4 py-2 rounded-full">
-                <MapPin className="w-4 h-4 text-amber-400" />
-                <span>Santa Teresa, RJ</span>
+            {/* Informações de contato rápido - Stack no mobile */}
+            <div className="flex flex-col sm:flex-row sm:flex-wrap justify-center items-center gap-3 sm:gap-4 md:gap-6 mb-8 md:mb-12 text-sm md:text-base">
+              <div className="flex items-center space-x-2 bg-black/30 backdrop-blur-sm px-3 sm:px-4 py-2 rounded-full min-w-0">
+                <MapPin className="w-4 h-4 text-amber-400 flex-shrink-0" />
+                <span className="whitespace-nowrap">Santa Teresa, RJ</span>
               </div>
-              <div className="flex items-center space-x-2 bg-black/30 backdrop-blur-sm px-4 py-2 rounded-full">
-                <Clock className="w-4 h-4 text-amber-400" />
-                <span>Seg-Sáb: 8h-20h</span>
+              <div className="flex items-center space-x-2 bg-black/30 backdrop-blur-sm px-3 sm:px-4 py-2 rounded-full min-w-0">
+                <Clock className="w-4 h-4 text-amber-400 flex-shrink-0" />
+                <span className="whitespace-nowrap">Ter-Dom: 12h-22h</span>
               </div>
-              <div className="flex items-center space-x-2 bg-black/30 backdrop-blur-sm px-4 py-2 rounded-full">
-                <Phone className="w-4 h-4 text-amber-400" />
-                <span>(21) 98565-8443</span>
+              <div className="flex items-center space-x-2 bg-black/30 backdrop-blur-sm px-3 sm:px-4 py-2 rounded-full min-w-0">
+                <Phone className="w-4 h-4 text-amber-400 flex-shrink-0" />
+                <span className="whitespace-nowrap">(21) 98565-8443</span>
               </div>
             </div>
 
-            {/* Botões de ação */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            {/* Botões de ação - Mobile optimized */}
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center px-4">
               <a
                 href="/menu"
-                className="bg-amber-600 hover:bg-amber-700 text-white px-8 py-4 rounded-lg font-semibold text-lg transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
+                className="w-full sm:w-auto bg-amber-600 hover:bg-amber-700 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-semibold text-base sm:text-lg transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl text-center"
               >
                 Ver Cardápio
               </a>
               <a
                 href="/reservas"
-                className="bg-transparent border-2 border-white hover:bg-white hover:text-gray-900 text-white px-8 py-4 rounded-lg font-semibold text-lg transition-all duration-300 transform hover:scale-105"
+                className="w-full sm:w-auto bg-transparent border-2 border-white hover:bg-white hover:text-gray-900 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-semibold text-base sm:text-lg transition-all duration-300 transform hover:scale-105 text-center"
               >
                 Fazer Reserva
               </a>
@@ -159,14 +156,14 @@ export default function HeroSection() {
         </div>
       </div>
 
-      {/* Controles do carousel - Simplificados */}
-      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-20">
-        <div className="flex space-x-3">
+      {/* Controles do carousel - Mobile friendly */}
+      <div className="absolute bottom-6 sm:bottom-8 left-1/2 transform -translate-x-1/2 z-20">
+        <div className="flex space-x-2 sm:space-x-3">
           {heroImages.map((_, index) => (
             <button
               key={index}
               onClick={() => goToSlide(index)}
-              className={`w-3 h-3 rounded-full transition-all duration-300 ${
+              className={`w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full transition-all duration-300 ${
                 index === currentSlide 
                   ? 'bg-amber-400 scale-125' 
                   : 'bg-white/50 hover:bg-white/75'
@@ -177,21 +174,21 @@ export default function HeroSection() {
         </div>
       </div>
 
-      {/* Botões de navegação - Otimizados */}
+      {/* Botões de navegação - Otimizados para mobile */}
       <button
         onClick={prevSlide}
-        className="absolute left-4 top-1/2 transform -translate-y-1/2 z-20 bg-black/30 hover:bg-black/50 text-white p-3 rounded-full transition-all duration-300 backdrop-blur-sm"
+        className="absolute left-2 sm:left-4 top-1/2 transform -translate-y-1/2 z-20 bg-black/30 hover:bg-black/50 text-white p-2 sm:p-3 rounded-full transition-all duration-300 backdrop-blur-sm touch-manipulation"
         aria-label="Slide anterior"
       >
-        <ChevronLeft className="w-6 h-6" />
+        <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
       </button>
       
       <button
         onClick={nextSlide}
-        className="absolute right-4 top-1/2 transform -translate-y-1/2 z-20 bg-black/30 hover:bg-black/50 text-white p-3 rounded-full transition-all duration-300 backdrop-blur-sm"
+        className="absolute right-2 sm:right-4 top-1/2 transform -translate-y-1/2 z-20 bg-black/30 hover:bg-black/50 text-white p-2 sm:p-3 rounded-full transition-all duration-300 backdrop-blur-sm touch-manipulation"
         aria-label="Próximo slide"
       >
-        <ChevronRight className="w-6 h-6" />
+        <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
       </button>
 
       {/* Indicador de progresso simplificado */}
