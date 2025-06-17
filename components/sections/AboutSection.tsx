@@ -2,9 +2,9 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { Award, MapPin, Clock, Users, Heart, Star, Camera, Calendar } from 'lucide-react'
-import Image from 'next/image'
 import Link from 'next/link'
 import Button from '../ui/Button'
+import ImageWithFallback from '../ImageWithFallback'
 
 const AboutSection = () => {
   const [isVisible, setIsVisible] = useState(false)
@@ -166,12 +166,14 @@ const AboutSection = () => {
                         index === activeImageIndex ? 'opacity-100 scale-100' : 'opacity-0 scale-105'
                       }`}
                     >
-                      <Image
+                      <ImageWithFallback
                         src={image.src}
                         alt={image.alt}
-                        fill
-                        className="object-cover"
-                        quality={90}
+                        className="object-cover w-full h-full"
+                        loading={index === 0 ? 'eager' : 'lazy'}
+                        priority={index === 0}
+                        sizes="(max-width: 768px) 100vw, 50vw"
+                        fallbackSrc="/images/placeholder.jpg"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                       <div className="absolute bottom-6 left-6 text-white">
