@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState, useEffect, useCallback } from 'react'
+import Image from 'next/image'
 import { ChevronLeft, ChevronRight, MapPin, Clock, Phone } from 'lucide-react'
 
 const heroImages = [
@@ -40,23 +41,9 @@ export default function HeroSection() {
     return () => clearInterval(interval)
   }, [isAutoPlaying])
 
-  // Preload das imagens para melhor performance
+  // Marcar como carregado após o primeiro render
   useEffect(() => {
-    const preloadImages = async () => {
-      const imagePromises = heroImages.map((image) => {
-        return new Promise((resolve) => {
-          const img = new Image()
-          img.onload = resolve
-          img.onerror = resolve
-          img.src = image.src
-        })
-      })
-      
-      await Promise.all(imagePromises)
-      setIsLoaded(true)
-    }
-
-    preloadImages()
+    setIsLoaded(true)
   }, [])
 
   const nextSlide = useCallback(() => {
@@ -76,7 +63,7 @@ export default function HeroSection() {
 
   return (
     <section className="relative h-screen min-h-[600px] max-h-[900px] overflow-hidden">
-      {/* Background Images - Otimizado */}
+      {/* Background Images - Otimizado com Next.js Image */}
       <div className="absolute inset-0">
         {heroImages.map((image, index) => (
           <div
@@ -85,12 +72,14 @@ export default function HeroSection() {
               index === currentSlide ? 'opacity-100' : 'opacity-0'
             }`}
           >
-            <img
+            <Image
               src={image.src}
               alt={image.alt}
-              className="object-cover will-change-transform absolute inset-0 w-full h-full"
-              loading={index === 0 ? 'eager' : 'lazy'}
-              onLoad={() => index === 0 && setIsLoaded(true)}
+              fill
+              className="object-cover"
+              priority={index === 0}
+              quality={90}
+              sizes="100vw"
             />
           </div>
         ))}

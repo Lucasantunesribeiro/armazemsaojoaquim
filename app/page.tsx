@@ -16,22 +16,25 @@ const SectionFallback = () => (
 
 export default function HomePage() {
   return (
-    <>
+    <main className="min-h-screen">
       <Suspense fallback={<SectionFallback />}>
         <ClientHeroSection />
       </Suspense>
-      <Suspense fallback={<SectionFallback />}>
-        <ClientAboutSection />
-      </Suspense>
-      <Suspense fallback={<SectionFallback />}>
-        <ClientMenuPreview />
-      </Suspense>
-      <Suspense fallback={<SectionFallback />}>
-        <ClientBlogPreview />
-      </Suspense>
-      <Suspense fallback={<SectionFallback />}>
-        <ClientContactSection />
-      </Suspense>
-    </>
+      
+      <div className="space-y-0">
+        <Suspense fallback={<SectionFallback />}>
+          <ClientAboutSection />
+        </Suspense>
+        <Suspense fallback={<SectionFallback />}>
+          <ClientMenuPreview />
+        </Suspense>
+        <Suspense fallback={<SectionFallback />}>
+          <ClientBlogPreview />
+        </Suspense>
+        <Suspense fallback={<SectionFallback />}>
+          <ClientContactSection />
+        </Suspense>
+      </div>
+    </main>
   )
 }
