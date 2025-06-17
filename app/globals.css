@@ -158,6 +158,31 @@ img {
   height: auto;
 }
 
+/* Next.js Image mobile optimization */
+.next-image-mobile {
+  position: relative !important;
+}
+
+/* Ensure images load on mobile */
+@media (max-width: 768px) {
+  img[data-nimg],
+  picture {
+    display: block !important;
+    width: 100% !important;
+    height: auto !important;
+  }
+  
+  /* Fix for hero section images on mobile */
+  [data-nimg="fill"] {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+  }
+}
+
 /* Print styles */
 @media print {
   * {
