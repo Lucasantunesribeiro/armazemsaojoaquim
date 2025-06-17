@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { cn } from '../lib/utils'
 
 interface ImageWithFallbackProps {
@@ -18,6 +18,7 @@ interface ImageWithFallbackProps {
   role?: string
   'aria-describedby'?: string
   'aria-labelledby'?: string
+  showDiagnostics?: boolean
 }
 
 export default function ImageWithFallback({
@@ -35,10 +36,29 @@ export default function ImageWithFallback({
   role,
   'aria-describedby': ariaDescribedby,
   'aria-labelledby': ariaLabelledby,
+  showDiagnostics = false,
 }: ImageWithFallbackProps) {
   const [imageSrc, setImageSrc] = useState(src)
   const [isLoading, setIsLoading] = useState(true)
   const [hasError, setHasError] = useState(false)
+  const [retryCount, setRetryCount] = useState(0)
+  const [connectionType, setConnectionType] = useState<string>('unknown')
+
+  // Detectar tipo de conexão para diagnóstico mobile
+  useEffect(() => {
+    if (typeof navigator !== 'undefined' && 'connection' in navigator) {
+      const connection = (navigator as any).connection
+      setConnectionType(connection?.effectiveType || connection?.type || 'unknown')
+    }
+  }, [])
+
+  // Reset state when src changes
+  useEffect(() => {
+    setImageSrc(src)
+    setIsLoading(true)
+    setHasError(false)
+    setRetryCount(0)
+  }, [src])
 
   const handleLoad = useCallback(() => {
     setIsLoading(false)
@@ -47,13 +67,24 @@ export default function ImageWithFallback({
   }, [onLoad])
 
   const handleError = useCallback(() => {
+    console.warn(`Erro ao carregar imagem: ${imageSrc} (tentativa ${retryCount + 1})`)
+    
+    // Tentar novamente até 2 vezes antes de usar fallback
+    if (retryCount < 2 && imageSrc === src) {
+      setRetryCount(prev => prev + 1)
+      // Adicionar timestamp para forçar reload
+      const newSrc = `${src}?retry=${retryCount + 1}&t=${Date.now()}`
+      setImageSrc(newSrc)
+      return
+    }
+    
     setIsLoading(false)
     setHasError(true)
     if (imageSrc !== fallbackSrc) {
       setImageSrc(fallbackSrc)
     }
     onError?.()
-  }, [imageSrc, fallbackSrc, onError])
+  }, [imageSrc, fallbackSrc, onError, retryCount, src])
 
   return (
     <div className={cn('relative overflow-hidden', className)}>
@@ -87,6 +118,24 @@ export default function ImageWithFallback({
         )}
       />
       
+      {/* Diagnósticos para mobile */}
+      {showDiagnostics && (
+        <div className="absolute top-2 left-2 text-xs bg-black/80 text-white px-2 py-1 rounded space-y-1 z-10">
+          <div className="flex items-center space-x-1">
+            <div className={`w-2 h-2 rounded-full ${
+              connectionType === 'slow-2g' || connectionType === '2g' ? 'bg-red-400' :
+              connectionType === '3g' ? 'bg-yellow-400' :
+              connectionType === '4g' ? 'bg-green-400' : 'bg-gray-400'
+            }`} />
+            <span>{connectionType}</span>
+          </div>
+          {retryCount > 0 && (
+            <div>Tentativas: {retryCount}</div>
+          )}
+          <div>Status: {isLoading ? 'Carregando' : hasError ? 'Erro' : 'OK'}</div>
+        </div>
+      )}
+
       {/* Error state indicator */}
       {hasError && (
         <div className="absolute inset-0 flex items-center justify-center bg-cinza-claro">
@@ -103,7 +152,9 @@ export default function ImageWithFallback({
                 clipRule="evenodd" 
               />
             </svg>
-            <span className="text-xs opacity-75">Imagem não disponível</span>
+            <span className="text-xs opacity-75">
+              {retryCount > 0 ? `Erro após ${retryCount} tentativas` : 'Imagem não disponível'}
+            </span>
           </div>
         </div>
       )}

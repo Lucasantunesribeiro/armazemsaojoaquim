@@ -19,8 +19,6 @@ const nextConfig = {
     unoptimized: false,
     loader: 'default',
     domains: [],
-    // Configurações de timeout para evitar ResponseAborted
-    timeout: 30000,
     remotePatterns: [
       {
         protocol: 'https',
