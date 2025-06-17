@@ -15,6 +15,12 @@ const nextConfig = {
     minimumCacheTTL: 60,
     dangerouslyAllowSVG: true,
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
+    // Configurações para melhor compatibilidade móvel
+    unoptimized: false,
+    loader: 'default',
+    domains: [],
+    // Configurações de timeout para evitar ResponseAborted
+    timeout: 30000,
     remotePatterns: [
       {
         protocol: 'https',

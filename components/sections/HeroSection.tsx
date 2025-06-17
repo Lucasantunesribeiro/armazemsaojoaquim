@@ -7,18 +7,21 @@ import { ChevronLeft, ChevronRight, MapPin, Clock, Phone } from 'lucide-react'
 const heroImages = [
   {
     src: '/images/armazem-fachada-historica.jpg',
+    fallback: '/images/placeholder.jpg',
     alt: 'Fachada histórica do Armazém São Joaquim',
     title: 'Patrimônio Histórico',
     subtitle: 'Desde 1854 preservando a história de Santa Teresa'
   },
   {
-    src: '/images/armazem-interior-aconchegante.jpg', 
+    src: '/images/armazem-interior-aconchegante.jpg',
+    fallback: '/images/placeholder.jpg',
     alt: 'Interior aconchegante do restaurante',
     title: 'Ambiente Acolhedor',
     subtitle: 'Onde cada refeição é uma experiência única'
   },
   {
     src: '/images/santa-teresa-vista-panoramica.jpg',
+    fallback: '/images/placeholder.jpg',
     alt: 'Vista panorâmica de Santa Teresa',
     title: 'Coração de Santa Teresa',
     subtitle: 'No bairro mais charmoso do Rio de Janeiro'
@@ -29,6 +32,7 @@ export default function HeroSection() {
   const [currentSlide, setCurrentSlide] = useState(0)
   const [isAutoPlaying, setIsAutoPlaying] = useState(true)
   const [isLoaded, setIsLoaded] = useState(false)
+  const [imageErrors, setImageErrors] = useState<Record<number, boolean>>({})
 
   // Auto-play otimizado do carousel
   useEffect(() => {
@@ -44,6 +48,10 @@ export default function HeroSection() {
   // Marcar como carregado após o primeiro render
   useEffect(() => {
     setIsLoaded(true)
+  }, [])
+
+  const handleImageError = useCallback((index: number) => {
+    setImageErrors(prev => ({ ...prev, [index]: true }))
   }, [])
 
   const nextSlide = useCallback(() => {
@@ -63,7 +71,7 @@ export default function HeroSection() {
 
   return (
     <section className="relative h-screen min-h-[600px] max-h-[900px] overflow-hidden">
-      {/* Background Images - Otimizado com Next.js Image */}
+      {/* Background Images - Otimizado com Next.js Image e fallbacks */}
       <div className="absolute inset-0">
         {heroImages.map((image, index) => (
           <div
@@ -73,13 +81,16 @@ export default function HeroSection() {
             }`}
           >
             <Image
-              src={image.src}
+              src={imageErrors[index] ? image.fallback : image.src}
               alt={image.alt}
               fill
               className="object-cover"
               priority={index === 0}
               quality={90}
               sizes="100vw"
+              onError={() => handleImageError(index)}
+              placeholder="blur"
+              blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkbHB0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R//2Q=="
             />
           </div>
         ))}
