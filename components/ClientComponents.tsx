@@ -39,11 +39,12 @@ export const ClientContactSection = dynamic(() => import('./sections/ContactSect
   ssr: false
 })
 
-export const ClientFooter = dynamic(() => import('./sections/Footer').then(mod => ({ default: mod.Footer })), {
+export const ClientFooter = dynamic(() => import('./layout/Footer'), {
   loading: () => (
-    <footer className="bg-slate-900 text-white py-8">
+    <footer className="bg-gradient-to-br from-madeira-escura via-madeira-escura to-preto-suave text-white py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white mx-auto"></div>
+        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-amarelo-armazem mx-auto"></div>
+        <p className="text-cinza-claro mt-4 font-inter">Carregando...</p>
       </div>
     </footer>
   ),
