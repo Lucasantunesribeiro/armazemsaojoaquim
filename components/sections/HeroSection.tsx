@@ -1,8 +1,7 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { ChevronLeft, ChevronRight, MapPin, Clock, Phone } from 'lucide-react'
-// import NetlifyImage from '../ui/NetlifyImage' // Removido para evitar problemas com static export
 
 const heroImages = [
   {
