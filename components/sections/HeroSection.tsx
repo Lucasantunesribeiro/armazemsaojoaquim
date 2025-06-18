@@ -3,8 +3,6 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import Image from 'next/image'
 import { ChevronLeft, ChevronRight, MapPin, Clock, Phone } from 'lucide-react'
-import ImageWithFallback from '../ImageWithFallback'
-
 const heroImages = [
   {
     src: '/images/armazem-fachada-historica.jpg',
@@ -24,8 +22,8 @@ const heroImages = [
     src: '/images/santa-teresa-vista-panoramica.jpg',
     fallback: '/images/placeholder.jpg',
     alt: 'Vista panorâmica de Santa Teresa',
-    title: 'Coração de Santa Teresa',
-    subtitle: 'No bairro mais charmoso do Rio de Janeiro'
+    title: 'Vista Deslumbrante',
+    subtitle: 'O melhor de Santa Teresa em um só lugar'
   }
 ]
 
@@ -70,10 +68,26 @@ export default function HeroSection() {
     setIsAutoPlaying(false)
   }, [])
 
+  // Auto-play functionality
+  useEffect(() => {
+    if (!isAutoPlaying) return
+
+    const interval = setInterval(nextSlide, 5000)
+    return () => clearInterval(interval)
+  }, [isAutoPlaying, nextSlide])
+
+  // Pause auto-play on user interaction
+  const handleUserInteraction = useCallback(() => {
+    setIsAutoPlaying(false)
+    setTimeout(() => setIsAutoPlaying(true), 10000) // Resume after 10s
+  }, [])
+
+  const currentImage = heroImages[currentSlide]
+
   return (
     <section className="relative h-screen min-h-[600px] max-h-[900px] overflow-hidden">
-      {/* Background Images - Otimizado com Next.js Image e fallbacks */}
-      <div className="absolute inset-0">
+      {/* Background Images - Com classes CSS para visual mobile aprimorado */}
+      <div className="hero-image-container absolute inset-0">
         {heroImages.map((image, index) => (
           <div
             key={index}
@@ -85,7 +99,7 @@ export default function HeroSection() {
               src={imageErrors[index] ? image.fallback : image.src}
               alt={image.alt}
               fill
-              className="object-cover"
+              className="featured-image-mobile object-cover"
               priority={index === 0}
               quality={90}
               sizes="100vw"
@@ -118,10 +132,10 @@ export default function HeroSection() {
             {/* Informações dinâmicas baseadas no slide - Mobile first */}
             <div className="mb-8 md:mb-12 space-y-2 md:space-y-4">
               <h2 className="text-xl sm:text-2xl md:text-3xl font-semibold text-amber-300 drop-shadow-md">
-                {heroImages[currentSlide].title}
+                {currentImage.title}
               </h2>
               <p className="text-base sm:text-lg md:text-xl text-gray-200 max-w-2xl mx-auto drop-shadow-sm px-4">
-                {heroImages[currentSlide].subtitle}
+                {currentImage.subtitle}
               </p>
             </div>
 
@@ -166,7 +180,10 @@ export default function HeroSection() {
           {heroImages.map((_, index) => (
             <button
               key={index}
-              onClick={() => goToSlide(index)}
+              onClick={() => {
+                goToSlide(index)
+                handleUserInteraction()
+              }}
               className={`w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full transition-all duration-300 ${
                 index === currentSlide 
                   ? 'bg-amber-400 scale-125' 
@@ -180,7 +197,10 @@ export default function HeroSection() {
 
       {/* Botões de navegação - Otimizados para mobile */}
       <button
-        onClick={prevSlide}
+        onClick={() => {
+          prevSlide()
+          handleUserInteraction()
+        }}
         className="absolute left-2 sm:left-4 top-1/2 transform -translate-y-1/2 z-20 bg-black/30 hover:bg-black/50 text-white p-2 sm:p-3 rounded-full transition-all duration-300 backdrop-blur-sm touch-manipulation"
         aria-label="Slide anterior"
       >
@@ -188,7 +208,10 @@ export default function HeroSection() {
       </button>
       
       <button
-        onClick={nextSlide}
+        onClick={() => {
+          nextSlide()
+          handleUserInteraction()
+        }}
         className="absolute right-2 sm:right-4 top-1/2 transform -translate-y-1/2 z-20 bg-black/30 hover:bg-black/50 text-white p-2 sm:p-3 rounded-full transition-all duration-300 backdrop-blur-sm touch-manipulation"
         aria-label="Próximo slide"
       >

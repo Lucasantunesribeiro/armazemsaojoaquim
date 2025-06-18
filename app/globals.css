@@ -521,3 +521,197 @@ button,
     text-align: center;
   }
 }
+
+/* ===== ESTILOS ESPECÍFICOS PARA IMAGENS EM MOBILE ===== */
+@media (max-width: 768px) {
+  /* Hero Section - Imagens com visual moderno */
+  .hero-image-container {
+    border-radius: 16px !important;
+    overflow: hidden !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15) !important;
+    position: relative !important;
+  }
+  
+  .hero-image-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(217, 119, 6, 0.1) 0%, rgba(146, 64, 14, 0.1) 100%);
+    z-index: 1;
+    pointer-events: none;
+  }
+  
+  .hero-image-container img {
+    border-radius: 16px !important;
+    transition: transform 0.3s ease !important;
+  }
+  
+  /* About Section - Imagens com estilo elegante */
+  .about-image-mobile {
+    border-radius: 12px !important;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12) !important;
+    border: 2px solid rgba(217, 119, 6, 0.1) !important;
+    transition: all 0.3s ease !important;
+  }
+  
+  .about-image-mobile:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.18) !important;
+    border-color: rgba(217, 119, 6, 0.3) !important;
+  }
+  
+  /* Imagens gerais - Visual aprimorado */
+  .mobile-image-enhanced {
+    border-radius: 10px !important;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1) !important;
+    transition: all 0.3s ease !important;
+    overflow: hidden !important;
+  }
+  
+  .mobile-image-enhanced:hover {
+    transform: scale(1.02) !important;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15) !important;
+  }
+  
+  /* Efeito de loading para imagens */
+  .image-loading-mobile {
+    background: linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 50%, #f3f4f6 75%);
+    background-size: 200% 100%;
+    animation: loading-shimmer 2s infinite;
+  }
+  
+  @keyframes loading-shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+  
+  /* Overlay para imagens com texto */
+  .image-overlay-mobile {
+    position: relative !important;
+  }
+  
+  .image-overlay-mobile::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 40%;
+    background: linear-gradient(transparent, rgba(0, 0, 0, 0.6));
+    border-radius: 0 0 10px 10px;
+  }
+  
+  /* Galeria de imagens mobile */
+  .image-gallery-mobile {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+    padding: 16px !important;
+  }
+  
+  .image-gallery-mobile img {
+    border-radius: 12px !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+    transition: transform 0.3s ease !important;
+  }
+  
+  .image-gallery-mobile img:hover {
+    transform: translateY(-4px) !important;
+  }
+  
+  /* Estilo especial para imagens de destaque */
+  .featured-image-mobile {
+    border-radius: 16px !important;
+    box-shadow: 0 12px 30px rgba(217, 119, 6, 0.2) !important;
+    border: 3px solid rgba(217, 119, 6, 0.1) !important;
+    position: relative !important;
+    overflow: hidden !important;
+  }
+  
+  .featured-image-mobile::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.1) 50%, transparent 70%);
+    transform: rotate(45deg);
+    animation: shine-effect 3s infinite;
+  }
+  
+  @keyframes shine-effect {
+    0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+    50% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+    100% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+  }
+  
+  /* Imagens circulares com borda */
+  .circular-image-mobile {
+    border-radius: 50% !important;
+    border: 4px solid rgba(217, 119, 6, 0.2) !important;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15) !important;
+    transition: all 0.3s ease !important;
+  }
+  
+  .circular-image-mobile:hover {
+    border-color: rgba(217, 119, 6, 0.4) !important;
+    transform: scale(1.05) !important;
+  }
+  
+  /* Container para imagens com padding mobile */
+  .image-container-mobile {
+    padding: 8px !important;
+    background: rgba(249, 250, 251, 0.8) !important;
+    border-radius: 20px !important;
+    backdrop-filter: blur(10px) !important;
+  }
+}
+
+/* Performance optimizations */
+@media (max-width: 768px) {
+  img {
+    content-visibility: auto;
+    contain-intrinsic-size: 300px 200px;
+  }
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Loading states */
+.loading {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: .5;
+  }
+}
+
+/* Focus styles for accessibility */
+button:focus,
+a:focus,
+input:focus,
+textarea:focus,
+select:focus {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  :root {
+    --color-text: #000000;
+    --color-bg: #ffffff;
+  }
+}
