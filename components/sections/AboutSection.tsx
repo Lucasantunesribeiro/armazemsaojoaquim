@@ -169,7 +169,7 @@ const AboutSection = () => {
                       <ImageWithFallback
                         src={image.src}
                         alt={image.alt}
-                        className="object-cover w-full h-full"
+                        className="about-image-mobile object-cover w-full h-full"
                         loading={index === 0 ? 'eager' : 'lazy'}
                         priority={index === 0}
                         sizes="(max-width: 768px) 100vw, 50vw"
