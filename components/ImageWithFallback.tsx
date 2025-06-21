@@ -48,10 +48,9 @@ export default function ImageWithFallback({
     className: `transition-opacity duration-300 ${isLoading ? 'opacity-0' : 'opacity-100'} ${className}`,
     onError: handleError,
     onLoad: handleLoad,
-    loading,
-    priority,
     quality,
     ...(sizes && { sizes }),
+    ...(priority ? { priority: true } : { loading }),
     ...props
   }
 
