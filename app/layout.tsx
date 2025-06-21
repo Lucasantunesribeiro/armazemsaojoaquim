@@ -4,6 +4,7 @@ import './globals.css'
 import { Providers } from '@/components/providers/Providers'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
+import BottomNavigation from '@/components/ui/BottomNavigation'
 import { Toaster } from '@/components/ui/toaster'
 
 // Importar utilitário para suprimir warnings do Grammarly
@@ -30,6 +31,9 @@ export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   maximumScale: 5,
+  userScalable: true,
+  themeColor: '#f59e0b', // Amber theme color
+  colorScheme: 'light dark',
 }
 
 export const metadata: Metadata = {
@@ -82,14 +86,19 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="pt-BR" className={`${inter.variable} ${playfair.variable} scroll-smooth`}>
-      <body className="min-h-screen bg-white text-gray-900 antialiased">
+    <html 
+      lang="pt-BR" 
+      className={`${inter.variable} ${playfair.variable} scroll-smooth`}
+      suppressHydrationWarning
+    >
+      <body className="min-h-screen bg-white dark:bg-slate-900 text-gray-900 dark:text-gray-100 antialiased">
         <Providers>
           <Header />
-          <main className="min-h-screen">
+          <main className="min-h-screen main-content-mobile">
             {children}
           </main>
           <Footer />
+          <BottomNavigation />
           <Toaster />
         </Providers>
       </body>

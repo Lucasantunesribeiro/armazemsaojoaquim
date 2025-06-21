@@ -8,12 +8,14 @@ interface SupabaseContextType {
   user: User | null
   loading: boolean
   supabase: typeof supabase
+  isClient: boolean
 }
 
 const SupabaseContext = createContext<SupabaseContextType>({
   user: null,
   loading: true,
   supabase,
+  isClient: false,
 })
 
 export const useSupabase = () => {
@@ -27,11 +29,21 @@ export const useSupabase = () => {
 export function SupabaseProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
+  const [isClient, setIsClient] = useState(false)
 
   useEffect(() => {
+    setIsClient(true)
+  }, [])
+
+  useEffect(() => {
+    if (!isClient) return
+
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }: { data: { session: any } }) => {
       setUser(session?.user ?? null)
+      setLoading(false)
+    }).catch((error: unknown) => {
+      console.error('Erro ao obter sessão:', error)
       setLoading(false)
     })
 
@@ -44,10 +56,10 @@ export function SupabaseProvider({ children }: { children: React.ReactNode }) {
     })
 
     return () => subscription.unsubscribe()
-  }, [])
+  }, [isClient])
 
   return (
-    <SupabaseContext.Provider value={{ user, loading, supabase }}>
+    <SupabaseContext.Provider value={{ user, loading, supabase, isClient }}>
       {children}
     </SupabaseContext.Provider>
   )
