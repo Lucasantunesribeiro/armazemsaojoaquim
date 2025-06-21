@@ -6,7 +6,7 @@ import { Search, Home, ArrowLeft, Coffee, MapPin, Clock, Phone } from 'lucide-re
 
 export default function NotFound() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-amber-50 to-orange-100">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-amber-50 to-orange-100 dark:from-slate-900 dark:to-slate-800">
       <div className="max-w-md w-full mx-auto text-center p-8">
         <div className="mb-8">
           <h1 className="text-6xl font-bold text-amber-800 mb-4">404</h1>

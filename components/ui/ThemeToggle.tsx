@@ -4,20 +4,13 @@ import { useState, useEffect } from 'react'
 import { useTheme } from 'next-themes'
 import { Sun, Moon } from 'lucide-react'
 
-// Hook para verificar se o componente foi montado
-function useMounted(): boolean {
+export default function ThemeToggle() {
   const [mounted, setMounted] = useState(false)
+  const { theme, setTheme, resolvedTheme } = useTheme()
 
   useEffect(() => {
     setMounted(true)
   }, [])
-
-  return mounted
-}
-
-export default function ThemeToggle() {
-  const mounted = useMounted()
-  const { theme, setTheme, resolvedTheme } = useTheme()
 
   // Evita problemas de hidratação
   if (!mounted) {
@@ -27,7 +20,7 @@ export default function ThemeToggle() {
         disabled
         aria-label="Carregando tema..."
       >
-        <div className="w-5 h-5" />
+        <div className="w-4 h-4 md:w-5 md:h-5" />
       </button>
     )
   }
@@ -41,14 +34,14 @@ export default function ThemeToggle() {
   return (
     <button
       onClick={toggleTheme}
-      className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 transition-colors duration-200"
+      className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-amber-500/50"
       aria-label={isDark ? 'Mudar para tema claro' : 'Mudar para tema escuro'}
       title={isDark ? 'Mudar para tema claro' : 'Mudar para tema escuro'}
     >
       {isDark ? (
-        <Sun className="w-5 h-5 text-yellow-500" />
+        <Sun className="w-4 h-4 md:w-5 md:h-5 text-yellow-500" />
       ) : (
-        <Moon className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+        <Moon className="w-4 h-4 md:w-5 md:h-5 text-gray-600 dark:text-gray-300" />
       )}
     </button>
   )
