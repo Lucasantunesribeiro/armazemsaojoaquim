@@ -73,6 +73,61 @@
   }
 }
 
+/* Dark mode improvements */
+.dark {
+  --background: #0f172a;
+  --surface: #1e293b;
+  --text-primary: #f1f5f9;
+  --text-secondary: #94a3b8;
+  --border: #334155;
+  --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.5);
+}
+
+/* Improved section backgrounds for dark mode */
+.dark section {
+  background-color: transparent;
+}
+
+/* Better contrast for dark mode text */
+.dark .text-slate-600 {
+  color: #cbd5e1 !important;
+}
+
+.dark .text-slate-700 {
+  color: #e2e8f0 !important;
+}
+
+.dark .text-slate-800 {
+  color: #f1f5f9 !important;
+}
+
+/* Improved amber colors for dark mode */
+.dark .text-amber-800 {
+  color: #fcd34d !important;
+}
+
+.dark .text-amber-700 {
+  color: #fbbf24 !important;
+}
+
+/* Better dark mode backgrounds */
+.dark .bg-amber-100 {
+  background-color: rgba(146, 64, 14, 0.4) !important;
+}
+
+.dark .bg-amber-50 {
+  background-color: rgba(146, 64, 14, 0.2) !important;
+}
+
+/* Improved borders for dark mode */
+.dark .border-amber-200 {
+  border-color: rgba(217, 119, 6, 0.5) !important;
+}
+
+.dark .border-amber-300 {
+  border-color: rgba(217, 119, 6, 0.6) !important;
+}
+
 /* Enhanced reset and base styles for better mobile support */
 * {
   box-sizing: border-box;
@@ -388,6 +443,16 @@ body {
   }
 }
 
+/* Hide scrollbar utility */
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;  /* Chrome, Safari and Opera */
+}
+
 /* Enhanced focus styles with better accessibility */
 *:focus {
   outline: 2px solid transparent;
@@ -584,10 +649,92 @@ img[loading="lazy"].loaded {
 /* Enhanced high contrast support */
 @media (prefers-contrast: high) {
   :root {
-    --border: #000000;
-    --text-secondary: #000000;
-    --shadow: 0 2px 8px 0 rgb(0 0 0 / 0.8);
+    --border: #64748b;
+    --shadow: 0 2px 8px 0 rgb(0 0 0 / 0.2);
   }
+}
+
+/* Additional dark mode fixes */
+.dark {
+  color-scheme: dark;
+}
+
+/* Fix section spacing in dark mode */
+.dark section:not(:first-of-type) {
+  border-top: 1px solid rgba(51, 65, 85, 0.2);
+}
+
+/* Improve card contrast in dark mode */
+.dark .card,
+.dark .card-responsive {
+  background-color: rgba(30, 41, 59, 0.6) !important;
+  border-color: rgba(51, 65, 85, 0.4) !important;
+  backdrop-filter: blur(8px);
+}
+
+/* Better button contrast */
+.dark .btn-secondary {
+  border-color: #fbbf24 !important;
+  color: #fbbf24 !important;
+}
+
+.dark .btn-secondary:hover {
+  background-color: #fbbf24 !important;
+  color: #0f172a !important;
+}
+
+/* Improve focus states in dark mode */
+.dark .focus-ring:focus {
+  ring-color: #fbbf24 !important;
+  ring-opacity: 0.6 !important;
+}
+
+/* Better form elements in dark mode */
+.dark input,
+.dark textarea,
+.dark select {
+  background-color: rgba(30, 41, 59, 0.8) !important;
+  border-color: rgba(51, 65, 85, 0.6) !important;
+  color: #f1f5f9 !important;
+}
+
+.dark input:focus,
+.dark textarea:focus,
+.dark select:focus {
+  border-color: #fbbf24 !important;
+  ring-color: #fbbf24 !important;
+}
+
+/* Fix navigation contrast */
+.dark .nav-link {
+  color: #e2e8f0 !important;
+}
+
+.dark .nav-link-active {
+  background-color: rgba(146, 64, 14, 0.4) !important;
+  color: #fcd34d !important;
+}
+
+/* Better mobile menu in dark mode */
+.dark .mobile-menu {
+  background-color: #0f172a !important;
+  border-color: rgba(51, 65, 85, 0.6) !important;
+}
+
+/* Improved scrollbar for dark mode */
+.dark ::-webkit-scrollbar-thumb {
+  background-color: rgba(51, 65, 85, 0.8) !important;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(71, 85, 105, 0.9) !important;
+}
+
+/* Fix gradient text in dark mode */
+.dark .bg-clip-text {
+  background: linear-gradient(to bottom right, #f1f5f9, #fcd34d, #fbbf24) !important;
+  background-clip: text !important;
+  -webkit-background-clip: text !important;
 }
 
 /* ===============================================
