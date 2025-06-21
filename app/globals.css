@@ -737,16 +737,14 @@ img[loading="lazy"].loaded {
 }
 
 /* Enhanced focus management for accessibility */
-.focus-ring-enhanced {
-  &:focus {
-    outline: 2px solid theme('colors.amarelo-armazem');
-    outline-offset: 2px;
-    border-radius: 0.25rem;
-  }
-  
-  &:focus:not(:focus-visible) {
-    outline: none;
-  }
+.focus-ring-enhanced:focus {
+  outline: 2px solid var(--amarelo-armazem);
+  outline-offset: 2px;
+  border-radius: 0.25rem;
+}
+
+.focus-ring-enhanced:focus:not(:focus-visible) {
+  outline: none;
 }
 
 /* Enhanced scroll behavior for mobile */

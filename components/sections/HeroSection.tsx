@@ -86,8 +86,8 @@ export default function HeroSection() {
 
   return (
     <section className="relative h-screen min-h-[600px] max-h-[900px] overflow-hidden">
-      {/* Background Images - Com classes CSS para visual mobile aprimorado */}
-      <div className="hero-image-container absolute inset-0">
+      {/* Background Images - Otimizado para mobile com melhor cobertura */}
+      <div className="absolute inset-0">
         {heroImages.map((image, index) => (
           <div
             key={index}
@@ -99,7 +99,7 @@ export default function HeroSection() {
               src={imageErrors[index] ? image.fallback : image.src}
               alt={image.alt}
               fill
-              className="featured-image-mobile object-cover"
+              className="object-cover object-center"
               priority={index === 0}
               quality={90}
               sizes="100vw"
@@ -174,9 +174,9 @@ export default function HeroSection() {
         </div>
       </div>
 
-      {/* Controles do carousel - Mobile friendly */}
+      {/* Controles do carousel - Pontos menores no mobile */}
       <div className="absolute bottom-6 sm:bottom-8 left-1/2 transform -translate-x-1/2 z-20">
-        <div className="flex space-x-2 sm:space-x-3">
+        <div className="flex space-x-1.5 sm:space-x-2">
           {heroImages.map((_, index) => (
             <button
               key={index}
@@ -184,7 +184,7 @@ export default function HeroSection() {
                 goToSlide(index)
                 handleUserInteraction()
               }}
-              className={`w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full transition-all duration-300 ${
+              className={`w-2 h-2 sm:w-2.5 sm:h-2.5 md:w-3 md:h-3 rounded-full transition-all duration-300 ${
                 index === currentSlide 
                   ? 'bg-amber-400 scale-125' 
                   : 'bg-white/50 hover:bg-white/75'
@@ -201,30 +201,22 @@ export default function HeroSection() {
           prevSlide()
           handleUserInteraction()
         }}
-        className="absolute left-2 sm:left-4 top-1/2 transform -translate-y-1/2 z-20 bg-black/30 hover:bg-black/50 text-white p-2 sm:p-3 rounded-full transition-all duration-300 backdrop-blur-sm touch-manipulation"
+        className="absolute left-4 top-1/2 transform -translate-y-1/2 z-20 bg-black/30 hover:bg-black/50 text-white p-2 sm:p-3 rounded-full transition-all duration-300 backdrop-blur-sm hover:scale-110 touch-target"
         aria-label="Slide anterior"
       >
         <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
       </button>
-      
+
       <button
         onClick={() => {
           nextSlide()
           handleUserInteraction()
         }}
-        className="absolute right-2 sm:right-4 top-1/2 transform -translate-y-1/2 z-20 bg-black/30 hover:bg-black/50 text-white p-2 sm:p-3 rounded-full transition-all duration-300 backdrop-blur-sm touch-manipulation"
+        className="absolute right-4 top-1/2 transform -translate-y-1/2 z-20 bg-black/30 hover:bg-black/50 text-white p-2 sm:p-3 rounded-full transition-all duration-300 backdrop-blur-sm hover:scale-110 touch-target"
         aria-label="Próximo slide"
       >
         <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
       </button>
-
-      {/* Indicador de progresso simplificado */}
-      <div className="absolute bottom-0 left-0 w-full h-1 bg-black/30">
-        <div 
-          className="h-full bg-amber-400 transition-all duration-300 ease-out"
-          style={{ width: `${((currentSlide + 1) / heroImages.length) * 100}%` }}
-        />
-      </div>
     </section>
   )
 }
