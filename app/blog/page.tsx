@@ -124,7 +124,7 @@ async function getBlogPosts() {
 
 function BlogLoading() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-white to-orange-50">
+    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-white to-orange-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-700">
       {/* Hero Section Skeleton */}
       <section className="relative py-20 overflow-hidden">
         <div className="container mx-auto px-4">
@@ -161,7 +161,7 @@ export default async function BlogPage() {
   const posts = await getBlogPosts()
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-white to-orange-50">
+    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-white to-orange-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-700">
       {/* Hero Section */}
       <section className="relative py-20 overflow-hidden">
         {/* Background Pattern */}
@@ -175,19 +175,19 @@ export default async function BlogPage() {
         <div className="relative z-10 container mx-auto px-4">
           <div className="text-center space-y-8">
             {/* Badge */}
-            <div className="inline-flex items-center space-x-2 bg-amber-100 border border-amber-200 px-4 py-2 rounded-full">
-              <BookOpen className="w-5 h-5 text-amber-600" />
-              <span className="text-sm font-medium text-amber-800">Blog Cultural</span>
+            <div className="inline-flex items-center space-x-2 bg-amber-100 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-700 px-4 py-2 rounded-full">
+              <BookOpen className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+              <span className="text-sm font-medium text-amber-800 dark:text-amber-300">Blog Cultural</span>
             </div>
             
             {/* Title */}
             <div className="space-y-4">
-              <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-gray-800 font-playfair leading-tight">
+              <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-gray-800 dark:text-white font-playfair leading-tight">
                 Histórias de
-                <span className="block text-amber-600">Santa Teresa</span>
+                <span className="block text-amber-600 dark:text-amber-400">Santa Teresa</span>
               </h1>
               
-              <p className="text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+              <p className="text-xl md:text-2xl text-gray-600 dark:text-slate-300 max-w-3xl mx-auto leading-relaxed">
                 Descubra 170 anos de tradição, cultura e sabores únicos no coração do bairro mais charmoso do Rio
               </p>
             </div>
@@ -195,16 +195,16 @@ export default async function BlogPage() {
             {/* Stats */}
             <div className="flex flex-wrap justify-center gap-8 pt-8">
               <div className="text-center">
-                <div className="text-3xl font-bold text-amber-600">{posts.length}</div>
-                <div className="text-sm text-gray-600">Artigos</div>
+                <div className="text-3xl font-bold text-amber-600 dark:text-amber-400">{posts.length}</div>
+                <div className="text-sm text-gray-600 dark:text-slate-400">Artigos</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-bold text-amber-600">170</div>
-                <div className="text-sm text-gray-600">Anos de História</div>
+                <div className="text-3xl font-bold text-amber-600 dark:text-amber-400">170</div>
+                <div className="text-sm text-gray-600 dark:text-slate-400">Anos de História</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-bold text-amber-600">1854</div>
-                <div className="text-sm text-gray-600">Fundação</div>
+                <div className="text-3xl font-bold text-amber-600 dark:text-amber-400">1854</div>
+                <div className="text-sm text-gray-600 dark:text-slate-400">Fundação</div>
               </div>
             </div>
           </div>
@@ -287,14 +287,14 @@ export default async function BlogPage() {
       )}
 
       {/* All Posts Grid */}
-      <section className="py-16 bg-gradient-to-br from-amber-50 to-orange-50">
+      <section className="py-16 bg-gradient-to-br from-amber-50 to-orange-50 dark:from-slate-800 dark:to-slate-700">
         <div className="container mx-auto px-4">
           <div className="max-w-6xl mx-auto">
             <div className="text-center mb-12">
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4 font-playfair">
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-800 dark:text-white mb-4 font-playfair">
                 Todos os Artigos
               </h2>
-              <p className="text-gray-600 max-w-2xl mx-auto">
+              <p className="text-gray-600 dark:text-slate-300 max-w-2xl mx-auto">
                 Explore nossa coleção completa de histórias e tradições
               </p>
             </div>

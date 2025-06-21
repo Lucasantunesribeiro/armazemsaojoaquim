@@ -1,163 +1,76 @@
 'use client'
 
-import { useState, useCallback, useEffect } from 'react'
-import { cn } from '../lib/utils'
+import { useState } from 'react'
+import Image from 'next/image'
 
 interface ImageWithFallbackProps {
   src: string
   alt: string
-  fallbackSrc?: string
   className?: string
-  width?: number
-  height?: number
+  fallbackSrc?: string
   loading?: 'lazy' | 'eager'
   priority?: boolean
   sizes?: string
-  onLoad?: () => void
-  onError?: () => void
-  role?: string
-  'aria-describedby'?: string
-  'aria-labelledby'?: string
-  showDiagnostics?: boolean
+  width?: number
+  height?: number
+  fill?: boolean
+  quality?: number
 }
 
 export default function ImageWithFallback({
   src,
   alt,
-  fallbackSrc = '/images/armazem-sem-imagem.jpg',
-  className,
-  width,
-  height,
+  className = '',
+  fallbackSrc = '/images/placeholder.svg',
   loading = 'lazy',
   priority = false,
   sizes,
-  onLoad,
-  onError,
-  role,
-  'aria-describedby': ariaDescribedby,
-  'aria-labelledby': ariaLabelledby,
-  showDiagnostics = false,
+  width,
+  height,
+  fill = false,
+  quality = 85,
+  ...props
 }: ImageWithFallbackProps) {
-  const [imageSrc, setImageSrc] = useState(src)
+  const [imgSrc, setImgSrc] = useState(src)
   const [isLoading, setIsLoading] = useState(true)
-  const [hasError, setHasError] = useState(false)
-  const [retryCount, setRetryCount] = useState(0)
-  const [connectionType, setConnectionType] = useState<string>('unknown')
 
-  // Detectar tipo de conexão para diagnóstico mobile
-  useEffect(() => {
-    if (typeof navigator !== 'undefined' && 'connection' in navigator) {
-      const connection = (navigator as any).connection
-      setConnectionType(connection?.effectiveType || connection?.type || 'unknown')
-    }
-  }, [])
+  const handleError = () => {
+    setImgSrc(fallbackSrc)
+  }
 
-  // Reset state when src changes
-  useEffect(() => {
-    setImageSrc(src)
-    setIsLoading(true)
-    setHasError(false)
-    setRetryCount(0)
-  }, [src])
-
-  const handleLoad = useCallback(() => {
+  const handleLoad = () => {
     setIsLoading(false)
-    setHasError(false)
-    onLoad?.()
-  }, [onLoad])
+  }
 
-  const handleError = useCallback(() => {
-    console.warn(`Erro ao carregar imagem: ${imageSrc} (tentativa ${retryCount + 1})`)
-    
-    // Tentar novamente até 2 vezes antes de usar fallback
-    if (retryCount < 2 && imageSrc === src) {
-      setRetryCount(prev => prev + 1)
-      // Adicionar timestamp para forçar reload
-      const newSrc = `${src}?retry=${retryCount + 1}&t=${Date.now()}`
-      setImageSrc(newSrc)
-      return
-    }
-    
-    setIsLoading(false)
-    setHasError(true)
-    if (imageSrc !== fallbackSrc) {
-      setImageSrc(fallbackSrc)
-    }
-    onError?.()
-  }, [imageSrc, fallbackSrc, onError, retryCount, src])
+  const imageProps = {
+    src: imgSrc,
+    alt,
+    className: `transition-opacity duration-300 ${isLoading ? 'opacity-0' : 'opacity-100'} ${className}`,
+    onError: handleError,
+    onLoad: handleLoad,
+    loading,
+    priority,
+    quality,
+    ...(sizes && { sizes }),
+    ...props
+  }
+
+  if (fill) {
+    return (
+      <Image 
+        {...imageProps} 
+        fill 
+        alt={alt}
+      />
+    )
+  }
 
   return (
-    <div className={cn('relative overflow-hidden', className)}>
-      {/* Loading skeleton */}
-      {isLoading && (
-        <div 
-          className="absolute inset-0 bg-cinza-claro animate-pulse"
-          aria-hidden="true"
-        />
-      )}
-      
-      {/* Main image */}
-      <img
-        src={imageSrc}
-        alt={alt}
-        width={width}
-        height={height}
-        loading={priority ? 'eager' : loading}
-        decoding="async"
-        sizes={sizes}
-        onLoad={handleLoad}
-        onError={handleError}
-        role={role}
-        aria-describedby={ariaDescribedby}
-        aria-labelledby={ariaLabelledby}
-        className={cn(
-          'transition-opacity duration-300',
-          isLoading ? 'opacity-0' : 'opacity-100',
-          hasError ? 'object-contain' : 'object-cover',
-          'w-full h-full'
-        )}
-      />
-      
-      {/* Diagnósticos para mobile */}
-      {showDiagnostics && (
-        <div className="absolute top-2 left-2 text-xs bg-black/80 text-white px-2 py-1 rounded space-y-1 z-10">
-          <div className="flex items-center space-x-1">
-            <div className={`w-2 h-2 rounded-full ${
-              connectionType === 'slow-2g' || connectionType === '2g' ? 'bg-red-400' :
-              connectionType === '3g' ? 'bg-yellow-400' :
-              connectionType === '4g' ? 'bg-green-400' : 'bg-gray-400'
-            }`} />
-            <span>{connectionType}</span>
-          </div>
-          {retryCount > 0 && (
-            <div>Tentativas: {retryCount}</div>
-          )}
-          <div>Status: {isLoading ? 'Carregando' : hasError ? 'Erro' : 'OK'}</div>
-        </div>
-      )}
-
-      {/* Error state indicator */}
-      {hasError && (
-        <div className="absolute inset-0 flex items-center justify-center bg-cinza-claro">
-          <div className="text-center text-cinza-medio">
-            <svg 
-              className="w-12 h-12 mx-auto mb-2 opacity-50" 
-              fill="currentColor" 
-              viewBox="0 0 20 20"
-              aria-hidden="true"
-            >
-              <path 
-                fillRule="evenodd" 
-                d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" 
-                clipRule="evenodd" 
-              />
-            </svg>
-            <span className="text-xs opacity-75">
-              {retryCount > 0 ? `Erro após ${retryCount} tentativas` : 'Imagem não disponível'}
-            </span>
-          </div>
-        </div>
-      )}
-    </div>
+    <Image
+      {...imageProps}
+      width={width || 800}
+      height={height || 600}
+      alt={alt}
+    />
   )
 } 
