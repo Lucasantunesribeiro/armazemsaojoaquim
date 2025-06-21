@@ -1,13 +1,15 @@
 // Utilitário para suprimir warnings específicos do Grammarly e outras extensões
+'use client'
 
 export const suppressGrammarlyWarnings = () => {
   if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
-    // Lista de warnings para suprimir
+    // Lista de warnings para suprimir (específicos do Grammarly)
     const suppressedPatterns = [
-      'Extra attributes from the server',
+      'Warning: Extra attributes from the server: data-new-gr-c-s-check-loaded,data-gr-ext-installed',
       'data-new-gr-c-s-check-loaded',
       'data-gr-ext-installed',
       'data-gr-c-s-loaded',
+      'Extra attributes from the server',
       'Grammarly',
     ]
     
@@ -42,6 +44,8 @@ export const suppressGrammarlyWarnings = () => {
         originalError.apply(console, args)
       }
     }
+
+    console.info('🛡️ Console warnings suppressão ativa para extensões de navegador')
   }
 }
 
