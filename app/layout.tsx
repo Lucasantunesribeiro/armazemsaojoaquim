@@ -91,7 +91,10 @@ export default function RootLayout({
       className={`${inter.variable} ${playfair.variable} scroll-smooth`}
       suppressHydrationWarning
     >
-      <body className="min-h-screen bg-white dark:bg-slate-900 text-gray-900 dark:text-gray-100 antialiased">
+      <body 
+        className="min-h-screen bg-white dark:bg-slate-900 text-gray-900 dark:text-gray-100 antialiased"
+        suppressHydrationWarning
+      >
         <Providers>
           <Header />
           <main className="min-h-screen main-content-mobile">
