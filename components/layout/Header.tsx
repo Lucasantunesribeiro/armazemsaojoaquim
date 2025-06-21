@@ -1,6 +1,6 @@
 'use client'
 
-import { memo, useMemo, useCallback } from 'react'
+import { memo, useMemo, useCallback, useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import toast from 'react-hot-toast'
 import { useSupabase } from '../providers/SupabaseProvider'
@@ -26,6 +26,14 @@ const Header = memo(() => {
   const router = useRouter()
   const { user, loading, supabase } = useSupabase()
   const { isMenuOpen, isScrolled, toggleMenu, closeMenu, isActive } = useHeader()
+  
+  // Estado para controlar se o componente foi hidratado
+  const [isHydrated, setIsHydrated] = useState(false)
+
+  // Garantir que só execute no cliente após hidratação
+  useEffect(() => {
+    setIsHydrated(true)
+  }, [])
 
   // Memoizar handlers para evitar re-renders desnecessários
   const handleSignOut = useCallback(async () => {
@@ -53,33 +61,40 @@ const Header = memo(() => {
     toggleMenu()
   }, [toggleMenu])
 
-  // Memoizar classes CSS para performance
+  // Memoizar classes CSS para performance - Otimizado para mobile
   const headerClasses = useMemo(() => `
     fixed top-0 left-0 right-0 z-50 transition-all duration-300
     ${isScrolled 
-      ? 'bg-white/95 dark:bg-slate-900/95 backdrop-blur-md shadow-lg' 
-      : 'bg-transparent'
+      ? 'bg-white/95 dark:bg-slate-900/95 backdrop-blur-md shadow-lg border-b border-slate-200/20 dark:border-slate-700/20' 
+      : 'bg-gradient-to-b from-black/40 to-transparent'
     }
   `, [isScrolled])
 
   const mobileButtonClasses = useMemo(() => `
-    p-2 rounded-lg transition-colors duration-200 focus-ring
+    p-2.5 rounded-xl transition-all duration-200 focus-ring touch-target
     ${isScrolled 
       ? 'text-madeira-escura dark:text-cinza-claro hover:bg-cinza-claro/20 dark:hover:bg-slate-800' 
       : 'text-white dark:text-cinza-claro hover:bg-white/10 dark:hover:bg-slate-800/50'
     }
+    active:scale-95 transform
   `, [isScrolled])
 
-  // Loading state
-  if (loading) {
+  // Loading state otimizado para mobile ou aguardando hidratação
+  if (loading || !isHydrated) {
     return (
-      <header className={headerClasses}>
+      <header className="fixed top-0 left-0 right-0 z-50 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md shadow-lg border-b border-slate-200/20 dark:border-slate-700/20 transition-all duration-300">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-20">
-            <Logo isScrolled={isScrolled} />
-            <div className="flex items-center space-x-4">
-              <ThemeToggle />
-              <div className="w-8 h-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+          <div className="flex items-center justify-between h-16 md:h-20">
+            {/* Logo Skeleton */}
+            <div className="flex items-center space-x-2">
+              <div className="w-8 h-8 md:w-10 md:h-10 bg-amber-200 dark:bg-amber-800 rounded-full animate-pulse" />
+              <div className="hidden sm:block w-32 h-6 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+            </div>
+            
+            {/* Actions Skeleton */}
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse" />
+              <div className="md:hidden w-10 h-10 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse" />
             </div>
           </div>
         </div>
@@ -91,12 +106,12 @@ const Header = memo(() => {
     <>
       <header className={headerClasses}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-20">
-            {/* Logo */}
+          <div className="flex items-center justify-between h-16 md:h-20">
+            {/* Logo - Otimizada para mobile */}
             <Logo 
               isScrolled={isScrolled} 
               onClick={closeMenu}
-              className="flex-shrink-0"
+              className="flex-shrink-0 z-10"
               priority={true}
             />
 
@@ -128,8 +143,8 @@ const Header = memo(() => {
               )}
             </div>
 
-            {/* Mobile menu button */}
-            <div className="md:hidden flex items-center space-x-3">
+            {/* Mobile Actions - Reorganizado */}
+            <div className="md:hidden flex items-center space-x-2">
               <ThemeToggle />
               <button
                 type="button"
@@ -149,25 +164,30 @@ const Header = memo(() => {
         </div>
 
         {/* Mobile Navigation */}
-        <MobileMenu
-          isOpen={isMenuOpen}
-          items={NAVIGATION_ITEMS}
-          isActive={isActive}
-          user={user}
-          onSignOut={handleSignOut}
-          onReservationClick={handleReservationClick}
-          onClose={closeMenu}
-        />
+        {isHydrated && (
+          <MobileMenu
+            isOpen={isMenuOpen}
+            items={NAVIGATION_ITEMS}
+            isActive={isActive}
+            user={user}
+            onSignOut={handleSignOut}
+            onReservationClick={handleReservationClick}
+            onClose={closeMenu}
+          />
+        )}
       </header>
 
       {/* Overlay para acessibilidade */}
-      {isMenuOpen && (
+      {isHydrated && isMenuOpen && (
         <div
-          className="fixed inset-0 bg-black/20 z-40 md:hidden"
+          className="fixed inset-0 bg-black/50 z-40 md:hidden transition-opacity duration-300"
           onClick={closeMenu}
           aria-hidden="true"
         />
       )}
+      
+      {/* Spacer para compensar o header fixo */}
+      <div className="h-16 md:h-20" />
     </>
   )
 })

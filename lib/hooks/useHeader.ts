@@ -6,16 +6,27 @@ import { usePathname } from 'next/navigation'
 export const useHeader = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
+  const [isClient, setIsClient] = useState(false)
   const pathname = usePathname()
 
+  // Verificar se estamos no cliente
   useEffect(() => {
+    setIsClient(true)
+  }, [])
+
+  useEffect(() => {
+    if (!isClient) return
+
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 10)
     }
 
+    // Definir estado inicial do scroll
+    handleScroll()
+
     window.addEventListener('scroll', handleScroll, { passive: true })
     return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
+  }, [isClient])
 
   // Fechar menu mobile quando a rota mudar
   useEffect(() => {
@@ -24,7 +35,7 @@ export const useHeader = () => {
 
   // Prevenir scroll quando menu mobile estiver aberto
   useEffect(() => {
-    if (typeof document === 'undefined') return
+    if (!isClient || typeof document === 'undefined') return
 
     if (isMenuOpen) {
       document.body.style.overflow = 'hidden'
@@ -35,7 +46,7 @@ export const useHeader = () => {
     return () => {
       document.body.style.overflow = 'unset'
     }
-  }, [isMenuOpen])
+  }, [isMenuOpen, isClient])
 
   const toggleMenu = () => setIsMenuOpen(prev => !prev)
   const closeMenu = () => setIsMenuOpen(false)
@@ -52,6 +63,7 @@ export const useHeader = () => {
     isScrolled,
     toggleMenu,
     closeMenu,
-    isActive
+    isActive,
+    isClient
   }
 } 
