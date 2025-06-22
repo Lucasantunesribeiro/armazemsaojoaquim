@@ -133,6 +133,34 @@ export default function AuthPage() {
       if (error) {
         console.error('❌ Registration Error:', error)
         
+        // Tratar erro 500 com mensagem detalhada
+        if (error.message?.includes('Erro 500 do servidor Supabase') || error.status === 500) {
+          toast.error(`🚨 Erro 500 do Servidor Supabase
+          
+Possíveis causas identificadas:
+• Problema no schema de autenticação
+• Constraints bloqueando criação de usuários  
+• Triggers com erro na tabela auth.users
+• Configuração SMTP incorreta
+• Sobrecarga temporária do servidor
+
+💡 Soluções:
+1. Aguarde alguns minutos e tente novamente
+2. Verifique se você já tem uma conta criada
+3. Tente fazer login caso a conta já exista
+4. Entre em contato com o suporte se persistir`)
+
+          // Oferecer opção de tentar login
+          setTimeout(() => {
+            if (confirm('Deseja tentar fazer login? A conta pode ter sido criada mesmo com o erro.')) {
+              setIsLogin(true)
+              loginForm.setValue('email', data.email)
+            }
+          }, 2000)
+          
+          return
+        }
+        
         // Se o erro é apenas de envio de email, tratar como sucesso parcial
         if (error.message?.includes('Error sending confirmation email')) {
           toast.success('Conta criada com sucesso! ⚠️ Houve um problema com o email de confirmação. Você pode tentar fazer login.')
