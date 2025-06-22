@@ -1,84 +1,73 @@
 'use client'
 
-import { useState } from 'react'
-
-const testImages = [
-  '/images/logo.jpg',
-  '/images/armazem-fachada-historica.jpg',
-  '/images/armazem-interior-aconchegante.jpg',
-  '/images/santa-teresa-vista-panoramica.jpg',
-  '/images/produtos-venda.jpeg',
-  '/images/historia.jpg',
-  '/images/placeholder.svg'
-]
+import SafeImage from '../../components/ui/SafeImage'
 
 export default function TestImagesPage() {
-  const [loadedImages, setLoadedImages] = useState<Record<string, boolean>>({})
-  const [errorImages, setErrorImages] = useState<Record<string, boolean>>({})
-
-  const handleImageLoad = (src: string) => {
-    setLoadedImages(prev => ({ ...prev, [src]: true }))
-  }
-
-  const handleImageError = (src: string) => {
-    setErrorImages(prev => ({ ...prev, [src]: true }))
-  }
+  const testImages = [
+    {
+      name: 'Supabase Working Image',
+      src: 'https://tgzgqtxrjvlgfgxhgwzw.supabase.co/storage/v1/object/public/menu-images/caprese_mineira.png',
+      description: 'Esta deveria carregar normalmente'
+    },
+    {
+      name: 'Supabase Broken Image (400 error)',
+      src: 'https://tgzgqtxrjvlgfgxhgwzw.supabase.co/storage/v1/object/public/menu-images/ceviche_carioca.png',
+      description: 'Esta deveria falhar e usar o SVG placeholder'
+    },
+    {
+      name: 'Local SVG Direct',
+      src: '/images/menu_images/ceviche_carioca.svg',
+      description: 'SVG placeholder direto'
+    },
+    {
+      name: 'Generic Placeholder',
+      src: '/images/placeholder.svg',
+      description: 'Placeholder genérico'
+    },
+    {
+      name: 'Null Source',
+      src: null,
+      description: 'Source nulo'
+    }
+  ]
 
   return (
-    <div className="container mx-auto py-8 px-4">
-      <h1 className="text-3xl font-bold mb-8">Teste de Imagens - Netlify</h1>
-      
-      <div className="space-y-12">
-        <section>
-          <h2 className="text-2xl font-semibold mb-4">Teste de Imagens Simples</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {testImages.map((src, index) => (
-              <div key={index} className="border rounded-lg p-4">
-                <h3 className="text-sm font-medium mb-2">{src}</h3>
-                <div className="w-full h-48 bg-gray-100 rounded relative">
-                  <img
-                    src={src}
-                    alt={`Teste ${index + 1}`}
-                    className="w-full h-full object-cover rounded"
-                    onLoad={() => handleImageLoad(src)}
-                    onError={() => handleImageError(src)}
-                  />
-                  {!loadedImages[src] && !errorImages[src] && (
-                    <div className="absolute inset-0 bg-gray-200 animate-pulse flex items-center justify-center rounded">
-                      <span className="text-gray-500 text-sm">Carregando...</span>
-                    </div>
-                  )}
-                  {errorImages[src] && (
-                    <div className="absolute inset-0 bg-red-100 flex items-center justify-center rounded">
-                      <span className="text-red-500 text-sm">Erro ao carregar</span>
-                    </div>
-                  )}
-                </div>
-                <div className="mt-2 text-xs">
-                  Status: {loadedImages[src] ? '✅ Carregada' : errorImages[src] ? '❌ Erro' : '⏳ Carregando'}
-                </div>
+    <div className="min-h-screen bg-gray-50 py-20">
+      <div className="max-w-6xl mx-auto px-4">
+        <h1 className="text-3xl font-bold text-center mb-12">
+          Teste do Sistema de Imagens
+        </h1>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {testImages.map((test, index) => (
+            <div key={index} className="bg-white rounded-lg shadow-lg overflow-hidden">
+              <div className="relative h-48">
+                <SafeImage
+                  src={test.src}
+                  alt={test.name}
+                  fill
+                  showPlaceholderIcon={true}
+                  className="object-cover"
+                />
               </div>
-            ))}
-          </div>
-        </section>
+              <div className="p-4">
+                <h3 className="font-bold text-lg mb-2">{test.name}</h3>
+                <p className="text-gray-600 text-sm mb-2">{test.description}</p>
+                <p className="text-xs text-gray-500 break-all">
+                  <strong>SRC:</strong> {test.src || 'null'}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
 
-        <section>
-          <h2 className="text-2xl font-semibold mb-4">Estatísticas</h2>
-          <div className="bg-gray-100 p-4 rounded">
-            <p><strong>Total de imagens:</strong> {testImages.length}</p>
-            <p><strong>Carregadas:</strong> {Object.keys(loadedImages).length}</p>
-            <p><strong>Com erro:</strong> {Object.keys(errorImages).length}</p>
-          </div>
-        </section>
-
-        <section>
-          <h2 className="text-2xl font-semibold mb-4">Debug Info</h2>
-          <div className="bg-gray-100 p-4 rounded">
-            <p><strong>Environment:</strong> production</p>
-            <p><strong>Static Export:</strong> Ativo</p>
-            <p><strong>Teste Page:</strong> Client Component</p>
-          </div>
-        </section>
+        <div className="mt-12 bg-white rounded-lg shadow-lg p-6">
+          <h2 className="text-xl font-bold mb-4">Console Debug</h2>
+          <p className="text-sm text-gray-600">
+            Abra o console do navegador (F12) para ver os logs de debug do SafeImage.
+            Cada imagem mostra seu nível de fallback no canto superior direito.
+          </p>
+        </div>
       </div>
     </div>
   )
