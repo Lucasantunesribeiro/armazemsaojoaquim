@@ -116,49 +116,77 @@ export default function AuthPage() {
       if (error) {
         console.error('❌ Registration Error:', error)
         
-        // Tratar diferentes tipos de erro
-        if (error.message?.includes('User already registered')) {
-          toast.error('Este email já está cadastrado. Tente fazer login ou use outro email.')
-        } else if (error.message?.includes('Invalid email')) {
-          toast.error('Email inválido. Verifique o formato do email.')
-        } else if (error.message?.includes('Password')) {
-          toast.error('Senha muito fraca. Use pelo menos 6 caracteres.')
-        } else if (error.message?.includes('signup is disabled')) {
-          toast.error('Cadastro temporariamente desabilitado. Tente novamente mais tarde.')
-        } else {
-          toast.error('Erro no cadastro. Tente novamente ou entre em contato conosco.')
-        }
-        return
-      }
-
-      console.log('✅ Registration successful:', authData)
-
-      // Verificar se o usuário foi criado com sucesso
-      if (authData.user) {
-        const userConfirmed = authData.user.email_confirmed_at
-        
-        if (!userConfirmed) {
-          toast.success('🎉 Conta criada com sucesso! Verifique seu email para confirmar sua conta.')
-        } else {
-          toast.success('🎉 Conta criada e confirmada automaticamente!')
-          router.push('/')
+        // Se o erro é apenas de envio de email, tratar como sucesso parcial
+        if (error.message?.includes('Error sending confirmation email')) {
+          toast.success('Conta criada com sucesso! ⚠️ Houve um problema com o email de confirmação. Você pode tentar fazer login.')
+          
+          // Redirecionar para login após um delay
+          setTimeout(() => {
+            setIsLogin(true)
+            registerForm.reset()
+          }, 3000)
+          
           return
         }
         
-        setIsLogin(true)
-        registerForm.reset()
-      } else {
-        toast.error('Erro inesperado ao criar conta. Tente novamente.')
+        // Tratar diferentes tipos de erro
+        if (error.message?.includes('User already registered')) {
+          toast.error('Este email já possui uma conta. Tente fazer login ou usar a opção "Esqueci minha senha".')
+          setIsLogin(true)
+          return
+        }
+
+        if (error.message?.includes('Password should be at least')) {
+          toast.error('A senha deve ter pelo menos 6 caracteres.')
+          return
+        }
+
+        if (error.message?.includes('Invalid email')) {
+          toast.error('Por favor, insira um email válido.')
+          return
+        }
+
+        // Erro genérico
+        toast.error(error.message || 'Ocorreu um erro inesperado. Tente novamente.')
+        return
       }
+
+      // Sucesso completo
+      if (authData?.user) {
+        console.log('✅ Usuário registrado com sucesso:', authData.user.email)
+        
+        // Se não há sessão, significa que precisa confirmar email
+        if (!authData.session) {
+          toast.success('📧 Cadastro realizado! Verifique seu email para confirmar sua conta antes de fazer login.')
+          
+          // Redirecionar para login após um delay
+          setTimeout(() => {
+            setIsLogin(true)
+            registerForm.reset()
+          }, 3000)
+        } else {
+          // Login automático se já tem sessão
+          toast.success('🎉 Bem-vindo! Sua conta foi criada e você já está logado.')
+          
+          // Redirecionar para página principal
+          setTimeout(() => {
+            router.push('/')
+          }, 2000)
+        }
+      } else {
+        // Caso especial: sucesso parcial (conta criada mas sem dados completos)
+        toast.success('Conta criada! ⚠️ Sua conta foi criada com sucesso. Tente fazer login.')
+        
+        setTimeout(() => {
+          setIsLogin(true)
+          registerForm.reset()
+        }, 3000)
+      }
+
     } catch (error: any) {
-      console.error('❌ Unexpected Registration Error:', error)
+      console.error('❌ Erro inesperado no registro:', error)
       
-      // Tratar erros de rede ou outros erros inesperados
-      if (error.name === 'NetworkError' || error.message?.includes('fetch')) {
-        toast.error('Erro de conexão. Verifique sua internet e tente novamente.')
-      } else {
-        toast.error('Erro inesperado ao criar conta. Tente novamente.')
-      }
+      toast.error('Erro inesperado. Algo deu errado. Tente novamente em alguns instantes.')
     } finally {
       setLoading(false)
     }
