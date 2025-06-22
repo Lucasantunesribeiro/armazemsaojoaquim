@@ -5,7 +5,7 @@ import { Calendar, Clock, ArrowRight, Book, Camera, MapPin } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import Button from '../ui/Button'
-import { SafeImage } from '../ui/SafeImage'
+import SafeImage from '../ui/SafeImage'
 
 const BlogPreview = () => {
   const [isVisible, setIsVisible] = useState(false)
