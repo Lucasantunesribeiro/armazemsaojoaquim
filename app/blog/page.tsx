@@ -17,108 +17,13 @@ export const metadata: Metadata = {
   },
 }
 
-// Mock data para fallback - usando slugs para navegação
-const mockPosts = [
-  {
-    id: 'a0dbcfb7-aa55-4b7f-b081-4525b57f54c8',
-    title: 'A História do Armazém São Joaquim',
-    content: 'O Armazém São Joaquim tem uma rica história de 170 anos...',
-    excerpt: 'Conheça a fascinante história de 170 anos do nosso restaurante histórico no coração de Santa Teresa.',
-    featured_image: '/images/blog/historia-armazem.jpg',
-    slug: 'historia-do-armazem-sao-joaquim',
-    published_at: '2024-01-15T10:00:00Z',
-    created_at: '2024-01-15T10:00:00Z',
-    updated_at: '2024-01-15T10:00:00Z',
-    published: true,
-    author_id: 'armazem-sao-joaquim'
-  },
-  {
-    id: '0049d04f-ad1c-4299-9986-8bc39e06fa8c',
-    title: 'Os Segredos da Nossa Feijoada',
-    content: 'Nossa feijoada é preparada seguindo uma receita tradicional...',
-    excerpt: 'Descubra os segredos por trás da nossa famosa feijoada tradicional, preparada com técnicas centenárias.',
-    featured_image: '/images/blog/segredos-feijoada.jpg',
-    slug: 'segredos-da-nossa-feijoada',
-    published_at: '2024-01-10T10:00:00Z',
-    created_at: '2024-01-10T10:00:00Z',
-    updated_at: '2024-01-10T10:00:00Z',
-    published: true,
-    author_id: 'armazem-sao-joaquim'
-  },
-  {
-    id: '5ea5f6d7-589e-4135-a5c2-a493f93c7eb5',
-    title: 'A Arte da Mixologia no Armazém',
-    content: 'Nossos drinks são muito mais que simples coquetéis...',
-    excerpt: 'Conheça o cuidado e a paixão por trás de cada drink servido no Armazém São Joaquim.',
-    featured_image: '/images/blog/drinks.jpg',
-    slug: 'arte-da-mixologia-no-armazem',
-    published_at: '2024-01-08T10:00:00Z',
-    created_at: '2024-01-08T10:00:00Z',
-    updated_at: '2024-01-08T10:00:00Z',
-    published: true,
-    author_id: 'armazem-sao-joaquim'
-  },
-  {
-    id: 'f4dbcfb7-aa55-4b7f-b081-4525b57f54cc',
-    title: 'Eventos e Celebrações no Armazém',
-    content: 'O Armazém São Joaquim é o local perfeito para celebrações especiais...',
-    excerpt: 'Descubra como tornamos cada evento uma experiência única em nosso espaço histórico.',
-    featured_image: '/images/blog/eventos.jpg',
-    slug: 'eventos-e-celebracoes-no-armazem',
-    published_at: '2024-01-05T10:00:00Z',
-    created_at: '2024-01-05T10:00:00Z',
-    updated_at: '2024-01-05T10:00:00Z',
-    published: true,
-    author_id: 'armazem-sao-joaquim'
-  },
-  {
-    id: 'b1dbcfb7-aa55-4b7f-b081-4525b57f54c9',
-    title: 'A História de Santa Teresa: Berço da Boemia Carioca',
-    content: 'Santa Teresa é um dos bairros mais charmosos e históricos do Rio de Janeiro...',
-    excerpt: 'Descubra como o bairro se tornou um dos mais charmosos do Rio de Janeiro, preservando suas tradições e cultura secular.',
-    featured_image: '/images/santa-teresa-vista-panoramica.jpg',
-    slug: 'historia-santa-teresa-berco-boemia-carioca',
-    published_at: '2024-01-12T10:00:00Z',
-    created_at: '2024-01-12T10:00:00Z',
-    updated_at: '2024-01-12T10:00:00Z',
-    published: true,
-    author_id: 'armazem-sao-joaquim'
-  },
-  {
-    id: 'c2dbcfb7-aa55-4b7f-b081-4525b57f54ca',
-    title: 'Receitas Centenárias: Os Segredos da Culinária Colonial',
-    content: 'A culinária colonial brasileira é um tesouro de sabores e técnicas...',
-    excerpt: 'Conheça as receitas tradicionais que atravessaram gerações e continuam encantando nossos clientes.',
-    featured_image: '/images/armazem-fachada-historica.jpg',
-    slug: 'receitas-centenarias-segredos-culinaria-colonial',
-    published_at: '2024-01-14T10:00:00Z',
-    created_at: '2024-01-14T10:00:00Z',
-    updated_at: '2024-01-14T10:00:00Z',
-    published: true,
-    author_id: 'armazem-sao-joaquim'
-  },
-  {
-    id: 'd3dbcfb7-aa55-4b7f-b081-4525b57f54cb',
-    title: 'Bondinho de Santa Teresa: Uma Viagem no Tempo',
-    content: 'O bondinho de Santa Teresa é muito mais que um meio de transporte...',
-    excerpt: 'A história do transporte mais charmoso do Rio e sua importância para o desenvolvimento do bairro.',
-    featured_image: '/images/bondinho.jpg',
-    slug: 'bondinho-santa-teresa-viagem-tempo',
-    published_at: '2024-01-06T10:00:00Z',
-    created_at: '2024-01-06T10:00:00Z',
-    updated_at: '2024-01-06T10:00:00Z',
-    published: true,
-    author_id: 'armazem-sao-joaquim'
-  }
-]
-
 async function getBlogPosts() {
   try {
     const posts = await blogApi.getAllPosts()
-    return posts.length > 0 ? posts : mockPosts
+    return posts || []
   } catch (error) {
     console.error('Erro ao carregar posts:', error)
-    return mockPosts
+    return []
   }
 }
 
@@ -238,6 +143,9 @@ export default async function BlogPage() {
                         alt={posts[0].title}
                         fill
                         className="object-cover group-hover:scale-105 transition-transform duration-500"
+                        priority={true}
+                        loading="eager"
+                        sizes="100vw"
                       />
                     ) : (
                       <div className="w-full h-full bg-gradient-to-br from-amber-200 via-orange-200 to-red-200 flex items-center justify-center">

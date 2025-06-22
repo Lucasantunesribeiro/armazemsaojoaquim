@@ -24,6 +24,7 @@ import {
   MessageCircle
 } from 'lucide-react'
 import Logo from '../atoms/Logo'
+import LogoSimple from '../atoms/LogoSimple'
 import NewsletterSignup from '../ui/NewsletterSignup'
 import MapButton from '../ui/MapButton'
 import { cn } from '../../lib/utils'
@@ -166,15 +167,7 @@ const Footer = () => {
               {/* Brand Section */}
               <div className="lg:col-span-2 space-y-6">
                 <div className="flex items-center space-x-4 mb-6">
-                  <Logo />
-                  <div>
-                    <h3 className="text-2xl md:text-3xl font-bold font-playfair text-amarelo-armazem">
-                      Armazém São Joaquim
-                    </h3>
-                    <p className="text-sm italic text-cinza-claro font-inter">
-                      "En esta casa tenemos memoria"
-                    </p>
-                  </div>
+                  <LogoSimple />
                 </div>
                 
                 <p className="text-cinza-claro leading-relaxed font-inter max-w-md text-base">

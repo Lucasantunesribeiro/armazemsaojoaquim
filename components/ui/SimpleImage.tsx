@@ -79,7 +79,7 @@ const SimpleImage = ({
           height: finalHeight!
         })}
         className={`${className} ${isLoading ? 'opacity-0' : 'opacity-100'} transition-opacity duration-300`}
-        loading={loading}
+        loading={priority ? 'eager' : loading}
         priority={priority}
         onError={() => {
           console.error(`❌ Erro ao carregar imagem (tentativa ${retryCount + 1}/${MAX_RETRIES}):`, src)
