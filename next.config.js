@@ -15,14 +15,30 @@ const nextConfig = {
     minimumCacheTTL: 60,
     dangerouslyAllowSVG: true,
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
-    // Configurações para melhor compatibilidade móvel
-    unoptimized: false,
+    // Configurações para desenvolvimento local e produção
+    unoptimized: process.env.NODE_ENV === 'development',
     loader: 'default',
     domains: [],
+    // Configurações mais específicas para evitar erro 400
     remotePatterns: [
+      // Para desenvolvimento local
+      {
+        protocol: 'http',
+        hostname: 'localhost',
+        port: '3000',
+        pathname: '/**',
+      },
+      // Para Netlify e outros domínios confiáveis
       {
         protocol: 'https',
-        hostname: '**',
+        hostname: '**.netlify.app',
+        pathname: '/**',
+      },
+      // Para Vercel (caso necessário)
+      {
+        protocol: 'https',
+        hostname: '**.vercel.app',
+        pathname: '/**',
       },
     ],
   },
