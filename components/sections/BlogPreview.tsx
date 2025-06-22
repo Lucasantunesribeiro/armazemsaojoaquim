@@ -6,18 +6,13 @@ import Image from 'next/image'
 import Link from 'next/link'
 import Button from '../ui/Button'
 import { SafeImage } from '../ui/SafeImage'
-import ImageTest from '../debug/ImageTest'
 
 const BlogPreview = () => {
   const [isVisible, setIsVisible] = useState(false)
   const [activeImageIndex, setActiveImageIndex] = useState(0)
   const sectionRef = useRef<HTMLDivElement>(null)
 
-  // Debug: Log das imagens para verificar se os caminhos estão corretos
-  useEffect(() => {
-    console.log('🖼️ BlogPreview - Imagens do bairro:', neighborhoodImages.map(img => img.src))
-    console.log('📝 BlogPreview - Imagens dos posts:', blogPosts.map(post => ({ title: post.title, image: post.image })))
-  }, [])
+
 
   const neighborhoodImages = [
     {
@@ -86,6 +81,9 @@ const BlogPreview = () => {
   ]
 
   useEffect(() => {
+    const currentRef = sectionRef.current
+    if (!currentRef) return
+
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
@@ -95,19 +93,22 @@ const BlogPreview = () => {
       { threshold: 0.2 }
     )
 
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current)
-    }
+    observer.observe(currentRef)
 
-    return () => observer.disconnect()
+    return () => {
+      observer.disconnect()
+    }
   }, [])
 
   useEffect(() => {
-    if (isVisible) {
-      const interval = setInterval(() => {
-        setActiveImageIndex((prev) => (prev + 1) % neighborhoodImages.length)
-      }, 5000)
-      return () => clearInterval(interval)
+    if (!isVisible) return
+
+    const interval = setInterval(() => {
+      setActiveImageIndex((prev) => (prev + 1) % neighborhoodImages.length)
+    }, 5000)
+    
+    return () => {
+      clearInterval(interval)
     }
   }, [isVisible, neighborhoodImages.length])
 
@@ -126,8 +127,6 @@ const BlogPreview = () => {
       id="blog"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Componente de Debug Temporário */}
-        <ImageTest />
         {/* Header */}
         <div className={`text-center mb-20 transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
           <div className="inline-flex items-center space-x-2 bg-amber-100 dark:bg-amber-900/30 border border-amber-300 dark:border-amber-700 rounded-full px-6 py-2 mb-6">
@@ -165,12 +164,9 @@ const BlogPreview = () => {
                       className="object-cover"
                       quality={90}
                       priority={index === 0}
-                      sizes="(max-width: 768px) 100vw, 50vw"
+                      sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 450px"
                     />
-                    {/* Debug info */}
-                    <div className="absolute top-2 right-2 bg-black/70 text-white text-xs p-1 rounded opacity-50">
-                      {image.src.split('/').pop()}
-                    </div>
+
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                     <div className="absolute bottom-6 left-6 text-white">
                       <h4 className="text-xl font-bold mb-2">{image.title}</h4>
@@ -244,7 +240,7 @@ const BlogPreview = () => {
           >
             <div className="bg-white dark:bg-slate-800 rounded-3xl shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-700 hover:shadow-3xl transition-all duration-300">
               <div className="grid md:grid-cols-2 gap-0">
-                <div className="relative h-80 md:h-auto">
+                <div className="relative h-80 md:h-96">
                   <SafeImage
                     src={post.image}
                     alt={post.title}
@@ -252,12 +248,9 @@ const BlogPreview = () => {
                     className="object-cover"
                     quality={90}
                     priority={true}
-                    sizes="(max-width: 768px) 100vw, 50vw"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 400px"
                   />
-                  {/* Debug info */}
-                  <div className="absolute top-8 right-4 bg-black/70 text-white text-xs p-1 rounded opacity-50">
-                    {post.image.split('/').pop()}
-                  </div>
+
                   <div className="absolute top-4 left-4">
                     <span className="bg-amber-500 text-white text-xs font-bold px-3 py-1 rounded-full">
                       DESTAQUE
@@ -320,12 +313,9 @@ const BlogPreview = () => {
                   fill
                   className="object-cover group-hover:scale-110 transition-transform duration-700"
                   quality={90}
-                  sizes="(max-width: 768px) 100vw, 50vw"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 300px"
                 />
-                {/* Debug info */}
-                <div className="absolute top-2 right-2 bg-black/70 text-white text-xs p-1 rounded opacity-50">
-                  {post.image.split('/').pop()}
-                </div>
+
                 <div className="absolute top-4 left-4">
                   <span className="bg-white/90 dark:bg-slate-800/90 text-slate-700 dark:text-slate-300 text-xs font-semibold px-3 py-1 rounded-full backdrop-blur-sm">
                     {post.category}

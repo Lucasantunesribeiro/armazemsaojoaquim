@@ -1,7 +1,7 @@
 'use client'
 
 import Image from 'next/image'
-import { useState } from 'react'
+import { useSafeState } from '@/lib/hooks/useSafeState'
 
 interface SafeImageProps {
   src: string
@@ -29,9 +29,9 @@ export const SafeImage = ({
   quality = 75,
   ...props
 }: SafeImageProps) => {
-  const [imgSrc, setImgSrc] = useState(src)
-  const [isLoading, setIsLoading] = useState(true)
-  const [hasError, setHasError] = useState(false)
+  const [imgSrc, setImgSrc] = useSafeState(src)
+  const [isLoading, setIsLoading] = useSafeState(true)
+  const [hasError, setHasError] = useSafeState(false)
 
   const handleError = () => {
     if (imgSrc !== fallbackSrc) {
@@ -62,6 +62,7 @@ export const SafeImage = ({
         sizes={sizes}
         fill={fill}
         quality={quality}
+        unoptimized={imgSrc.startsWith('/')}
         onError={handleError}
         onLoad={handleLoad}
         {...props}
