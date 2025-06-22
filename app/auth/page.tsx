@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { useSupabase } from '../../components/providers/SupabaseProvider'
+// import { useSupabase } from '../../components/providers/SupabaseProvider' // Removido - usando supabase diretamente
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -12,6 +12,7 @@ import Input from '../../components/ui/Input'
 import { Card, CardContent, CardHeader } from '../../components/ui/Card'
 import { Mail, User, Eye, EyeOff, Shield, CheckCircle } from 'lucide-react'
 import OptimizedImage from '@/components/ui/OptimizedImage'
+import { supabase as createClient } from '@/lib/supabase'
 
 const loginSchema = z.object({
   email: z.string().email('E-mail inválido'),
@@ -40,8 +41,9 @@ export default function AuthPage() {
   const [showResendConfirmation, setShowResendConfirmation] = useState(false)
   const [resendEmail, setResendEmail] = useState('')
   const [rateLimitInfo, setRateLimitInfo] = useState<{active: boolean, remainingMinutes: number, email: string} | null>(null)
-  const { supabase } = useSupabase()
+
   const router = useRouter()
+  const supabase = createClient
 
   // Verificar se há erro na URL
   useEffect(() => {
@@ -74,7 +76,7 @@ export default function AuthPage() {
             email: rateLimitEmail
           })
         } else {
-          // Rate limit expirado
+          // Limpar rate limit expirado
           localStorage.removeItem('supabase_rate_limit_timestamp')
           localStorage.removeItem('supabase_rate_limit_email')
           setRateLimitInfo(null)
@@ -101,6 +103,11 @@ export default function AuthPage() {
   const handleLogin = async (data: LoginForm) => {
     setLoading(true)
     try {
+      console.log('🔄 Tentando fazer login:', {
+        email: data.email,
+        environment: window.location.hostname !== 'localhost' ? 'production' : 'development'
+      })
+
       const { data: authData, error } = await supabase.auth.signInWithPassword({
         email: data.email,
         password: data.password,
@@ -109,37 +116,37 @@ export default function AuthPage() {
       if (error) {
         console.error('❌ Login Error:', error)
         
-        // Tratar erro de email não confirmado
-        if (error.message?.includes('Email not confirmed')) {
-          toast.error('Email não confirmado! Verifique sua caixa de entrada e clique no link de confirmação.')
-          setShowResendConfirmation(true)
-          return
-        }
-        
-        // Tratar erro de credenciais inválidas (pode ser conta não confirmada)
-        if (error.message?.includes('Invalid login credentials')) {
-          // Verificar se é uma conta recém-criada que precisa de confirmação
-          const recentRegistration = localStorage.getItem('recent_registration_email')
-          if (recentRegistration === data.email) {
-            toast.error('Conta criada mas não confirmada! Verifique seu email ou reenvie a confirmação.')
+        // Detectar conta não confirmada
+        if (error.message?.includes('Email not confirmed') || 
+            error.message?.includes('Invalid login credentials')) {
+          
+          // Verificar se é um email recém-registrado
+          const recentEmail = localStorage.getItem('recent_registration_email')
+          if (recentEmail === data.email) {
+            toast.error('📧 Conta ainda não confirmada!\n\nVerifique seu email e clique no link de confirmação.')
             setShowResendConfirmation(true)
             setResendEmail(data.email)
             return
           }
-          
-          toast.error('Email ou senha incorretos. Verifique suas credenciais e tente novamente.')
-          return
         }
         
-        toast.error('Erro no login. Tente novamente.')
+        toast.error(`Erro no login: ${error.message}`)
         return
       }
 
-      toast.success('Login realizado com sucesso!')
-      router.push('/')
+      if (authData.user) {
+        console.log('✅ Login realizado com sucesso!')
+        toast.success('🎉 Login realizado com sucesso!')
+        
+        // Limpar dados de registro recente
+        localStorage.removeItem('recent_registration_email')
+        
+        router.push('/')
+      }
+
     } catch (error) {
-      console.error('Unexpected Login Error:', error)
-      toast.error('Erro inesperado ao fazer login')
+      console.error('❌ Erro inesperado no login:', error)
+      toast.error('Erro inesperado. Tente novamente.')
     } finally {
       setLoading(false)
     }
@@ -159,18 +166,18 @@ export default function AuthPage() {
         // Se ainda não passou 2 horas e é o mesmo email
         if (hoursWaited < 2 && rateLimitEmail === data.email) {
           const remainingMinutes = Math.ceil((2 * 60) - (timeSinceRateLimit / (1000 * 60)))
-          toast.error(`⏰ Rate limit ainda ativo!\n\nAguarde mais ${remainingMinutes} minutos ou use um email diferente.`)
+          toast.error(`⏰ Rate limit ativo!\n\nAguarde mais ${remainingMinutes} minutos ou use um email diferente.`)
           setLoading(false)
           return
         }
         
-        // Limpar rate limit expirado
+        // Se passou 2 horas, limpar o rate limit
         if (hoursWaited >= 2) {
           localStorage.removeItem('supabase_rate_limit_timestamp')
           localStorage.removeItem('supabase_rate_limit_email')
         }
       }
-      
+
       console.log('🔄 Tentando registrar usuário:', {
         email: data.email,
         name: data.name,
@@ -257,45 +264,42 @@ export default function AuthPage() {
             return
           }
         }
-        
-        // Tratar erro 500 SMTP
-        if (error.message?.includes('Error sending') || error.status === 500) {
-          toast.error('📧 Problema no envio do email de confirmação. Verifique se o SMTP está configurado corretamente no Supabase.')
+
+        // Outros erros
+        if (error.message?.includes('User already registered')) {
+          toast.error('📧 Este email já está cadastrado!\n\nTente fazer login ou use a opção "Esqueci minha senha".')
           return
         }
-        
-        // Outros erros
+
         toast.error(`Erro no cadastro: ${error.message}`)
         return
       }
 
-      // Sucesso - sempre exigir verificação por email
-      if (authData.user && !authData.user.email_confirmed_at) {
-        console.log('✅ Registro bem-sucedido - aguardando confirmação por email')
+      if (authData.user) {
+        console.log('✅ Usuário registrado com sucesso!')
         
-        // Salvar email para facilitar detecção no login
-        localStorage.setItem('recent_registration_email', data.email)
-        
-        toast.success('📧 Cadastro realizado com sucesso! Verifique seu email para confirmar sua conta.')
-        
-        // Mudar para tela de login após 3 segundos
-        setTimeout(() => {
-          setIsLogin(true)
-          registerForm.reset()
-        }, 3000)
-      } else if (authData.user && authData.user.email_confirmed_at) {
-        // Email já confirmado (não deveria acontecer com SMTP configurado)
-        console.log('⚠️ Email já confirmado automaticamente')
-        toast.success('🎉 Bem-vindo! Sua conta foi criada e confirmada.')
-        localStorage.removeItem('recent_registration_email')
-        setTimeout(() => router.push('/'), 2000)
-      } else {
-        toast.error('❌ Erro inesperado no cadastro. Tente novamente.')
+        // Verificar se precisa de confirmação
+        if (!authData.session) {
+          toast.success('🎉 Conta criada com sucesso!\n\nVerifique seu email para confirmar sua conta.')
+          
+          // Salvar email para facilitar detecção no login
+          localStorage.setItem('recent_registration_email', data.email)
+          
+          // Mudar para tela de login após 3 segundos
+          setTimeout(() => {
+            setIsLogin(true)
+            registerForm.reset()
+          }, 3000)
+        } else {
+          // Login automático se não precisar de confirmação
+          toast.success('🎉 Conta criada e login realizado com sucesso!')
+          router.push('/')
+        }
       }
 
     } catch (error) {
-      console.error('❌ Unexpected registration error:', error)
-      toast.error('❌ Erro inesperado. Tente novamente mais tarde.')
+      console.error('❌ Erro inesperado no registro:', error)
+      toast.error('Erro inesperado. Tente novamente.')
     } finally {
       setLoading(false)
     }
@@ -304,29 +308,27 @@ export default function AuthPage() {
   const handleGoogleLogin = async () => {
     setLoading(true)
     try {
-      const isProduction = window.location.hostname !== 'localhost'
-      const redirectUrl = isProduction 
-        ? 'https://armazemsaojoaquim.netlify.app/auth/callback'
-        : `${window.location.origin}/auth/callback`
-
-      const { error } = await supabase.auth.signInWithOAuth({
+      console.log('🔄 Iniciando Google OAuth...')
+      
+      const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: redirectUrl,
-          queryParams: {
-            access_type: 'offline',
-            prompt: 'consent',
-          }
+          redirectTo: `${window.location.origin}/auth/callback`
         }
       })
 
       if (error) {
-        console.error('Google OAuth Error:', error)
-        toast.error(`Erro ao fazer login com Google: ${error.message}`)
+        console.error('❌ Google OAuth Error:', error)
+        toast.error(`Erro no login com Google: ${error.message}`)
+        return
       }
+
+      console.log('✅ Google OAuth iniciado com sucesso')
+      // O redirecionamento acontece automaticamente
+      
     } catch (error: any) {
-      console.error('Unexpected Google OAuth Error:', error)
-      toast.error('Erro inesperado ao fazer login com Google')
+      console.error('❌ Erro inesperado no Google OAuth:', error)
+      toast.error('Erro inesperado no login com Google. Tente novamente.')
     } finally {
       setLoading(false)
     }
@@ -340,7 +342,7 @@ export default function AuthPage() {
 
     try {
       setLoading(true)
-      console.log('📧 Reenviando email de confirmação para:', resendEmail)
+      console.log('🔄 Reenviando email de confirmação para:', resendEmail)
       
       const { error } = await supabase.auth.resend({
         type: 'signup',
@@ -349,22 +351,27 @@ export default function AuthPage() {
           emailRedirectTo: `${window.location.origin}/auth/callback`
         }
       })
-      
+
       if (error) {
-        console.error('❌ Erro ao reenviar email:', error)
-        if (error.status === 429) {
-          toast.error('⏰ Aguarde alguns minutos antes de solicitar um novo email.')
+        console.error('❌ Erro ao reenviar confirmação:', error)
+        
+        if (error.message?.includes('rate limit')) {
+          toast.error('⏰ Limite de reenvio atingido. Aguarde alguns minutos e tente novamente.')
         } else {
           toast.error(`Erro ao reenviar email: ${error.message}`)
         }
-      } else {
-        toast.success('📧 Email de confirmação reenviado! Verifique sua caixa de entrada.')
-        setShowResendConfirmation(false)
-        localStorage.removeItem('recent_registration_email')
+        return
       }
+
+      console.log('✅ Email de confirmação reenviado!')
+      toast.success('📧 Email de confirmação reenviado!\n\nVerifique sua caixa de entrada.')
+      
+      setShowResendConfirmation(false)
+      localStorage.removeItem('recent_registration_email')
+      
     } catch (error) {
       console.error('❌ Erro inesperado ao reenviar email:', error)
-      toast.error('❌ Erro inesperado. Tente novamente.')
+      toast.error('Erro inesperado. Tente novamente.')
     } finally {
       setLoading(false)
     }
@@ -457,109 +464,149 @@ export default function AuthPage() {
                 {isLogin ? (
                   <form onSubmit={loginForm.handleSubmit(handleLogin)} className="space-y-5">
                     <div className="space-y-4">
-                      <Input
-                        label="E-mail"
-                        type="email"
-                        placeholder="seu@email.com"
-                        {...loginForm.register('email')}
-                        error={loginForm.formState.errors.email?.message}
-                        className="border-amber-200 focus:border-amber-400 focus:ring-amber-400"
-                      />
-                      
-                      <div className="relative">
+                      <div className="space-y-2">
+                        <label htmlFor="email" className="text-sm font-medium text-madeira-escura">E-mail</label>
                         <Input
-                          label="Senha"
-                          type={showPassword ? "text" : "password"}
-                          placeholder="Sua senha"
-                          {...loginForm.register('password')}
-                          error={loginForm.formState.errors.password?.message}
-                          className="border-amber-200 focus:border-amber-400 focus:ring-amber-400 pr-12"
+                          id="email"
+                          type="email"
+                          placeholder="seu@email.com"
+                          aria-invalid={loginForm.formState.errors.email ? "true" : "false"}
+                          {...loginForm.register('email')}
+                          className="border-amber-200 focus:border-amber-400 focus:ring-amber-400"
                         />
-                        <button
-                          type="button"
-                          onClick={() => setShowPassword(!showPassword)}
-                          className="absolute right-3 top-9 text-amber-600 hover:text-amber-700"
-                        >
-                          {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                        </button>
+                        {loginForm.formState.errors.email && (
+                          <span role="alert" className="text-sm text-red-600">
+                            {loginForm.formState.errors.email.message}
+                          </span>
+                        )}
+                      </div>
+                      
+                      <div className="relative space-y-2">
+                        <label htmlFor="password" className="text-sm font-medium text-madeira-escura">Senha</label>
+                        <div className="relative">
+                          <Input
+                            id="password"
+                            type={showPassword ? "text" : "password"}
+                            placeholder="Sua senha"
+                            aria-invalid={loginForm.formState.errors.password ? "true" : "false"}
+                            {...loginForm.register('password')}
+                            className="border-amber-200 focus:border-amber-400 focus:ring-amber-400 pr-12"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setShowPassword(!showPassword)}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-amber-600 hover:text-amber-700"
+                            aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
+                          >
+                            {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                          </button>
+                        </div>
+                        {loginForm.formState.errors.password && (
+                          <span role="alert" className="text-sm text-red-600">
+                            {loginForm.formState.errors.password.message}
+                          </span>
+                        )}
                       </div>
                     </div>
 
                     <Button
                       type="submit"
-                      variant="primary"
-                      size="lg"
                       className="w-full bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white font-semibold py-3 shadow-lg"
-                      loading={loading}
+                      disabled={loading}
                     >
                       <Mail className="w-5 h-5 mr-2" />
-                      Entrar na minha conta
+                      {loading ? 'Entrando...' : 'Entrar na minha conta'}
                     </Button>
-
-                    <button
-                      type="button"
-                      onClick={handleResendConfirmation}
-                      disabled={resendingEmail}
-                      className="w-full text-sm text-amber-600 hover:text-amber-700 transition-colors disabled:opacity-50 font-medium"
-                    >
-                      {resendingEmail ? 'Reenviando...' : 'Reenviar email de confirmação'}
-                    </button>
                   </form>
                 ) : (
                   <form onSubmit={registerForm.handleSubmit(handleRegister)} className="space-y-5">
                     <div className="space-y-4">
-                      <Input
-                        label="Nome completo"
-                        type="text"
-                        placeholder="Seu nome completo"
-                        {...registerForm.register('name')}
-                        error={registerForm.formState.errors.name?.message}
-                        className="border-amber-200 focus:border-amber-400 focus:ring-amber-400"
-                      />
-                      
-                      <Input
-                        label="E-mail"
-                        type="email"
-                        placeholder="seu@email.com"
-                        {...registerForm.register('email')}
-                        error={registerForm.formState.errors.email?.message}
-                        className="border-amber-200 focus:border-amber-400 focus:ring-amber-400"
-                      />
-                      
-                      <div className="relative">
+                      <div className="space-y-2">
+                        <label htmlFor="name" className="text-sm font-medium text-madeira-escura">Nome completo</label>
                         <Input
-                          label="Senha"
-                          type={showPassword ? "text" : "password"}
-                          placeholder="Crie uma senha segura"
-                          {...registerForm.register('password')}
-                          error={registerForm.formState.errors.password?.message}
-                          className="border-amber-200 focus:border-amber-400 focus:ring-amber-400 pr-12"
+                          id="name"
+                          type="text"
+                          placeholder="Seu nome completo"
+                          aria-invalid={registerForm.formState.errors.name ? "true" : "false"}
+                          {...registerForm.register('name')}
+                          className="border-amber-200 focus:border-amber-400 focus:ring-amber-400"
                         />
-                        <button
-                          type="button"
-                          onClick={() => setShowPassword(!showPassword)}
-                          className="absolute right-3 top-9 text-amber-600 hover:text-amber-700"
-                        >
-                          {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                        </button>
+                        {registerForm.formState.errors.name && (
+                          <span role="alert" className="text-sm text-red-600">
+                            {registerForm.formState.errors.name.message}
+                          </span>
+                        )}
                       </div>
                       
-                      <div className="relative">
+                      <div className="space-y-2">
+                        <label htmlFor="email" className="text-sm font-medium text-madeira-escura">E-mail</label>
                         <Input
-                          label="Confirmar senha"
-                          type={showConfirmPassword ? "text" : "password"}
-                          placeholder="Confirme sua senha"
-                          {...registerForm.register('confirmPassword')}
-                          error={registerForm.formState.errors.confirmPassword?.message}
-                          className="border-amber-200 focus:border-amber-400 focus:ring-amber-400 pr-12"
+                          id="email"
+                          type="email"
+                          placeholder="seu@email.com"
+                          aria-invalid={registerForm.formState.errors.email ? "true" : "false"}
+                          {...registerForm.register('email')}
+                          className="border-amber-200 focus:border-amber-400 focus:ring-amber-400"
                         />
-                        <button
-                          type="button"
-                          onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                          className="absolute right-3 top-9 text-amber-600 hover:text-amber-700"
-                        >
-                          {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                        </button>
+                        {registerForm.formState.errors.email && (
+                          <span role="alert" className="text-sm text-red-600">
+                            {registerForm.formState.errors.email.message}
+                          </span>
+                        )}
+                      </div>
+                      
+                      <div className="relative space-y-2">
+                        <label htmlFor="password" className="text-sm font-medium text-madeira-escura">Senha</label>
+                        <div className="relative">
+                          <Input
+                            id="password"
+                            type={showPassword ? "text" : "password"}
+                            placeholder="Crie uma senha segura"
+                            aria-invalid={registerForm.formState.errors.password ? "true" : "false"}
+                            {...registerForm.register('password')}
+                            className="border-amber-200 focus:border-amber-400 focus:ring-amber-400 pr-12"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setShowPassword(!showPassword)}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-amber-600 hover:text-amber-700"
+                            aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
+                          >
+                            {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                          </button>
+                        </div>
+                        {registerForm.formState.errors.password && (
+                          <span role="alert" className="text-sm text-red-600">
+                            {registerForm.formState.errors.password.message}
+                          </span>
+                        )}
+                      </div>
+                      
+                      <div className="relative space-y-2">
+                        <label htmlFor="confirmPassword" className="text-sm font-medium text-madeira-escura">Confirmar senha</label>
+                        <div className="relative">
+                          <Input
+                            id="confirmPassword"
+                            type={showConfirmPassword ? "text" : "password"}
+                            placeholder="Confirme sua senha"
+                            aria-invalid={registerForm.formState.errors.confirmPassword ? "true" : "false"}
+                            {...registerForm.register('confirmPassword')}
+                            className="border-amber-200 focus:border-amber-400 focus:ring-amber-400 pr-12"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-amber-600 hover:text-amber-700"
+                            aria-label={showConfirmPassword ? "Ocultar senha" : "Mostrar senha"}
+                          >
+                            {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                          </button>
+                        </div>
+                        {registerForm.formState.errors.confirmPassword && (
+                          <span role="alert" className="text-sm text-red-600">
+                            {registerForm.formState.errors.confirmPassword.message}
+                          </span>
+                        )}
                       </div>
                     </div>
 
@@ -575,13 +622,11 @@ export default function AuthPage() {
 
                     <Button
                       type="submit"
-                      variant="primary"
-                      size="lg"
                       className="w-full bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white font-semibold py-3 shadow-lg"
-                      loading={loading}
+                      disabled={loading || (rateLimitInfo?.active && rateLimitInfo.email === registerForm.watch('email'))}
                     >
                       <User className="w-5 h-5 mr-2" />
-                      Criar minha conta
+                      {loading ? 'Criando conta...' : 'Criar minha conta'}
                     </Button>
                   </form>
                 )}
@@ -592,12 +637,49 @@ export default function AuthPage() {
                   </p>
                   <button
                     type="button"
-                    onClick={() => setIsLogin(!isLogin)}
+                    onClick={() => {
+                      setIsLogin(!isLogin)
+                      setShowResendConfirmation(false)
+                      loginForm.reset()
+                      registerForm.reset()
+                    }}
                     className="mt-2 text-amber-600 hover:text-amber-700 font-semibold transition-colors"
                   >
                     {isLogin ? 'Criar nova conta' : 'Fazer login'}
                   </button>
                 </div>
+
+                {/* Resend Confirmation */}
+                {showResendConfirmation && (
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <div className="text-center space-y-4">
+                      <div className="text-sm text-blue-800">
+                        <p className="font-medium mb-1">Não recebeu o email de confirmação?</p>
+                        <p className="text-blue-700">Email: <code className="bg-blue-100 px-1 rounded">{resendEmail}</code></p>
+                      </div>
+                      
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="w-full border-blue-200 hover:border-blue-300 hover:bg-blue-50"
+                        onClick={handleResendConfirmation}
+                        disabled={loading}
+                      >
+                        {loading ? 'Reenviando...' : 'Reenviar Email de Confirmação'}
+                      </Button>
+                      
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setShowResendConfirmation(false)}
+                        className="text-blue-600 hover:text-blue-700"
+                      >
+                        Cancelar
+                      </Button>
+                    </div>
+                  </div>
+                )}
 
                 {!isLogin && (
                   <div className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-lg p-4 mt-6">
@@ -620,39 +702,6 @@ export default function AuthPage() {
                       </li>
                     </ul>
                   </div>
-                )}
-
-                {/* Seção de Reenvio de Confirmação */}
-                {showResendConfirmation && (
-                  <Card className="w-full max-w-md mx-auto mt-4">
-                    <CardContent className="pt-6">
-                      <div className="text-center space-y-4">
-                        <div className="text-sm text-muted-foreground">
-                          <p>Não recebeu o email de confirmação?</p>
-                          <p className="text-xs mt-1">Email: {resendEmail || 'N/A'}</p>
-                        </div>
-                        
-                        <Button
-                          type="button"
-                          variant="outline"
-                          className="w-full"
-                          onClick={handleResendConfirmation}
-                          disabled={loading}
-                        >
-                          {loading ? 'Reenviando...' : 'Reenviar Email de Confirmação'}
-                        </Button>
-                        
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => setShowResendConfirmation(false)}
-                        >
-                          Cancelar
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
                 )}
               </CardContent>
             </Card>
