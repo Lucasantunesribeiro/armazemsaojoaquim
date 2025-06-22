@@ -6,17 +6,20 @@ export default function TestSimplePage() {
     {
       url: '/images/placeholder.svg',
       name: 'Placeholder SVG',
-      useFill: true
+      useFill: true,
+      loading: 'eager' as const
     },
     {
       url: 'https://enolssforaepnrpfrima.supabase.co/storage/v1/object/public/menu-images/posta_de_salmao_grelhado.png',
       name: 'Salmão Grelhado',
-      useFill: true
+      useFill: true,
+      loading: 'eager' as const
     },
     {
       url: 'https://enolssforaepnrpfrima.supabase.co/storage/v1/object/public/menu-images/picanha_ao_carvao.png',
       name: 'Picanha ao Carvão',
-      useFill: false
+      useFill: false,
+      loading: 'lazy' as const
     }
   ]
 
@@ -31,7 +34,7 @@ export default function TestSimplePage() {
           {testImages.map((img, index) => (
             <div key={index} className="bg-white p-6 rounded-lg shadow-md">
               <h2 className="text-xl font-semibold mb-4">
-                {img.name} - {img.useFill ? 'Com Fill' : 'Dimensões Fixas'}
+                {img.name} - {img.useFill ? 'Com Fill' : 'Dimensões Fixas'} - Loading: {img.loading}
               </h2>
               
               <div className="border-2 border-dashed border-gray-300 p-4">
@@ -42,6 +45,7 @@ export default function TestSimplePage() {
                       src={img.url}
                       alt={img.name}
                       fill
+                      loading={img.loading}
                       className="rounded object-cover"
                     />
                   </div>
@@ -53,6 +57,7 @@ export default function TestSimplePage() {
                       alt={img.name}
                       width={400}
                       height={300}
+                      loading={img.loading}
                       className="rounded object-cover"
                     />
                   </div>

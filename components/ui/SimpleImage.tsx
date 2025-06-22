@@ -9,11 +9,22 @@ interface SimpleImageProps {
   height?: number
   className?: string
   fill?: boolean
+  loading?: 'lazy' | 'eager'
+  priority?: boolean
 }
 
-const SimpleImage = ({ src, alt, width = 400, height = 300, className = '', fill = false }: SimpleImageProps) => {
+const SimpleImage = ({ 
+  src, 
+  alt, 
+  width = 400, 
+  height = 300, 
+  className = '', 
+  fill = false,
+  loading = 'lazy',
+  priority = false 
+}: SimpleImageProps) => {
   const [error, setError] = useState(false)
-  const [loading, setLoading] = useState(true)
+  const [isLoading, setIsLoading] = useState(true)
   const [retryCount, setRetryCount] = useState(0)
   
   // Evitar loops infinitos - máximo 1 tentativa
@@ -22,7 +33,7 @@ const SimpleImage = ({ src, alt, width = 400, height = 300, className = '', fill
   // Reset estado quando URL muda
   useEffect(() => {
     setError(false)
-    setLoading(true)
+    setIsLoading(true)
     setRetryCount(0)
   }, [src])
   
@@ -48,7 +59,7 @@ const SimpleImage = ({ src, alt, width = 400, height = 300, className = '', fill
 
   return (
     <div className={fill ? 'relative w-full h-full' : 'relative'}>
-      {loading && (
+      {isLoading && (
         <div 
           className={`bg-gray-100 animate-pulse flex items-center justify-center z-10 ${fill ? 'absolute inset-0 w-full h-full' : ''}`}
           style={fill ? {} : { width: finalWidth, height: finalHeight }}
@@ -67,7 +78,9 @@ const SimpleImage = ({ src, alt, width = 400, height = 300, className = '', fill
           width: finalWidth!,
           height: finalHeight!
         })}
-        className={`${className} ${loading ? 'opacity-0' : 'opacity-100'} transition-opacity duration-300`}
+        className={`${className} ${isLoading ? 'opacity-0' : 'opacity-100'} transition-opacity duration-300`}
+        loading={loading}
+        priority={priority}
         onError={() => {
           console.error(`❌ Erro ao carregar imagem (tentativa ${retryCount + 1}/${MAX_RETRIES}):`, src)
           setRetryCount(prev => prev + 1)
@@ -75,14 +88,13 @@ const SimpleImage = ({ src, alt, width = 400, height = 300, className = '', fill
           if (retryCount >= MAX_RETRIES - 1) {
             setError(true)
           }
-          setLoading(false)
+          setIsLoading(false)
         }}
         onLoad={() => {
           console.log('✅ Imagem carregada:', src)
-          setLoading(false)
+          setIsLoading(false)
           setRetryCount(0) // Reset contador em caso de sucesso
         }}
-        unoptimized={true} // Desabilitar otimização para teste
       />
     </div>
   )
