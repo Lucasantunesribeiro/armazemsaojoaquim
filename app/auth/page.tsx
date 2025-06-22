@@ -102,12 +102,7 @@ export default function AuthPage() {
         environment: window.location.hostname !== 'localhost' ? 'production' : 'development'
       })
 
-      // Log detalhado para debug
-      console.log('🔍 Supabase URL:', supabase.supabaseUrl)
-      console.log('🔍 Auth endpoint:', `${supabase.supabaseUrl}/auth/v1/signup`)
-
-      // Primeira tentativa: registro com confirmação de email
-      let { data: authData, error } = await supabase.auth.signUp({
+      const { data: authData, error } = await supabase.auth.signUp({
         email: data.email,
         password: data.password,
         options: {
@@ -118,82 +113,8 @@ export default function AuthPage() {
         }
       })
 
-      // Se houver erro 500 ou erro de email, tentar registro sem confirmação
-      if (error && (
-        error.message?.includes('Error sending confirmation email') ||
-        error.message?.includes('Internal Server Error') ||
-        error.message?.includes('500') ||
-        error.status === 500 ||
-        error.code === 500 ||
-        (typeof error === 'object' && error.toString().includes('500'))
-      )) {
-        console.log('⚠️ Erro de servidor/email detectado:', {
-          message: error.message,
-          status: error.status,
-          code: error.code,
-          errorString: error.toString()
-        })
-        console.log('🔄 Tentando registro alternativo...')
-        
-        // Fallback: tentar novamente sem opções de email e com configurações mínimas
-        const { data: fallbackData, error: fallbackError } = await supabase.auth.signUp({
-          email: data.email,
-          password: data.password,
-          options: {
-            data: {
-              full_name: data.name,
-              name: data.name
-            },
-            emailRedirectTo: undefined // Explicitamente remover redirect
-          }
-        })
-
-        if (fallbackError) {
-          console.error('❌ Fallback Registration Error:', {
-            message: fallbackError.message,
-            status: fallbackError.status,
-            code: fallbackError.code,
-            details: fallbackError
-          })
-          
-          // Se ainda houver erro, informar que a conta pode ter sido criada
-          if (fallbackError.message?.includes('User already registered')) {
-            toast.error('Este email já está cadastrado. Tente fazer login ou use outro email.')
-          } else if (fallbackError.message?.includes('Invalid email')) {
-            toast.error('Email inválido. Verifique o formato do email.')
-          } else if (fallbackError.message?.includes('Password')) {
-            toast.error('Senha muito fraca. Use pelo menos 6 caracteres.')
-          } else if (fallbackError.message?.includes('signup is disabled')) {
-            toast.error('Cadastro temporariamente desabilitado. Tente novamente mais tarde.')
-          } else {
-            // Para erros 500 persistentes, assumir que a conta pode ter sido criada
-            toast.success('🎉 Sua conta pode ter sido criada com sucesso! Tente fazer login ou verifique seu email.')
-            setIsLogin(true)
-            registerForm.reset()
-            return
-          }
-          return
-        }
-
-        // Sucesso no fallback
-        authData = fallbackData
-        error = null
-        
-        console.log('✅ Registro alternativo bem-sucedido')
-        toast.success('🎉 Conta criada com sucesso! Você já pode fazer login.')
-        setIsLogin(true)
-        registerForm.reset()
-        return
-      }
-
-      // Se houver outros tipos de erro
       if (error) {
-        console.error('❌ Registration Error:', {
-          message: error.message,
-          status: error.status,
-          code: error.code,
-          details: error
-        })
+        console.error('❌ Registration Error:', error)
         
         // Tratar diferentes tipos de erro
         if (error.message?.includes('User already registered')) {
@@ -205,7 +126,7 @@ export default function AuthPage() {
         } else if (error.message?.includes('signup is disabled')) {
           toast.error('Cadastro temporariamente desabilitado. Tente novamente mais tarde.')
         } else {
-          toast.error('Erro no servidor. Sua conta pode ter sido criada. Tente fazer login.')
+          toast.error('Erro no cadastro. Tente novamente ou entre em contato conosco.')
         }
         return
       }
@@ -235,17 +156,6 @@ export default function AuthPage() {
       // Tratar erros de rede ou outros erros inesperados
       if (error.name === 'NetworkError' || error.message?.includes('fetch')) {
         toast.error('Erro de conexão. Verifique sua internet e tente novamente.')
-      } else if (
-        error.message?.includes('500') ||
-        error.status === 500 ||
-        error.code === 500 ||
-        error.toString().includes('500') ||
-        error.toString().includes('Internal Server Error')
-      ) {
-        console.log('🎯 Erro 500 capturado no catch - assumindo conta criada')
-        toast.success('🎉 Sua conta pode ter sido criada com sucesso! Tente fazer login ou verifique seu email.')
-        setIsLogin(true)
-        registerForm.reset()
       } else {
         toast.error('Erro inesperado ao criar conta. Tente novamente.')
       }

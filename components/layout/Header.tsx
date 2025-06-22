@@ -7,6 +7,7 @@ import { Menu, X, Calendar, User, LogOut, Lock, Moon, Sun } from 'lucide-react'
 import { useSupabase } from '../providers/SupabaseProvider'
 import { useTheme } from 'next-themes'
 import LogoSimple from '../atoms/LogoSimple'
+import { forceLogout } from '../../lib/supabase'
 
 const navLinks = [
   { name: 'Início', href: '/' },
@@ -40,8 +41,35 @@ export default function Header() {
 
   // Handle logout
   const handleLogout = async () => {
-    await supabase.auth.signOut()
-    setIsUserMenuOpen(false)
+    try {
+      console.log('🔄 Iniciando logout...')
+      
+      // Tentar logout normal primeiro
+      const { error } = await supabase.auth.signOut({ scope: 'local' })
+      
+      if (error) {
+        console.warn('⚠️ Erro no logout normal, usando logout forçado:', error)
+        await forceLogout()
+      }
+      
+      console.log('✅ Logout concluído')
+      setIsUserMenuOpen(false)
+      
+      // Opcional: recarregar a página para garantir limpeza completa
+      if (typeof window !== 'undefined') {
+        window.location.reload()
+      }
+    } catch (error) {
+      console.error('❌ Erro no logout:', error)
+      
+      // Fallback: usar logout forçado
+      await forceLogout()
+      setIsUserMenuOpen(false)
+      
+      if (typeof window !== 'undefined') {
+        window.location.reload()
+      }
+    }
   }
 
   // Toggle theme

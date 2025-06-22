@@ -132,7 +132,11 @@ try {
       auth: {
         persistSession: typeof window !== 'undefined',
         autoRefreshToken: typeof window !== 'undefined',
-        detectSessionInUrl: typeof window !== 'undefined'
+        detectSessionInUrl: typeof window !== 'undefined',
+        flowType: 'pkce',
+        storage: typeof window !== 'undefined' ? window.localStorage : undefined,
+        storageKey: 'armazem-sao-joaquim-auth',
+        debug: process.env.NODE_ENV === 'development'
       },
       realtime: {
         params: {
@@ -141,10 +145,94 @@ try {
       },
       global: {
         headers: {
-          'X-Client-Info': 'armazem-sao-joaquim'
+          'X-Client-Info': 'armazem-sao-joaquim',
+          'apikey': supabaseAnonKey
         }
       }
     })
+
+    // Wrapper para signOut com fallback
+    const originalSignOut = supabase.auth.signOut
+    supabase.auth.signOut = async (options?: { scope?: 'global' | 'local' }) => {
+      try {
+        console.log('🔄 Tentando logout...', options)
+        const result = await originalSignOut.call(supabase.auth, options)
+        
+        if (result.error) {
+          console.warn('⚠️ Erro no logout do servidor, fazendo limpeza local:', result.error)
+          
+          // Fallback: limpar sessão localmente
+          if (typeof window !== 'undefined') {
+            localStorage.removeItem('armazem-sao-joaquim-auth')
+            localStorage.removeItem('sb-enolssforaepnrpfrima-auth-token')
+            sessionStorage.clear()
+          }
+          
+          // Retornar sucesso mesmo com erro do servidor
+          return { error: null }
+        }
+        
+        console.log('✅ Logout realizado com sucesso')
+        return result
+      } catch (error) {
+        console.error('❌ Erro inesperado no logout:', error)
+        
+        // Fallback: limpar sessão localmente
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem('armazem-sao-joaquim-auth')
+          localStorage.removeItem('sb-enolssforaepnrpfrima-auth-token')
+          sessionStorage.clear()
+        }
+        
+        // Retornar sucesso para não bloquear o usuário
+        return { error: null }
+      }
+    }
+
+    // Wrapper para signUp com melhor tratamento de erros
+    const originalSignUp = supabase.auth.signUp
+    supabase.auth.signUp = async (credentials: any) => {
+      try {
+        console.log('🔄 Tentando registro...', { email: credentials.email })
+        
+        const result = await originalSignUp.call(supabase.auth, credentials)
+        
+        // Se houve erro 500, tentar novamente com configurações simplificadas
+        if (result.error && (
+          result.error.message?.includes('500') ||
+          result.error.message?.includes('Internal Server Error') ||
+          result.error.message?.includes('Error sending confirmation email')
+        )) {
+          console.log('⚠️ Erro 500 detectado, tentando registro simplificado...')
+          
+          // Tentar novamente sem opções de email
+          const fallbackCredentials = {
+            email: credentials.email,
+            password: credentials.password,
+            options: {
+              data: credentials.options?.data || {},
+              emailRedirectTo: undefined
+            }
+          }
+          
+          const fallbackResult = await originalSignUp.call(supabase.auth, fallbackCredentials)
+          
+          if (fallbackResult.error) {
+            console.error('❌ Fallback também falhou:', fallbackResult.error)
+            return fallbackResult
+          }
+          
+          console.log('✅ Registro fallback bem-sucedido')
+          return fallbackResult
+        }
+        
+        return result
+      } catch (error) {
+        console.error('❌ Erro inesperado no registro:', error)
+        throw error
+      }
+    }
+
   } else {
     console.warn('Supabase não configurado. Usando cliente mock.')
     supabase = createMockClient()
@@ -185,6 +273,34 @@ export const getSupabaseStatus = async () => {
       message: error.message || 'Erro desconhecido',
       timestamp: new Date().toISOString()
     }
+  }
+}
+
+// Função auxiliar para logout forçado
+export const forceLogout = async () => {
+  try {
+    console.log('🔄 Forçando logout...')
+    
+    // Tentar logout normal primeiro
+    await supabase.auth.signOut({ scope: 'local' })
+    
+    // Limpar storage local
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('armazem-sao-joaquim-auth')
+      localStorage.removeItem('sb-enolssforaepnrpfrima-auth-token')
+      sessionStorage.clear()
+      
+      // Limpar cookies relacionados ao Supabase
+      document.cookie.split(";").forEach(function(c) { 
+        document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); 
+      });
+    }
+    
+    console.log('✅ Logout forçado realizado')
+    return { success: true }
+  } catch (error) {
+    console.error('❌ Erro no logout forçado:', error)
+    return { success: false, error }
   }
 }
 
