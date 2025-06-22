@@ -309,8 +309,9 @@ export default function AuthPage() {
                     src="/images/logo-optimized.jpg"
                     alt="Armazém São Joaquim"
                     fill
-                    className="object-contain rounded-full shadow-lg"
-                    fallbackSrc="/images/placeholder.svg"
+                    sizes="80px"
+                    className="transition-opacity duration-300 opacity-100 object-contain rounded-full shadow-lg"
+                    priority
                   />
                 </div>
                 
