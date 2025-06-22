@@ -113,96 +113,71 @@ export default function AuthPage() {
   const handleRegister = async (data: RegisterForm) => {
     setLoading(true)
     try {
-      console.log('🔄 Tentando registrar usuário com fallback:', {
+      console.log('🔄 Tentando registrar usuário:', {
         email: data.email,
         name: data.name,
         environment: window.location.hostname !== 'localhost' ? 'production' : 'development'
       })
 
-      // Usar o novo sistema inteligente SMTP
-      const response = await fetch('/api/auth/check-smtp-status', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email: data.email,
-          password: data.password,
-          name: data.name
-        })
+      // SEMPRE usar signup público para garantir verificação por email
+      const { data: authData, error } = await supabase.auth.signUp({
+        email: data.email,
+        password: data.password,
+        options: {
+          data: {
+            full_name: data.name,
+            name: data.name
+          }
+        }
       })
 
-      const result = await response.json()
-
-      if (!response.ok) {
-        console.error('❌ Registration Error:', result)
+      if (error) {
+        console.error('❌ Registration Error:', error)
         
-        // Tratar diferentes tipos de erro
-        if (result.error?.includes('User already registered') || result.user_exists) {
-          toast.error('Este email já possui uma conta. Tente fazer login ou usar a opção "Esqueci minha senha".')
-          setIsLogin(true)
+        // Tratar rate limit
+        if (error.status === 429 || error.message?.includes('rate limit')) {
+          toast.error('⏰ Muitas tentativas de cadastro. Aguarde alguns minutos e tente novamente.')
           return
         }
-
-        if (result.error?.includes('Password should be at least')) {
-          toast.error('A senha deve ter pelo menos 6 caracteres.')
+        
+        // Tratar erro 500 SMTP
+        if (error.message?.includes('Error sending') || error.status === 500) {
+          toast.error('📧 Problema no envio do email de confirmação. Verifique se o SMTP está configurado corretamente no Supabase.')
           return
         }
-
-        if (result.error?.includes('Invalid email')) {
-          toast.error('Por favor, insira um email válido.')
-          return
-        }
-
-        // Erro genérico
-        toast.error(result.error || 'Ocorreu um erro inesperado. Tente novamente.')
+        
+        // Outros erros
+        toast.error(`Erro no cadastro: ${error.message}`)
         return
       }
 
-      // Sucesso com estratégia inteligente SMTP
-      if (result.success) {
-        console.log('✅ Registro bem-sucedido via:', result.strategy)
+      // Sucesso - sempre exigir verificação por email
+      if (authData.user && !authData.user.email_confirmed_at) {
+        console.log('✅ Registro bem-sucedido - aguardando confirmação por email')
         
         // Salvar email para facilitar detecção no login
         localStorage.setItem('recent_registration_email', data.email)
         
-        if (result.strategy === 'public_with_verification') {
-          // SMTP funcionando - verificação por email ativada
-          toast.success('🎉 Conta criada! Verifique seu email para confirmar.')
-          console.log('📧 SMTP FUNCIONANDO - Verificação por email ativada!')
-          
-          setTimeout(() => {
-            toast.success('📧 Verifique sua caixa de entrada e pasta de spam!')
-          }, 2000)
-          
-          setTimeout(() => {
-            setIsLogin(true)
-            registerForm.reset()
-          }, 4000)
-          
-        } else if (result.strategy === 'admin_auto_confirm') {
-          // SMTP não funcionando - conta criada sem verificação
-          toast.success('✅ Conta criada! Você já pode fazer login.')
-          console.log('⚠️ SMTP não configurado - usando fallback sem verificação')
-          
-          setTimeout(() => {
-            setIsLogin(true)
-            registerForm.reset()
-            loginForm.setValue('email', data.email)
-          }, 2500)
-        }
+        toast.success('📧 Cadastro realizado com sucesso! Verifique seu email para confirmar sua conta.')
         
-        // Mostrar aviso sobre configuração SMTP se necessário
-        if (result.warning) {
-          setTimeout(() => {
-            toast.success(`ℹ️ ${result.warning}`)
-          }, 1500)
-        }
+        // Mudar para tela de login após 3 segundos
+        setTimeout(() => {
+          setIsLogin(true)
+          registerForm.reset()
+        }, 3000)
+      } else if (authData.user && authData.user.email_confirmed_at) {
+        // Email já confirmado (não deveria acontecer com SMTP configurado)
+        console.log('⚠️ Email já confirmado automaticamente')
+        toast.success('🎉 Bem-vindo! Sua conta foi criada e confirmada.')
+        localStorage.removeItem('recent_registration_email')
+        setTimeout(() => router.push('/'), 2000)
+      } else {
+        toast.error('❌ Erro inesperado no cadastro. Tente novamente.')
       }
 
-    } catch (error: any) {
-      console.error('❌ Erro inesperado no registro:', error)
-      toast.error('Erro inesperado. Algo deu errado. Tente novamente em alguns instantes.')
+    } catch (error) {
+      console.error('❌ Unexpected registration error:', error)
+      toast.error('❌ Erro inesperado. Tente novamente mais tarde.')
     } finally {
       setLoading(false)
     }
@@ -245,34 +220,33 @@ export default function AuthPage() {
       return
     }
 
-    setLoading(true)
     try {
-      console.log('🔄 Reenviando confirmação para:', resendEmail)
+      setLoading(true)
+      console.log('📧 Reenviando email de confirmação para:', resendEmail)
       
       const { error } = await supabase.auth.resend({
         type: 'signup',
-        email: resendEmail
+        email: resendEmail,
+        options: {
+          emailRedirectTo: `${window.location.origin}/auth/callback`
+        }
       })
-
+      
       if (error) {
-        console.error('❌ Erro ao reenviar confirmação:', error)
-        
-        if (error.message?.includes('User already registered')) {
-          toast.error('Esta conta já foi confirmada. Tente fazer login normalmente.')
-        } else if (error.message?.includes('Email rate limit exceeded')) {
-          toast.error('Muitas tentativas. Aguarde alguns minutos antes de tentar novamente.')
+        console.error('❌ Erro ao reenviar email:', error)
+        if (error.status === 429) {
+          toast.error('⏰ Aguarde alguns minutos antes de solicitar um novo email.')
         } else {
-          toast.error(`Erro ao reenviar confirmação: ${error.message}`)
+          toast.error(`Erro ao reenviar email: ${error.message}`)
         }
       } else {
-        toast.success('Email de confirmação reenviado! Verifique sua caixa de entrada.')
+        toast.success('📧 Email de confirmação reenviado! Verifique sua caixa de entrada.')
         setShowResendConfirmation(false)
-        // Limpar o email salvo após reenvio bem-sucedido
         localStorage.removeItem('recent_registration_email')
       }
-    } catch (error: any) {
-      console.error('❌ Erro inesperado ao reenviar confirmação:', error)
-      toast.error('Erro inesperado ao reenviar confirmação')
+    } catch (error) {
+      console.error('❌ Erro inesperado ao reenviar email:', error)
+      toast.error('❌ Erro inesperado. Tente novamente.')
     } finally {
       setLoading(false)
     }
