@@ -39,6 +39,7 @@ export default function AuthPage() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [showResendConfirmation, setShowResendConfirmation] = useState(false)
   const [resendEmail, setResendEmail] = useState('')
+  const [rateLimitInfo, setRateLimitInfo] = useState<{active: boolean, remainingMinutes: number, email: string} | null>(null)
   const { supabase } = useSupabase()
   const router = useRouter()
 
@@ -53,6 +54,40 @@ export default function AuthPage() {
       // Limpar o erro da URL
       window.history.replaceState({}, document.title, window.location.pathname)
     }
+  }, [])
+
+  // Monitorar rate limit
+  useEffect(() => {
+    const checkRateLimit = () => {
+      const rateLimitTimestamp = localStorage.getItem('supabase_rate_limit_timestamp')
+      const rateLimitEmail = localStorage.getItem('supabase_rate_limit_email')
+      
+      if (rateLimitTimestamp && rateLimitEmail) {
+        const timeSinceRateLimit = Date.now() - parseInt(rateLimitTimestamp)
+        const hoursWaited = timeSinceRateLimit / (1000 * 60 * 60)
+        
+        if (hoursWaited < 2) {
+          const remainingMinutes = Math.ceil((2 * 60) - (timeSinceRateLimit / (1000 * 60)))
+          setRateLimitInfo({
+            active: true,
+            remainingMinutes,
+            email: rateLimitEmail
+          })
+        } else {
+          // Rate limit expirado
+          localStorage.removeItem('supabase_rate_limit_timestamp')
+          localStorage.removeItem('supabase_rate_limit_email')
+          setRateLimitInfo(null)
+        }
+      } else {
+        setRateLimitInfo(null)
+      }
+    }
+
+    checkRateLimit()
+    const interval = setInterval(checkRateLimit, 60000) // Verificar a cada minuto
+
+    return () => clearInterval(interval)
   }, [])
 
   const loginForm = useForm<LoginForm>({
@@ -113,6 +148,29 @@ export default function AuthPage() {
   const handleRegister = async (data: RegisterForm) => {
     setLoading(true)
     try {
+      // Verificar rate limit ativo
+      const rateLimitTimestamp = localStorage.getItem('supabase_rate_limit_timestamp')
+      const rateLimitEmail = localStorage.getItem('supabase_rate_limit_email')
+      
+      if (rateLimitTimestamp) {
+        const timeSinceRateLimit = Date.now() - parseInt(rateLimitTimestamp)
+        const hoursWaited = timeSinceRateLimit / (1000 * 60 * 60)
+        
+        // Se ainda não passou 2 horas e é o mesmo email
+        if (hoursWaited < 2 && rateLimitEmail === data.email) {
+          const remainingMinutes = Math.ceil((2 * 60) - (timeSinceRateLimit / (1000 * 60)))
+          toast.error(`⏰ Rate limit ainda ativo!\n\nAguarde mais ${remainingMinutes} minutos ou use um email diferente.`)
+          setLoading(false)
+          return
+        }
+        
+        // Limpar rate limit expirado
+        if (hoursWaited >= 2) {
+          localStorage.removeItem('supabase_rate_limit_timestamp')
+          localStorage.removeItem('supabase_rate_limit_email')
+        }
+      }
+      
       console.log('🔄 Tentando registrar usuário:', {
         email: data.email,
         name: data.name,
@@ -134,10 +192,23 @@ export default function AuthPage() {
       if (error) {
         console.error('❌ Registration Error:', error)
         
-        // Tratar rate limit
+        // Tratar rate limit específico do Supabase Auth
         if (error.status === 429 || error.message?.includes('rate limit')) {
-          toast.error('⏰ Muitas tentativas de cadastro. Aguarde alguns minutos e tente novamente.')
-          return
+          console.log('🚫 Rate limit detectado:', error.message)
+          
+          // Verificar se é rate limit de email
+          if (error.message?.includes('email rate limit')) {
+            toast.error(`📧 Limite de emails atingido!\n\n• Aguarde 1-2 horas antes de tentar novamente\n• Use um email diferente se urgente\n• Este é um limite do Supabase para prevenir spam`)
+            
+            // Salvar timestamp do rate limit
+            localStorage.setItem('supabase_rate_limit_timestamp', Date.now().toString())
+            localStorage.setItem('supabase_rate_limit_email', data.email)
+            
+            return
+          } else {
+            toast.error('⏰ Muitas tentativas de cadastro. Aguarde alguns minutos e tente novamente.')
+            return
+          }
         }
         
         // Tratar erro 500 SMTP
@@ -314,6 +385,27 @@ export default function AuthPage() {
                     <span className="px-4 bg-white text-amber-600 font-medium">ou continue com email</span>
                   </div>
                 </div>
+
+                {/* Rate Limit Warning */}
+                {rateLimitInfo?.active && !isLogin && (
+                  <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                    <div className="flex items-start space-x-3">
+                      <div className="w-5 h-5 text-red-600 mt-0.5 flex-shrink-0">⏰</div>
+                      <div className="text-sm text-red-800">
+                        <p className="font-medium mb-1">Limite de cadastros atingido</p>
+                        <p className="text-red-700 mb-2">
+                          Email <code className="bg-red-100 px-1 rounded">{rateLimitInfo.email}</code> está em rate limit.
+                        </p>
+                        <p className="text-red-700">
+                          ⏳ Aguarde <strong>{rateLimitInfo.remainingMinutes} minutos</strong> ou use um email diferente.
+                        </p>
+                        <p className="text-red-600 text-xs mt-1">
+                          Este limite é do Supabase para prevenir spam de emails.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
 
                 {isLogin ? (
                   <form onSubmit={loginForm.handleSubmit(handleLogin)} className="space-y-5">
