@@ -336,7 +336,7 @@ export default function AuthPage() {
               <CardHeader className="text-center pb-6 pt-8">
                 <div className="w-20 h-20 mx-auto mb-6 relative">
                   <OptimizedImage
-                    src="/images/logo.jpg"
+                    src="/images/logo-optimized.jpg"
                     alt="Armazém São Joaquim"
                     fill
                     className="object-contain rounded-full shadow-lg"
