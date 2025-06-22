@@ -25,7 +25,7 @@ export const SafeImage = ({
   priority = false,
   sizes,
   fill = false,
-  fallbackSrc = '/images/placeholder.jpg',
+  fallbackSrc = '/images/placeholder.svg',
   quality = 75,
   ...props
 }: SafeImageProps) => {

@@ -5,15 +5,23 @@ import { Calendar, Clock, ArrowRight, Book, Camera, MapPin } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import Button from '../ui/Button'
+import { SafeImage } from '../ui/SafeImage'
+import ImageTest from '../debug/ImageTest'
 
 const BlogPreview = () => {
   const [isVisible, setIsVisible] = useState(false)
   const [activeImageIndex, setActiveImageIndex] = useState(0)
   const sectionRef = useRef<HTMLDivElement>(null)
 
+  // Debug: Log das imagens para verificar se os caminhos estão corretos
+  useEffect(() => {
+    console.log('🖼️ BlogPreview - Imagens do bairro:', neighborhoodImages.map(img => img.src))
+    console.log('📝 BlogPreview - Imagens dos posts:', blogPosts.map(post => ({ title: post.title, image: post.image })))
+  }, [])
+
   const neighborhoodImages = [
     {
-      src: '/images/santa-teresa-vista-panoramica-2.jpg',
+      src: '/images/santa-teresa-vista-panoramica.jpg',
       alt: 'Vista panorâmica de Santa Teresa',
       title: 'Santa Teresa Vista Aérea',
       description: 'O charme colonial visto do alto'
@@ -28,39 +36,51 @@ const BlogPreview = () => {
 
   const blogPosts = [
     {
-      id: 1,
-      title: "A História de Santa Teresa: Berço da Boemia Carioca",
-      excerpt: "Descubra como o bairro se tornou um dos mais charmosos do Rio de Janeiro, preservando suas tradições e cultura secular.",
+      id: 'eba7ad99-df5c-40e8-a3fb-597e7945c4d6',
+      title: "A História do Armazém São Joaquim",
+      excerpt: "Conheça a fascinante história de 170 anos do nosso restaurante histórico no coração de Santa Teresa.",
       category: "História",
       readTime: "8 min",
       date: "2024-01-15",
       author: "Equipe Armazém",
-      image: "/images/historia.jpg",
-      slug: "historia-santa-teresa-berco-boemia-carioca",
+      image: "/images/blog/historia-armazem.jpg",
+      slug: "historia-do-armazem-sao-joaquim",
       featured: true
     },
     {
-      id: 2,
-      title: "Receitas Centenárias: Os Segredos da Culinária Colonial",
-      excerpt: "Conheça as receitas tradicionais que atravessaram gerações e continuam encantando nossos clientes.",
-      category: "Gastronomia",
+      id: 'c7d5e4fd-3d36-4e48-b8d1-41fd08d2c37d',
+      title: "A Arte da Mixologia no Armazém",
+      excerpt: "Conheça o cuidado e a paixão por trás de cada drink servido no Armazém São Joaquim.",
+      category: "Drinks",
       readTime: "6 min",
-      date: "2024-01-10",
-      author: "Chef Tradicional",
-      image: "/images/armazem-interior-aconchegante.jpg",
-      slug: "receitas-centenarias-segredos-culinaria-colonial",
+      date: "2025-06-08",
+      author: "Bartender Especialista",
+      image: "/images/blog/drinks.jpg",
+      slug: "a-arte-da-mixologia-no-armazem",
       featured: false
     },
     {
-      id: 3,
-      title: "Bondinho de Santa Teresa: Uma Viagem no Tempo",
-      excerpt: "A história do transporte mais charmoso do Rio e sua importância para o desenvolvimento do bairro.",
-      category: "Patrimônio",
+      id: 'e4681889-d24a-4535-accb-54c5c5055f54',
+      title: "Os Segredos da Nossa Feijoada",
+      excerpt: "Descubra os segredos por trás da nossa famosa feijoada tradicional.",
+      category: "Gastronomia",
       readTime: "5 min",
-      date: "2024-01-05",
-      author: "Historiador Local",
-      image: "/images/bondinho.jpg",
-      slug: "bondinho-santa-teresa-viagem-tempo",
+      date: "2025-06-07",
+      author: "Chef Tradicional",
+      image: "/images/blog/segredos-feijoada.jpg",
+      slug: "os-segredos-da-nossa-feijoada",
+      featured: false
+    },
+    {
+      id: 'd8e22349-f2ef-46da-be27-8c3f18ca3d3b',
+      title: "Eventos e Celebrações no Armazém",
+      excerpt: "Descubra como transformar seus momentos especiais em memórias inesquecíveis no Armazém.",
+      category: "Eventos",
+      readTime: "7 min",
+      date: "2025-06-08",
+      author: "Coordenador de Eventos",
+      image: "/images/blog/eventos.jpg",
+      slug: "eventos-e-celebracoes-no-armazem",
       featured: false
     }
   ]
@@ -106,6 +126,8 @@ const BlogPreview = () => {
       id="blog"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Componente de Debug Temporário */}
+        <ImageTest />
         {/* Header */}
         <div className={`text-center mb-20 transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
           <div className="inline-flex items-center space-x-2 bg-amber-100 dark:bg-amber-900/30 border border-amber-300 dark:border-amber-700 rounded-full px-6 py-2 mb-6">
@@ -136,13 +158,19 @@ const BlogPreview = () => {
                       index === activeImageIndex ? 'opacity-100 scale-100' : 'opacity-0 scale-105'
                     }`}
                   >
-                    <Image
+                    <SafeImage
                       src={image.src}
                       alt={image.alt}
                       fill
                       className="object-cover"
                       quality={90}
+                      priority={index === 0}
+                      sizes="(max-width: 768px) 100vw, 50vw"
                     />
+                    {/* Debug info */}
+                    <div className="absolute top-2 right-2 bg-black/70 text-white text-xs p-1 rounded opacity-50">
+                      {image.src.split('/').pop()}
+                    </div>
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                     <div className="absolute bottom-6 left-6 text-white">
                       <h4 className="text-xl font-bold mb-2">{image.title}</h4>
@@ -217,13 +245,19 @@ const BlogPreview = () => {
             <div className="bg-white dark:bg-slate-800 rounded-3xl shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-700 hover:shadow-3xl transition-all duration-300">
               <div className="grid md:grid-cols-2 gap-0">
                 <div className="relative h-80 md:h-auto">
-                  <Image
+                  <SafeImage
                     src={post.image}
                     alt={post.title}
                     fill
                     className="object-cover"
                     quality={90}
+                    priority={true}
+                    sizes="(max-width: 768px) 100vw, 50vw"
                   />
+                  {/* Debug info */}
+                  <div className="absolute top-8 right-4 bg-black/70 text-white text-xs p-1 rounded opacity-50">
+                    {post.image.split('/').pop()}
+                  </div>
                   <div className="absolute top-4 left-4">
                     <span className="bg-amber-500 text-white text-xs font-bold px-3 py-1 rounded-full">
                       DESTAQUE
@@ -280,13 +314,18 @@ const BlogPreview = () => {
               className="bg-white dark:bg-slate-800 rounded-2xl shadow-lg hover:shadow-2xl transform hover:scale-[1.02] transition-all duration-300 border border-slate-200 dark:border-slate-700 overflow-hidden group"
             >
               <div className="relative h-48">
-                <Image
+                <SafeImage
                   src={post.image}
                   alt={post.title}
                   fill
                   className="object-cover group-hover:scale-110 transition-transform duration-700"
                   quality={90}
+                  sizes="(max-width: 768px) 100vw, 50vw"
                 />
+                {/* Debug info */}
+                <div className="absolute top-2 right-2 bg-black/70 text-white text-xs p-1 rounded opacity-50">
+                  {post.image.split('/').pop()}
+                </div>
                 <div className="absolute top-4 left-4">
                   <span className="bg-white/90 dark:bg-slate-800/90 text-slate-700 dark:text-slate-300 text-xs font-semibold px-3 py-1 rounded-full backdrop-blur-sm">
                     {post.category}
