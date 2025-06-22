@@ -37,6 +37,8 @@ export default function AuthPage() {
   const [resendingEmail, setResendingEmail] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const [showResendConfirmation, setShowResendConfirmation] = useState(false)
+  const [resendEmail, setResendEmail] = useState('')
   const { supabase } = useSupabase()
   const router = useRouter()
 
@@ -70,16 +72,31 @@ export default function AuthPage() {
       })
 
       if (error) {
-        console.error('Login Error:', error)
-        const errorMessage = error.message || 'Authentication failed'
+        console.error('❌ Login Error:', error)
         
-        if (errorMessage.includes('Email not confirmed')) {
+        // Tratar erro de email não confirmado
+        if (error.message?.includes('Email not confirmed')) {
           toast.error('Email não confirmado! Verifique sua caixa de entrada e clique no link de confirmação.')
-        } else if (errorMessage.includes('Invalid login credentials')) {
-          toast.error('Email ou senha incorretos. Verifique suas credenciais e tente novamente.')
-        } else {
-          toast.error('Erro no login. Tente novamente.')
+          setShowResendConfirmation(true)
+          return
         }
+        
+        // Tratar erro de credenciais inválidas (pode ser conta não confirmada)
+        if (error.message?.includes('Invalid login credentials')) {
+          // Verificar se é uma conta recém-criada que precisa de confirmação
+          const recentRegistration = localStorage.getItem('recent_registration_email')
+          if (recentRegistration === data.email) {
+            toast.error('Conta criada mas não confirmada! Verifique seu email ou reenvie a confirmação.')
+            setShowResendConfirmation(true)
+            setResendEmail(data.email)
+            return
+          }
+          
+          toast.error('Email ou senha incorretos. Verifique suas credenciais e tente novamente.')
+          return
+        }
+        
+        toast.error('Erro no login. Tente novamente.')
         return
       }
 
@@ -120,6 +137,9 @@ export default function AuthPage() {
         if (error.message?.includes('Error sending confirmation email')) {
           toast.success('Conta criada com sucesso! ⚠️ Houve um problema com o email de confirmação. Você pode tentar fazer login.')
           
+          // Salvar email para facilitar detecção no login
+          localStorage.setItem('recent_registration_email', data.email)
+          
           // Redirecionar para login após um delay
           setTimeout(() => {
             setIsLogin(true)
@@ -159,6 +179,9 @@ export default function AuthPage() {
         if (!authData.session) {
           toast.success('📧 Cadastro realizado! Verifique seu email para confirmar sua conta antes de fazer login.')
           
+          // Salvar email para facilitar detecção no login
+          localStorage.setItem('recent_registration_email', data.email)
+          
           // Redirecionar para login após um delay
           setTimeout(() => {
             setIsLogin(true)
@@ -168,6 +191,9 @@ export default function AuthPage() {
           // Login automático se já tem sessão
           toast.success('🎉 Bem-vindo! Sua conta foi criada e você já está logado.')
           
+          // Limpar registro temporário pois já está logado
+          localStorage.removeItem('recent_registration_email')
+          
           // Redirecionar para página principal
           setTimeout(() => {
             router.push('/')
@@ -176,6 +202,9 @@ export default function AuthPage() {
       } else {
         // Caso especial: sucesso parcial (conta criada mas sem dados completos)
         toast.success('Conta criada! ⚠️ Sua conta foi criada com sucesso. Tente fazer login.')
+        
+        // Salvar email para facilitar detecção no login
+        localStorage.setItem('recent_registration_email', data.email)
         
         setTimeout(() => {
           setIsLogin(true)
@@ -224,38 +253,41 @@ export default function AuthPage() {
   }
 
   const handleResendConfirmation = async () => {
-    const email = loginForm.getValues('email')
-    if (!email) {
-      toast.error('Digite seu e-mail antes de reenviar a confirmação')
+    if (!resendEmail) {
+      toast.error('Email não especificado para reenvio')
       return
     }
 
-    setResendingEmail(true)
+    setLoading(true)
     try {
-      const isProduction = window.location.hostname !== 'localhost'
-      const redirectUrl = isProduction 
-        ? 'https://armazemsaojoaquim.netlify.app/auth/callback'
-        : `${window.location.origin}/auth/callback`
-
+      console.log('🔄 Reenviando confirmação para:', resendEmail)
+      
       const { error } = await supabase.auth.resend({
         type: 'signup',
-        email: email,
-        options: {
-          emailRedirectTo: redirectUrl
-        }
+        email: resendEmail
       })
 
       if (error) {
-        console.error('Resend Confirmation Error:', error)
-        toast.error(`Erro ao reenviar confirmação: ${error.message}`)
+        console.error('❌ Erro ao reenviar confirmação:', error)
+        
+        if (error.message?.includes('User already registered')) {
+          toast.error('Esta conta já foi confirmada. Tente fazer login normalmente.')
+        } else if (error.message?.includes('Email rate limit exceeded')) {
+          toast.error('Muitas tentativas. Aguarde alguns minutos antes de tentar novamente.')
+        } else {
+          toast.error(`Erro ao reenviar confirmação: ${error.message}`)
+        }
       } else {
         toast.success('Email de confirmação reenviado! Verifique sua caixa de entrada.')
+        setShowResendConfirmation(false)
+        // Limpar o email salvo após reenvio bem-sucedido
+        localStorage.removeItem('recent_registration_email')
       }
     } catch (error: any) {
-      console.error('Unexpected Resend Error:', error)
+      console.error('❌ Erro inesperado ao reenviar confirmação:', error)
       toast.error('Erro inesperado ao reenviar confirmação')
     } finally {
-      setResendingEmail(false)
+      setLoading(false)
     }
   }
 
@@ -487,6 +519,39 @@ export default function AuthPage() {
                       </li>
                     </ul>
                   </div>
+                )}
+
+                {/* Seção de Reenvio de Confirmação */}
+                {showResendConfirmation && (
+                  <Card className="w-full max-w-md mx-auto mt-4">
+                    <CardContent className="pt-6">
+                      <div className="text-center space-y-4">
+                        <div className="text-sm text-muted-foreground">
+                          <p>Não recebeu o email de confirmação?</p>
+                          <p className="text-xs mt-1">Email: {resendEmail || 'N/A'}</p>
+                        </div>
+                        
+                        <Button
+                          type="button"
+                          variant="outline"
+                          className="w-full"
+                          onClick={handleResendConfirmation}
+                          disabled={loading}
+                        >
+                          {loading ? 'Reenviando...' : 'Reenviar Email de Confirmação'}
+                        </Button>
+                        
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setShowResendConfirmation(false)}
+                        >
+                          Cancelar
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
                 )}
               </CardContent>
             </Card>
