@@ -13,6 +13,7 @@ import { Card, CardContent, CardHeader } from '../../components/ui/Card'
 import { Mail, User, Eye, EyeOff, Shield, CheckCircle } from 'lucide-react'
 import OptimizedImage from '@/components/ui/OptimizedImage'
 import { supabase as createClient } from '@/lib/supabase'
+import LogoSimple from '@/components/atoms/LogoSimple'
 
 const loginSchema = z.object({
   email: z.string().email('E-mail inválido'),
@@ -391,14 +392,7 @@ export default function AuthPage() {
             <Card className="shadow-2xl border-0 bg-white/95 backdrop-blur-sm">
               <CardHeader className="text-center pb-6 pt-8">
                 <div className="w-20 h-20 mx-auto mb-6 relative">
-                  <OptimizedImage
-                    src="/images/logo-optimized.jpg"
-                    alt="Armazém São Joaquim"
-                    fill
-                    sizes="80px"
-                    className="transition-opacity duration-300 opacity-100 object-contain rounded-full shadow-lg"
-                    priority
-                  />
+                  <img src="/images/logo-optimized.jpg" alt="Armazém São Joaquim" className="w-full h-full object-contain rounded-full shadow-lg" />
                 </div>
                 
                 <h1 className="font-playfair text-3xl font-bold text-amber-900 mb-2">
