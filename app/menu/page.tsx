@@ -460,6 +460,7 @@ export default function MenuPage() {
                       src={item.image_url || ''}
                       alt={item.name}
                       fill
+                      loading="eager"
                       className="group-hover:scale-105 transition-transform duration-300 object-cover"
                     />
                     
