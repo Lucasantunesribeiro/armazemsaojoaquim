@@ -37,7 +37,7 @@ const MenuPreview = () => {
       ],
       gradient: 'from-amber-500 to-orange-600',
       bgColor: 'bg-amber-50',
-      image: '/images/armazem-interior-aconchegante.webp'
+      image: '/images/pratos_tradicionais.png'
     },
     {
       icon: Wine,
@@ -50,7 +50,7 @@ const MenuPreview = () => {
       ],
       gradient: 'from-slate-600 to-slate-800',
       bgColor: 'bg-slate-50',
-      image: '/images/historia.webp'
+      image: '/images/feijoada_tradicional.png'
     }
   ]
 
@@ -250,7 +250,7 @@ const MenuPreview = () => {
                       className="object-cover transition-transform duration-700 group-hover:scale-110"
                       quality={90}
                       sizes="(max-width: 768px) 100vw, 50vw"
-                      priority={activeCategory === 0}
+                      priority={true}
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                     
@@ -356,6 +356,7 @@ const MenuPreview = () => {
               className="object-cover transition-transform duration-700 hover:scale-110"
               quality={90}
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              priority
             />
             <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-transparent to-transparent" />
             

@@ -170,9 +170,9 @@ const AboutSection = () => {
                       src={image.src}
                       alt={image.alt}
                       fill
-                      className="object-cover w-full h-full"
-                      sizes="(max-width: 768px) 100vw, 50vw"
-                      priority={index === 0}
+                      className="object-cover"
+                      sizes="(max-width: 1024px) 100vw, 50vw"
+                      priority={true}
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
                     <div className="absolute bottom-4 sm:bottom-6 left-4 sm:left-6 text-white">
@@ -189,7 +189,7 @@ const AboutSection = () => {
                   <button
                     key={index}
                     onClick={() => setActiveImageIndex(index)}
-                    className={`w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full transition-all duration-300 ${
+                    className={`w-2 h-2 md:w-3 md:h-3 rounded-full transition-all duration-300 ${
                       index === activeImageIndex 
                         ? 'bg-amber-600 dark:bg-amber-400 scale-125' 
                         : 'bg-slate-300 dark:bg-slate-600 hover:bg-amber-400 dark:hover:bg-amber-500'

@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react'
 import { Search, Download, AlertCircle, Clock } from 'lucide-react'
-import SafeImage from '../../components/ui/SafeImage'
 import SimpleImage from '../../components/ui/SimpleImage'
 import { supabase } from '../../lib/supabase'
 import { toast } from 'react-hot-toast'
@@ -356,7 +355,7 @@ export default function MenuPage() {
       <section className="relative pt-20 pb-16 overflow-hidden">
         {/* Background Image */}
         <div className="absolute inset-0 z-0">
-          <SafeImage
+          <SimpleImage
             src="/images/armazem-interior-aconchegante.jpg"
             alt="Interior do Armazém São Joaquim"
             fill

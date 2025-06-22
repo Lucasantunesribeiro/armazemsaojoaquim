@@ -250,9 +250,15 @@ const SafeImage = ({
     className: `${className} ${isLoading ? 'opacity-0' : 'opacity-100'} transition-opacity duration-300`,
     priority,
     quality,
-    placeholder,
-    sizes: sizes || (fill ? undefined : `(max-width: 768px) ${width || 300}px, ${width || 400}px`),
-    ...(fill ? { fill: true } : { width, height })
+    sizes,
+    ...(fill
+      ? {
+          fill: true,
+        }
+      : {
+          width: width || 400,
+          height: height || 300,
+        }),
   }
 
   return (

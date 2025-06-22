@@ -192,7 +192,7 @@ export default function HeroSection() {
               alt={image.alt}
               fill
               className="object-cover object-center"
-              priority={index === 0}
+              priority={true}
               quality={85}
               sizes="100vw"
               onError={() => handleImageError(index)}

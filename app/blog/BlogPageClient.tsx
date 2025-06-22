@@ -26,21 +26,23 @@ interface BlogPageClientProps {
 
 export default function BlogPageClient({ initialPosts }: BlogPageClientProps) {
   const [searchTerm, setSearchTerm] = useState('')
-  const [posts] = useState<BlogPost[]>(initialPosts)
 
   const filteredPosts = useMemo(() => {
+    // A lista de posts já vem sem o post de destaque
+    const displayPosts = initialPosts.slice(1);
+
     if (!searchTerm.trim()) {
-      return posts.slice(1) // Pular o primeiro post (featured)
+      return displayPosts;
     }
 
-    return posts.filter(post =>
+    return displayPosts.filter(post =>
       post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (post.excerpt && post.excerpt.toLowerCase().includes(searchTerm.toLowerCase())) ||
       post.content.toLowerCase().includes(searchTerm.toLowerCase())
     )
-  }, [posts, searchTerm])
+  }, [initialPosts, searchTerm])
 
-  if (posts.length === 0) {
+  if (initialPosts.length === 0) {
     return (
       <div className="text-center py-16">
         <div className="w-20 h-20 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -102,6 +104,9 @@ export default function BlogPageClient({ initialPosts }: BlogPageClientProps) {
                     alt={post.title}
                     fill
                     className="object-cover group-hover:scale-105 transition-transform duration-300"
+                    priority={true}
+                    loading="eager"
+                    sizes="100vw"
                   />
                 ) : (
                   <div className="flex items-center justify-center h-full">
