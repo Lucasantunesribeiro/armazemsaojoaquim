@@ -113,136 +113,115 @@ export default function AuthPage() {
   const handleRegister = async (data: RegisterForm) => {
     setLoading(true)
     try {
-      console.log('🔄 Tentando registrar usuário:', {
+      console.log('🔄 Tentando registrar usuário com fallback:', {
         email: data.email,
         name: data.name,
         environment: window.location.hostname !== 'localhost' ? 'production' : 'development'
       })
 
-      const { data: authData, error } = await supabase.auth.signUp({
-        email: data.email,
-        password: data.password,
-        options: {
-          data: {
-            full_name: data.name,
-            name: data.name
-          }
-        }
+      // Usar o novo endpoint com fallback automático
+      const response = await fetch('/api/auth/signup-with-fallback', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: data.email,
+          password: data.password,
+          name: data.name
+        })
       })
 
-      if (error) {
-        console.error('❌ Registration Error:', error)
-        
-        // Tratar erro 500 com mensagem detalhada
-        if (error.message?.includes('Erro 500 do servidor Supabase') || error.status === 500) {
-          toast.error(`🚨 Erro 500 do Servidor Supabase
-          
-Possíveis causas identificadas:
-• Problema no schema de autenticação
-• Constraints bloqueando criação de usuários  
-• Triggers com erro na tabela auth.users
-• Configuração SMTP incorreta
-• Sobrecarga temporária do servidor
+      const result = await response.json()
 
-💡 Soluções:
-1. Aguarde alguns minutos e tente novamente
-2. Verifique se você já tem uma conta criada
-3. Tente fazer login caso a conta já exista
-4. Entre em contato com o suporte se persistir`)
-
-          // Oferecer opção de tentar login
-          setTimeout(() => {
-            if (confirm('Deseja tentar fazer login? A conta pode ter sido criada mesmo com o erro.')) {
-              setIsLogin(true)
-              loginForm.setValue('email', data.email)
-            }
-          }, 2000)
-          
-          return
-        }
-        
-        // Se o erro é apenas de envio de email, tratar como sucesso parcial
-        if (error.message?.includes('Error sending confirmation email')) {
-          toast.success('Conta criada com sucesso! ⚠️ Houve um problema com o email de confirmação. Você pode tentar fazer login.')
-          
-          // Salvar email para facilitar detecção no login
-          localStorage.setItem('recent_registration_email', data.email)
-          
-          // Redirecionar para login após um delay
-          setTimeout(() => {
-            setIsLogin(true)
-            registerForm.reset()
-          }, 3000)
-          
-          return
-        }
+      if (!response.ok) {
+        console.error('❌ Registration Error:', result)
         
         // Tratar diferentes tipos de erro
-        if (error.message?.includes('User already registered')) {
+        if (result.error?.includes('User already registered') || result.user_exists) {
           toast.error('Este email já possui uma conta. Tente fazer login ou usar a opção "Esqueci minha senha".')
           setIsLogin(true)
           return
         }
 
-        if (error.message?.includes('Password should be at least')) {
+        if (result.error?.includes('Password should be at least')) {
           toast.error('A senha deve ter pelo menos 6 caracteres.')
           return
         }
 
-        if (error.message?.includes('Invalid email')) {
+        if (result.error?.includes('Invalid email')) {
           toast.error('Por favor, insira um email válido.')
           return
         }
 
         // Erro genérico
-        toast.error(error.message || 'Ocorreu um erro inesperado. Tente novamente.')
+        toast.error(result.error || 'Ocorreu um erro inesperado. Tente novamente.')
         return
       }
 
-      // Sucesso completo
-      if (authData?.user) {
-        console.log('✅ Usuário registrado com sucesso:', authData.user.email)
-        
-        // Se não há sessão, significa que precisa confirmar email
-        if (!authData.session) {
-          toast.success('📧 Cadastro realizado! Verifique seu email para confirmar sua conta antes de fazer login.')
-          
-          // Salvar email para facilitar detecção no login
-          localStorage.setItem('recent_registration_email', data.email)
-          
-          // Redirecionar para login após um delay
-          setTimeout(() => {
-            setIsLogin(true)
-            registerForm.reset()
-          }, 3000)
-        } else {
-          // Login automático se já tem sessão
-          toast.success('🎉 Bem-vindo! Sua conta foi criada e você já está logado.')
-          
-          // Limpar registro temporário pois já está logado
-          localStorage.removeItem('recent_registration_email')
-          
-          // Redirecionar para página principal
-          setTimeout(() => {
-            router.push('/')
-          }, 2000)
-        }
-      } else {
-        // Caso especial: sucesso parcial (conta criada mas sem dados completos)
-        toast.success('Conta criada! ⚠️ Sua conta foi criada com sucesso. Tente fazer login.')
+      // Sucesso com diferentes métodos
+      if (result.success) {
+        console.log('✅ Registro bem-sucedido via:', result.method)
         
         // Salvar email para facilitar detecção no login
         localStorage.setItem('recent_registration_email', data.email)
         
-        setTimeout(() => {
-          setIsLogin(true)
-          registerForm.reset()
-        }, 3000)
+        switch (result.method) {
+          case 'public_api':
+            if (result.session) {
+              toast.success('🎉 Bem-vindo! Sua conta foi criada e você já está logado.')
+              localStorage.removeItem('recent_registration_email')
+              setTimeout(() => router.push('/'), 2000)
+            } else {
+              toast.success('📧 Cadastro realizado! Verifique seu email para confirmar sua conta.')
+              setTimeout(() => {
+                setIsLogin(true)
+                registerForm.reset()
+              }, 3000)
+            }
+            break
+            
+          case 'admin_api':
+            toast.success('✅ Conta criada com sucesso! Você já pode fazer login (email confirmado automaticamente).')
+            setTimeout(() => {
+              setIsLogin(true)
+              registerForm.reset()
+            }, 3000)
+            break
+            
+          case 'admin_api_existing':
+            toast.success('✅ Conta já existe! Redirecionando para login...')
+            setTimeout(() => {
+              setIsLogin(true)
+              loginForm.setValue('email', data.email)
+            }, 2000)
+            break
+            
+          case 'partial_success':
+            toast.success('⚠️ Conta pode ter sido criada. Tente fazer login.')
+            setTimeout(() => {
+              setIsLogin(true)
+              registerForm.reset()
+            }, 3000)
+            break
+            
+          default:
+            toast.success(result.message || 'Conta criada com sucesso!')
+            setTimeout(() => {
+              setIsLogin(true)
+              registerForm.reset()
+            }, 3000)
+        }
+        
+                 if (result.warning) {
+           setTimeout(() => {
+             toast.success(`ℹ️ ${result.warning}`)
+           }, 1000)
+         }
       }
 
     } catch (error: any) {
       console.error('❌ Erro inesperado no registro:', error)
-      
       toast.error('Erro inesperado. Algo deu errado. Tente novamente em alguns instantes.')
     } finally {
       setLoading(false)
