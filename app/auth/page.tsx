@@ -198,6 +198,53 @@ export default function AuthPage() {
           
           // Verificar se é rate limit de email
           if (error.message?.includes('email rate limit')) {
+            console.log('🔄 Tentando bypass via Admin API...')
+            
+            try {
+              // Tentar bypass usando Admin API
+              const bypassResponse = await fetch('/api/auth/signup-bypass', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                  email: data.email,
+                  password: data.password,
+                  userData: {
+                    full_name: data.name,
+                    name: data.name
+                  }
+                })
+              })
+
+              const bypassResult = await bypassResponse.json()
+
+              if (bypassResult.success) {
+                console.log('✅ Bypass bem-sucedido via Admin API')
+                
+                if (bypassResult.requiresManualActivation) {
+                  toast.success('🎯 Conta criada com sucesso!\n\nDevido ao rate limit, entre em contato conosco para ativar sua conta.')
+                } else {
+                  toast.success('🎯 Conta criada via sistema alternativo!\n\nVerifique seu email para confirmar.')
+                  
+                  // Salvar email para facilitar detecção no login
+                  localStorage.setItem('recent_registration_email', data.email)
+                  
+                  // Mudar para tela de login após 3 segundos
+                  setTimeout(() => {
+                    setIsLogin(true)
+                    registerForm.reset()
+                  }, 3000)
+                }
+                return
+              } else {
+                console.error('❌ Bypass falhou:', bypassResult.error)
+              }
+            } catch (bypassError) {
+              console.error('❌ Erro no bypass:', bypassError)
+            }
+
+            // Se bypass falhou, mostrar mensagem original
             toast.error(`📧 Limite de emails atingido!\n\n• Aguarde 1-2 horas antes de tentar novamente\n• Use um email diferente se urgente\n• Este é um limite do Supabase para prevenir spam`)
             
             // Salvar timestamp do rate limit
