@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { memo, useState } from 'react'
+import { memo, useState, useEffect, SyntheticEvent } from 'react'
 
 interface LogoProps {
   className?: string
@@ -22,6 +22,22 @@ const Logo = memo(({
   size = 'desktop'
 }: LogoProps) => {
   const [imageError, setImageError] = useState(false)
+  const [imageLoaded, setImageLoaded] = useState(false)
+
+  const handleImageError = (e: SyntheticEvent<HTMLImageElement, Event>) => {
+    console.warn('❌ Erro ao carregar logo:', e.currentTarget.src)
+    setImageError(true)
+  }
+
+  const handleImageLoad = () => {
+    setImageLoaded(true)
+  }
+
+  // Reset error state when component remounts
+  useEffect(() => {
+    setImageError(false)
+    setImageLoaded(false)
+  }, [])
 
   // Clean, professional sizing
   const getLogoSize = () => {
@@ -37,7 +53,7 @@ const Logo = memo(({
     <Link 
       href="/" 
       className={`
-        group flex items-center gap-3
+        group flex items-center gap-2 sm:gap-3
         transition-all duration-200 ease-out
         focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2
         rounded-lg p-1 -m-1
@@ -52,25 +68,77 @@ const Logo = memo(({
           relative overflow-hidden rounded-lg
           transition-all duration-200
           ${isScrolled ? 'shadow-sm' : 'shadow-md'}
+          ${!imageLoaded && !imageError ? 'animate-pulse bg-gray-200 dark:bg-gray-700' : ''}
         `}>
-          <Image
-            src={imageError ? "/images/placeholder.svg" : "/images/logo.jpg"}
-            alt="Armazém São Joaquim"
-            width={logoSize}
-            height={logoSize}
-            className={`
-              object-cover object-center rounded-lg
-              transition-all duration-300 ease-out
-              ${isScrolled ? 'w-8 h-8 sm:w-9 sm:h-9' : 'w-9 h-9 sm:w-10 sm:h-10'}
-              group-hover:scale-105
-            `}
-            priority={priority}
-            quality={90}
-            sizes="(max-width: 640px) 36px, 44px"
-            onError={() => setImageError(true)}
-            placeholder="blur"
-            blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R+Cc5xmwBcDvvGgKOeT7/8AhLLdwxWfILvUP//Z"
-          />
+          {/* Primary Logo */}
+          {!imageError && (
+            <Image
+              src="/images/logo.jpg"
+              alt="Armazém São Joaquim"
+              width={logoSize}
+              height={logoSize}
+              className={`
+                object-cover object-center rounded-lg
+                transition-all duration-300 ease-out
+                group-hover:scale-105
+                ${isScrolled 
+                  ? 'w-7 h-7 sm:w-8 sm:h-8 md:w-9 md:h-9' 
+                  : 'w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10'
+                }
+                ${!imageLoaded ? 'opacity-0' : 'opacity-100'}
+              `}
+              priority={priority}
+              quality={90}
+              sizes="(max-width: 640px) 32px, (max-width: 768px) 36px, 40px"
+              onError={handleImageError}
+              onLoad={handleImageLoad}
+              placeholder="blur"
+              blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R+Cc5xmwBcDvvGgKOeT7/8AhLLdwxWfILvUP//Z"
+            />
+          )}
+          
+          {/* Emergency fallback - Logo optimizado */}
+          {imageError && (
+            <Image
+              src="/images/logo-optimized.jpg"
+              alt="Armazém São Joaquim"
+              width={logoSize}
+              height={logoSize}
+              className={`
+                object-cover object-center rounded-lg
+                transition-all duration-300 ease-out
+                group-hover:scale-105
+                ${isScrolled 
+                  ? 'w-7 h-7 sm:w-8 sm:h-8 md:w-9 md:h-9' 
+                  : 'w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10'
+                }
+              `}
+              priority={priority}
+              quality={90}
+              sizes="(max-width: 640px) 32px, (max-width: 768px) 36px, 40px"
+              unoptimized={true}
+              onError={() => {
+                // Se nem o optimized funcionar, vamos mostrar a letra
+                setImageError(true)
+                setImageLoaded(false)
+              }}
+            />
+          )}
+          
+          {/* Fallback final - Letra */}
+          {imageError && !imageLoaded && (
+            <div className={`
+              flex items-center justify-center
+              bg-gradient-to-br from-amber-500 to-orange-500
+              text-white font-bold rounded-lg
+              ${isScrolled 
+                ? 'w-7 h-7 sm:w-8 sm:h-8 md:w-9 md:h-9 text-xs sm:text-sm' 
+                : 'w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 text-sm sm:text-base'
+              }
+            `}>
+              A
+            </div>
+          )}
         </div>
       </div>
 
@@ -79,23 +147,24 @@ const Logo = memo(({
         <div className="flex flex-col leading-tight">
           {/* Restaurant Name */}
           <h1 className={`
-            font-playfair font-bold text-gray-900
+            font-playfair font-bold text-gray-900 dark:text-white
             transition-all duration-200
             ${isScrolled 
-              ? 'text-lg sm:text-xl' 
-              : 'text-xl sm:text-2xl'
+              ? 'text-sm sm:text-base md:text-lg' 
+              : 'text-base sm:text-lg md:text-xl'
             }
-            group-hover:text-amber-700
+            group-hover:text-amber-700 dark:group-hover:text-amber-300
           `}>
-            Armazém São Joaquim
+            <span className="hidden sm:inline">Armazém São Joaquim</span>
+            <span className="sm:hidden">Armazém</span>
           </h1>
           
           {/* Established Year */}
           <span className={`
-            text-xs font-medium text-gray-600 tracking-wide
+            font-medium text-gray-600 dark:text-gray-400 tracking-wide
             transition-all duration-200
-            group-hover:text-amber-600
-            ${isScrolled ? 'text-xs' : 'text-sm'}
+            group-hover:text-amber-600 dark:group-hover:text-amber-400
+            ${isScrolled ? 'text-xs' : 'text-xs sm:text-sm'}
           `}>
             Desde 1854
           </span>

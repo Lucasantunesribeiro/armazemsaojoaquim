@@ -1,8 +1,8 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import Image from 'next/image'
-import { Search, Filter, Star, Clock, Download, AlertCircle, Users } from 'lucide-react'
+import { Search, Download, AlertCircle, Clock } from 'lucide-react'
+import SafeImage from '../../components/ui/SafeImage'
 import { supabase } from '../../lib/supabase'
 import { toast } from 'react-hot-toast'
 import { trackDatabaseError, trackApiError } from '../../lib/error-tracking'
@@ -27,6 +27,8 @@ const CATEGORIES = [
   'Petiscos',
   'Pratos Principais',
   'Sanduíches', 
+  'Saladas',
+  'Guarnições',
   'Sobremesas',
   'Bebidas Sem Álcool',
   'Cervejas',
@@ -353,7 +355,7 @@ export default function MenuPage() {
       <section className="relative pt-20 pb-16 overflow-hidden">
         {/* Background Image */}
         <div className="absolute inset-0 z-0">
-          <Image
+          <SafeImage
             src="/images/armazem-interior-aconchegante.jpg"
             alt="Interior do Armazém São Joaquim"
             fill
@@ -452,19 +454,14 @@ export default function MenuPage() {
                   className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group"
                 >
                   {/* Image */}
-                  <div className="relative h-48 bg-gradient-to-br from-amarelo-armazem/20 to-vermelho-portas/20">
-                    {item.image_url ? (
-                      <Image
-                        src={item.image_url}
-                        alt={item.name}
-                        fill
-                        className="object-cover group-hover:scale-105 transition-transform duration-300"
-                      />
-                    ) : (
-                      <div className="flex items-center justify-center h-full">
-                        <span className="text-4xl">🍽️</span>
-                      </div>
-                    )}
+                  <div className="relative h-48">
+                    <SafeImage
+                      src={item.image_url}
+                      alt={item.name}
+                      fill
+                      showPlaceholderIcon={true}
+                      className="group-hover:scale-105 transition-transform duration-300"
+                    />
                     
                     {/* Featured Badge */}
                     {item.featured && (

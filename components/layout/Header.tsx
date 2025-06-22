@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation'
 import { Menu, X, Calendar, User, LogOut, Lock, Moon, Sun } from 'lucide-react'
 import { useSupabase } from '../providers/SupabaseProvider'
 import { useTheme } from 'next-themes'
-import Logo from '../atoms/Logo'
+import LogoSimple from '../atoms/LogoSimple'
 
 const navLinks = [
   { name: 'Início', href: '/' },
@@ -126,9 +126,9 @@ export default function Header() {
             
             {/* Logo Only */}
             <div className="flex-shrink-0">
-              <Logo 
+              <LogoSimple 
                 isScrolled={isScrolled}
-                priority={true}
+                showText={true}
                 className="transition-all duration-300"
               />
             </div>

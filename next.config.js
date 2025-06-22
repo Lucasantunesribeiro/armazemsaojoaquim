@@ -14,7 +14,7 @@ const nextConfig = {
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
     minimumCacheTTL: 60,
     dangerouslyAllowSVG: true,
-    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
+    contentSecurityPolicy: "default-src 'self'; script-src 'none'; img-src 'self' data: blob:; sandbox;",
     // Configurações para desenvolvimento local e produção
     unoptimized: false,
     // Configurações para Supabase Storage e outros domínios

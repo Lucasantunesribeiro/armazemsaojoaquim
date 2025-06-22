@@ -45,10 +45,11 @@ const Footer = () => {
     { name: 'WhatsApp', href: 'https://wa.me/5521985658443', icon: MessageCircle, external: true },
   ]
 
-  const legalLinks = [
-    { name: 'Política de Privacidade', href: '/politica-privacidade' },
-    { name: 'Termos de Uso', href: '/termos-uso' },
-    { name: 'Política de Cookies', href: '/cookies' },
+  const legalLinks: { name: string; href: string }[] = [
+    // Páginas temporariamente desabilitadas - serão implementadas em breve
+    // { name: 'Política de Privacidade', href: '/politica-privacidade' },
+    // { name: 'Termos de Uso', href: '/termos-uso' },
+    // { name: 'Política de Cookies', href: '/cookies' },
   ]
 
   const socialLinks = [
@@ -428,7 +429,8 @@ const Footer = () => {
                 </p>
               </div>
 
-              {/* Legal Links */}
+              {/* Legal Links - Temporariamente desabilitado */}
+              {/* 
               <div className="flex flex-wrap items-center justify-center gap-4 text-sm">
                 {legalLinks.map((link, index) => (
                   <React.Fragment key={link.name}>
@@ -444,6 +446,7 @@ const Footer = () => {
                   </React.Fragment>
                 ))}
               </div>
+              */}
 
               {/* Badges */}
               <div className="flex items-center space-x-4">

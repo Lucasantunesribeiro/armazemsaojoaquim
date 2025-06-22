@@ -24,7 +24,7 @@ const MenuPreview = () => {
       ],
       gradient: 'from-red-500 to-pink-600',
       bgColor: 'bg-red-50',
-      image: '/images/aperitivos.webp'
+      image: '/images/aperitivos.jpg'
     },
     {
       icon: Utensils,
