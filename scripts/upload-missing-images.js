@@ -8,6 +8,7 @@
 const { createClient } = require('@supabase/supabase-js')
 const fs = require('fs')
 const path = require('path')
+const https = require('https')
 
 // Configuração do Supabase
 const supabaseUrl = 'https://enolssforaepnrpfrima.supabase.co'
@@ -22,34 +23,101 @@ if (!supabaseKey) {
 
 const supabase = createClient(supabaseUrl, supabaseKey)
 
-// Lista das imagens faltantes
-const missingImages = [
-  'caesar_salad_com_fatias_de_frango.png',
-  'caesar_salad_sem_fatias_de_frango.png',
-  'picanha_ao_carvao_2_pessoas.png',
-  'saladinha_da_casa.png',
-  'marquise_au_chocolat.png',
-  'linguica_na_brasa.png',
-  'vinagrete_de_polvo.png',
-  'patatas_brava.png',
-  'mix_vegetariano.png',
-  'sobrecoxa_ao_carvao_1_pessoa.png',
-  'legumes_na_brasa.png',
-  'envelopado_de_acelga.png',
-  'farofa.png',
-  'feijoada_da_casa_individual.png',
-  'pasteis_de_pupunha.png',
-  'patatas_bravas.png',
-  'feijoada_da_casa_para_dois.png',
-  'feijoada_da_casa_buffet.png',
+console.log('🔍 IDENTIFICANDO IMAGENS FALTANTES DO MENU...\n')
+
+// Imagens que estão falhando baseadas nos erros do console
+const failingImages = [
   'ceviche_carioca.png',
+  'feijoada_da_casa_individual.png', 
+  'feijoada_da_casa_para_dois.png',
+  'marquise_au_chocolat.png',
+  'farofa.png',
   'pure_de_batata.png',
-  'hamburguer_vegetariano.png',
-  'bife_a_milanesa.png'
+  'patatas_brava.png',
+  'legumes_na_brasa.png',
+  'linguica_na_brasa.png',
+  'pasteis_de_pupunha.png',
+  'vinagrete_de_polvo.png',
+  'mix_vegetariano.png',
+  'envelopado_de_acelga.png',
+  'patatas_bravas.png',
+  'bife_a_milanesa.png',
+  'feijoada_da_casa_buffet.png',
+  'sobrecoxa_ao_carvao.png',
+  'hamburguer_vegetariano.png'
 ]
 
-// Diretório onde estão as imagens locais
-const localImagesDir = path.join(__dirname, '..', 'public', 'images', 'menu_images')
+// Diretório local de imagens
+const localImagesDir = path.join(process.cwd(), 'public/images/menu_images')
+
+// Verificar quais imagens existem localmente
+console.log('📁 VERIFICANDO IMAGENS LOCAIS:')
+const existingImages = []
+const missingImages = []
+
+failingImages.forEach(imageName => {
+  const localPath = path.join(localImagesDir, imageName)
+  if (fs.existsSync(localPath)) {
+    existingImages.push(imageName)
+    console.log(`✅ ${imageName} - EXISTE LOCALMENTE`)
+  } else {
+    missingImages.push(imageName)
+    console.log(`❌ ${imageName} - FALTANDO`)
+  }
+})
+
+console.log(`\n📊 RESUMO:`)
+console.log(`✅ Existem localmente: ${existingImages.length}`)
+console.log(`❌ Faltando: ${missingImages.length}`)
+
+// Função para baixar imagem
+function downloadImage(url, filename) {
+  return new Promise((resolve, reject) => {
+    const localPath = path.join(localImagesDir, filename)
+    const file = fs.createWriteStream(localPath)
+    
+    https.get(url, (response) => {
+      if (response.statusCode === 200) {
+        response.pipe(file)
+        file.on('finish', () => {
+          file.close()
+          console.log(`✅ Baixado: ${filename}`)
+          resolve(true)
+        })
+      } else {
+        console.log(`❌ Erro ${response.statusCode} para: ${filename}`)
+        resolve(false)
+      }
+    }).on('error', (err) => {
+      console.log(`❌ Erro de rede para ${filename}:`, err.message)
+      resolve(false)
+    })
+  })
+}
+
+// Criar placeholders para imagens faltantes
+console.log('\n🎨 CRIANDO PLACEHOLDERS PARA IMAGENS FALTANTES:')
+
+missingImages.forEach(imageName => {
+  const placeholderPath = path.join(localImagesDir, imageName)
+  const placeholderContent = `<svg width="400" height="300" xmlns="http://www.w3.org/2000/svg">
+    <rect width="400" height="300" fill="#f3f4f6"/>
+    <text x="200" y="150" text-anchor="middle" font-family="Arial" font-size="16" fill="#6b7280">
+      ${imageName.replace('.png', '').replace(/_/g, ' ')}
+    </text>
+    <text x="200" y="180" text-anchor="middle" font-family="Arial" font-size="12" fill="#9ca3af">
+      Imagem não disponível
+    </text>
+  </svg>`
+  
+  // Criar arquivo SVG como placeholder
+  const svgPath = placeholderPath.replace('.png', '.svg')
+  fs.writeFileSync(svgPath, placeholderContent)
+  console.log(`📄 Placeholder SVG criado: ${imageName.replace('.png', '.svg')}`)
+})
+
+console.log('\n✅ PROCESSO CONCLUÍDO!')
+console.log('💡 Dica: Atualize o SafeImage para usar os placeholders SVG como fallback final.')
 
 async function uploadImage(imageName) {
   const localPath = path.join(localImagesDir, imageName)
