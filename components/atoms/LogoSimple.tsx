@@ -28,7 +28,7 @@ const LogoSimple = ({
       {/* Logo Image Container */}
       <div className="relative flex-shrink-0">
         <Image
-          src="/images/logo.jpg"
+          src="/images/logo-optimized.jpg"
           alt="Armazém São Joaquim"
           width={logoSize}
           height={logoSize}

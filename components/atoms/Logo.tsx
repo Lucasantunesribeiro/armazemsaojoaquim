@@ -73,7 +73,7 @@ const Logo = memo(({
           {/* Primary Logo */}
           {!imageError && (
             <Image
-              src="/images/logo.jpg"
+              src="/images/logo-optimized.jpg"
               alt="Armazém São Joaquim"
               width={logoSize}
               height={logoSize}
@@ -97,10 +97,10 @@ const Logo = memo(({
             />
           )}
           
-          {/* Emergency fallback - Logo optimizado */}
+          {/* Emergency fallback - Logo antigo */}
           {imageError && (
             <Image
-              src="/images/logo-optimized.jpg"
+              src="/images/logo.jpg"
               alt="Armazém São Joaquim"
               width={logoSize}
               height={logoSize}

@@ -23,7 +23,7 @@ export default function AuthHeader({
             <div className="flex items-center space-x-4">
               <div className="w-10 h-10 relative">
                 <Image
-                  src="/images/logo.webp"
+                  src="/images/logo-optimized.jpg"
                   alt="Armazém São Joaquim"
                   fill
                   className="object-contain rounded-full"
