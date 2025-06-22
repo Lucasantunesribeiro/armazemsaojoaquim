@@ -119,8 +119,8 @@ export default function AuthPage() {
         environment: window.location.hostname !== 'localhost' ? 'production' : 'development'
       })
 
-      // Usar o novo endpoint com fallback automático
-      const response = await fetch('/api/auth/signup-with-fallback', {
+      // Usar o novo sistema inteligente SMTP
+      const response = await fetch('/api/auth/check-smtp-status', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -159,65 +159,45 @@ export default function AuthPage() {
         return
       }
 
-      // Sucesso com diferentes métodos
+      // Sucesso com estratégia inteligente SMTP
       if (result.success) {
-        console.log('✅ Registro bem-sucedido via:', result.method)
+        console.log('✅ Registro bem-sucedido via:', result.strategy)
         
         // Salvar email para facilitar detecção no login
         localStorage.setItem('recent_registration_email', data.email)
         
-        switch (result.method) {
-          case 'public_api':
-            if (result.session) {
-              toast.success('🎉 Bem-vindo! Sua conta foi criada e você já está logado.')
-              localStorage.removeItem('recent_registration_email')
-              setTimeout(() => router.push('/'), 2000)
-            } else {
-              toast.success('📧 Cadastro realizado! Verifique seu email para confirmar sua conta.')
-              setTimeout(() => {
-                setIsLogin(true)
-                registerForm.reset()
-              }, 3000)
-            }
-            break
-            
-          case 'admin_api':
-            toast.success('✅ Conta criada com sucesso! Você já pode fazer login (email confirmado automaticamente).')
-            setTimeout(() => {
-              setIsLogin(true)
-              registerForm.reset()
-            }, 3000)
-            break
-            
-          case 'admin_api_existing':
-            toast.success('✅ Conta já existe! Redirecionando para login...')
-            setTimeout(() => {
-              setIsLogin(true)
-              loginForm.setValue('email', data.email)
-            }, 2000)
-            break
-            
-          case 'partial_success':
-            toast.success('⚠️ Conta pode ter sido criada. Tente fazer login.')
-            setTimeout(() => {
-              setIsLogin(true)
-              registerForm.reset()
-            }, 3000)
-            break
-            
-          default:
-            toast.success(result.message || 'Conta criada com sucesso!')
-            setTimeout(() => {
-              setIsLogin(true)
-              registerForm.reset()
-            }, 3000)
+        if (result.strategy === 'public_with_verification') {
+          // SMTP funcionando - verificação por email ativada
+          toast.success('🎉 Conta criada! Verifique seu email para confirmar.')
+          console.log('📧 SMTP FUNCIONANDO - Verificação por email ativada!')
+          
+          setTimeout(() => {
+            toast.success('📧 Verifique sua caixa de entrada e pasta de spam!')
+          }, 2000)
+          
+          setTimeout(() => {
+            setIsLogin(true)
+            registerForm.reset()
+          }, 4000)
+          
+        } else if (result.strategy === 'admin_auto_confirm') {
+          // SMTP não funcionando - conta criada sem verificação
+          toast.success('✅ Conta criada! Você já pode fazer login.')
+          console.log('⚠️ SMTP não configurado - usando fallback sem verificação')
+          
+          setTimeout(() => {
+            setIsLogin(true)
+            registerForm.reset()
+            loginForm.setValue('email', data.email)
+          }, 2500)
         }
         
-                 if (result.warning) {
-           setTimeout(() => {
-             toast.success(`ℹ️ ${result.warning}`)
-           }, 1000)
-         }
+        // Mostrar aviso sobre configuração SMTP se necessário
+        if (result.warning) {
+          setTimeout(() => {
+            toast.success(`ℹ️ ${result.warning}`)
+          }, 1500)
+        }
       }
 
     } catch (error: any) {
