@@ -19,9 +19,11 @@ interface SafeImageProps {
 }
 
 // Lista de imagens que sabemos que falham no Supabase (400 errors)
+// ATUALIZADA em 22/06/2025 - Apenas imagens que realmente falham
 const KNOWN_FAILING_IMAGES = [
+  // Imagens que retornam 400 no Supabase Storage
   'ceviche_carioca.png',
-  'feijoada_da_casa_individual.png',
+  'feijoada_da_casa_individual.png', 
   'feijoada_da_casa_para_dois.png',
   'marquise_au_chocolat.png',
   'farofa.png',
@@ -37,7 +39,14 @@ const KNOWN_FAILING_IMAGES = [
   'torta_limao.png',
   'mousse_chocolate.png',
   'cheesecake_frutas.png',
-  'tiramisu.png'
+  'tiramisu.png',
+  
+  // NOTA: Imagens removidas da lista pois agora funcionam:
+  // - bife_ancho.png ✅ OK
+  // - caesar_salad_com_frango.png ✅ OK  
+  // - bolinho_de_bacalhau.png ✅ OK
+  // - picanha_ao_carvao.png ✅ OK
+  // E outras 23+ imagens que estão funcionando no Supabase
 ]
 
 const SafeImage = ({
