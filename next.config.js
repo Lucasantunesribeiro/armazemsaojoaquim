@@ -16,10 +16,8 @@ const nextConfig = {
     dangerouslyAllowSVG: true,
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
     // Configurações para desenvolvimento local e produção
-    unoptimized: process.env.NODE_ENV === 'development',
-    loader: 'default',
-    domains: [],
-    // Configurações mais específicas para evitar erro 400
+    unoptimized: false,
+    // Configurações para Supabase Storage e outros domínios
     remotePatterns: [
       // Para desenvolvimento local
       {
@@ -28,7 +26,7 @@ const nextConfig = {
         port: '3000',
         pathname: '/**',
       },
-      // Para Netlify e outros domínios confiáveis
+      // Para Netlify
       {
         protocol: 'https',
         hostname: '**.netlify.app',
@@ -39,6 +37,24 @@ const nextConfig = {
         protocol: 'https',
         hostname: '**.vercel.app',
         pathname: '/**',
+      },
+      // Para Supabase Storage - IMPORTANTE!
+      {
+        protocol: 'https',
+        hostname: 'enolssforaepnrpfrima.supabase.co',
+        pathname: '/storage/v1/object/public/**',
+      },
+      // Para Supabase Storage - Render API (transformações)
+      {
+        protocol: 'https',
+        hostname: 'enolssforaepnrpfrima.supabase.co',
+        pathname: '/storage/v1/render/image/public/**',
+      },
+      // Para outros subdomínios do Supabase (caso necessário)
+      {
+        protocol: 'https',
+        hostname: '**.supabase.co',
+        pathname: '/storage/v1/object/public/**',
       },
     ],
   },

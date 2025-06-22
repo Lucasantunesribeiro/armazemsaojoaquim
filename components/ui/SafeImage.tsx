@@ -62,7 +62,7 @@ export const SafeImage = ({
         sizes={sizes}
         fill={fill}
         quality={quality}
-        unoptimized={imgSrc.startsWith('/')}
+        unoptimized={imgSrc.includes('supabase.co')}
         onError={handleError}
         onLoad={handleLoad}
         {...props}
