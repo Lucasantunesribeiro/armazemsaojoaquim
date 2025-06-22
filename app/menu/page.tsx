@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { Search, Download, AlertCircle, Clock } from 'lucide-react'
 import SafeImage from '../../components/ui/SafeImage'
+import SimpleImage from '../../components/ui/SimpleImage'
 import { supabase } from '../../lib/supabase'
 import { toast } from 'react-hot-toast'
 import { trackDatabaseError, trackApiError } from '../../lib/error-tracking'
@@ -455,12 +456,11 @@ export default function MenuPage() {
                 >
                   {/* Image */}
                   <div className="relative h-48">
-                    <SafeImage
-                      src={item.image_url}
+                    <SimpleImage
+                      src={item.image_url || ''}
                       alt={item.name}
                       fill
-                      showPlaceholderIcon={true}
-                      className="group-hover:scale-105 transition-transform duration-300"
+                      className="group-hover:scale-105 transition-transform duration-300 object-cover"
                     />
                     
                     {/* Featured Badge */}
