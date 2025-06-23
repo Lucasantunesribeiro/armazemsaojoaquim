@@ -30,11 +30,17 @@ const registerSchema = z.object({
   path: ["confirmPassword"],
 })
 
+const forgotPasswordSchema = z.object({
+  email: z.string().email('E-mail inválido'),
+})
+
 type LoginForm = z.infer<typeof loginSchema>
 type RegisterForm = z.infer<typeof registerSchema>
+type ForgotPasswordForm = z.infer<typeof forgotPasswordSchema>
 
 export default function AuthPage() {
   const [isLogin, setIsLogin] = useState(true)
+  const [showForgotPassword, setShowForgotPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   const [resendingEmail, setResendingEmail] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
@@ -52,8 +58,15 @@ export default function AuthPage() {
     
     const urlParams = new URLSearchParams(window.location.search)
     const error = urlParams.get('error')
+    const message = urlParams.get('message')
+    
     if (error) {
-      toast.error(`Erro de autenticação: ${decodeURIComponent(error)}`)
+      if (error === 'link_expired') {
+        toast.error('🔗 Link expirado!\n\nO link de redefinição de senha expirou. Solicite um novo link abaixo.')
+        setShowForgotPassword(true)
+      } else {
+        toast.error(`Erro de autenticação: ${decodeURIComponent(message || error)}`)
+      }
       // Limpar o erro da URL
       window.history.replaceState({}, document.title, window.location.pathname)
     }
@@ -99,6 +112,10 @@ export default function AuthPage() {
 
   const registerForm = useForm<RegisterForm>({
     resolver: zodResolver(registerSchema),
+  })
+
+  const forgotPasswordForm = useForm<ForgotPasswordForm>({
+    resolver: zodResolver(forgotPasswordSchema),
   })
 
   const handleLogin = async (data: LoginForm) => {
@@ -378,6 +395,28 @@ export default function AuthPage() {
     }
   }
 
+  const handlePasswordReset = async (data: ForgotPasswordForm) => {
+    setLoading(true)
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(data.email, {
+        redirectTo: `${window.location.origin}/auth/callback?type=recovery`,
+      })
+
+      if (error) {
+        toast.error(`Erro ao enviar email de recuperação: ${error.message}`)
+      } else {
+        toast.success('Email de recuperação enviado! Verifique sua caixa de entrada.')
+        setShowForgotPassword(false)
+        forgotPasswordForm.reset()
+      }
+    } catch (error: any) {
+      console.error('Erro ao enviar email de recuperação:', error)
+      toast.error('Erro inesperado')
+    } finally {
+      setLoading(false)
+    }
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-red-50">
       {/* Background pattern com z-index baixo */}
@@ -386,8 +425,8 @@ export default function AuthPage() {
       }}></div>
       
       {/* Container principal com padding adequado para compensar header fixo */}
-      <div className="relative z-10 pt-28 pb-8 px-4 min-h-screen">
-        <div className="flex items-center justify-center min-h-[calc(100vh-8rem)]">
+      <div className="relative z-10 pt-32 pb-8 px-4 min-h-screen">
+        <div className="flex items-center justify-center min-h-[calc(100vh-6rem)]">
           <div className="w-full max-w-md">
             <Card className="shadow-2xl border-0 bg-white/95 backdrop-blur-sm">
               <CardHeader className="text-center pb-6 pt-8">
@@ -399,12 +438,15 @@ export default function AuthPage() {
                   Armazém São Joaquim
                 </h1>
                 <h2 className="font-playfair text-xl font-semibold text-amber-800 mb-3">
-                  {isLogin ? 'Bem-vindo de volta!' : 'Junte-se a nós'}
+                  {showForgotPassword ? 'Recuperar Senha' : (isLogin ? 'Bem-vindo de volta!' : 'Junte-se a nós')}
                 </h2>
                 <p className="text-amber-700/80 text-sm leading-relaxed">
-                  {isLogin 
-                    ? 'Acesse sua conta para fazer reservas e acompanhar seu histórico' 
-                    : 'Crie sua conta e faça parte da nossa história gastronômica'
+                  {showForgotPassword 
+                    ? 'Insira seu email para receber o link de recuperação'
+                    : (isLogin 
+                      ? 'Acesse sua conta para fazer reservas e acompanhar seu histórico' 
+                      : 'Crie sua conta e faça parte da nossa história gastronômica'
+                    )
                   }
                 </p>
               </CardHeader>
@@ -455,7 +497,50 @@ export default function AuthPage() {
                   </div>
                 )}
 
-                {isLogin ? (
+                {showForgotPassword ? (
+                  <form onSubmit={forgotPasswordForm.handleSubmit(handlePasswordReset)} className="space-y-5">
+                    <div className="space-y-4">
+                      <div className="space-y-2">
+                        <label htmlFor="forgot-email" className="text-sm font-medium text-madeira-escura">E-mail</label>
+                        <Input
+                          id="forgot-email"
+                          type="email"
+                          placeholder="seu@email.com"
+                          aria-invalid={forgotPasswordForm.formState.errors.email ? "true" : "false"}
+                          {...forgotPasswordForm.register('email')}
+                          className="border-amber-200 focus:border-amber-400 focus:ring-amber-400"
+                        />
+                        {forgotPasswordForm.formState.errors.email && (
+                          <span role="alert" className="text-sm text-red-600">
+                            {forgotPasswordForm.formState.errors.email.message}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    <Button
+                      type="submit"
+                      className="w-full bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white font-semibold py-3 shadow-lg"
+                      disabled={loading}
+                    >
+                      <Mail className="w-5 h-5 mr-2" />
+                      {loading ? 'Enviando...' : 'Enviar link de recuperação'}
+                    </Button>
+
+                    <div className="text-center">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setShowForgotPassword(false)
+                          forgotPasswordForm.reset()
+                        }}
+                        className="text-amber-600 hover:text-amber-700 font-medium transition-colors text-sm"
+                      >
+                        ← Voltar ao login
+                      </button>
+                    </div>
+                  </form>
+                ) : isLogin ? (
                   <form onSubmit={loginForm.handleSubmit(handleLogin)} className="space-y-5">
                     <div className="space-y-4">
                       <div className="space-y-2">
@@ -501,6 +586,16 @@ export default function AuthPage() {
                           </span>
                         )}
                       </div>
+                    </div>
+
+                    <div className="text-right">
+                      <button
+                        type="button"
+                        onClick={() => setShowForgotPassword(true)}
+                        className="text-sm text-amber-600 hover:text-amber-700 font-medium transition-colors"
+                      >
+                        Esqueci minha senha
+                      </button>
                     </div>
 
                     <Button
@@ -625,23 +720,27 @@ export default function AuthPage() {
                   </form>
                 )}
 
-                <div className="text-center pt-6 border-t border-amber-100">
-                  <p className="text-sm text-amber-700">
-                    {isLogin ? 'Ainda não tem uma conta?' : 'Já tem uma conta?'}
-                  </p>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setIsLogin(!isLogin)
-                      setShowResendConfirmation(false)
-                      loginForm.reset()
-                      registerForm.reset()
-                    }}
-                    className="mt-2 text-amber-600 hover:text-amber-700 font-semibold transition-colors"
-                  >
-                    {isLogin ? 'Criar nova conta' : 'Fazer login'}
-                  </button>
-                </div>
+                {!showForgotPassword && (
+                  <div className="text-center pt-6 border-t border-amber-100">
+                    <p className="text-sm text-amber-700">
+                      {isLogin ? 'Ainda não tem uma conta?' : 'Já tem uma conta?'}
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsLogin(!isLogin)
+                        setShowResendConfirmation(false)
+                        setShowForgotPassword(false)
+                        loginForm.reset()
+                        registerForm.reset()
+                        forgotPasswordForm.reset()
+                      }}
+                      className="mt-2 text-amber-600 hover:text-amber-700 font-semibold transition-colors"
+                    >
+                      {isLogin ? 'Criar nova conta' : 'Fazer login'}
+                    </button>
+                  </div>
+                )}
 
                 {/* Resend Confirmation */}
                 {showResendConfirmation && (

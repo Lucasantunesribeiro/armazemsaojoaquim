@@ -16,10 +16,18 @@ export default function AuthCallbackPage() {
         const code = searchParams.get('code')
         const error = searchParams.get('error')
         const errorDescription = searchParams.get('error_description')
+        const type = searchParams.get('type')
 
         // Se houver erro no OAuth
         if (error) {
           console.error('OAuth Error:', error, errorDescription)
+          
+          // Tratamento específico para erros de OTP expirado
+          if (error === 'access_denied' && errorDescription?.includes('expired')) {
+            router.push('/auth?error=link_expired&message=O link de redefinição expirou. Solicite um novo.')
+            return
+          }
+          
           router.push(`/auth?error=${encodeURIComponent(errorDescription || error)}`)
           return
         }
@@ -33,6 +41,12 @@ export default function AuthCallbackPage() {
               ? (authError as any).message 
               : 'Authentication failed'
             router.push(`/auth?error=${encodeURIComponent(errorMessage)}`)
+            return
+          }
+
+          // Verificar se é recovery (redefinição de senha)
+          if (type === 'recovery') {
+            router.push('/auth/reset-password')
             return
           }
 
