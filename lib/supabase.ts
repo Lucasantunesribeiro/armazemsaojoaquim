@@ -169,7 +169,7 @@ try {
             sessionStorage.clear()
           }
           
-          // Retornar sucesso mesmo com erro do servidor
+          // Retornar sucesso para não bloquear o usuário
           return { error: null }
         }
         
@@ -190,151 +190,6 @@ try {
       }
     }
 
-    // Wrapper para signUp com estratégias avançadas baseadas na documentação oficial
-    const originalSignUp = supabase.auth.signUp
-    supabase.auth.signUp = async (credentials: any) => {
-      try {
-        console.log('🔄 Tentando registro...', { email: credentials.email })
-        
-        const result = await originalSignUp.call(supabase.auth, credentials)
-        
-        // Se houve erro 500 ou relacionado a servidor/email, usar estratégias documentadas
-        if (result.error && (
-          result.error.message?.includes('500') ||
-          result.error.message?.includes('Internal Server Error') ||
-          result.error.message?.includes('Error sending confirmation email') ||
-          result.error.message?.includes('Database error') ||
-          result.error.message?.includes('SMTP') ||
-          result.error.status === 500
-        )) {
-          console.log('⚠️ Erro 500/servidor detectado, aplicando estratégias de contorno...', result.error)
-          
-          // Estratégia 1: Usar Admin API (contorna problemas de schema/constraints)
-          console.log('🔄 Estratégia 1: Usando Admin API para bypass de constraints...')
-          try {
-            const adminResult = await fetch(`${supabaseUrl}/auth/v1/admin/users`, {
-              method: 'POST',
-              headers: {
-                'Authorization': `Bearer ${supabaseServiceKey || supabaseAnonKey}`,
-                'Content-Type': 'application/json',
-                'apikey': supabaseAnonKey
-              },
-              body: JSON.stringify({
-                email: credentials.email,
-                password: credentials.password,
-                user_metadata: credentials.options?.data || {},
-                email_confirm: false // Evita problemas SMTP
-              })
-            })
-            
-            if (adminResult.ok) {
-              const adminData = await adminResult.json()
-              console.log('✅ Estratégia 1 bem-sucedida via Admin API')
-              
-              return {
-                data: {
-                  user: adminData,
-                  session: null // Usuário precisa fazer login após criação
-                },
-                error: null
-              }
-            }
-          } catch (adminError) {
-            console.log('⚠️ Estratégia 1 falhou:', adminError)
-          }
-          
-          // Estratégia 2: Registro direto na tabela (último recurso)
-          console.log('🔄 Estratégia 2: Registro direto na tabela auth.users...')
-          try {
-            const userId = crypto.randomUUID()
-            const hashedPassword = await hashPassword(credentials.password)
-            
-            const { data: directInsert, error: insertError } = await supabase
-              .from('auth.users')
-              .insert({
-                id: userId,
-                email: credentials.email,
-                encrypted_password: hashedPassword,
-                email_confirmed_at: null,
-                raw_user_meta_data: credentials.options?.data || {},
-                created_at: new Date().toISOString(),
-                updated_at: new Date().toISOString()
-              })
-              .select()
-              .single()
-            
-            if (!insertError) {
-              console.log('✅ Estratégia 2 bem-sucedida via inserção direta')
-              
-              return {
-                data: {
-                  user: directInsert,
-                  session: null
-                },
-                error: null
-              }
-            }
-          } catch (directError) {
-            console.log('⚠️ Estratégia 2 falhou:', directError)
-          }
-          
-          // Estratégia 3: Assumir sucesso parcial (conta pode ter sido criada)
-          console.log('🎯 Estratégia 3: Assumindo sucesso parcial - conta provavelmente criada')
-          
-          // Verificar se usuário já existe
-          try {
-            const { data: existingUser } = await supabase
-              .from('auth.users')
-              .select('id, email, email_confirmed_at')
-              .eq('email', credentials.email)
-              .single()
-            
-            if (existingUser) {
-              console.log('✅ Conta encontrada - registro foi bem-sucedido apesar do erro')
-              return {
-                data: {
-                  user: existingUser,
-                  session: null
-                },
-                error: null
-              }
-            }
-          } catch (checkError) {
-            console.log('⚠️ Não foi possível verificar se conta existe:', checkError)
-          }
-          
-          // Se todas as estratégias falharam, retornar erro customizado mais útil
-          return {
-            data: { user: null, session: null },
-            error: {
-              ...result.error,
-              message: `Erro 500 do servidor Supabase. Possíveis causas: 
-              1. Problema no schema de autenticação
-              2. Constraints de foreign key bloqueando auth.users  
-              3. Triggers personalizados com erro
-              4. Configuração SMTP incorreta
-              5. Sobrecarga do servidor
-              
-              Tente novamente em alguns minutos ou contate o suporte.`,
-              hint: 'Verifique os logs do Supabase Dashboard para mais detalhes'
-            }
-          }
-        }
-        
-        return result
-      } catch (error) {
-        console.error('❌ Erro crítico no wrapper de signUp:', error)
-        
-        return {
-          data: { user: null, session: null },
-          error: {
-            message: 'Erro crítico no sistema de autenticação. Tente novamente.',
-            status: 500
-          }
-        }
-      }
-    }
-
     // Função auxiliar para hash de senha (simplificada)
     async function hashPassword(password: string): Promise<string> {
       // Em produção, usar bcrypt ou similar
@@ -351,7 +206,8 @@ try {
     supabase = createMockClient()
   }
 } catch (error) {
-  console.error('Erro ao inicializar Supabase:', error)
+  console.error('❌ Falha na inicialização do Supabase:', error)
+  // Em caso de falha, usar o cliente mock para evitar que a aplicação quebre
   supabase = createMockClient()
 }
 
