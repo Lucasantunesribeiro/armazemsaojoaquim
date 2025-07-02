@@ -90,11 +90,7 @@ const ContactSection = () => {
       title: 'Localização',
       content: ['Rua Almirante Alexandrino, 470', 'Santa Teresa, Rio de Janeiro - RJ', 'CEP: 20241-262'],
       gradient: 'from-red-500 to-pink-600',
-<<<<<<< HEAD
       action: () => window.open('https://maps.google.com/?q=Rua+Almirante+Alexandrino,+470,+Santa+Teresa,+Rio+de+Janeiro', '_blank')
-=======
-      action: () => window.open('https://maps.google.com/?q=Santa+Teresa+Rio+de+Janeiro', '_blank')
->>>>>>> db71da20d421fb713050462e83c63369986edb18
     },
     {
       icon: Phone,
@@ -155,11 +151,7 @@ const ContactSection = () => {
   return (
     <section 
       ref={sectionRef}
-<<<<<<< HEAD
       className="relative py-24 overflow-hidden bg-gradient-to-br from-slate-100 via-white to-amber-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900"
-=======
-      className="relative py-24 overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-amber-900"
->>>>>>> db71da20d421fb713050462e83c63369986edb18
     >
       {/* Background Pattern */}
       <div className="absolute inset-0 opacity-10">
@@ -206,15 +198,9 @@ const ContactSection = () => {
                     <div
                       key={index}
                       className={cn(
-<<<<<<< HEAD
                         "group relative bg-white/90 dark:bg-white/5 backdrop-blur-xl rounded-3xl p-6",
                         "border border-gray-200 dark:border-white/10 hover:border-amber-400/50",
                         "transition-all duration-500 hover:bg-white dark:hover:bg-white/10",
-=======
-                        "group relative bg-white/5 backdrop-blur-xl rounded-3xl p-6",
-                        "border border-white/10 hover:border-amber-400/50",
-                        "transition-all duration-500 hover:bg-white/10",
->>>>>>> db71da20d421fb713050462e83c63369986edb18
                         "transform hover:scale-105 hover:-translate-y-2",
                         "shadow-2xl hover:shadow-amber-500/20",
                         info.action ? 'cursor-pointer' : ''
@@ -231,20 +217,12 @@ const ContactSection = () => {
                       </div>
                       
                       <div className="pt-8">
-<<<<<<< HEAD
                         <h3 className="font-bold text-lg text-amber-700 dark:text-amber-200 mb-3">
-=======
-                        <h3 className="font-bold text-lg text-amber-200 mb-3">
->>>>>>> db71da20d421fb713050462e83c63369986edb18
                           {info.title}
                         </h3>
                         <div className="space-y-1">
                           {info.content.map((line, lineIndex) => (
-<<<<<<< HEAD
                             <p key={lineIndex} className="text-slate-600 dark:text-white/80 text-sm leading-relaxed">
-=======
-                            <p key={lineIndex} className="text-white/80 text-sm leading-relaxed">
->>>>>>> db71da20d421fb713050462e83c63369986edb18
                               {line}
                             </p>
                           ))}
@@ -256,17 +234,10 @@ const ContactSection = () => {
               </div>
 
               {/* Social Media */}
-<<<<<<< HEAD
               <div className="bg-white/90 dark:bg-white/5 backdrop-blur-xl rounded-3xl p-8 border border-gray-200 dark:border-white/10">
                 <div className="flex items-center space-x-3 mb-6">
                   <Star className="w-6 h-6 text-amber-600 dark:text-amber-400" />
                   <h3 className="font-playfair text-2xl font-bold text-slate-900 dark:text-white">
-=======
-              <div className="bg-white/5 backdrop-blur-xl rounded-3xl p-8 border border-white/10">
-                <div className="flex items-center space-x-3 mb-6">
-                  <Star className="w-6 h-6 text-amber-400" />
-                  <h3 className="font-playfair text-2xl font-bold text-white">
->>>>>>> db71da20d421fb713050462e83c63369986edb18
                     Siga-nos & Reserve
                   </h3>
                 </div>
@@ -282,13 +253,8 @@ const ContactSection = () => {
                         rel="noopener noreferrer"
                         className={cn(
                           "group flex items-center space-x-4 p-4 rounded-2xl",
-<<<<<<< HEAD
                           "bg-gray-50 dark:bg-white/5 hover:bg-gray-100 dark:hover:bg-white/10 backdrop-blur-sm",
                           "border border-gray-200 dark:border-white/10 hover:border-amber-400/50",
-=======
-                          "bg-white/5 hover:bg-white/10 backdrop-blur-sm",
-                          "border border-white/10 hover:border-amber-400/50",
->>>>>>> db71da20d421fb713050462e83c63369986edb18
                           "transition-all duration-300 hover:scale-105"
                         )}
                       >
@@ -299,17 +265,10 @@ const ContactSection = () => {
                           <Icon className="w-5 h-5 text-white" />
                         </div>
                         <div>
-<<<<<<< HEAD
                           <div className="font-semibold text-slate-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-300 transition-colors">
                             {social.name}
                           </div>
                           <div className="text-sm text-slate-500 dark:text-white/60">
-=======
-                          <div className="font-semibold text-white group-hover:text-amber-300 transition-colors">
-                            {social.name}
-                          </div>
-                          <div className="text-sm text-white/60">
->>>>>>> db71da20d421fb713050462e83c63369986edb18
                             {social.followers}
                           </div>
                         </div>
@@ -318,21 +277,12 @@ const ContactSection = () => {
                   })}
                 </div>
                 
-<<<<<<< HEAD
                 <div className="mt-6 p-4 bg-amber-50 dark:bg-amber-500/10 rounded-2xl border border-amber-200 dark:border-amber-500/20">
                   <div className="flex items-center space-x-2 mb-2">
                     <Coffee className="w-4 h-4 text-amber-600 dark:text-amber-400" />
                     <span className="text-amber-800 dark:text-amber-200 font-semibold text-sm">Dica Especial</span>
                   </div>
                   <p className="text-slate-600 dark:text-white/80 text-sm">
-=======
-                <div className="mt-6 p-4 bg-amber-500/10 rounded-2xl border border-amber-500/20">
-                  <div className="flex items-center space-x-2 mb-2">
-                    <Coffee className="w-4 h-4 text-amber-400" />
-                    <span className="text-amber-200 font-semibold text-sm">Dica Especial</span>
-                  </div>
-                  <p className="text-white/80 text-sm">
->>>>>>> db71da20d421fb713050462e83c63369986edb18
                     Acompanhe nossas redes para eventos especiais, novidades do cardápio e promoções exclusivas
                   </p>
                 </div>
@@ -344,17 +294,10 @@ const ContactSection = () => {
               "transition-all duration-1000 delay-500 ease-out",
               isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
             )}>
-<<<<<<< HEAD
               <div className="bg-white/90 dark:bg-white/5 backdrop-blur-xl rounded-3xl p-8 border border-gray-200 dark:border-white/10 shadow-2xl">
                 <div className="flex items-center space-x-3 mb-8">
                   <Send className="w-6 h-6 text-amber-600 dark:text-amber-400" />
                   <h3 className="font-playfair text-2xl font-bold text-slate-900 dark:text-white">
-=======
-              <div className="bg-white/5 backdrop-blur-xl rounded-3xl p-8 border border-white/10 shadow-2xl">
-                <div className="flex items-center space-x-3 mb-8">
-                  <Send className="w-6 h-6 text-amber-400" />
-                  <h3 className="font-playfair text-2xl font-bold text-white">
->>>>>>> db71da20d421fb713050462e83c63369986edb18
                     Envie uma Mensagem
                   </h3>
                 </div>
@@ -362,11 +305,7 @@ const ContactSection = () => {
                 <form onSubmit={handleSubmit} className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-<<<<<<< HEAD
                       <label className="block text-amber-800 dark:text-amber-200 text-sm font-semibold mb-2">
-=======
-                      <label className="block text-amber-200 text-sm font-semibold mb-2">
->>>>>>> db71da20d421fb713050462e83c63369986edb18
                         Nome completo *
                       </label>
                       <input
@@ -378,26 +317,16 @@ const ContactSection = () => {
                         required
                         className={cn(
                           "w-full px-4 py-3 rounded-xl",
-<<<<<<< HEAD
                           "bg-gray-50 dark:bg-white/10 backdrop-blur-sm border border-gray-300 dark:border-white/20",
                           "text-slate-900 dark:text-white placeholder-slate-500 dark:placeholder-white/50",
                           "focus:border-amber-500 dark:focus:border-amber-400 focus:ring-2 focus:ring-amber-500/20 dark:focus:ring-amber-400/20",
-=======
-                          "bg-white/10 backdrop-blur-sm border border-white/20",
-                          "text-white placeholder-white/50",
-                          "focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20",
->>>>>>> db71da20d421fb713050462e83c63369986edb18
                           "transition-all duration-200"
                         )}
                       />
                     </div>
                     
                     <div>
-<<<<<<< HEAD
                       <label className="block text-amber-800 dark:text-amber-200 text-sm font-semibold mb-2">
-=======
-                      <label className="block text-amber-200 text-sm font-semibold mb-2">
->>>>>>> db71da20d421fb713050462e83c63369986edb18
                         Telefone
                       </label>
                       <input
@@ -408,15 +337,9 @@ const ContactSection = () => {
                         placeholder="(21) 99999-9999"
                         className={cn(
                           "w-full px-4 py-3 rounded-xl",
-<<<<<<< HEAD
                           "bg-gray-50 dark:bg-white/10 backdrop-blur-sm border border-gray-300 dark:border-white/20",
                           "text-slate-900 dark:text-white placeholder-slate-500 dark:placeholder-white/50",
                           "focus:border-amber-500 dark:focus:border-amber-400 focus:ring-2 focus:ring-amber-500/20 dark:focus:ring-amber-400/20",
-=======
-                          "bg-white/10 backdrop-blur-sm border border-white/20",
-                          "text-white placeholder-white/50",
-                          "focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20",
->>>>>>> db71da20d421fb713050462e83c63369986edb18
                           "transition-all duration-200"
                         )}
                       />
@@ -436,26 +359,16 @@ const ContactSection = () => {
                       required
                       className={cn(
                         "w-full px-4 py-3 rounded-xl",
-<<<<<<< HEAD
                         "bg-gray-50 dark:bg-white/10 backdrop-blur-sm border border-gray-300 dark:border-white/20",
                         "text-slate-900 dark:text-white placeholder-slate-500 dark:placeholder-white/50",
                         "focus:border-amber-500 dark:focus:border-amber-400 focus:ring-2 focus:ring-amber-500/20 dark:focus:ring-amber-400/20",
-=======
-                        "bg-white/10 backdrop-blur-sm border border-white/20",
-                        "text-white placeholder-white/50",
-                        "focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20",
->>>>>>> db71da20d421fb713050462e83c63369986edb18
                         "transition-all duration-200"
                       )}
                     />
                   </div>
                   
                   <div>
-<<<<<<< HEAD
                     <label className="block text-amber-800 dark:text-amber-200 text-sm font-semibold mb-2">
-=======
-                    <label className="block text-amber-200 text-sm font-semibold mb-2">
->>>>>>> db71da20d421fb713050462e83c63369986edb18
                       Mensagem *
                     </label>
                     <textarea
@@ -467,15 +380,9 @@ const ContactSection = () => {
                       required
                       className={cn(
                         "w-full px-4 py-3 rounded-xl",
-<<<<<<< HEAD
                         "bg-gray-50 dark:bg-white/10 backdrop-blur-sm border border-gray-300 dark:border-white/20",
                         "text-slate-900 dark:text-white placeholder-slate-500 dark:placeholder-white/50",
                         "focus:border-amber-500 dark:focus:border-amber-400 focus:ring-2 focus:ring-amber-500/20 dark:focus:ring-amber-400/20",
-=======
-                        "bg-white/10 backdrop-blur-sm border border-white/20",
-                        "text-white placeholder-white/50",
-                        "focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20",
->>>>>>> db71da20d421fb713050462e83c63369986edb18
                         "transition-all duration-200 resize-none"
                       )}
                     />
@@ -502,21 +409,12 @@ const ContactSection = () => {
                   </Button>
                 </form>
 
-<<<<<<< HEAD
                 <div className="mt-8 p-4 bg-green-50 dark:bg-green-500/10 rounded-2xl border border-green-200 dark:border-green-500/20">
                   <div className="flex items-center space-x-2 mb-2">
                     <Calendar className="w-4 h-4 text-green-600 dark:text-green-400" />
                     <span className="text-green-800 dark:text-green-200 font-semibold text-sm">Reservas Rápidas</span>
                   </div>
                   <p className="text-slate-600 dark:text-white/80 text-sm mb-3">
-=======
-                <div className="mt-8 p-4 bg-green-500/10 rounded-2xl border border-green-500/20">
-                  <div className="flex items-center space-x-2 mb-2">
-                    <Calendar className="w-4 h-4 text-green-400" />
-                    <span className="text-green-200 font-semibold text-sm">Reservas Rápidas</span>
-                  </div>
-                  <p className="text-white/80 text-sm mb-3">
->>>>>>> db71da20d421fb713050462e83c63369986edb18
                     Para reservas urgentes, ligue diretamente ou use nosso WhatsApp
                   </p>
                   <a
@@ -540,11 +438,7 @@ const ContactSection = () => {
                 {/* Mapa Interativo do Google Maps */}
                 <div className="relative w-full h-full">
                   <iframe
-<<<<<<< HEAD
                     src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3675.222964964393!2d-43.188993!3d-22.913273!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x997e58a0b1e1b1%3A0x4d11c63743e5a5a5!2sRua%20Almirante%20Alexandrino%2C%20470%20-%20Santa%20Teresa%2C%20Rio%20de%20Janeiro%20-%20RJ%2C%2020241-262!5e0!3m2!1spt-BR!2sbr!4v1718040000000!5m2!1spt-BR!2sbr"
-=======
-                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3675.2234567890123!2d-43.1897!3d-22.9133!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x997e58a085b7af%3A0x4d11c63743e5a5a5!2sR.%20%C3%81urea%2C%2026%20-%20Santa%20Teresa%2C%20Rio%20de%20Janeiro%20-%20RJ%2C%2020241-220!5e0!3m2!1spt-BR!2sbr!4v1234567890123!5m2!1spt-BR!2sbr"
->>>>>>> db71da20d421fb713050462e83c63369986edb18
                     width="100%"
                     height="100%"
                     style={{ border: 0 }}
@@ -566,24 +460,15 @@ const ContactSection = () => {
                           <div>
                             <h4 className="font-bold text-slate-900 dark:text-white mb-1">Nossa Localização</h4>
                             <p className="text-slate-600 dark:text-slate-300 text-sm mb-2">
-<<<<<<< HEAD
                               Rua Almirante Alexandrino, 470 - Santa Teresa<br />
                               Rio de Janeiro - RJ, 20241-262
-=======
-                              Rua Áurea, 26 - Santa Teresa<br />
-                              Rio de Janeiro - RJ, 20241-220
->>>>>>> db71da20d421fb713050462e83c63369986edb18
                             </p>
                             <div className="flex items-center space-x-4 text-xs">
                               <span className="text-amber-600 dark:text-amber-400 font-medium">
                                 📍 No coração histórico de Santa Teresa
                               </span>
                               <a
-<<<<<<< HEAD
                                 href="https://maps.google.com/?q=Rua+Almirante+Alexandrino,+470+-+Santa+Teresa,+Rio+de+Janeiro+-+RJ"
-=======
-                                href="https://maps.google.com/?q=Rua+Áurea,+26+-+Santa+Teresa,+Rio+de+Janeiro+-+RJ"
->>>>>>> db71da20d421fb713050462e83c63369986edb18
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="bg-amber-500 hover:bg-amber-600 text-white px-3 py-1 rounded-lg transition-colors duration-200 pointer-events-auto"

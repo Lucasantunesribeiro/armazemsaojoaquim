@@ -167,26 +167,15 @@ const BlogPreview = () => {
 							</div>
 
 							{/* Image Navigation */}
-<<<<<<< HEAD
 							<div className="flex justify-center space-x-2 sm:space-x-3 mt-6">
-=======
-							<div className="flex justify-center space-x-2 mt-6">
->>>>>>> db71da20d421fb713050462e83c63369986edb18
 								{neighborhoodImages.map((_, index) => (
 									<button
 										key={index}
 										onClick={() => setActiveImageIndex(index)}
-<<<<<<< HEAD
 										className={`w-3 h-3 sm:w-4 sm:h-4 md:w-3 md:h-3 lg:w-4 lg:h-4 rounded-full transition-all duration-300 min-w-[12px] min-h-[12px] touch-manipulation ${
 											index === activeImageIndex
 												? 'bg-amber-600 dark:bg-amber-400 scale-125'
 												: 'bg-slate-300 dark:bg-slate-600 hover:bg-amber-400 dark:hover:bg-amber-500 hover:scale-110 active:scale-95'
-=======
-										className={`w-1 h-1 md:w-2 md:h-2 rounded-full transition-all duration-300 ${
-											index === activeImageIndex
-												? 'bg-amber-600 dark:bg-amber-400 scale-125'
-												: 'bg-slate-300 dark:bg-slate-600 hover:bg-amber-400 dark:hover:bg-amber-500'
->>>>>>> db71da20d421fb713050462e83c63369986edb18
 										}`}
 										aria-label={`Ver imagem ${index + 1}`}
 									/>

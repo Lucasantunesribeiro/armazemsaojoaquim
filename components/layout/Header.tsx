@@ -8,29 +8,17 @@ import { useSupabase } from '../providers/SupabaseProvider'
 import { useTheme } from 'next-themes'
 import LogoSimple from '../atoms/LogoSimple'
 import { forceLogout } from '../../lib/supabase'
-<<<<<<< HEAD
 import { useMobileMenu } from '../providers/MobileMenuProvider'
-=======
->>>>>>> db71da20d421fb713050462e83c63369986edb18
 
 const navLinks = [
   { name: 'Início', href: '/' },
   { name: 'Menu', href: '/menu' },
   { name: 'Reservas', href: '/reservas', requiresAuth: true },
-<<<<<<< HEAD
   { name: 'Blog', href: '/blog' },
-  { name: 'Contato', href: '/#contato' }
-=======
-  { name: 'Blog', href: '/blog' }
->>>>>>> db71da20d421fb713050462e83c63369986edb18
 ]
 
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false)
-<<<<<<< HEAD
-=======
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
->>>>>>> db71da20d421fb713050462e83c63369986edb18
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false)
   const [mounted, setMounted] = useState(false)
   const pathname = usePathname()
@@ -38,10 +26,7 @@ export default function Header() {
   const { theme, setTheme } = useTheme()
   const userMenuRef = useRef<HTMLDivElement>(null)
   const mobileMenuRef = useRef<HTMLDivElement>(null)
-<<<<<<< HEAD
   const { isMobileMenuOpen, openMobileMenu, closeMobileMenu, toggleMobileMenu } = useMobileMenu()
-=======
->>>>>>> db71da20d421fb713050462e83c63369986edb18
 
   // Scroll handler
   const handleScroll = useCallback(() => {
@@ -49,15 +34,6 @@ export default function Header() {
     setIsScrolled(scrolled)
   }, [])
 
-<<<<<<< HEAD
-=======
-  // Close mobile menu
-  const closeMobileMenu = useCallback(() => {
-    setIsMobileMenuOpen(false)
-    document.body.style.overflow = 'unset'
-  }, [])
-
->>>>>>> db71da20d421fb713050462e83c63369986edb18
   // Handle logout
   const handleLogout = async () => {
     try {
@@ -124,11 +100,7 @@ export default function Header() {
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
-<<<<<<< HEAD
         closeMobileMenu()
-=======
-        setIsMobileMenuOpen(false)
->>>>>>> db71da20d421fb713050462e83c63369986edb18
         setIsUserMenuOpen(false)
         document.body.style.overflow = 'unset'
       }
@@ -319,11 +291,7 @@ export default function Header() {
 
             {/* Mobile Menu Button */}
             <button
-<<<<<<< HEAD
               onClick={() => toggleMobileMenu()}
-=======
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
->>>>>>> db71da20d421fb713050462e83c63369986edb18
               className="lg:hidden p-2.5 rounded-xl text-slate-800 dark:text-slate-200 hover:text-amber-700 dark:hover:text-amber-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all duration-300"
               aria-label="Abrir menu"
             >
@@ -339,11 +307,7 @@ export default function Header() {
 
       {/* Mobile Menu Overlay */}
       {isMobileMenuOpen && (
-<<<<<<< HEAD
         <div className="fixed inset-0 z-50 lg:hidden">
-=======
-        <div className="fixed inset-0 z-40 lg:hidden">
->>>>>>> db71da20d421fb713050462e83c63369986edb18
           <div className="fixed inset-0 bg-black/80 backdrop-blur-sm" onClick={closeMobileMenu} />
           
           <div 
@@ -353,25 +317,11 @@ export default function Header() {
             {/* Mobile Menu Header */}
             <div className="flex items-center justify-between p-4 sm:p-6 border-b border-slate-200 dark:border-slate-700 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-slate-800 dark:to-slate-700">
               <div className="flex items-center space-x-3">
-<<<<<<< HEAD
                 <LogoSimple 
                   isScrolled={isScrolled}
                   showText={true}
                   className="transition-all duration-300"
                 />
-=======
-                <div className="w-8 h-8 bg-gradient-to-br from-amber-500 to-orange-500 rounded-lg flex items-center justify-center">
-                  <span className="text-white font-bold text-sm">A</span>
-                </div>
-                <div>
-                  <h2 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white font-playfair leading-tight">
-                    Armazém São Joaquim
-                  </h2>
-                  <p className="text-xs text-amber-600 dark:text-amber-400 font-medium">
-                    Desde 1854
-                  </p>
-                </div>
->>>>>>> db71da20d421fb713050462e83c63369986edb18
               </div>
               <div className="flex items-center space-x-1">
                 {/* Mobile Theme Toggle */}
@@ -399,57 +349,6 @@ export default function Header() {
             {/* Mobile Menu Content */}
             <div className="flex flex-col h-[calc(100%-theme(spacing.20))] overflow-y-auto">
               {/* Navigation Links */}
-<<<<<<< HEAD
-=======
-              <nav className="flex-1 p-4 sm:p-6">
-                <div className="space-y-1">
-                  {navLinks.map((link) => {
-                    const isActive = isActiveLink(link.href)
-                    const requiresAuth = link.requiresAuth && !user
-                    
-                    return (
-                      <Link
-                        key={link.name}
-                        href={requiresAuth ? '/auth' : link.href}
-                        onClick={closeMobileMenu}
-                        className={`
-                          group flex items-center justify-between px-4 py-4 rounded-2xl text-base font-semibold transition-all duration-300 font-inter
-                          ${isActive
-                            ? 'text-amber-700 dark:text-amber-300 bg-gradient-to-r from-amber-100 to-orange-100 dark:from-amber-900/40 dark:to-orange-900/40 shadow-lg border border-amber-200 dark:border-amber-800' 
-                            : requiresAuth
-                              ? 'text-orange-600 dark:text-orange-400 hover:text-orange-700 dark:hover:text-orange-300 hover:bg-gradient-to-r hover:from-orange-50 hover:to-red-50 dark:hover:from-orange-900/20 dark:hover:to-red-900/20 hover:shadow-md'
-                              : 'text-slate-700 dark:text-slate-300 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-gradient-to-r hover:from-slate-50 hover:to-amber-50 dark:hover:from-slate-800/50 dark:hover:to-amber-900/20 hover:shadow-md'
-                          }
-                        `}
-                      >
-                        <span className="flex items-center space-x-3">
-                          {requiresAuth && (
-                            <Lock className="w-4 h-4 opacity-70 group-hover:opacity-100 transition-opacity" />
-                          )}
-                          <span className="text-base sm:text-lg">{link.name}</span>
-                        </span>
-                        {isActive && (
-                          <div className="w-2.5 h-2.5 bg-amber-500 rounded-full animate-pulse shadow-lg" />
-                        )}
-                      </Link>
-                    )
-                  })}
-                  
-                  {/* Mobile Reservar Button */}
-                  <div className="pt-4">
-                    <Link
-                      href={user ? '/reservas' : '/auth'}
-                      onClick={closeMobileMenu}
-                      className="group flex items-center justify-center space-x-3 w-full px-6 py-4 rounded-2xl font-bold text-base sm:text-lg font-inter transition-all duration-300 shadow-xl hover:shadow-2xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white hover:scale-[1.02] active:scale-[0.98]"
-                    >
-                      <Calendar className="w-5 h-5 group-hover:scale-110 transition-transform" />
-                      <span>Reservar Mesa</span>
-                    </Link>
-                  </div>
-                </div>
-              </nav>
-
->>>>>>> db71da20d421fb713050462e83c63369986edb18
               {/* Mobile User Section */}
               <div className="border-t border-slate-200 dark:border-slate-700 p-4 sm:p-6 bg-slate-50/50 dark:bg-slate-800/50">
                 {user ? (
@@ -489,7 +388,6 @@ export default function Header() {
                   </Link>
                 )}
               </div>
-<<<<<<< HEAD
               <nav className="flex-1 p-4 sm:p-6">
                 <div className="space-y-1">
                   {navLinks.map((link) => {
@@ -547,8 +445,6 @@ export default function Header() {
               </nav>
 
               
-=======
->>>>>>> db71da20d421fb713050462e83c63369986edb18
             </div>
           </div>
         </div>

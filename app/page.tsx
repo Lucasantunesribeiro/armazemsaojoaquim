@@ -34,52 +34,28 @@ export default function HomePage() {
       
       {/* About Section */}
       <Suspense fallback={<SectionFallback />}>
-<<<<<<< HEAD
         <ClientAboutSection />
-=======
-        <div className="py-8 md:py-16 bg-white dark:bg-slate-900">
-          <ClientAboutSection />
-        </div>
->>>>>>> db71da20d421fb713050462e83c63369986edb18
       </Suspense>
       
       <SectionSeparator />
       
       {/* Menu Preview */}
       <Suspense fallback={<SectionFallback />}>
-<<<<<<< HEAD
         <ClientMenuPreview />
-=======
-        <div className="py-8 md:py-16 bg-gradient-to-br from-amber-50/30 to-orange-50/30 dark:from-slate-800/50 dark:to-amber-950/30">
-          <ClientMenuPreview />
-        </div>
->>>>>>> db71da20d421fb713050462e83c63369986edb18
       </Suspense>
       
       <SectionSeparator />
       
       {/* Blog Preview */}
       <Suspense fallback={<SectionFallback />}>
-<<<<<<< HEAD
         <ClientBlogPreview />
-=======
-        <div className="py-8 md:py-16 bg-white dark:bg-slate-900">
-          <ClientBlogPreview />
-        </div>
->>>>>>> db71da20d421fb713050462e83c63369986edb18
       </Suspense>
       
       <SectionSeparator />
       
       {/* Contact Section */}
       <Suspense fallback={<SectionFallback />}>
-<<<<<<< HEAD
         <ClientContactSection />
-=======
-        <div className="py-8 md:py-16 bg-gradient-to-br from-amber-50/20 to-orange-50/20 dark:from-slate-900/80 dark:to-slate-800/60">
-          <ClientContactSection />
-        </div>
->>>>>>> db71da20d421fb713050462e83c63369986edb18
       </Suspense>
     </main>
   )

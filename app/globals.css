@@ -7,7 +7,6 @@
 
 /* Enhanced CSS Variables for responsive design */
 :root {
-<<<<<<< HEAD
   /* Light mode colors */
   --background: #ffffff;
   --surface: #f8f9fa;
@@ -36,14 +35,6 @@
   --button-primary-hover: #d97706;
   
   /* Layout */
-=======
-  --background: #ffffff;
-  --surface: #f8fafc;
-  --text-primary: #1e293b;
-  --text-secondary: #64748b;
-  --border: #e2e8f0;
-  --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
->>>>>>> db71da20d421fb713050462e83c63369986edb18
   --header-height: 80px;
   --mobile-header-height: 70px;
   --footer-height: auto;
@@ -93,7 +84,6 @@
   --ease-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
 }
 
-<<<<<<< HEAD
 /* Dark mode variables */
 [data-theme="dark"],
 .dark {
@@ -153,42 +143,19 @@
     --input-border: #4b5563;
     --button-primary-bg: #fbbf24;
     --button-primary-hover: #f59e0b;
-=======
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0f172a;
-    --surface: #1e293b;
-    --text-primary: #f1f5f9;
-    --text-secondary: #94a3b8;
-    --border: #334155;
-    --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.3);
->>>>>>> db71da20d421fb713050462e83c63369986edb18
   }
 }
 
 /* Dark mode improvements */
 .dark {
-<<<<<<< HEAD
   color-scheme: dark;
 }
 
 /* Better contrast for section backgrounds */
-=======
-  --background: #0f172a;
-  --surface: #1e293b;
-  --text-primary: #f1f5f9;
-  --text-secondary: #94a3b8;
-  --border: #334155;
-  --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.5);
-}
-
-/* Improved section backgrounds for dark mode */
->>>>>>> db71da20d421fb713050462e83c63369986edb18
 .dark section {
   background-color: transparent;
 }
 
-<<<<<<< HEAD
 /* Better contrast for dark mode text - usando a nova paleta */
 .dark .text-gray-900 { color: var(--text-primary) !important; }
 .dark .text-gray-800 { color: var(--text-primary) !important; }
@@ -238,47 +205,6 @@
 .dark .border-amber-300 { border-color: rgba(251, 191, 36, 0.4) !important; }
 .dark .border-amber-400 { border-color: rgba(251, 191, 36, 0.5) !important; }
 .dark .border-amber-500 { border-color: rgba(251, 191, 36, 0.6) !important; }
-=======
-/* Better contrast for dark mode text */
-.dark .text-slate-600 {
-  color: #cbd5e1 !important;
-}
-
-.dark .text-slate-700 {
-  color: #e2e8f0 !important;
-}
-
-.dark .text-slate-800 {
-  color: #f1f5f9 !important;
-}
-
-/* Improved amber colors for dark mode */
-.dark .text-amber-800 {
-  color: #fcd34d !important;
-}
-
-.dark .text-amber-700 {
-  color: #fbbf24 !important;
-}
-
-/* Better dark mode backgrounds */
-.dark .bg-amber-100 {
-  background-color: rgba(146, 64, 14, 0.4) !important;
-}
-
-.dark .bg-amber-50 {
-  background-color: rgba(146, 64, 14, 0.2) !important;
-}
-
-/* Improved borders for dark mode */
-.dark .border-amber-200 {
-  border-color: rgba(217, 119, 6, 0.5) !important;
-}
-
-.dark .border-amber-300 {
-  border-color: rgba(217, 119, 6, 0.6) !important;
-}
->>>>>>> db71da20d421fb713050462e83c63369986edb18
 
 /* Enhanced reset and base styles for better mobile support */
 * {
@@ -301,13 +227,10 @@ html {
   -webkit-tap-highlight-color: transparent;
   /* Improve scrolling on iOS */
   -webkit-overflow-scrolling: touch;
-<<<<<<< HEAD
   /* Unified background to prevent dark mode black bars */
   background-color: var(--background);
   color: var(--text-primary);
   transition: background-color 0.3s ease, color 0.3s ease;
-=======
->>>>>>> db71da20d421fb713050462e83c63369986edb18
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -826,13 +749,8 @@ img[loading="lazy"].loaded {
 /* Improve card contrast in dark mode */
 .dark .card,
 .dark .card-responsive {
-<<<<<<< HEAD
   background-color: rgba(30, 30, 30, 0.8) !important;
   border-color: rgba(75, 85, 99, 0.4) !important;
-=======
-  background-color: rgba(30, 41, 59, 0.6) !important;
-  border-color: rgba(51, 65, 85, 0.4) !important;
->>>>>>> db71da20d421fb713050462e83c63369986edb18
   backdrop-filter: blur(8px);
 }
 
@@ -844,11 +762,7 @@ img[loading="lazy"].loaded {
 
 .dark .btn-secondary:hover {
   background-color: #fbbf24 !important;
-<<<<<<< HEAD
   color: #0f0f0f !important;
-=======
-  color: #0f172a !important;
->>>>>>> db71da20d421fb713050462e83c63369986edb18
 }
 
 /* Improve focus states in dark mode */
@@ -861,15 +775,9 @@ img[loading="lazy"].loaded {
 .dark input,
 .dark textarea,
 .dark select {
-<<<<<<< HEAD
   background-color: rgba(38, 38, 38, 0.8) !important;
   border-color: rgba(75, 85, 99, 0.6) !important;
   color: #f8f9fa !important;
-=======
-  background-color: rgba(30, 41, 59, 0.8) !important;
-  border-color: rgba(51, 65, 85, 0.6) !important;
-  color: #f1f5f9 !important;
->>>>>>> db71da20d421fb713050462e83c63369986edb18
 }
 
 .dark input:focus,
@@ -885,54 +793,32 @@ img[loading="lazy"].loaded {
 }
 
 .dark .nav-link-active {
-<<<<<<< HEAD
   background-color: rgba(251, 191, 36, 0.2) !important;
-=======
-  background-color: rgba(146, 64, 14, 0.4) !important;
->>>>>>> db71da20d421fb713050462e83c63369986edb18
   color: #fcd34d !important;
 }
 
 /* Better mobile menu in dark mode */
 .dark .mobile-menu {
-<<<<<<< HEAD
   background-color: #0f0f0f !important;
   border-color: rgba(75, 85, 99, 0.6) !important;
-=======
-  background-color: #0f172a !important;
-  border-color: rgba(51, 65, 85, 0.6) !important;
->>>>>>> db71da20d421fb713050462e83c63369986edb18
 }
 
 /* Improved scrollbar for dark mode */
 .dark ::-webkit-scrollbar-thumb {
-<<<<<<< HEAD
   background-color: rgba(75, 85, 99, 0.8) !important;
 }
 
 .dark ::-webkit-scrollbar-thumb:hover {
   background-color: rgba(107, 114, 128, 0.9) !important;
-=======
-  background-color: rgba(51, 65, 85, 0.8) !important;
-}
-
-.dark ::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(71, 85, 105, 0.9) !important;
->>>>>>> db71da20d421fb713050462e83c63369986edb18
 }
 
 /* Fix gradient text in dark mode */
 .dark .bg-clip-text {
-<<<<<<< HEAD
   background: linear-gradient(to bottom right, #f8f9fa, #fcd34d, #fbbf24) !important;
-=======
-  background: linear-gradient(to bottom right, #f1f5f9, #fcd34d, #fbbf24) !important;
->>>>>>> db71da20d421fb713050462e83c63369986edb18
   background-clip: text !important;
   -webkit-background-clip: text !important;
 }
 
-<<<<<<< HEAD
 /* Touch target improvements for mobile */
 @media (max-width: 768px) {
   button,
@@ -951,8 +837,6 @@ img[loading="lazy"].loaded {
   }
 }
 
-=======
->>>>>>> db71da20d421fb713050462e83c63369986edb18
 /* ===============================================
    ENHANCED RESPONSIVE IMPROVEMENTS
    =============================================== */
