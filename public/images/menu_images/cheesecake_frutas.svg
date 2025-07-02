@@ -1,0 +1,32 @@
+<svg width="300" height="200" viewBox="0 0 300 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg-cheesecake_frutas" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#f8f9fa;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#e9ecef;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="300" height="200" fill="url(#bg-cheesecake_frutas)" stroke="#dee2e6" stroke-width="2" rx="8"/>
+  
+  <!-- Restaurant icon -->
+  <g transform="translate(130, 40)">
+    <circle cx="20" cy="20" r="18" fill="#6c757d" opacity="0.3"/>
+    <path d="M10 15 L30 15 M15 10 L25 10 M12 20 L28 20 M14 25 L26 25" stroke="#495057" stroke-width="2" stroke-linecap="round"/>
+  </g>
+  
+  <!-- Dish name -->
+  <text x="150" y="120" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#495057">
+    Cheesecake Frutas
+  </text>
+  
+  <!-- "Image not available" text -->
+  <text x="150" y="140" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#6c757d">
+    Imagem não disponível
+  </text>
+  
+  <!-- Restaurant name -->
+  <text x="150" y="170" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="#868e96">
+    Armazém São Joaquim
+  </text>
+</svg>
