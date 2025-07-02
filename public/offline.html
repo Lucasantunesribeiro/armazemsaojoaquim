@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Offline - Armazém São Joaquim</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(135deg, #F4C430 0%, #2D1810 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      text-align: center;
+      padding: 1rem;
+    }
+    
+    .container {
+      max-width: 500px;
+      padding: 2rem;
+      background: rgba(45, 24, 16, 0.9);
+      border-radius: 16px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    }
+    
+    .logo {
+      width: 80px;
+      height: 80px;
+      background: #F4C430;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 2rem;
+      font-size: 2.5rem;
+      font-weight: bold;
+      color: #2D1810;
+    }
+    
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+      font-weight: 700;
+    }
+    
+    .subtitle {
+      font-size: 1.1rem;
+      margin-bottom: 2rem;
+      opacity: 0.9;
+      line-height: 1.6;
+    }
+    
+    .offline-info {
+      background: rgba(244, 196, 48, 0.1);
+      border: 1px solid rgba(244, 196, 48, 0.3);
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    
+    .offline-info h2 {
+      font-size: 1.2rem;
+      margin-bottom: 1rem;
+      color: #F4C430;
+    }
+    
+    .offline-info ul {
+      text-align: left;
+      list-style: none;
+      padding: 0;
+    }
+    
+    .offline-info li {
+      padding: 0.5rem 0;
+      position: relative;
+      padding-left: 1.5rem;
+    }
+    
+    .offline-info li::before {
+      content: "📍";
+      position: absolute;
+      left: 0;
+    }
+    
+    .contact-info {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    
+    .contact-info h2 {
+      color: #F4C430;
+      margin-bottom: 1rem;
+    }
+    
+    .contact-info a {
+      color: #F4C430;
+      text-decoration: none;
+      font-weight: 600;
+    }
+    
+    .retry-btn {
+      background: #F4C430;
+      color: #2D1810;
+      border: none;
+      padding: 1rem 2rem;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-top: 1rem;
+    }
+    
+    .retry-btn:hover {
+      background: #e8b429;
+      transform: translateY(-2px);
+    }
+    
+    @media (max-width: 768px) {
+      .container {
+        padding: 1.5rem;
+      }
+      
+      h1 {
+        font-size: 1.5rem;
+      }
+      
+      .subtitle {
+        font-size: 1rem;
+      }
+    }
+    
+    .animation {
+      animation: fadeInUp 0.8s ease-out;
+    }
+    
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container animation">
+    <div class="logo">A</div>
+    
+    <h1>Você está offline</h1>
+    <p class="subtitle">
+      Parece que você está sem conexão com a internet. 
+      Mas não se preocupe, ainda temos informações úteis para você!
+    </p>
+    
+    <div class="offline-info">
+      <h2>📍 Informações de Contato</h2>
+      <ul>
+        <li><strong>Endereço:</strong> Rua Almirante Alexandrino, 470, Santa Teresa - RJ</li>
+        <li><strong>Telefone:</strong> +55 21 98565-8443</li>
+        <li><strong>E-mail:</strong> armazemjoaquimoficial@gmail.com</li>
+        <li><strong>Instagram:</strong> @armazemsaojoaquim</li>
+      </ul>
+    </div>
+    
+    <div class="contact-info">
+      <h2>🕒 Horário de Funcionamento</h2>
+      <p>Segunda a Sexta: 12h às 24h</p>
+      <p>Sábado: 11h30 às 24h</p>
+      <p>Domingo: 11h30 às 22h</p>
+      <p><strong>Happy Hour:</strong> Seg-Qui: 17h-20h | Sex: 19h-20h</p>
+      <p><strong>Café da Manhã:</strong> 8h às 20h (todos os dias)</p>
+    </div>
+    
+    <div class="contact-info">
+      <h2>🏨 Pousada São Joaquim</h2>
+      <p>Reserve um quarto em nosso casarão histórico</p>
+      <a href="https://vivapp.bukly.com/d/hotel_view/5041" target="_blank" rel="noopener">
+        Ver Disponibilidade
+      </a>
+    </div>
+    
+    <button class="retry-btn" onclick="window.location.reload()">
+      🔄 Tentar Novamente
+    </button>
+    
+    <p style="margin-top: 2rem; opacity: 0.7; font-size: 0.9rem;">
+      Esta página funciona offline. Quando sua conexão voltar, você poderá acessar todo o conteúdo.
+    </p>
+  </div>
+  
+  <script>
+    // Check if back online
+    window.addEventListener('online', function() {
+      // Show notification that we're back online
+      const notification = document.createElement('div');
+      notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #2E7D32;
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 8px;
+        z-index: 1000;
+        animation: slideIn 0.3s ease-out;
+      `;
+      notification.textContent = '✅ Conexão restaurada!';
+      document.body.appendChild(notification);
+      
+      // Auto redirect after 2 seconds
+      setTimeout(() => {
+        window.location.href = '/';
+      }, 2000);
+    });
+    
+    // Add slide in animation for online notification
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes slideIn {
+        from { transform: translateX(100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+      }
+    `;
+    document.head.appendChild(style);
+  </script>
+</body>
+</html> 
