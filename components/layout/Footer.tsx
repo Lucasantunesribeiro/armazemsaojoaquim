@@ -41,6 +41,11 @@ const Footer = () => {
 
   const utilityLinks = [
     { name: 'Baixar Cardápio PDF', href: '/api/cardapio-pdf', icon: Download },
+<<<<<<< HEAD
+=======
+    { name: 'Sistema de Saúde', href: '/api/health', icon: Shield },
+    { name: 'Suporte', href: '/contato', icon: HelpCircle },
+>>>>>>> db71da20d421fb713050462e83c63369986edb18
     { name: 'WhatsApp', href: 'https://wa.me/5521985658443', icon: MessageCircle, external: true },
   ]
 
@@ -60,11 +65,26 @@ const Footer = () => {
       bgColor: 'hover:bg-pink-500/10'
     },
     {
+<<<<<<< HEAD
       name: 'Pousada',
       href: 'https://vivapp.bukly.com/d/hotel_view/5041',
       icon: ExternalLink,
       color: 'hover:text-green-400',
       bgColor: 'hover:bg-green-500/10'
+=======
+      name: 'Facebook',
+      href: 'https://facebook.com/armazemsaojoaquim',
+      icon: Facebook,
+      color: 'hover:text-blue-400',
+      bgColor: 'hover:bg-blue-500/10'
+    },
+    {
+      name: 'YouTube',
+      href: 'https://youtube.com/@armazemsaojoaquim',
+      icon: Youtube,
+      color: 'hover:text-red-400',
+      bgColor: 'hover:bg-red-500/10'
+>>>>>>> db71da20d421fb713050462e83c63369986edb18
     }
   ]
 
@@ -279,6 +299,7 @@ const Footer = () => {
                     <MapPin className="w-5 h-5 text-amarelo-armazem mt-1 flex-shrink-0" />
                     <div>
                       <p className="text-cinza-claro font-inter text-sm leading-relaxed">
+<<<<<<< HEAD
                         <strong>Rua Almirante Alexandrino, 470</strong><br />
                         Santa Teresa<br />
                         Rio de Janeiro - RJ<br />
@@ -286,6 +307,15 @@ const Footer = () => {
                       </p>
                       <MapButton
                         address="Rua Almirante Alexandrino, 470, Santa Teresa, Rio de Janeiro - RJ"
+=======
+                        <strong>Rua Áurea, 26</strong><br />
+                        Santa Teresa<br />
+                        Rio de Janeiro - RJ<br />
+                        CEP: 20241-220
+                      </p>
+                      <MapButton
+                        address="Rua Áurea, 26, Santa Teresa, Rio de Janeiro - RJ"
+>>>>>>> db71da20d421fb713050462e83c63369986edb18
                         variant="link"
                         className="mt-2"
                       />
@@ -454,7 +484,11 @@ const Footer = () => {
                 </h3>
                 <div className="max-w-2xl mx-auto rounded-xl overflow-hidden shadow-lg border border-white/10">
                   <iframe
+<<<<<<< HEAD
                     src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3675.222964964393!2d-43.188993!3d-22.913273!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x997e58a0b1e1b1%3A0x4d11c63743e5a5a5!2sRua%20Almirante%20Alexandrino%2C%20470%20-%20Santa%20Teresa%2C%20Rio%20de%20Janeiro%20-%20RJ%2C%2020241-262!5e0!3m2!1spt-BR!2sbr!4v1718040000000!5m2!1spt-BR!2sbr"
+=======
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3675.4926431929147!2d-43.18775!3d-22.929892!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x997e58a085b7af%3A0x4d11c63ce0ae015b!2sRua%20%C3%81urea%2C%2026%20-%20Santa%20Teresa%2C%20Rio%20de%20Janeiro%20-%20RJ!5e0!3m2!1spt-BR!2sbr!4v1698765432109!5m2!1spt-BR!2sbr"
+>>>>>>> db71da20d421fb713050462e83c63369986edb18
                     width="100%"
                     height="300"
                     style={{ border: 0 }}
@@ -467,7 +501,11 @@ const Footer = () => {
                 </div>
                 <div className="mt-4 space-x-4">
                   <MapButton
+<<<<<<< HEAD
                     address="Rua Almirante Alexandrino, 470, Santa Teresa, Rio de Janeiro - RJ"
+=======
+                    address="Rua Áurea, 26, Santa Teresa, Rio de Janeiro - RJ"
+>>>>>>> db71da20d421fb713050462e83c63369986edb18
                     variant="default"
                     className="mx-auto"
                   />
