@@ -24,6 +24,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     'aria-describedby': ariaDescribedby,
     ...props 
   }, ref) => {
+<<<<<<< HEAD
     const baseClasses = 'inline-flex items-center justify-center font-medium rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer border-0 text-center relative overflow-hidden touch-manipulation'
     
     const variants = {
@@ -37,6 +38,21 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       sm: 'px-4 py-2.5 text-sm min-h-[44px] min-w-[44px]', // Increased from 40px to 44px
       md: 'px-6 py-3 text-base min-h-[48px] min-w-[48px]', // Increased from 44px to 48px
       lg: 'px-8 py-4 text-lg min-h-[56px] min-w-[56px]' // Increased from 48px to 56px
+=======
+    const baseClasses = 'inline-flex items-center justify-center font-medium rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer border-0 text-center relative overflow-hidden'
+    
+    const variants = {
+      primary: 'bg-amarelo-armazem text-madeira-escura hover:bg-yellow-500 focus:ring-amarelo-armazem shadow-md hover:shadow-lg active:bg-yellow-600 active:transform active:scale-95',
+      secondary: 'bg-madeira-escura text-white hover:bg-amber-900 focus:ring-madeira-escura shadow-md hover:shadow-lg active:bg-amber-800 active:transform active:scale-95',
+      outline: 'border-2 border-madeira-escura text-madeira-escura hover:bg-madeira-escura hover:text-white focus:ring-madeira-escura active:bg-amber-900',
+      ghost: 'text-madeira-escura hover:bg-cinza-claro focus:ring-cinza-medio active:bg-gray-200'
+    }
+    
+    const sizes = {
+      sm: 'px-4 py-2 text-sm min-h-[40px] min-w-[40px]', // Minimum touch target 40px
+      md: 'px-6 py-3 text-base min-h-[44px] min-w-[44px]', // Recommended touch target 44px
+      lg: 'px-8 py-4 text-lg min-h-[48px] min-w-[48px]' // Large touch target 48px
+>>>>>>> db71da20d421fb713050462e83c63369986edb18
     }
 
     const isDisabled = disabled || loading

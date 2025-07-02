@@ -294,18 +294,32 @@ export default function HeroSection() {
       {/* Navigation Arrows */}
       <button
         onClick={prevSlide}
+<<<<<<< HEAD
         className="absolute left-2 sm:left-4 lg:left-6 top-1/2 transform -translate-y-1/2 z-20 bg-black/50 hover:bg-black/70 dark:bg-white/20 dark:hover:bg-white/30 text-white dark:text-white p-3 sm:p-3 md:p-4 rounded-full transition-all duration-300 hover:scale-110 active:scale-95 min-w-[48px] min-h-[48px] touch-manipulation backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-amber-500 group"
         aria-label="Slide anterior"
       >
         <ChevronLeft className="w-5 h-5 sm:w-5 sm:h-5 md:w-6 md:h-6 group-hover:-translate-x-0.5 transition-transform" />
+=======
+        className="absolute left-4 sm:left-6 lg:left-8 top-1/2 transform -translate-y-1/2 z-20 bg-black/40 hover:bg-black/60 text-white p-2 sm:p-3 rounded-full transition-all duration-300 hover:scale-110 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-amber-500 group"
+        aria-label="Slide anterior"
+      >
+        <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5 group-hover:-translate-x-0.5 transition-transform" />
+>>>>>>> db71da20d421fb713050462e83c63369986edb18
       </button>
 
       <button
         onClick={nextSlide}
+<<<<<<< HEAD
         className="absolute right-2 sm:right-4 lg:right-6 top-1/2 transform -translate-y-1/2 z-20 bg-black/50 hover:bg-black/70 dark:bg-white/20 dark:hover:bg-white/30 text-white dark:text-white p-3 sm:p-3 md:p-4 rounded-full transition-all duration-300 hover:scale-110 active:scale-95 min-w-[48px] min-h-[48px] touch-manipulation backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-amber-500 group"
         aria-label="Próximo slide"
       >
         <ChevronRight className="w-5 h-5 sm:w-5 sm:h-5 md:w-6 md:h-6 group-hover:translate-x-0.5 transition-transform" />
+=======
+        className="absolute right-4 sm:right-6 lg:right-8 top-1/2 transform -translate-y-1/2 z-20 bg-black/40 hover:bg-black/60 text-white p-2 sm:p-3 rounded-full transition-all duration-300 hover:scale-110 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-amber-500 group"
+        aria-label="Próximo slide"
+      >
+        <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-0.5 transition-transform" />
+>>>>>>> db71da20d421fb713050462e83c63369986edb18
       </button>
 
       {/* Screen Reader Information */}

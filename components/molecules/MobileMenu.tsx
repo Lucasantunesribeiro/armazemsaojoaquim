@@ -65,6 +65,7 @@ const MobileMenu = memo(({
       }
       overflow-hidden ${className}
     `}>
+<<<<<<< HEAD
       <div className="p-6 space-y-6 flex flex-col h-full bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-cinza-claro/20 dark:border-slate-700/20">
         {/* Header do menu */}
         <div className="flex items-center justify-between">
@@ -100,6 +101,38 @@ const MobileMenu = memo(({
             )}
           </div>
         </nav>
+=======
+      <div className="px-4 pt-2 pb-6 space-y-1 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-cinza-claro/20 dark:border-slate-700/20">
+        {/* User Info in Mobile */}
+        {user && (
+          <div className="px-4 py-3 bg-cinza-claro dark:bg-slate-800 rounded-lg mb-4">
+            <p className="text-sm font-medium text-madeira-escura dark:text-white font-inter truncate">
+              {user.user_metadata?.full_name || 'Usuário'}
+            </p>
+            <p className="text-xs text-cinza-medio dark:text-slate-400 font-inter truncate">
+              {user.email}
+            </p>
+          </div>
+        )}
+
+        {/* Navigation Links */}
+        <nav role="navigation" aria-label="Menu de navegação mobile">
+          {items.map((item) => (
+            <NavLink
+              key={item.name}
+              href={item.href}
+              isActive={isActive(item.href)}
+              requireAuth={item.requireAuth}
+              hasAuth={!!user}
+              onClick={(e) => handleAuthRequiredClick(e, item)}
+              isMobile={true}
+            >
+              {item.name}
+            </NavLink>
+          ))}
+        </nav>
+        
+>>>>>>> db71da20d421fb713050462e83c63369986edb18
         {/* Mobile User Actions */}
         <div className="pt-4 space-y-2">
           {user ? (
@@ -127,6 +160,20 @@ const MobileMenu = memo(({
             </>
           ) : (
             <>
+<<<<<<< HEAD
+=======
+              <Link
+                href="/auth"
+                className="block w-full border border-amarelo-armazem text-amarelo-armazem hover:bg-amarelo-armazem hover:text-white font-semibold px-4 py-3 rounded-lg text-center transition-colors duration-200 font-inter focus-ring"
+                onClick={handleAuthClick}
+                aria-label="Fazer login"
+              >
+                <span className="flex items-center justify-center space-x-2">
+                  <User className="w-5 h-5" />
+                  <span>Entrar</span>
+                </span>
+              </Link>
+>>>>>>> db71da20d421fb713050462e83c63369986edb18
               <button
                 onClick={handleReservationClick}
                 className="block w-full bg-amarelo-armazem hover:bg-vermelho-portas text-white font-semibold px-4 py-3 rounded-lg text-center transition-colors duration-200 font-inter focus-ring"

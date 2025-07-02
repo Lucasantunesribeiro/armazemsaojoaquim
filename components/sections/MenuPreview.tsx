@@ -154,16 +154,26 @@ const MenuPreview = () => {
                   key={index}
                   className={cn(
                     "group text-center p-4 md:p-6 rounded-2xl transition-all duration-500",
+<<<<<<< HEAD
                     "bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm border border-white/20 dark:border-gray-700/20 shadow-lg",
                     "hover:bg-white/80 dark:hover:bg-gray-700/80 hover:scale-105 hover:-translate-y-2",
+=======
+                    "bg-white/60 backdrop-blur-sm border border-white/20 shadow-lg",
+                    "hover:bg-white/80 hover:scale-105 hover:-translate-y-2",
+>>>>>>> db71da20d421fb713050462e83c63369986edb18
                     "hover:shadow-xl"
                   )}
                 >
                   <div className="w-10 h-10 md:w-14 md:h-14 mx-auto mb-3 md:mb-4 rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center shadow-lg group-hover:shadow-amber-500/50 transition-all duration-300">
                     <Icon className="w-5 h-5 md:w-7 md:h-7 text-white" />
                   </div>
+<<<<<<< HEAD
                   <div className="text-xl md:text-2xl font-bold text-slate-900 dark:text-white mb-1">{specialty.count}</div>
                   <div className="text-xs md:text-sm text-slate-600 dark:text-slate-400 font-medium">{specialty.title}</div>
+=======
+                  <div className="text-xl md:text-2xl font-bold text-slate-900 mb-1">{specialty.count}</div>
+                  <div className="text-xs md:text-sm text-slate-600 font-medium">{specialty.title}</div>
+>>>>>>> db71da20d421fb713050462e83c63369986edb18
                 </div>
               )
             })}
@@ -187,7 +197,11 @@ const MenuPreview = () => {
                       "flex items-center space-x-2 md:space-x-3 px-4 md:px-6 py-2 md:py-3 rounded-2xl font-semibold transition-all duration-300 whitespace-nowrap",
                       index === activeCategory
                         ? `bg-gradient-to-r ${category.gradient} text-white shadow-lg scale-105`
+<<<<<<< HEAD
                         : 'bg-white/50 dark:bg-gray-800/50 text-slate-700 dark:text-slate-300 hover:bg-white/80 dark:hover:bg-gray-700/80 hover:scale-105'
+=======
+                        : 'bg-white/50 text-slate-700 hover:bg-white/80 hover:scale-105'
+>>>>>>> db71da20d421fb713050462e83c63369986edb18
                     )}
                   >
                     <Icon className="w-4 h-4 md:w-5 md:h-5" />
@@ -201,10 +215,17 @@ const MenuPreview = () => {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 items-center">
               <div className="space-y-6 md:space-y-8 order-2 lg:order-1">
                 <div className="text-center lg:text-left">
+<<<<<<< HEAD
                   <h3 className="font-playfair text-2xl md:text-3xl lg:text-4xl font-bold text-slate-900 dark:text-white mb-3 md:mb-4">
                     {menuCategories[activeCategory].title}
                   </h3>
                   <p className="text-base md:text-lg lg:text-xl text-slate-600 dark:text-slate-300 leading-relaxed">
+=======
+                  <h3 className="font-playfair text-2xl md:text-3xl lg:text-4xl font-bold text-slate-900 mb-3 md:mb-4">
+                    {menuCategories[activeCategory].title}
+                  </h3>
+                  <p className="text-base md:text-lg lg:text-xl text-slate-600 leading-relaxed">
+>>>>>>> db71da20d421fb713050462e83c63369986edb18
                     {menuCategories[activeCategory].description}
                   </p>
                 </div>
@@ -215,13 +236,22 @@ const MenuPreview = () => {
                       key={index}
                       className={cn(
                         "group p-4 md:p-6 rounded-2xl transition-all duration-300",
+<<<<<<< HEAD
                         "bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm border border-white/20 dark:border-gray-700/20",
                         "hover:bg-white/80 dark:hover:bg-gray-700/80 hover:scale-105 hover:-translate-y-1",
+=======
+                        "bg-white/60 backdrop-blur-sm border border-white/20",
+                        "hover:bg-white/80 hover:scale-105 hover:-translate-y-1",
+>>>>>>> db71da20d421fb713050462e83c63369986edb18
                         "hover:shadow-lg"
                       )}
                     >
                       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2 mb-2">
+<<<<<<< HEAD
                         <h4 className="font-bold text-base md:text-lg text-slate-900 dark:text-white group-hover:text-amber-700 dark:group-hover:text-amber-400 transition-colors">
+=======
+                        <h4 className="font-bold text-base md:text-lg text-slate-900 group-hover:text-amber-700 transition-colors">
+>>>>>>> db71da20d421fb713050462e83c63369986edb18
                           {item.name}
                         </h4>
                         <span className={cn(
@@ -231,7 +261,11 @@ const MenuPreview = () => {
                           {item.price}
                         </span>
                       </div>
+<<<<<<< HEAD
                       <p className="text-slate-600 dark:text-slate-400 text-xs md:text-sm">
+=======
+                      <p className="text-slate-600 text-xs md:text-sm">
+>>>>>>> db71da20d421fb713050462e83c63369986edb18
                         {item.description}
                       </p>
                     </div>
@@ -329,7 +363,11 @@ const MenuPreview = () => {
                       variant="outline" 
                       size="lg" 
                       className={cn(
+<<<<<<< HEAD
                         "w-full sm:w-auto border-2 border-white text-white hover:bg-white hover:text-slate-900 dark:border-gray-300 dark:hover:bg-gray-300",
+=======
+                        "w-full sm:w-auto border-2 border-white text-white hover:bg-white hover:text-slate-900",
+>>>>>>> db71da20d421fb713050462e83c63369986edb18
                         "font-bold text-base md:text-lg px-6 md:px-8 py-3 md:py-4 rounded-2xl backdrop-blur-sm",
                         "shadow-xl hover:shadow-white/25",
                         "transform hover:scale-105 hover:-translate-y-1",
