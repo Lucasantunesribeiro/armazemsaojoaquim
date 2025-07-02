@@ -47,16 +47,10 @@ const UserMenu = memo(({ user, isScrolled, onSignOut, onReservationClick, classN
         className={`
           flex items-center space-x-2 px-4 py-2 text-sm font-semibold rounded-lg
           transition-all duration-200 hover:scale-105 cursor-pointer font-inter
-<<<<<<< HEAD
           touch-manipulation min-h-[44px]
           ${isScrolled 
             ? 'bg-amarelo-armazem hover:bg-vermelho-portas text-white shadow-lg dark:bg-amber-500 dark:hover:bg-amber-600' 
             : 'bg-white/90 text-amarelo-armazem hover:bg-white hover:text-vermelho-portas shadow-lg dark:bg-gray-200 dark:text-gray-900 dark:hover:bg-gray-100'
-=======
-          ${isScrolled 
-            ? 'bg-amarelo-armazem hover:bg-vermelho-portas text-white shadow-lg' 
-            : 'bg-white/90 text-amarelo-armazem hover:bg-white hover:text-vermelho-portas shadow-lg'
->>>>>>> db71da20d421fb713050462e83c63369986edb18
           }
           backdrop-blur-sm border-0 focus-ring
         `}
