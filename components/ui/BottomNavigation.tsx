@@ -4,10 +4,7 @@ import { memo, useMemo } from 'react'
 import { usePathname } from 'next/navigation'
 import Link from 'next/link'
 import { Home, Menu, Calendar, BookOpen, MapPin } from 'lucide-react'
-<<<<<<< HEAD
 import { useMobileMenu } from '../providers/MobileMenuProvider'
-=======
->>>>>>> db71da20d421fb713050462e83c63369986edb18
 
 interface BottomNavItem {
   name: string
@@ -21,19 +18,12 @@ const BOTTOM_NAV_ITEMS: BottomNavItem[] = [
   { name: 'Menu', href: '/menu', icon: Menu },
   { name: 'Reservas', href: '/reservas', icon: Calendar, badge: true },
   { name: 'Blog', href: '/blog', icon: BookOpen },
-<<<<<<< HEAD
   { name: 'Contato', href: '/#contato', icon: MapPin },
 ]
 
 const BottomNavigation = memo(() => {
   const { isMobileMenuOpen } = useMobileMenu()
   if (isMobileMenuOpen) return null
-=======
-  { name: 'Local', href: '/#contato', icon: MapPin },
-]
-
-const BottomNavigation = memo(() => {
->>>>>>> db71da20d421fb713050462e83c63369986edb18
   const pathname = usePathname()
 
   const isActive = useMemo(() => (href: string) => {
@@ -44,11 +34,7 @@ const BottomNavigation = memo(() => {
   }, [pathname])
 
   return (
-<<<<<<< HEAD
     <nav className="fixed bottom-0 left-0 right-0 z-30 lg:hidden bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-700 shadow-lg">
-=======
-    <nav className="fixed bottom-0 left-0 right-0 z-40 md:hidden bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-700 shadow-lg">
->>>>>>> db71da20d421fb713050462e83c63369986edb18
       <div className="flex items-center justify-around py-2 px-2 safe-area-padding-bottom">
         {BOTTOM_NAV_ITEMS.map((item) => {
           const Icon = item.icon

@@ -443,7 +443,7 @@ export default function ReservasPage() {
               </div>
               <div className="flex items-center space-x-2">
                 <Phone className="w-4 h-4 text-amarelo-armazem" />
-                <span className="font-inter">(21) 99999-9999</span>
+                <span className="font-inter">(21) 98565-8443</span>
               </div>
               <div className="flex items-center space-x-2">
                 <Heart className="w-4 h-4 text-vermelho-portas" />
@@ -640,9 +640,9 @@ export default function ReservasPage() {
                     <div>
                       <h4 className="font-semibold text-madeira-escura dark:text-white font-inter">Endereço</h4>
                       <p className="text-cinza-medio dark:text-slate-400 font-inter">
-                        Rua Áurea, 26<br />
-                        Santa Teresa - Rio de Janeiro<br />
-                        CEP: 20241-220
+                        Rua Almirante Alexandrino, 470<br />
+                        Santa Teresa, Rio de Janeiro - RJ<br />
+                        CEP: 20241-262
                       </p>
                     </div>
                   </div>
@@ -652,9 +652,8 @@ export default function ReservasPage() {
                     <div>
                       <h4 className="font-semibold text-madeira-escura dark:text-white font-inter">Funcionamento</h4>
                       <div className="text-cinza-medio dark:text-slate-400 font-inter space-y-1">
-                        <p>Terça a Sexta: 12h às 22h</p>
-                        <p>Sábado e Domingo: 12h às 23h</p>
-                        <p className="text-vermelho-portas">Segunda: Fechado</p>
+                        <p>Segunda a Sábado: 8:00 - 20:00</p>
+                        <p className="text-vermelho-portas">Domingo: Fechado</p>
                       </div>
                     </div>
                   </div>
@@ -664,7 +663,7 @@ export default function ReservasPage() {
                     <div>
                       <h4 className="font-semibold text-madeira-escura dark:text-white font-inter">Contato</h4>
                       <div className="text-cinza-medio dark:text-slate-400 font-inter space-y-1">
-                        <p>(21) 99999-9999</p>
+                        <p>+55 21 98565-8443</p>
                         <p>armazemsaojoaquimoficial@gmail.com</p>
                       </div>
                     </div>
