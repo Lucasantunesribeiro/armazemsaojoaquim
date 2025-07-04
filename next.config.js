@@ -66,10 +66,6 @@ const nextConfig = {
     optimizePackageImports: ['@radix-ui/react-icons', 'lucide-react', 'framer-motion'],
     optimizeCss: true,
     swcMinify: true,
-    // Desabilitar lazy loading padrão para imagens
-    images: {
-      allowFutureImage: true,
-    },
   },
 
   // Configurações de compilação
