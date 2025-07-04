@@ -1,11 +1,23 @@
 import { Suspense } from 'react'
-import {
-  ClientHeroSection,
-  ClientAboutSection,
-  ClientMenuPreview,
-  ClientBlogPreview,
-  ClientContactSection,
-} from '@/components/ClientComponents'
+import dynamic from 'next/dynamic'
+import { ClientHeroSection } from '@/components/ClientComponents'
+
+// Lazy load non-critical sections
+const LazyAboutSection = dynamic(() => import('@/components/sections/AboutSection'), {
+  loading: () => <SectionFallback />
+})
+
+const LazyMenuPreview = dynamic(() => import('@/components/sections/MenuPreview'), {
+  loading: () => <SectionFallback />
+})
+
+const LazyBlogPreview = dynamic(() => import('@/components/sections/BlogPreview'), {
+  loading: () => <SectionFallback />
+})
+
+const LazyContactSection = dynamic(() => import('@/components/sections/ContactSection'), {
+  loading: () => <SectionFallback />
+})
 
 // Loading fallback melhorado para mobile
 const SectionFallback = () => (
@@ -34,28 +46,28 @@ export default function HomePage() {
       
       {/* About Section */}
       <Suspense fallback={<SectionFallback />}>
-        <ClientAboutSection />
+        <LazyAboutSection />
       </Suspense>
       
       <SectionSeparator />
       
       {/* Menu Preview */}
       <Suspense fallback={<SectionFallback />}>
-        <ClientMenuPreview />
+        <LazyMenuPreview />
       </Suspense>
       
       <SectionSeparator />
       
       {/* Blog Preview */}
       <Suspense fallback={<SectionFallback />}>
-        <ClientBlogPreview />
+        <LazyBlogPreview />
       </Suspense>
       
       <SectionSeparator />
       
       {/* Contact Section */}
       <Suspense fallback={<SectionFallback />}>
-        <ClientContactSection />
+        <LazyContactSection />
       </Suspense>
     </main>
   )

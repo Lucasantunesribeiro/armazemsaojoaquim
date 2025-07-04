@@ -23,7 +23,6 @@ const BOTTOM_NAV_ITEMS: BottomNavItem[] = [
 
 const BottomNavigation = memo(() => {
   const { isMobileMenuOpen } = useMobileMenu()
-  if (isMobileMenuOpen) return null
   const pathname = usePathname()
 
   const isActive = useMemo(() => (href: string) => {
@@ -32,6 +31,8 @@ const BottomNavigation = memo(() => {
     }
     return pathname.startsWith(href)
   }, [pathname])
+
+  if (isMobileMenuOpen) return null
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-30 lg:hidden bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-700 shadow-lg">

@@ -11,7 +11,6 @@ interface NetlifyImageProps {
   className?: string
   priority?: boolean
   sizes?: string
-  loading?: 'lazy' | 'eager'
 }
 
 export default function NetlifyImage({
@@ -22,7 +21,6 @@ export default function NetlifyImage({
   className,
   priority = false,
   sizes,
-  loading = 'lazy'
 }: NetlifyImageProps) {
   const [isLoaded, setIsLoaded] = useState(false)
   const [hasError, setHasError] = useState(false)
@@ -58,7 +56,6 @@ export default function NetlifyImage({
             isLoaded ? "opacity-100" : "opacity-0",
             width && height ? "" : "w-full h-full object-cover"
           )}
-          loading={priority ? 'eager' : loading}
           onLoad={handleImageLoad}
           onError={handleImageError}
           sizes={sizes}

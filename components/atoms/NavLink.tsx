@@ -13,6 +13,8 @@ interface NavLinkProps {
   onClick?: (e: React.MouseEvent) => void
   className?: string
   isMobile?: boolean
+  external?: boolean
+  target?: string
 }
 
 const NavLink = memo(({ 
@@ -24,7 +26,9 @@ const NavLink = memo(({
   hasAuth = true, 
   onClick, 
   className = '',
-  isMobile = false
+  isMobile = false,
+  external = false,
+  target
 }: NavLinkProps) => {
   const baseClasses = isMobile 
     ? `block px-4 py-3 text-base font-medium rounded-lg transition-all duration-200 font-inter`
@@ -47,6 +51,31 @@ const NavLink = memo(({
     : ''
 
   const authClasses = requireAuth && !hasAuth ? 'opacity-60' : ''
+
+  if (external) {
+    return (
+      <a
+        href={href}
+        target={target || '_blank'}
+        rel="noopener noreferrer"
+        onClick={onClick}
+        className={`
+          ${baseClasses}
+          ${isActive ? activeClasses : inactiveClasses}
+          ${underlineClasses}
+          ${authClasses}
+          ${className}
+        `}
+      >
+        <span className={isMobile ? "flex items-center space-x-2" : ""}>
+          <span>{children}</span>
+          {requireAuth && !hasAuth && (
+            <span className="text-xs" aria-label="Requer autenticação">🔒</span>
+          )}
+        </span>
+      </a>
+    )
+  }
 
   return (
     <Link

@@ -22,8 +22,8 @@ export default function ImageWithFallback({
   alt,
   className = '',
   fallbackSrc = '/images/placeholder.svg',
-  loading = 'lazy',
-  priority = false,
+  loading = 'eager',
+  priority = true,
   sizes,
   width,
   height,
@@ -49,8 +49,9 @@ export default function ImageWithFallback({
     onError: handleError,
     onLoad: handleLoad,
     quality,
+    loading: 'eager' as const,
+    priority: true,
     ...(sizes && { sizes }),
-    ...(priority ? { priority: true } : { loading }),
     ...props
   }
 

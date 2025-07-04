@@ -17,6 +17,8 @@ const nextConfig = {
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; img-src 'self' data: blob:; sandbox;",
     // Configurações para desenvolvimento local e produção
     unoptimized: false,
+    // Desabilitar lazy loading padrão
+    loader: 'default',
     // Configurações para Supabase Storage e outros domínios
     remotePatterns: [
       // Para desenvolvimento local
@@ -61,7 +63,13 @@ const nextConfig = {
 
   // Configurações experimentais
   experimental: {
-    optimizePackageImports: ['@radix-ui/react-icons'],
+    optimizePackageImports: ['@radix-ui/react-icons', 'lucide-react', 'framer-motion'],
+    optimizeCss: true,
+    swcMinify: true,
+    // Desabilitar lazy loading padrão para imagens
+    images: {
+      allowFutureImage: true,
+    },
   },
 
   // Configurações de compilação
@@ -76,6 +84,26 @@ const nextConfig = {
       test: /\.svg$/,
       use: ['@svgr/webpack'],
     })
+
+    // Otimizações de bundle
+    if (!dev && !isServer) {
+      config.optimization.splitChunks = {
+        chunks: 'all',
+        cacheGroups: {
+          vendor: {
+            test: /[\\/]node_modules[\\/]/,
+            name: 'vendors',
+            chunks: 'all',
+          },
+          common: {
+            name: 'common',
+            minChunks: 2,
+            chunks: 'all',
+            enforce: true,
+          },
+        },
+      }
+    }
 
     return config
   },

@@ -88,14 +88,14 @@ export default function ImageOptimized({
   quality = 85,
   className = '',
   style,
-  priority = false,
+  priority = true,
   placeholder = 'blur',
   blurDataURL,
   sizes,
   objectFit = 'cover',
   onLoad,
   onError,
-  loading = 'lazy',
+  loading = 'eager',
   fetchPriority = 'auto',
 }: ImageOptimizedProps) {
   const [isLoaded, setIsLoaded] = useState(false)
@@ -206,7 +206,7 @@ export default function ImageOptimized({
           }}
           onLoad={handleLoad}
           onError={handleError}
-          loading={priority ? 'eager' : loading}
+          loading="eager"
           decoding="async"
           sizes={sizes}
           fetchPriority={fetchPriority}

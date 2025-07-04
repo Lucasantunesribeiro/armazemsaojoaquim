@@ -224,10 +224,10 @@ export default function HeroSection() {
           {/* Main Title with Fluid Typography */}
           <div className="mb-6 sm:mb-8">
             <h1 className="font-playfair font-bold leading-[0.9] tracking-tight">
-              <span className="block text-[clamp(2.5rem,8vw,5rem)] text-amber-300 drop-shadow-2xl mb-2 transform transition-transform duration-500 hover:scale-105">
+              <span className="block text-[clamp(3.5rem,12vw,8rem)] text-amber-300 drop-shadow-2xl mb-2 transform transition-transform duration-500 hover:scale-105">
                 Armazém
               </span>
-              <span className="block text-[clamp(2.5rem,8vw,5rem)] text-white drop-shadow-2xl transform transition-transform duration-500 hover:scale-105">
+              <span className="block text-[clamp(3.5rem,12vw,8rem)] text-white drop-shadow-2xl transform transition-transform duration-500 hover:scale-105">
                 São Joaquim
               </span>
             </h1>
