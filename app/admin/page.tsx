@@ -1,8 +1,10 @@
+import { requireAdmin } from '@/lib/auth/middleware'
 import { getUser } from '@/lib/auth/middleware'
 import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
 
 export default async function AdminDashboard() {
+  await requireAdmin()
   const user = await getUser()
   const supabase = createServerComponentClient({ cookies })
   
