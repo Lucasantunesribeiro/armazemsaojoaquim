@@ -80,6 +80,7 @@ const MobileMenu = memo(({
                 isActive={isActive(item.href)}
                 requireAuth={item.requireAuth}
                 hasAuth={!!user}
+                external={item.external}
                 onClick={(e) => handleAuthRequiredClick(e, item)}
                 isMobile={true}
               >

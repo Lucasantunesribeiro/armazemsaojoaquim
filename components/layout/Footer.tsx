@@ -459,7 +459,7 @@ const Footer = () => {
                     height="300"
                     style={{ border: 0 }}
                     allowFullScreen
-                    loading="lazy"
+    
                     referrerPolicy="no-referrer-when-downgrade"
                     title="Localização do Armazém São Joaquim"
                     className="rounded-xl"

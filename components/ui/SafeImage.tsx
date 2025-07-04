@@ -248,7 +248,8 @@ const SafeImage = ({
     onError: handleImageError,
     onLoad: handleImageLoad,
     className: `${className} ${isLoading ? 'opacity-0' : 'opacity-100'} transition-opacity duration-300`,
-    priority,
+    loading: 'eager' as const,
+    priority: true,
     quality,
     sizes,
     ...(fill

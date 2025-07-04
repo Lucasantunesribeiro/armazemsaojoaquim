@@ -3,30 +3,37 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Menu, X, Calendar, User, LogOut, Lock, Moon, Sun } from 'lucide-react'
+import { Menu, X, Calendar, User, LogOut, Lock, Moon, Sun, Instagram, Music2, FileText, Shield } from 'lucide-react'
 import { useSupabase } from '../providers/SupabaseProvider'
 import { useTheme } from 'next-themes'
 import LogoSimple from '../atoms/LogoSimple'
 import { forceLogout } from '../../lib/supabase'
 import { useMobileMenu } from '../providers/MobileMenuProvider'
+import { useAdmin } from '@/hooks/useAdmin'
 
-const navLinks = [
+// TODO: Reativar sistema de reservas
+const RESERVATIONS_ENABLED = false
+
+const navLinks: Array<{ name: string; href: string; requiresAuth?: boolean; external?: boolean, target?: string }> = [
   { name: 'Início', href: '/' },
+  { name: 'Acesse o Cardápio', href: '/images/Cardapio.pdf', external: true, target: '_blank' },
   { name: 'Menu', href: '/menu' },
-  { name: 'Reservas', href: '/reservas', requiresAuth: true },
+  // Temporariamente desabilitado - TODO: Reativar sistema de reservas
+  // { name: 'Reservas', href: '/reservas', requiresAuth: true },
   { name: 'Blog', href: '/blog' },
 ]
 
 export default function Header() {
-  const [isScrolled, setIsScrolled] = useState(false)
-  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false)
-  const [mounted, setMounted] = useState(false)
   const pathname = usePathname()
   const { user, supabase } = useSupabase()
   const { theme, setTheme } = useTheme()
+  const { isMobileMenuOpen, openMobileMenu, closeMobileMenu, toggleMobileMenu } = useMobileMenu()
+  const { isAdmin } = useAdmin()
+  const [isScrolled, setIsScrolled] = useState(false)
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false)
+  const [isMounted, setIsMounted] = useState(false)
   const userMenuRef = useRef<HTMLDivElement>(null)
   const mobileMenuRef = useRef<HTMLDivElement>(null)
-  const { isMobileMenuOpen, openMobileMenu, closeMobileMenu, toggleMobileMenu } = useMobileMenu()
 
   // Scroll handler
   const handleScroll = useCallback(() => {
@@ -74,7 +81,7 @@ export default function Header() {
 
   // Effects
   useEffect(() => {
-    setMounted(true)
+    setIsMounted(true)
   }, [])
 
   useEffect(() => {
@@ -108,7 +115,7 @@ export default function Header() {
 
     document.addEventListener('keydown', handleKeyDown)
     return () => document.removeEventListener('keydown', handleKeyDown)
-  }, [])
+  }, [closeMobileMenu])
 
   // Prevent body scroll when mobile menu is open
   useEffect(() => {
@@ -131,7 +138,7 @@ export default function Header() {
     return pathname.startsWith(href)
   }
 
-  if (!mounted) {
+  if (!isMounted) {
     return null
   }
 
@@ -161,7 +168,39 @@ export default function Header() {
               {navLinks.map((link) => {
                 const isActive = isActiveLink(link.href)
                 const requiresAuth = link.requiresAuth && !user
-                
+                if (link.external) {
+                  return (
+                    <a
+                      key={link.name}
+                      href={link.href}
+                      target={link.target || '_blank'}
+                      rel="noopener noreferrer"
+                      className={`
+                        relative transition-all duration-300 rounded-xl font-inter tracking-wide hover:scale-105
+                        ${isScrolled 
+                          ? 'px-3 py-2 text-sm font-bold' 
+                          : 'px-4 py-2.5 text-[15px] font-semibold'
+                        }
+                        ${isActive
+                          ? 'text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-900/40 shadow-lg' 
+                          : requiresAuth
+                            ? 'text-orange-700 dark:text-orange-300 hover:text-orange-800 dark:hover:text-orange-200 hover:bg-orange-50 dark:hover:bg-orange-900/30'
+                            : 'text-slate-800 dark:text-slate-200 hover:text-amber-700 dark:hover:text-amber-300 hover:bg-slate-50 dark:hover:bg-slate-800/70'
+                        }
+                      `}
+                    >
+                      <span className="flex items-center space-x-1">
+                        {requiresAuth && (
+                          <Lock className={`opacity-70 transition-all duration-300 ${isScrolled ? 'w-3 h-3' : 'w-3.5 h-3.5'}`} />
+                        )}
+                        <span>{link.name}</span>
+                      </span>
+                      {isActive && (
+                        <span className="absolute inset-x-2 -bottom-1 h-0.5 bg-gradient-to-r from-amber-500 to-orange-500 rounded-full" />
+                      )}
+                    </a>
+                  )
+                }
                 return (
                   <Link
                     key={link.name}
@@ -197,6 +236,28 @@ export default function Header() {
             {/* Desktop Actions */}
             <div className={`hidden lg:flex items-center transition-all duration-300 ${isScrolled ? 'space-x-2' : 'space-x-4'}`}>
               
+              {/* Social Media Icons */}
+              <div className="flex items-center gap-3">
+                <a 
+                  href="https://instagram.com/armazemsaojoaquim" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-slate-700 dark:text-slate-300 hover:text-amber-700 dark:hover:text-amber-300 transition-all duration-300 hover:scale-110"
+                  aria-label="Instagram"
+                >
+                  <Instagram className={`transition-all duration-300 ${isScrolled ? 'w-4 h-4' : 'w-5 h-5'}`} />
+                </a>
+                <a 
+                  href="https://tiktok.com/@armazemsaojoaquim" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-slate-700 dark:text-slate-300 hover:text-amber-700 dark:hover:text-amber-300 transition-all duration-300 hover:scale-110"
+                  aria-label="TikTok"
+                >
+                  <Music2 className={`transition-all duration-300 ${isScrolled ? 'w-4 h-4' : 'w-5 h-5'}`} />
+                </a>
+              </div>
+
               {/* Theme Toggle */}
               <button
                 onClick={toggleTheme}
@@ -248,6 +309,16 @@ export default function Header() {
                           {user.email}
                         </p>
                       </div>
+                      {isAdmin && (
+                        <Link
+                          href="/admin"
+                          onClick={() => setIsUserMenuOpen(false)}
+                          className="flex items-center space-x-3 w-full px-4 py-3 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors font-inter font-semibold"
+                        >
+                          <Shield className="w-4 h-4" />
+                          <span>Painel Admin</span>
+                        </Link>
+                      )}
                       <button
                         onClick={handleLogout}
                         className="flex items-center space-x-3 w-full px-4 py-3 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors font-inter font-semibold"
@@ -273,33 +344,33 @@ export default function Header() {
                 </Link>
               )}
 
-              {/* Reservar Button */}
-              <Link
-                href={user ? '/reservas' : '/auth'}
-                className={`
-                  group relative inline-flex items-center rounded-xl font-bold font-inter tracking-wide 
-                  transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl 
-                  bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white
-                  ${isScrolled ? 'space-x-1.5 px-4 py-2 text-sm' : 'space-x-2 px-6 py-2.5 text-[15px]'}
-                `}
-              >
-                <Calendar className={`transition-all duration-300 ${isScrolled ? 'w-3.5 h-3.5' : 'w-4 h-4'}`} />
-                <span>Reservar</span>
-                <div className="absolute inset-0 bg-white/20 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-              </Link>
+              {/* Reservar Button - Temporariamente removido */}
+              {/* TODO: Reativar sistema de reservas
+              {RESERVATIONS_ENABLED && (
+                <Link
+                  href={user ? '/reservas' : '/auth'}
+                  className={`
+                    group relative inline-flex items-center rounded-xl font-bold font-inter tracking-wide 
+                    transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl 
+                    bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white
+                    ${isScrolled ? 'space-x-1.5 px-4 py-2 text-sm' : 'space-x-2 px-6 py-2.5 text-[15px]'}
+                  `}
+                >
+                  <Calendar className={`transition-all duration-300 ${isScrolled ? 'w-3.5 h-3.5' : 'w-4 h-4'}`} />
+                  <span>Reservar</span>
+                  <div className="absolute inset-0 bg-white/20 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                </Link>
+              )}
+              */}
             </div>
 
             {/* Mobile Menu Button */}
             <button
-              onClick={() => toggleMobileMenu()}
+              onClick={openMobileMenu}
               className="lg:hidden p-2.5 rounded-xl text-slate-800 dark:text-slate-200 hover:text-amber-700 dark:hover:text-amber-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all duration-300"
               aria-label="Abrir menu"
             >
-              {isMobileMenuOpen ? (
-                <X className="w-6 h-6" />
-              ) : (
-                <Menu className="w-6 h-6" />
-              )}
+              <Menu className="w-6 h-6" />
             </button>
           </div>
         </div>
@@ -349,33 +420,44 @@ export default function Header() {
             {/* Mobile Menu Content */}
             <div className="flex flex-col h-[calc(100%-theme(spacing.20))] overflow-y-auto">
               {/* Navigation Links */}
-              {/* Mobile User Section */}
               <div className="border-t border-slate-200 dark:border-slate-700 p-4 sm:p-6 bg-slate-50/50 dark:bg-slate-800/50">
                 {user ? (
-                  <div className="space-y-4">
-                    <div className="flex items-center space-x-3 px-4 py-4 bg-white dark:bg-slate-800 rounded-2xl shadow-md border border-slate-200 dark:border-slate-700">
-                      <div className="w-12 h-12 bg-gradient-to-br from-amber-500 to-orange-500 rounded-2xl flex items-center justify-center text-white font-bold text-lg shadow-lg">
+                  <div className="bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/30 dark:to-orange-900/30 rounded-2xl p-4 sm:p-6 border border-amber-200 dark:border-amber-800">
+                    <div className="flex items-center space-x-4 mb-4">
+                      <div className="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-amber-500 to-orange-500 rounded-2xl flex items-center justify-center text-white font-bold text-lg sm:text-xl shadow-lg">
                         {user.email?.charAt(0).toUpperCase()}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm sm:text-base font-bold text-slate-900 dark:text-white font-inter truncate">
+                        <p className="text-base sm:text-lg font-bold text-slate-900 dark:text-white font-inter truncate">
                           {user.email?.split('@')[0] || 'Usuário'}
                         </p>
-                        <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 truncate">
+                        <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 truncate">
                           {user.email}
                         </p>
                       </div>
                     </div>
-                    <button
-                      onClick={() => {
-                        handleLogout()
-                        closeMobileMenu()
-                      }}
-                      className="flex items-center justify-center space-x-3 w-full px-4 py-3 text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-2xl transition-all duration-300 font-inter font-semibold border border-red-200 dark:border-red-800 hover:border-red-300 dark:hover:border-red-700 hover:shadow-md"
-                    >
-                      <LogOut className="w-5 h-5" />
-                      <span>Sair da conta</span>
-                    </button>
+                    <div className="space-y-2">
+                      {isAdmin && (
+                        <Link
+                          href="/admin"
+                          onClick={closeMobileMenu}
+                          className="flex items-center justify-center space-x-3 w-full px-4 py-3 text-slate-700 dark:text-slate-300 hover:text-amber-700 dark:hover:text-amber-300 hover:bg-amber-50 dark:hover:bg-amber-900/20 rounded-2xl transition-all duration-300 font-inter font-semibold border border-slate-200 dark:border-slate-700 hover:border-amber-300 dark:hover:border-amber-700 hover:shadow-md"
+                        >
+                          <Shield className="w-4 h-4" />
+                          <span>Painel Admin</span>
+                        </Link>
+                      )}
+                      <button
+                        onClick={() => {
+                          handleLogout()
+                          closeMobileMenu()
+                        }}
+                        className="flex items-center justify-center space-x-3 w-full px-4 py-3 text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-2xl transition-all duration-300 font-inter font-semibold border border-red-200 dark:border-red-800 hover:border-red-300 dark:hover:border-red-700 hover:shadow-md"
+                      >
+                        <LogOut className="w-4 h-4" />
+                        <span>Sair da conta</span>
+                      </button>
+                    </div>
                   </div>
                 ) : (
                   <Link
@@ -429,17 +511,59 @@ export default function Header() {
                     )
                   })}
                   
-                  {/* Mobile Reservar Button */}
-                  <div className="pt-4">
-                    <Link
-                      href={user ? '/reservas' : '/auth'}
-                      onClick={closeMobileMenu}
-                      className="group flex items-center justify-center space-x-3 w-full px-6 py-4 rounded-2xl font-bold text-base sm:text-lg font-inter transition-all duration-300 shadow-xl hover:shadow-2xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white hover:scale-[1.02] active:scale-[0.98]"
-                    >
-                      <Calendar className="w-5 h-5 group-hover:scale-110 transition-transform" />
-                      <span>Reservar Mesa</span>
-                    </Link>
+                  {/* Cardápio Link Mobile */}
+                  <Link
+                    href="/cardapio.pdf"
+                    target="_blank"
+                    onClick={closeMobileMenu}
+                    className="group flex items-center justify-between px-4 py-4 rounded-2xl text-base font-semibold transition-all duration-300 font-inter text-slate-700 dark:text-slate-300 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-gradient-to-r hover:from-slate-50 hover:to-amber-50 dark:hover:from-slate-800/50 dark:hover:to-amber-900/20 hover:shadow-md"
+                  >
+                    <span className="flex items-center space-x-3">
+                      <FileText className="w-4 h-4" />
+                      <span className="text-base sm:text-lg">Cardápio</span>
+                    </span>
+                  </Link>
+
+                  {/* Social Media Links Mobile */}
+                  <div className="pt-4 pb-2">
+                    <p className="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wider px-4 mb-3">Redes Sociais</p>
+                    <div className="flex items-center justify-center gap-6">
+                      <a 
+                        href="https://instagram.com/armazemsaojoaquim" 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-slate-700 dark:text-slate-300 hover:text-amber-700 dark:hover:text-amber-300 transition-all duration-300 hover:scale-110"
+                        aria-label="Instagram"
+                      >
+                        <Instagram className="w-6 h-6" />
+                      </a>
+                      <a 
+                        href="https://tiktok.com/@armazemsaojoaquim" 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-slate-700 dark:text-slate-300 hover:text-amber-700 dark:hover:text-amber-300 transition-all duration-300 hover:scale-110"
+                        aria-label="TikTok"
+                      >
+                        <Music2 className="w-6 h-6" />
+                      </a>
+                    </div>
                   </div>
+                  
+                  {/* Mobile Reservar Button - Temporariamente removido */}
+                  {/* TODO: Reativar sistema de reservas
+                  {RESERVATIONS_ENABLED && (
+                    <div className="pt-4">
+                      <Link
+                        href={user ? '/reservas' : '/auth'}
+                        onClick={() => setIsOpen(false)}
+                        className="group flex items-center justify-center space-x-3 w-full px-6 py-4 rounded-2xl font-bold text-base sm:text-lg font-inter transition-all duration-300 shadow-xl hover:shadow-2xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white hover:scale-[1.02] active:scale-[0.98]"
+                      >
+                        <Calendar className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                        <span>Reservar Mesa</span>
+                      </Link>
+                    </div>
+                  )}
+                  */}
                   
                 </div>
               </nav>

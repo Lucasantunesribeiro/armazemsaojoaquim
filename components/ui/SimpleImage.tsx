@@ -20,8 +20,8 @@ const SimpleImage = ({
   height = 300, 
   className = '', 
   fill = false,
-  loading = 'lazy',
-  priority = false 
+  loading = 'eager',
+  priority = true
 }: SimpleImageProps) => {
   const [error, setError] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
@@ -79,8 +79,9 @@ const SimpleImage = ({
           height: finalHeight!
         })}
         className={`${className} ${isLoading ? 'opacity-0' : 'opacity-100'} transition-opacity duration-300`}
-        loading={priority ? 'eager' : loading}
-        priority={priority}
+        
+        loading="eager"
+        priority={true}
         onError={() => {
           console.error(`❌ Erro ao carregar imagem (tentativa ${retryCount + 1}/${MAX_RETRIES}):`, src)
           setRetryCount(prev => prev + 1)

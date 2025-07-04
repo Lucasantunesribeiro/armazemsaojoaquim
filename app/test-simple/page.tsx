@@ -19,7 +19,7 @@ export default function TestSimplePage() {
       url: 'https://enolssforaepnrpfrima.supabase.co/storage/v1/object/public/menu-images/picanha_ao_carvao.png',
       name: 'Picanha ao Carvão',
       useFill: false,
-      loading: 'lazy' as const
+      loading: 'eager' as const
     }
   ]
 

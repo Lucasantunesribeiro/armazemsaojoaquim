@@ -35,6 +35,7 @@ const Navigation = memo(({ items, isScrolled, isActive, user, className = '' }: 
           isScrolled={isScrolled}
           requireAuth={item.requireAuth}
           hasAuth={!!user}
+          external={item.external}
           onClick={(e) => handleAuthRequiredClick(e, item)}
         >
           {item.name}
