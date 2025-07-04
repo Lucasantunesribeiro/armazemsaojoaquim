@@ -1,3 +1,9 @@
+import * as dotenv from 'dotenv'
+dotenv.config({ path: '.env.local' })
+
+console.log('SUPABASE_URL:', process.env.NEXT_PUBLIC_SUPABASE_URL)
+console.log('SERVICE_ROLE:', process.env.SUPABASE_SERVICE_ROLE_KEY)
+
 import { createClient } from '@supabase/supabase-js'
 import bcrypt from 'bcryptjs'
 
@@ -9,7 +15,7 @@ const PASSWORD = '123456'
 const ROLE = 'admin'
 
 if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
-  console.error('❌ SUPABASE_URL ou SUPABASE_SERVICE_ROLE_KEY não definidos no .env')
+  console.error('❌ SUPABASE_URL ou SUPABASE_SERVICE_ROLE_KEY não definidos no .env.local')
   process.exit(1)
 }
 
@@ -23,33 +29,26 @@ async function upsertUser() {
     .eq('email', EMAIL)
 
   if (fetchError) {
-    console.error('❌ Erro ao buscar usuário:', fetchError)
+    console.error('Erro ao buscar usuário:', fetchError)
     process.exit(1)
   }
 
-  const password_hash = await bcrypt.hash(PASSWORD, 10)
-
   if (users && users.length > 0) {
-    // Usuário já existe, atualizar senha e role
+    // Usuário já existe, atualiza role
     const { error: updateError } = await supabase
       .from('users')
-      .update({ password_hash, role: ROLE })
+      .update({ role: ROLE })
       .eq('email', EMAIL)
     if (updateError) {
-      console.error('❌ Erro ao atualizar usuário:', updateError)
+      console.error('Erro ao atualizar usuário:', updateError)
       process.exit(1)
     }
-    console.log('✅ Usuário atualizado com sucesso!')
+    console.log('Usuário atualizado para admin com sucesso!')
   } else {
-    // Usuário não existe, criar
-    const { error: insertError } = await supabase
-      .from('users')
-      .insert([{ email: EMAIL, password_hash, role: ROLE }])
-    if (insertError) {
-      console.error('❌ Erro ao criar usuário:', insertError)
-      process.exit(1)
-    }
-    console.log('✅ Usuário criado com sucesso!')
+    // Usuário não existe, cria novo
+    // Aqui seria necessário criar o usuário no auth também, mas mantive o fluxo original
+    console.error('Usuário não encontrado. Crie o usuário pelo fluxo de autenticação primeiro.')
+    process.exit(1)
   }
 }
 

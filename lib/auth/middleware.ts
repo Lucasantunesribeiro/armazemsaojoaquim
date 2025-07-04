@@ -22,18 +22,30 @@ export async function requireAdmin() {
   if (!session) {
     redirect('/auth')
   }
+
+  // Debug: log id do usuário
+  console.log('Verificando admin para user id:', session.user.id)
   
-  // Check if user is admin
+  // Busca o usuário na tabela users
   const { data: user, error } = await supabase
     .from('users')
     .select('role')
     .eq('id', session.user.id)
     .single()
   
-  if (error || !user || user.role !== 'admin') {
+  if (error) {
+    console.error('Erro ao buscar usuário na tabela users:', error)
     redirect('/unauthorized')
   }
-  
+  if (!user) {
+    console.error('Usuário não encontrado na tabela users')
+    redirect('/unauthorized')
+  }
+  if (user.role !== 'admin') {
+    console.warn('Usuário não é admin:', user)
+    redirect('/unauthorized')
+  }
+  // Se chegou aqui, é admin
   return session
 }
 
