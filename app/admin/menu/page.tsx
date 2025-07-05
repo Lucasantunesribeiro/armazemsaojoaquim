@@ -32,8 +32,11 @@ export default async function MenuManagementPage() {
   }
   
   const getCategoryName = (categoryId: string) => {
-    const category = categories?.find(c => c.id === categoryId)
-    return category?.name || 'Sem categoria'
+    if (!categories || !Array.isArray(categories)) {
+      return 'Sem categoria'
+    }
+    const category = categories.find(c => c && typeof c === 'object' && 'id' in c && c.id === categoryId)
+    return (category && 'name' in category && typeof category.name === 'string') ? category.name : 'Sem categoria'
   }
   
   return (
@@ -60,14 +63,18 @@ export default async function MenuManagementPage() {
             Categorias
           </h2>
           <div className="space-y-2">
-            {categories?.map((category) => (
+            {(categories && Array.isArray(categories)) ? categories.map((category) => (
               <div key={category.id} className="flex justify-between items-center p-2 bg-gray-50 dark:bg-gray-700 rounded">
                 <span className="text-sm text-gray-900 dark:text-white">{category.name}</span>
                 <span className="text-xs text-gray-500 dark:text-gray-400">
-                  {menuItems?.filter(item => item.category === category.id).length || 0} itens
+                  {(menuItems && Array.isArray(menuItems)) ? menuItems.filter(item => item.category === category.id).length : 0} itens
                 </span>
               </div>
-            ))}
+            )) : (
+              <div className="text-sm text-gray-500 dark:text-gray-400">
+                Nenhuma categoria encontrada
+              </div>
+            )}
           </div>
           <Link
             href="/admin/categories"
@@ -108,7 +115,7 @@ export default async function MenuManagementPage() {
                   </tr>
                 </thead>
                 <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                  {menuItems?.map((item) => (
+                  {(menuItems && Array.isArray(menuItems)) ? menuItems.map((item) => (
                     <tr key={item.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
@@ -165,7 +172,7 @@ export default async function MenuManagementPage() {
                         </button>
                       </td>
                     </tr>
-                  ))}
+                  )) : null}
                 </tbody>
               </table>
             </div>
