@@ -17,12 +17,18 @@ export async function requireAuth() {
 export async function requireAdmin() {
   const supabase = createServerComponentClient({ cookies })
   
-  const { data: { session } } = await supabase.auth.getSession()
+  const { data: { session }, error: sessionError } = await supabase.auth.getSession()
   
   console.log('MIDDLEWARE requireAdmin: Session:', session)
-  if (!session) {
-    console.warn('MIDDLEWARE requireAdmin: Sem sessão, redirecionando para /auth')
-    redirect('/auth')
+  console.log('MIDDLEWARE requireAdmin: Session Error:', sessionError)
+  
+  if (!session || sessionError) {
+    console.warn('MIDDLEWARE requireAdmin: Sem sessão ou erro de sessão, redirecionando para /auth', {
+      hasSession: !!session,
+      sessionError,
+      userId: session?.user?.id
+    })
+    redirect('/auth?error=session_required&message=Sessão expirada ou inválida')
   }
 
   // Debug: log id do usuário
@@ -41,15 +47,29 @@ export async function requireAdmin() {
 
   if (error) {
     console.error('MIDDLEWARE requireAdmin: Erro ao buscar usuário na tabela users:', error)
-    redirect('/unauthorized')
+    console.error('MIDDLEWARE requireAdmin: Detalhes do erro:', {
+      code: error.code,
+      message: error.message,
+      details: error.details,
+      hint: error.hint
+    })
+    redirect('/unauthorized?error=database_error&message=Erro ao verificar permissões')
   }
   if (!user) {
-    console.error('MIDDLEWARE requireAdmin: Usuário não encontrado na tabela users')
-    redirect('/unauthorized')
+    console.error('MIDDLEWARE requireAdmin: Usuário não encontrado na tabela users', {
+      userId: session.user.id,
+      userEmail: session.user.email
+    })
+    redirect('/unauthorized?error=user_not_found&message=Usuário não encontrado no sistema')
   }
   if (user.role !== 'admin') {
-    console.warn('MIDDLEWARE requireAdmin: Usuário não é admin:', user)
-    redirect('/unauthorized')
+    console.warn('MIDDLEWARE requireAdmin: Usuário não é admin:', {
+      userId: session.user.id,
+      userEmail: session.user.email,
+      currentRole: user.role,
+      expectedRole: 'admin'
+    })
+    redirect('/unauthorized?error=insufficient_permissions&message=Acesso negado - privilégios de administrador necessários')
   }
   // Se chegou aqui, é admin
   return session
