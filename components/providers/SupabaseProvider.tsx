@@ -64,32 +64,26 @@ export function SupabaseProvider({ children }: { children: React.ReactNode }) {
     return () => subscription.unsubscribe()
   }, [isClient])
 
-  // Buscar role do usuário sempre que user mudar
+  // Check admin role based on email (since users table doesn't exist)
   useEffect(() => {
     if (!user) {
       setUserRole(null)
       setIsAdmin(false)
       return
     }
-    let cancelled = false
-    setUserRole(null)
-    setIsAdmin(false)
-    supabase
-      .from('users')
-      .select('role')
-      .eq('id', user.id)
-      .single()
-      .then(({ data, error }: { data: { role?: string } | null, error: any }) => {
-        if (cancelled) return
-        if (error || !data) {
-          setUserRole(null)
-          setIsAdmin(false)
-        } else {
-          setUserRole(data.role ?? null)
-          setIsAdmin(data.role === 'admin')
-        }
-      })
-    return () => { cancelled = true }
+    
+    // Check if user is admin based on email
+    const adminEmails = ['armazemsaojoaquimoficial@gmail.com']
+    const isUserAdmin = adminEmails.includes(user.email || '')
+    
+    console.log('🔍 SupabaseProvider: Verificando admin:', {
+      userEmail: user.email,
+      isUserAdmin,
+      adminEmails
+    })
+    
+    setUserRole(isUserAdmin ? 'admin' : 'user')
+    setIsAdmin(isUserAdmin)
   }, [user])
 
   return (

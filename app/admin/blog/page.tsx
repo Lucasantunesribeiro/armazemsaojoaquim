@@ -1,23 +1,69 @@
-import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
-import { cookies } from 'next/headers'
+'use client'
+
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { useSupabase } from '@/components/providers/SupabaseProvider'
 import { Database } from '@/types/database.types'
 
 type BlogPost = Database['public']['Tables']['blog_posts']['Row']
 
-export default async function BlogManagementPage() {
-  const supabase = createServerComponentClient<Database>({ cookies })
+export default function BlogManagementPage() {
+  const { supabase } = useSupabase()
+  const [blogPosts, setBlogPosts] = useState<BlogPost[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   
   // Fetch blog posts
-  const { data: blogPosts, error: blogError } = await supabase
-    .from('blog_posts')
-    .select('*')
-    .order('created_at', { ascending: false })
-  
-  if (blogError) {
-    console.error('Error fetching blog posts:', blogError)
+  const fetchBlogPosts = async () => {
+    try {
+      setLoading(true)
+      const { data, error } = await supabase
+        .from('blog_posts')
+        .select('*')
+        .order('created_at', { ascending: false })
+      
+      if (error) {
+        console.error('Error fetching blog posts:', error)
+        setError('Erro ao carregar posts do blog')
+      } else {
+        setBlogPosts(data || [])
+      }
+    } catch (err) {
+      console.error('Unexpected error:', err)
+      setError('Erro inesperado ao carregar posts')
+    } finally {
+      setLoading(false)
+    }
   }
-  
+
+  useEffect(() => {
+    fetchBlogPosts()
+  }, [supabase])
+
+  const handleDelete = async (postId: string, postTitle: string) => {
+    if (!confirm(`Tem certeza que deseja excluir o post "${postTitle}"? Esta ação não pode ser desfeita.`)) {
+      return
+    }
+
+    try {
+      const response = await fetch(`/api/admin/blog/${postId}`, {
+        method: 'DELETE',
+      })
+
+      if (!response.ok) {
+        const data = await response.json()
+        throw new Error(data.error || 'Failed to delete blog post')
+      }
+
+      // Refresh the blog posts list
+      await fetchBlogPosts()
+      alert('Post excluído com sucesso!')
+    } catch (err) {
+      console.error('Error deleting blog post:', err)
+      alert('Erro ao excluir post: ' + (err instanceof Error ? err.message : 'Erro desconhecido'))
+    }
+  }
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('pt-BR', {
       year: 'numeric',
@@ -29,6 +75,30 @@ export default async function BlogManagementPage() {
   const truncateContent = (content: string, maxLength: number = 100) => {
     if (content.length <= maxLength) return content
     return content.substring(0, maxLength) + '...'
+  }
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center min-h-64">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+        <span className="ml-2 text-gray-600">Carregando posts...</span>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="bg-red-50 border border-red-200 rounded-lg p-6">
+        <h2 className="text-xl font-semibold text-red-800 mb-2">Erro</h2>
+        <p className="text-red-700">{error}</p>
+        <button
+          onClick={fetchBlogPosts}
+          className="mt-4 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+        >
+          Tentar Novamente
+        </button>
+      </div>
+    )
   }
   
   return (
@@ -57,7 +127,7 @@ export default async function BlogManagementPage() {
           <div className="space-y-4">
             <div>
               <div className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">
-                {blogPosts?.length || 0}
+                {blogPosts.length}
               </div>
               <div className="text-sm text-gray-500 dark:text-gray-400">
                 Total de Posts
@@ -65,7 +135,7 @@ export default async function BlogManagementPage() {
             </div>
             <div>
               <div className="text-2xl font-bold text-green-600 dark:text-green-400">
-                {blogPosts?.filter(post => post.published).length || 0}
+                {blogPosts.filter(post => post.published).length}
               </div>
               <div className="text-sm text-gray-500 dark:text-gray-400">
                 Posts Publicados
@@ -73,7 +143,7 @@ export default async function BlogManagementPage() {
             </div>
             <div>
               <div className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">
-                {blogPosts?.filter(post => !post.published).length || 0}
+                {blogPosts.filter(post => !post.published).length}
               </div>
               <div className="text-sm text-gray-500 dark:text-gray-400">
                 Rascunhos
@@ -173,7 +243,10 @@ export default async function BlogManagementPage() {
                               Ver
                             </Link>
                           )}
-                          <button className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300">
+                          <button 
+                            onClick={() => handleDelete(post.id, post.title)}
+                            className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
+                          >
                             Excluir
                           </button>
                         </td>

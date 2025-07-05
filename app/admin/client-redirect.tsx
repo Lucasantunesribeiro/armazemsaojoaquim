@@ -22,19 +22,25 @@ export default function ClientRedirect() {
       return
     }
 
-    if (!user) {
-      console.log('❌ ClientRedirect: Sem usuário, redirecionando para /auth')
-      router.push('/auth?error=client_no_session&message=Login necessário')
-      return
-    }
+    // Don't redirect immediately, only after a reasonable time
+    // This prevents flashing and gives time for the auth state to settle
+    const timer = setTimeout(() => {
+      if (!user) {
+        console.log('❌ ClientRedirect: Sem usuário após delay, redirecionando para /auth')
+        router.push('/auth?error=client_no_session&message=Login necessário')
+        return
+      }
 
-    if (!isAdmin) {
-      console.log('❌ ClientRedirect: Usuário não é admin, redirecionando para /unauthorized')
-      router.push('/unauthorized?error=client_not_admin&message=Acesso negado')
-      return
-    }
+      if (!isAdmin) {
+        console.log('❌ ClientRedirect: Usuário não é admin após delay, redirecionando para /unauthorized')
+        router.push('/unauthorized?error=client_not_admin&message=Acesso negado')
+        return
+      }
 
-    console.log('✅ ClientRedirect: Usuário admin confirmado, permanecendo na página')
+      console.log('✅ ClientRedirect: Usuário admin confirmado após delay, permanecendo na página')
+    }, 2000) // Increased delay to 2 seconds
+
+    return () => clearTimeout(timer)
   }, [user, loading, isAdmin, router])
 
   if (loading) {
