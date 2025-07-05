@@ -167,25 +167,16 @@ export default function AuthPage() {
         console.log('⏳ Aguardando propagação da sessão...')
         await new Promise(resolve => setTimeout(resolve, 1500))
         
-        // Verificar se o usuário é admin e redirecionar adequadamente
-        try {
-          const { data: userData, error: userError } = await supabase
-            .from('users')
-            .select('role')
-            .eq('id', authData.user.id)
-            .single()
-          
-          if (!userError && userData?.role === 'admin') {
-            console.log('🔐 Usuário admin detectado, redirecionando para /admin')
-            // Usar window.location.href para forçar uma nova requisição e garantir sincronização
-            window.location.href = '/admin'
-            return
-          } else {
-            router.push('/')
-          }
-        } catch (error) {
-          console.error('Erro ao verificar role do usuário:', error)
-          // Fallback para página inicial em caso de erro
+        // Verificar se o usuário é admin baseado no email
+        const adminEmails = ['armazemsaojoaquimoficial@gmail.com']
+        const isUserAdmin = adminEmails.includes(authData.user.email || '')
+        
+        if (isUserAdmin) {
+          console.log('🔐 Usuário admin detectado, redirecionando para /admin')
+          // Usar window.location.href para forçar uma nova requisição e garantir sincronização
+          window.location.href = '/admin'
+          return
+        } else {
           router.push('/')
         }
       }
@@ -344,25 +335,16 @@ export default function AuthPage() {
           console.log('⏳ Aguardando propagação da sessão após registro...')
           await new Promise(resolve => setTimeout(resolve, 1500))
           
-          // Verificar se o usuário é admin e redirecionar adequadamente
-          try {
-            const { data: userData, error: userError } = await supabase
-              .from('users')
-              .select('role')
-              .eq('id', authData.user.id)
-              .single()
-            
-            if (!userError && userData?.role === 'admin') {
-              console.log('🔐 Usuário admin detectado, redirecionando para /admin')
-              // Usar window.location.href para forçar uma nova requisição e garantir sincronização
-              window.location.href = '/admin'
-              return
-            } else {
-              router.push('/')
-            }
-          } catch (error) {
-            console.error('Erro ao verificar role do usuário:', error)
-            // Fallback para página inicial em caso de erro
+          // Verificar se o usuário é admin baseado no email
+          const adminEmails = ['armazemsaojoaquimoficial@gmail.com']
+          const isUserAdmin = adminEmails.includes(authData.user.email || '')
+          
+          if (isUserAdmin) {
+            console.log('🔐 Usuário admin detectado, redirecionando para /admin')
+            // Usar window.location.href para forçar uma nova requisição e garantir sincronização
+            window.location.href = '/admin'
+            return
+          } else {
             router.push('/')
           }
         }
