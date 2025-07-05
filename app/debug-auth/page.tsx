@@ -113,7 +113,7 @@ export default function AuthDebugPage() {
       // Simular o fluxo exato do login
       const { data: authData, error } = await supabase.auth.signInWithPassword({
         email: 'armazemsaojoaquimoficial@gmail.com',
-        password: 'sua_senha_aqui' // VOCÊ PRECISA INSERIR A SENHA CORRETA
+        password: 'armazem2000'
       })
 
       if (error) {

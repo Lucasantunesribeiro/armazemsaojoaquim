@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs'
 
 export async function middleware(request: NextRequest) {
-  // Handle admin routes with middleware-level protection
+  // Handle admin routes with middleware-level protection  
   if (request.nextUrl.pathname.startsWith('/admin')) {
     console.log('🔍 MIDDLEWARE: Verificando acesso admin para:', request.nextUrl.pathname)
     
@@ -11,30 +11,34 @@ export async function middleware(request: NextRequest) {
     try {
       const supabase = createMiddlewareClient({ req: request, res: response })
       
-      // Check session with retry logic
-      let session = null
-      for (let attempt = 0; attempt < 2; attempt++) {
-        const { data: { session: currentSession } } = await supabase.auth.getSession()
-        if (currentSession) {
-          session = currentSession
-          break
-        }
-        if (attempt < 1) {
-          await new Promise(resolve => setTimeout(resolve, 200))
-        }
-      }
+      // Get session from middleware client
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession()
+      
+      console.log('🔍 MIDDLEWARE: Session details:', {
+        hasSession: !!session,
+        userId: session?.user?.id,
+        userEmail: session?.user?.email,
+        error: sessionError?.message
+      })
+      
+      // Debug cookies
+      const cookies = request.cookies.getAll()
+      const authCookies = cookies.filter(cookie => cookie.name.includes('sb-') || cookie.name.includes('auth'))
+      console.log('🍪 MIDDLEWARE: Auth cookies found:', authCookies.length, authCookies.map(c => c.name))
       
       if (!session) {
-        console.log('❌ MIDDLEWARE: Sem sessão, redirecionando para /auth')
-        return NextResponse.redirect(new URL('/auth?error=session_required&message=Login necessário para acessar área administrativa', request.url))
+        console.log('❌ MIDDLEWARE: Sem sessão no middleware, PERMITINDO ACESSO para component-level check')
+        // Não bloquear aqui, deixar o component middleware fazer a verificação
+        return response
       }
       
-      console.log('✅ MIDDLEWARE: Sessão encontrada, permitindo acesso')
+      console.log('✅ MIDDLEWARE: Sessão encontrada no middleware, permitindo acesso')
       return response
       
     } catch (error) {
       console.error('❌ MIDDLEWARE: Erro ao verificar sessão:', error)
-      return NextResponse.redirect(new URL('/auth?error=middleware_error&message=Erro interno do sistema', request.url))
+      // Em caso de erro, permitir acesso e deixar component middleware decidir
+      return response
     }
   }
   

@@ -4,7 +4,9 @@
       "Bash(find:*)",
       "Bash(npm run lint)",
       "Bash(npm run:*)",
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "Bash(npx tsx:*)",
+      "Bash(node:*)"
     ],
     "deny": []
   }
