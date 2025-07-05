@@ -18,18 +18,19 @@ export async function requireAdmin() {
   console.log('🚀 MIDDLEWARE requireAdmin: INICIANDO VERIFICAÇÃO')
   console.log('🚀 MIDDLEWARE requireAdmin: Timestamp:', new Date().toISOString())
   
+  // Primeiro, tentar com createServerComponentClient
   const supabase = createServerComponentClient({ cookies })
   
   // Tentar múltiplas vezes para lidar with race condition
   let session = null
   let sessionError = null
   
-  for (let attempt = 0; attempt < 3; attempt++) {
-    console.log(`🔄 MIDDLEWARE requireAdmin: Tentativa ${attempt + 1}/3 de obter sessão...`)
+  for (let attempt = 0; attempt < 5; attempt++) {
+    console.log(`🔄 MIDDLEWARE requireAdmin: Tentativa ${attempt + 1}/5 de obter sessão...`)
     
     const { data: { session: currentSession }, error: currentError } = await supabase.auth.getSession()
     
-    console.log(`📊 MIDDLEWARE requireAdmin: Tentativa ${attempt + 1}/3:`, {
+    console.log(`📊 MIDDLEWARE requireAdmin: Tentativa ${attempt + 1}/5:`, {
       hasSession: !!currentSession,
       userId: currentSession?.user?.id,
       userEmail: currentSession?.user?.email,
@@ -43,9 +44,10 @@ export async function requireAdmin() {
       break
     }
     
-    if (attempt < 2) {
-      console.log('⏳ MIDDLEWARE requireAdmin: Aguardando 500ms antes de tentar novamente...')
-      await new Promise(resolve => setTimeout(resolve, 500))
+    if (attempt < 4) {
+      const delay = (attempt + 1) * 300 // Delay crescente: 300ms, 600ms, 900ms, 1200ms
+      console.log(`⏳ MIDDLEWARE requireAdmin: Aguardando ${delay}ms antes de tentar novamente...`)
+      await new Promise(resolve => setTimeout(resolve, delay))
     } else {
       session = currentSession
       sessionError = currentError
