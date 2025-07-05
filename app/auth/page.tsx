@@ -163,6 +163,10 @@ export default function AuthPage() {
         // Limpar dados de registro recente
         localStorage.removeItem('recent_registration_email')
         
+        // Aguardar um pouco para garantir que a sessão seja propagada para o servidor
+        console.log('⏳ Aguardando propagação da sessão...')
+        await new Promise(resolve => setTimeout(resolve, 1500))
+        
         // Verificar se o usuário é admin e redirecionar adequadamente
         try {
           const { data: userData, error: userError } = await supabase
@@ -173,7 +177,9 @@ export default function AuthPage() {
           
           if (!userError && userData?.role === 'admin') {
             console.log('🔐 Usuário admin detectado, redirecionando para /admin')
-            router.push('/admin')
+            // Usar window.location.href para forçar uma nova requisição e garantir sincronização
+            window.location.href = '/admin'
+            return
           } else {
             router.push('/')
           }
@@ -334,6 +340,10 @@ export default function AuthPage() {
           // Login automático se não precisar de confirmação
           toast.success('🎉 Conta criada e login realizado com sucesso!')
           
+          // Aguardar um pouco para garantir que a sessão seja propagada para o servidor
+          console.log('⏳ Aguardando propagação da sessão após registro...')
+          await new Promise(resolve => setTimeout(resolve, 1500))
+          
           // Verificar se o usuário é admin e redirecionar adequadamente
           try {
             const { data: userData, error: userError } = await supabase
@@ -344,7 +354,9 @@ export default function AuthPage() {
             
             if (!userError && userData?.role === 'admin') {
               console.log('🔐 Usuário admin detectado, redirecionando para /admin')
-              router.push('/admin')
+              // Usar window.location.href para forçar uma nova requisição e garantir sincronização
+              window.location.href = '/admin'
+              return
             } else {
               router.push('/')
             }

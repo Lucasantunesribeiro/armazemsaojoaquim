@@ -71,6 +71,10 @@ export default function AuthCallbackPage() {
             return
           }
 
+          // Aguardar um pouco para garantir que a sessão seja propagada para o servidor
+          console.log('⏳ Aguardando propagação da sessão após OAuth...')
+          await new Promise(resolve => setTimeout(resolve, 1500))
+          
           // Sucesso - verificar se é admin e redirecionar adequadamente
           try {
             const { data: userData, error: userError } = await supabase
@@ -81,7 +85,9 @@ export default function AuthCallbackPage() {
             
             if (!userError && userData?.role === 'admin') {
               console.log('🔐 Usuário admin detectado, redirecionando para /admin')
-              router.push('/admin')
+              // Usar window.location.href para forçar uma nova requisição e garantir sincronização
+              window.location.href = '/admin'
+              return
             } else {
               console.log('🏠 Redirecionando para página principal...')
               router.push('/')
