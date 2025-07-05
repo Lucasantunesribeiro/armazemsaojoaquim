@@ -64,6 +64,10 @@ export default function AuthPage() {
       if (error === 'link_expired') {
         toast.error('🔗 Link expirado!\n\nO link de redefinição de senha expirou. Solicite um novo link abaixo.')
         setShowForgotPassword(true)
+      } else if (error === 'session_required') {
+        toast.error('🔐 Sessão expirada!\n\nFaça login novamente para acessar a área administrativa.')
+      } else if (error === 'session_expired') {
+        toast.error('⏰ Sua sessão expirou!\n\nPor favor, faça login novamente.')
       } else {
         toast.error(`Erro de autenticação: ${decodeURIComponent(message || error)}`)
       }
