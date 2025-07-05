@@ -36,8 +36,8 @@ export default async function MenuManagementPage() {
       return 'Sem categoria'
     }
     try {
-      const category = categories.find((c: any) => c && c.id === categoryId)
-      return category?.name || 'Sem categoria'
+      const category = categories.find((c: any) => c && c.id === categoryId) as any
+      return (category && category.name) ? category.name : 'Sem categoria'
     } catch {
       return 'Sem categoria'
     }
