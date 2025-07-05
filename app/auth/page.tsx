@@ -159,7 +159,25 @@ export default function AuthPage() {
         // Limpar dados de registro recente
         localStorage.removeItem('recent_registration_email')
         
-        router.push('/')
+        // Verificar se o usuário é admin e redirecionar adequadamente
+        try {
+          const { data: userData, error: userError } = await supabase
+            .from('users')
+            .select('role')
+            .eq('id', authData.user.id)
+            .single()
+          
+          if (!userError && userData?.role === 'admin') {
+            console.log('🔐 Usuário admin detectado, redirecionando para /admin')
+            router.push('/admin')
+          } else {
+            router.push('/')
+          }
+        } catch (error) {
+          console.error('Erro ao verificar role do usuário:', error)
+          // Fallback para página inicial em caso de erro
+          router.push('/')
+        }
       }
 
     } catch (error) {
@@ -311,7 +329,26 @@ export default function AuthPage() {
         } else {
           // Login automático se não precisar de confirmação
           toast.success('🎉 Conta criada e login realizado com sucesso!')
-          router.push('/')
+          
+          // Verificar se o usuário é admin e redirecionar adequadamente
+          try {
+            const { data: userData, error: userError } = await supabase
+              .from('users')
+              .select('role')
+              .eq('id', authData.user.id)
+              .single()
+            
+            if (!userError && userData?.role === 'admin') {
+              console.log('🔐 Usuário admin detectado, redirecionando para /admin')
+              router.push('/admin')
+            } else {
+              router.push('/')
+            }
+          } catch (error) {
+            console.error('Erro ao verificar role do usuário:', error)
+            // Fallback para página inicial em caso de erro
+            router.push('/')
+          }
         }
       }
 

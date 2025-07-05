@@ -71,9 +71,27 @@ export default function AuthCallbackPage() {
             return
           }
 
-          // Sucesso - redireciona para a página principal
-          console.log('🏠 Redirecionando para página principal...')
-          router.push('/')
+          // Sucesso - verificar se é admin e redirecionar adequadamente
+          try {
+            const { data: userData, error: userError } = await supabase
+              .from('users')
+              .select('role')
+              .eq('id', data.user.id)
+              .single()
+            
+            if (!userError && userData?.role === 'admin') {
+              console.log('🔐 Usuário admin detectado, redirecionando para /admin')
+              router.push('/admin')
+            } else {
+              console.log('🏠 Redirecionando para página principal...')
+              router.push('/')
+            }
+          } catch (error) {
+            console.error('Erro ao verificar role do usuário:', error)
+            // Fallback para página inicial em caso de erro
+            console.log('🏠 Redirecionando para página principal (fallback)...')
+            router.push('/')
+          }
           return
         }
 
