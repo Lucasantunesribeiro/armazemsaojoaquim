@@ -32,8 +32,9 @@ export default function EditBlogPostPage({ params }: Props) {
   useEffect(() => {
     const fetchPost = async () => {
       try {
-        const response = await fetch(`/api/admin/blog/${params.id}`, {
-          credentials: 'include'
+        const response = await fetch(`/api/admin/blog/${params.id}?t=${Date.now()}`, {
+          credentials: 'include',
+          cache: 'no-store'
         })
         const data = await response.json()
 
