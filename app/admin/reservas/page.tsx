@@ -20,30 +20,31 @@ export default function ReservasManagementPage() {
   const fetchReservas = async () => {
     try {
       setLoading(true)
-      let query = supabase
-        .from('reservas')
-        .select(`
-          *,
-          profiles!user_id (
-            id,
-            name,
-            email,
-            phone
-          )
-        `)
-        .order('data', { ascending: false })
-        .order('horario', { ascending: false })
-
-      // Aplicar filtro de status
+      
+      // Use the new admin API
+      const params = new URLSearchParams()
       if (filter !== 'todas') {
-        query = query.eq('status', filter)
+        params.append('status', filter)
+      }
+      
+      const response = await fetch(`/api/admin/reservas?${params.toString()}`, {
+        credentials: 'include'
+      })
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          setError('Não autorizado. Faça login novamente.')
+          return
+        }
+        if (response.status === 403) {
+          setError('Acesso negado. Apenas administradores podem visualizar reservas.')
+          return
+        }
+        throw new Error('Erro ao carregar reservas')
       }
 
-      const { data, error } = await query
-
-      if (error) throw error
-
-      setReservas(data || [])
+      const data = await response.json()
+      setReservas(data.reservas || [])
     } catch (err) {
       console.error('Error fetching reservas:', err)
       setError('Erro ao carregar reservas')
@@ -54,26 +55,28 @@ export default function ReservasManagementPage() {
 
   const handleStatusChange = async (reservaId: string, newStatus: string) => {
     try {
-      const updateData: any = { status: newStatus, updated_at: new Date().toISOString() }
-      
-      if (newStatus === 'confirmada') {
-        updateData.confirmado_em = new Date().toISOString()
-      } else if (newStatus === 'cancelada') {
-        updateData.cancelado_em = new Date().toISOString()
+      const response = await fetch('/api/admin/reservas', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          id: reservaId,
+          status: newStatus
+        })
+      })
+
+      if (!response.ok) {
+        const data = await response.json()
+        throw new Error(data.error || 'Failed to update reserva')
       }
-
-      const { error } = await supabase
-        .from('reservas')
-        .update(updateData)
-        .eq('id', reservaId)
-
-      if (error) throw error
 
       await fetchReservas()
       alert(`Reserva ${newStatus} com sucesso!`)
     } catch (err) {
       console.error('Error updating reserva:', err)
-      alert('Erro ao atualizar reserva')
+      alert('Erro ao atualizar reserva: ' + (err instanceof Error ? err.message : 'Erro desconhecido'))
     }
   }
 
@@ -212,7 +215,7 @@ export default function ReservasManagementPage() {
             </thead>
             <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
               {reservas.map((reserva) => {
-                const profile = (reserva as any).profiles
+                const profile = (reserva as any).profile
                 return (
                   <tr key={reserva.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
                     <td className="px-6 py-4 whitespace-nowrap">
