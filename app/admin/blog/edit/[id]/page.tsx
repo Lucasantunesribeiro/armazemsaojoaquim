@@ -32,14 +32,35 @@ export default function EditBlogPostPage({ params }: Props) {
   useEffect(() => {
     const fetchPost = async () => {
       try {
+        console.log('📝 Frontend: Iniciando busca do post para edição...')
+        console.log('📝 Frontend: Cookies disponíveis:', document.cookie.split(';').map(c => c.trim().split('=')[0]))
+        
         const response = await fetch(`/api/admin/blog/${params.id}?t=${Date.now()}`, {
           credentials: 'include',
-          cache: 'no-store'
+          cache: 'no-store',
+          headers: {
+            'Content-Type': 'application/json',
+          }
         })
+        
+        console.log('📝 Frontend: Resposta da API:', {
+          status: response.status,
+          statusText: response.statusText,
+          headers: Object.fromEntries(response.headers.entries())
+        })
+        
         const data = await response.json()
+        console.log('📝 Frontend: Dados recebidos:', data)
 
         if (!response.ok) {
+          console.error('❌ Frontend: Erro na resposta:', {
+            status: response.status,
+            statusText: response.statusText,
+            error: data.error
+          })
+          
           if (response.status === 401) {
+            console.log('🔄 Frontend: Redirecionando para auth devido a 401...')
             router.push('/auth?error=unauthorized&message=Faça login para continuar')
             return
           }
