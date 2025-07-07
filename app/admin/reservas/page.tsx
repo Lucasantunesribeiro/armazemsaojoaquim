@@ -24,7 +24,7 @@ export default function ReservasManagementPage() {
         .from('reservas')
         .select(`
           *,
-          profiles:user_id (
+          profiles!user_id (
             id,
             name,
             email,

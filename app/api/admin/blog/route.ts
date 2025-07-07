@@ -16,9 +16,8 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // Check if user is admin - for now, allow any authenticated user to be admin
-    // TODO: Implement proper role-based access control
-    if (!session.user.email?.includes('armazemsaojoaquimoficial@gmail.com')) {
+    // Check if user is admin - exact email match
+    if (session.user.email !== 'armazemsaojoaquimoficial@gmail.com') {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
@@ -83,9 +82,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // Check if user is admin - for now, allow any authenticated user to be admin
-    // TODO: Implement proper role-based access control
-    if (!session.user.email?.includes('armazemsaojoaquimoficial@gmail.com')) {
+    // Check if user is admin - exact email match
+    if (session.user.email !== 'armazemsaojoaquimoficial@gmail.com') {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
