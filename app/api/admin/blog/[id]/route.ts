@@ -12,9 +12,8 @@ async function checkAdminAuth(supabase: any) {
     return { authorized: false, status: 401, message: 'Unauthorized' }
   }
 
-  // Check if user is admin - for now, allow any authenticated user to be admin
-  // TODO: Implement proper role-based access control
-  if (!session.user.email?.includes('armazemsaojoaquimoficial@gmail.com')) {
+  // Check if user is admin - exact email match
+  if (session.user.email !== 'armazemsaojoaquimoficial@gmail.com') {
     return { authorized: false, status: 403, message: 'Forbidden' }
   }
 

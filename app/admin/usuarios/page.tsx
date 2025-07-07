@@ -13,18 +13,11 @@ type User = {
   }
 }
 
-type Profile = {
-  id: string
-  email: string | null
-  name: string | null
-  phone: string | null
-  created_at: string
-}
+
 
 export default function UsersManagementPage() {
   const { supabase } = useSupabase()
   const [users, setUsers] = useState<User[]>([])
-  const [profiles, setProfiles] = useState<Record<string, Profile>>({})
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -36,47 +29,37 @@ export default function UsersManagementPage() {
     try {
       setLoading(true)
       
-      // Buscar usuários do auth.users
-      const { data: { users: authUsers }, error: authError } = await supabase.auth.admin.listUsers()
-      
-      if (authError) {
-        // Se não tiver permissão admin, buscar apenas profiles
-        const { data: profilesData, error: profilesError } = await supabase
-          .from('profiles')
-          .select('*')
-          .order('created_at', { ascending: false })
+      // Usar a nova API de admin para buscar usuários
+      const response = await fetch('/api/admin/users', {
+        credentials: 'include'
+      })
 
-        if (profilesError) throw profilesError
-
-        // Converter profiles em formato de usuário
-        const usersList: User[] = (profilesData || []).map((profile: Profile) => ({
-          id: profile.id,
-          email: profile.email || '',
-          created_at: profile.created_at,
-          user_metadata: {
-            name: profile.name || undefined,
-            phone: profile.phone || undefined
-          }
-        }))
-
-        setUsers(usersList)
-      } else {
-        // Se tiver usuários do auth, buscar profiles correspondentes
-        setUsers(authUsers || [])
-        
-        if (authUsers && authUsers.length > 0) {
-          const { data: profilesData } = await supabase
-            .from('profiles')
-            .select('*')
-            .in('id', authUsers.map((u: User) => u.id))
-
-          const profilesMap: Record<string, Profile> = {}
-          profilesData?.forEach((profile: Profile) => {
-            profilesMap[profile.id] = profile
-          })
-          setProfiles(profilesMap)
+      if (!response.ok) {
+        if (response.status === 401) {
+          setError('Não autorizado. Faça login novamente.')
+          return
         }
+        if (response.status === 403) {
+          setError('Acesso negado. Apenas administradores podem visualizar usuários.')
+          return
+        }
+        throw new Error('Erro ao carregar usuários')
       }
+
+      const data = await response.json()
+      
+      // Converter profiles em formato de usuário
+      const usersList: User[] = (data.users || []).map((profile: any) => ({
+        id: profile.id,
+        email: profile.email || '',
+        created_at: profile.created_at,
+        user_metadata: {
+          name: profile.name || undefined,
+          phone: profile.phone || undefined
+        }
+      }))
+
+      setUsers(usersList)
     } catch (err) {
       console.error('Error fetching users:', err)
       setError('Erro ao carregar usuários')
@@ -96,13 +79,11 @@ export default function UsersManagementPage() {
   }
 
   const getUserName = (user: User) => {
-    const profile = profiles[user.id]
-    return profile?.name || user.user_metadata?.name || 'Sem nome'
+    return user.user_metadata?.name || 'Sem nome'
   }
 
   const getUserPhone = (user: User) => {
-    const profile = profiles[user.id]
-    return profile?.phone || user.user_metadata?.phone || '-'
+    return user.user_metadata?.phone || '-'
   }
 
   const isAdmin = (email: string) => {
