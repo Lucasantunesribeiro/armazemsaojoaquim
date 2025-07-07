@@ -48,6 +48,7 @@ export default function BlogManagementPage() {
     try {
       const response = await fetch(`/api/admin/blog/${postId}`, {
         method: 'DELETE',
+        credentials: 'include'
       })
 
       if (!response.ok) {
