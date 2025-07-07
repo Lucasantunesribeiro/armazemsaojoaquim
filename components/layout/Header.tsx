@@ -511,18 +511,6 @@ export default function Header() {
                     )
                   })}
                   
-                  {/* Cardápio Link Mobile */}
-                  <Link
-                    href="/cardapio.pdf"
-                    target="_blank"
-                    onClick={closeMobileMenu}
-                    className="group flex items-center justify-between px-4 py-4 rounded-2xl text-base font-semibold transition-all duration-300 font-inter text-slate-700 dark:text-slate-300 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-gradient-to-r hover:from-slate-50 hover:to-amber-50 dark:hover:from-slate-800/50 dark:hover:to-amber-900/20 hover:shadow-md"
-                  >
-                    <span className="flex items-center space-x-3">
-                      <FileText className="w-4 h-4" />
-                      <span className="text-base sm:text-lg">Cardápio</span>
-                    </span>
-                  </Link>
 
                   {/* Social Media Links Mobile */}
                   <div className="pt-4 pb-2">
