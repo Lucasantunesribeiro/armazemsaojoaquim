@@ -105,7 +105,7 @@ export default async function AdminLayout({
                 {/* User Management */}
                 <li>
                   <a
-                    href="/admin/users"
+                    href="/admin/usuarios"
                     className="flex items-center px-4 py-2 text-sm font-medium rounded-lg text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
                   >
                     <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -118,7 +118,7 @@ export default async function AdminLayout({
                 {/* Reservations Management */}
                 <li>
                   <a
-                    href="/admin/reservations"
+                    href="/admin/reservas"
                     className="flex items-center px-4 py-2 text-sm font-medium rounded-lg text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
                   >
                     <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">

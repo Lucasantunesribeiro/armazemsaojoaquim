@@ -224,7 +224,7 @@ export default async function AdminDashboard() {
           </h2>
           <div className="space-y-3">
             <Link
-              href="/admin/reservations"
+              href="/admin/reservas"
               className="flex items-center p-3 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
             >
               <svg className="w-5 h-5 mr-3 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -233,19 +233,6 @@ export default async function AdminDashboard() {
               <div>
                 <h3 className="font-medium text-gray-900 dark:text-white">Todas as Reservas</h3>
                 <p className="text-sm text-gray-500 dark:text-gray-400">Visualizar e gerenciar todas as reservas</p>
-              </div>
-            </Link>
-            
-            <Link
-              href="/admin/availability"
-              className="flex items-center p-3 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-            >
-              <svg className="w-5 h-5 mr-3 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <div>
-                <h3 className="font-medium text-gray-900 dark:text-white">Disponibilidade</h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400">Configurar horários e capacidade</p>
               </div>
             </Link>
           </div>
@@ -261,7 +248,7 @@ export default async function AdminDashboard() {
           </h2>
           <div className="space-y-3">
             <Link
-              href="/admin/users"
+              href="/admin/usuarios"
               className="flex items-center p-3 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
             >
               <svg className="w-5 h-5 mr-3 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -270,19 +257,6 @@ export default async function AdminDashboard() {
               <div>
                 <h3 className="font-medium text-gray-900 dark:text-white">Todos os Usuários</h3>
                 <p className="text-sm text-gray-500 dark:text-gray-400">Visualizar e gerenciar contas de usuários</p>
-              </div>
-            </Link>
-            
-            <Link
-              href="/admin/messages"
-              className="flex items-center p-3 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-            >
-              <svg className="w-5 h-5 mr-3 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-              </svg>
-              <div>
-                <h3 className="font-medium text-gray-900 dark:text-white">Mensagens</h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400">Visualizar mensagens de contato</p>
               </div>
             </Link>
           </div>

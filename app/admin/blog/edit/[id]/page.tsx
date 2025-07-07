@@ -32,10 +32,16 @@ export default function EditBlogPostPage({ params }: Props) {
   useEffect(() => {
     const fetchPost = async () => {
       try {
-        const response = await fetch(`/api/admin/blog/${params.id}`)
+        const response = await fetch(`/api/admin/blog/${params.id}`, {
+          credentials: 'include'
+        })
         const data = await response.json()
 
         if (!response.ok) {
+          if (response.status === 401) {
+            router.push('/auth?error=unauthorized&message=Faça login para continuar')
+            return
+          }
           throw new Error(data.error || 'Failed to fetch blog post')
         }
 
@@ -82,12 +88,17 @@ export default function EditBlogPostPage({ params }: Props) {
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include',
         body: JSON.stringify(formData),
       })
 
       const data = await response.json()
 
       if (!response.ok) {
+        if (response.status === 401) {
+          router.push('/auth?error=unauthorized&message=Faça login para continuar')
+          return
+        }
         throw new Error(data.error || 'Failed to update blog post')
       }
 
@@ -127,9 +138,14 @@ export default function EditBlogPostPage({ params }: Props) {
     try {
       const response = await fetch(`/api/admin/blog/${params.id}`, {
         method: 'DELETE',
+        credentials: 'include'
       })
 
       if (!response.ok) {
+        if (response.status === 401) {
+          router.push('/auth?error=unauthorized&message=Faça login para continuar')
+          return
+        }
         const data = await response.json()
         throw new Error(data.error || 'Failed to delete blog post')
       }

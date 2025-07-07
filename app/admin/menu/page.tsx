@@ -166,7 +166,7 @@ export default async function MenuManagementPage() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
                         <Link
-                          href={`/admin/menu/edit/${item.id}`}
+                          href={`/admin/menu/${item.id}`}
                           className="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300"
                         >
                           Editar
