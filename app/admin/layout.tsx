@@ -42,15 +42,30 @@ export default function AdminLayout({
 
       // Verificar se é admin através da API
       try {
+        console.log('🔍 AdminLayout: Fazendo requisição para check-role...')
+        
         const response = await fetch('/api/admin/check-role', {
+          method: 'GET',
           headers: {
-            'Authorization': `Bearer ${session.access_token}`,
             'Content-Type': 'application/json'
-          }
+          },
+          credentials: 'include'
         })
 
         if (!response.ok) {
-          console.error('❌ AdminLayout: API check-role falhou:', response.status)
+          console.error('❌ AdminLayout: API check-role falhou:', {
+            status: response.status,
+            statusText: response.statusText
+          })
+          
+          // Try to get error details
+          try {
+            const errorData = await response.json()
+            console.error('❌ AdminLayout: Detalhes do erro:', errorData)
+          } catch (e) {
+            console.error('❌ AdminLayout: Não foi possível ler detalhes do erro')
+          }
+          
           router.push('/auth?message=Erro+ao+verificar+permissões')
           return
         }
@@ -59,23 +74,45 @@ export default function AdminLayout({
         console.log('🔍 AdminLayout: Role verificada:', roleData)
 
         if (!roleData.isAdmin) {
-          console.log('❌ AdminLayout: Usuário não é admin')
+          console.log('❌ AdminLayout: Usuário não é admin:', {
+            email: session.user.email,
+            roleData
+          })
           router.push('/auth?message=Acesso+negado+ao+painel+administrativo')
           return
         }
 
-        console.log('✅ AdminLayout: Usuário admin confirmado')
+        console.log('✅ AdminLayout: Usuário admin confirmado:', {
+          email: session.user.email,
+          source: roleData.source
+        })
         setIsAdmin(true)
 
-      } catch (apiError) {
+      } catch (apiError: any) {
         console.error('❌ AdminLayout: Erro na API:', apiError)
+        
+        // Fallback: check admin by email directly if API fails
+        if (session.user.email === 'armazemsaojoaquimoficial@gmail.com') {
+          console.log('✅ AdminLayout: Admin confirmado por fallback de email')
+          setIsAdmin(true)
+          return
+        }
+        
         router.push('/auth?message=Erro+ao+verificar+permissões')
         return
       }
 
-    } catch (error) {
+    } catch (error: any) {
       console.error('❌ AdminLayout: Erro geral:', error)
-      setError('Erro na autenticação')
+      
+      // If it's a general error but user email is admin, try to continue
+      if (session?.user?.email === 'armazemsaojoaquimoficial@gmail.com') {
+        console.log('⚠️ AdminLayout: Erro geral mas email é admin - tentando continuar')
+        setUser(session.user)
+        setIsAdmin(true)
+      } else {
+        setError('Erro na autenticação: ' + error.message)
+      }
     } finally {
       setLoading(false)
     }

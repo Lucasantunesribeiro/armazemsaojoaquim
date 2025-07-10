@@ -1,86 +1,131 @@
-import { createClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
-
-// Service Role para acessar dados sem RLS
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false
-    }
-  }
-)
-
-// Cliente regular para verificar auth
-const supabaseAuth = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-)
+import { createServerClient } from '@supabase/ssr'
+import { cookies } from 'next/headers'
+import { Database } from '@/types/database.types'
 
 export async function GET(request: NextRequest) {
+  console.log('🔍 API CheckRole: Iniciando verificação de permissões - ' + new Date().toISOString())
+  
   try {
-    console.log('🔍 API CheckRole: Verificando permissões...')
+    const cookieStore = cookies()
     
-    const authHeader = request.headers.get('Authorization')
-    if (!authHeader?.startsWith('Bearer ')) {
-      console.log('❌ API CheckRole: Token não encontrado')
-      return NextResponse.json({ isAdmin: false, error: 'No token' })
+    // Create Supabase client with same configuration as other admin APIs
+    const supabase = createServerClient<Database>(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() {
+            return cookieStore.getAll()
+          },
+          setAll(cookiesToSet) {
+            try {
+              cookiesToSet.forEach(({ name, value, options }) => {
+                cookieStore.set(name, value, options)
+              })
+            } catch (error) {
+              console.log('🍪 API CheckRole: Error setting cookies:', error)
+            }
+          },
+        },
+        auth: {
+          persistSession: false,
+          autoRefreshToken: false,
+          detectSessionInUrl: false,
+          flowType: 'pkce',
+          storageKey: 'armazem-sao-joaquim-auth',
+          debug: process.env.NODE_ENV === 'development'
+        },
+      }
+    )
+    
+    // Get session from cookies (same as other admin APIs)
+    const { data: { session }, error: sessionError } = await supabase.auth.getSession()
+    
+    if (sessionError) {
+      console.error('❌ API CheckRole: Erro na sessão:', sessionError)
+      return NextResponse.json({ 
+        isAdmin: false, 
+        error: 'Session error',
+        details: sessionError.message 
+      })
+    }
+    
+    if (!session || !session.user) {
+      console.log('❌ API CheckRole: Sem sessão ativa')
+      return NextResponse.json({ 
+        isAdmin: false, 
+        error: 'No active session' 
+      })
     }
 
-    const token = authHeader.substring(7)
-    
-    // Verificar usuário com token
-    const { data: { user }, error: userError } = await supabaseAuth.auth.getUser(token)
-    
-    if (userError || !user) {
-      console.log('❌ API CheckRole: Usuário inválido:', userError?.message)
-      return NextResponse.json({ isAdmin: false, error: 'Invalid user' })
-    }
+    const user = session.user
+    console.log('✅ API CheckRole: Usuário autenticado:', user.email)
 
-    console.log('✅ API CheckRole: Usuário válido:', user.email)
-
-    // Verificar se é admin pelo email (método mais direto)
-    const isAdmin = user.email === 'armazemsaojoaquimoficial@gmail.com'
+    // Primary check: admin email verification
+    const isAdminByEmail = user.email === 'armazemsaojoaquimoficial@gmail.com'
     
-    if (isAdmin) {
-      console.log('✅ API CheckRole: Admin confirmado por email')
+    if (isAdminByEmail) {
+      console.log('✅ API CheckRole: Admin confirmado por email direto')
       return NextResponse.json({ 
         isAdmin: true,
         user: {
           id: user.id,
           email: user.email,
           role: 'admin'
-        }
+        },
+        source: 'email_verification'
       })
     }
 
-    // Verificar role usando Service Role (bypassa RLS) como fallback
+    // Secondary check: verify in public.users table for role
     try {
-      const { data: userData, error: roleError } = await supabaseAdmin
-        .from('profiles')
-        .select('id, email, created_at')
+      console.log('🔍 API CheckRole: Verificando role na tabela users...')
+      
+      const { data: userData, error: roleError } = await supabase
+        .from('users')
+        .select('id, email, role')
         .eq('id', user.id)
         .single()
 
       if (roleError) {
-        console.error('❌ API CheckRole: Erro ao buscar perfil:', roleError)
-        // Se não encontrar no profiles, ainda pode ser admin se for o email correto
+        console.error('❌ API CheckRole: Erro ao buscar usuário na tabela users:', roleError)
+        
+        // Fallback: if user not found in public.users but email matches admin, still allow
+        if (user.email === 'armazemsaojoaquimoficial@gmail.com') {
+          console.log('✅ API CheckRole: Admin confirmado por email (fallback)')
+          return NextResponse.json({ 
+            isAdmin: true,
+            user: {
+              id: user.id,
+              email: user.email,
+              role: 'admin'
+            },
+            source: 'email_fallback'
+          })
+        }
+        
         return NextResponse.json({ 
           isAdmin: false, 
-          error: 'Profile not found'
+          error: 'User not found in database',
+          details: roleError.message
         })
       }
 
-      console.log('🔍 API CheckRole: Perfil encontrado:', userData?.email)
+      console.log('🔍 API CheckRole: Dados do usuário encontrados:', {
+        email: userData.email,
+        role: userData.role
+      })
       
-      // Dupla verificação: email admin ou perfil existente
-      const finalIsAdmin = userData?.email === 'armazemsaojoaquimoficial@gmail.com'
+      // Check if user has admin role OR is the admin email
+      const isAdminByRole = userData.role === 'admin'
+      const isAdminByEmailMatch = userData.email === 'armazemsaojoaquimoficial@gmail.com'
+      const finalIsAdmin = isAdminByRole || isAdminByEmailMatch
       
       console.log('🔍 API CheckRole: Verificação final:', {
-        email: userData?.email,
-        isAdmin: finalIsAdmin
+        isAdminByRole,
+        isAdminByEmailMatch,
+        finalIsAdmin
       })
 
       return NextResponse.json({ 
@@ -88,28 +133,41 @@ export async function GET(request: NextRequest) {
         user: {
           id: user.id,
           email: user.email,
-          role: finalIsAdmin ? 'admin' : 'user'
-        }
+          role: finalIsAdmin ? 'admin' : (userData.role || 'user')
+        },
+        source: 'database_verification'
       })
 
-    } catch (dbError) {
-      console.error('❌ API CheckRole: Erro no banco:', dbError)
-      // Em caso de erro no banco, verificar apenas pelo email
+    } catch (dbError: any) {
+      console.error('❌ API CheckRole: Erro no banco de dados:', dbError)
+      
+      // Final fallback: if database fails but email is admin, allow access
+      if (user.email === 'armazemsaojoaquimoficial@gmail.com') {
+        console.log('✅ API CheckRole: Admin confirmado por email (fallback de erro)')
+        return NextResponse.json({ 
+          isAdmin: true,
+          user: {
+            id: user.id,
+            email: user.email,
+            role: 'admin'
+          },
+          source: 'error_fallback'
+        })
+      }
+      
       return NextResponse.json({ 
-        isAdmin: user.email === 'armazemsaojoaquimoficial@gmail.com',
-        user: {
-          id: user.id,
-          email: user.email,
-          role: user.email === 'armazemsaojoaquimoficial@gmail.com' ? 'admin' : 'user'
-        }
+        isAdmin: false, 
+        error: 'Database error',
+        details: dbError.message
       })
     }
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('❌ API CheckRole: Erro interno:', error)
     return NextResponse.json({ 
       isAdmin: false, 
-      error: 'Internal error'
-    })
+      error: 'Internal server error',
+      details: error.message
+    }, { status: 500 })
   }
 }
