@@ -1,11 +1,8 @@
-import { createClient } from '@supabase/supabase-js'
+import { createClient as createSupabaseClient } from '@supabase/supabase-js'
+import { createBrowserClient, createServerClient as createSSRServerClient } from '@supabase/ssr'
+import { cookies } from 'next/headers'
+import { NextRequest, NextResponse } from 'next/server'
 import { Database } from '../types/database.types'
-
-// Temporariamente comentado para debug
-// Importar polyfills apenas no servidor
-// if (typeof window === 'undefined') {
-//   require('./polyfills-minimal.js')
-// }
 
 // Verificar se as variáveis de ambiente estão configuradas
 export const isSupabaseConfigured = () => {
@@ -120,166 +117,179 @@ function createMockClient() {
   }
 }
 
-// Configuração do cliente Supabase com tratamento de erro
-let supabase: any
-
-try {
-  if (isSupabaseConfigured()) {
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-    const supabaseServiceKey = process.env.NEXT_PUBLIC_SUPABASE_SERVICE_KEY
-    
-    supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
-      auth: {
-        persistSession: typeof window !== 'undefined',
-        autoRefreshToken: typeof window !== 'undefined',
-        detectSessionInUrl: typeof window !== 'undefined',
-        flowType: 'pkce',
-        storage: typeof window !== 'undefined' ? window.localStorage : undefined,
-        storageKey: 'armazem-sao-joaquim-auth',
-        debug: process.env.NODE_ENV === 'development'
-      },
-      realtime: {
-        params: {
-          eventsPerSecond: 10
-        }
-      },
-      global: {
-        headers: {
-          'X-Client-Info': 'armazem-sao-joaquim',
-          'apikey': supabaseAnonKey
-        }
-      }
-    })
-
-    // Wrapper para signOut com fallback
-    const originalSignOut = supabase.auth.signOut
-    supabase.auth.signOut = async (options?: { scope?: 'global' | 'local' }) => {
-      try {
-        console.log('🔄 Tentando logout...', options)
-        const result = await originalSignOut.call(supabase.auth, options)
-        
-        if (result.error) {
-          console.warn('⚠️ Erro no logout do servidor, fazendo limpeza local:', result.error)
-          
-          // Fallback: limpar sessão localmente
-          if (typeof window !== 'undefined') {
-            localStorage.removeItem('armazem-sao-joaquim-auth')
-            localStorage.removeItem('sb-enolssforaepnrpfrima-auth-token')
-            sessionStorage.clear()
-          }
-          
-          // Retornar sucesso para não bloquear o usuário
-          return { error: null }
-        }
-        
-        console.log('✅ Logout realizado com sucesso')
-        return result
-      } catch (error) {
-        console.error('❌ Erro inesperado no logout:', error)
-        
-        // Fallback: limpar sessão localmente
-        if (typeof window !== 'undefined') {
-          localStorage.removeItem('armazem-sao-joaquim-auth')
-          localStorage.removeItem('sb-enolssforaepnrpfrima-auth-token')
-          sessionStorage.clear()
-        }
-        
-        // Retornar sucesso para não bloquear o usuário
-        return { error: null }
-      }
-    }
-
-    // Função auxiliar para hash de senha (simplificada)
-    async function hashPassword(password: string): Promise<string> {
-      // Em produção, usar bcrypt ou similar
-      // Por enquanto, retornar um hash simples para teste
-      const encoder = new TextEncoder()
-      const data = encoder.encode(password + 'salt')
-      const hashBuffer = await crypto.subtle.digest('SHA-256', data)
-      const hashArray = Array.from(new Uint8Array(hashBuffer))
-      return hashArray.map(b => b.toString(16).padStart(2, '0')).join('')
-    }
-
-  } else {
-    console.warn('Supabase não configurado. Usando cliente mock.')
-    supabase = createMockClient()
+// Cliente para o browser (client-side)
+export function createClient() {
+  if (!isSupabaseConfigured()) {
+    console.warn('⚠️ Supabase não configurado, usando cliente mock')
+    return createMockClient() as any
   }
-} catch (error) {
-  console.error('❌ Falha na inicialização do Supabase:', error)
-  // Em caso de falha, usar o cliente mock para evitar que a aplicação quebre
-  supabase = createMockClient()
+
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+
+  return createBrowserClient<Database>(supabaseUrl, supabaseAnonKey, {
+    auth: {
+      persistSession: true,
+      autoRefreshToken: true,
+      detectSessionInUrl: true,
+      flowType: 'pkce',
+      storageKey: 'armazem-sao-joaquim-auth',
+      debug: process.env.NODE_ENV === 'development'
+    },
+    realtime: {
+      params: {
+        eventsPerSecond: 10
+      }
+    },
+    global: {
+      headers: {
+        'X-Client-Info': 'armazem-sao-joaquim',
+      }
+    }
+  })
 }
 
-// Função para verificar status do Supabase
+// Cliente para server components
+export function createServerClient(cookieStore: ReturnType<typeof cookies>) {
+  if (!isSupabaseConfigured()) {
+    console.warn('⚠️ Supabase não configurado, usando cliente mock')
+    return createMockClient() as any
+  }
+
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+
+  return createSSRServerClient<Database>(supabaseUrl, supabaseAnonKey, {
+    cookies: {
+      getAll() {
+        return cookieStore.getAll()
+      },
+      setAll(cookiesToSet: Array<{ name: string; value: string; options?: any }>) {
+        try {
+          cookiesToSet.forEach(({ name, value, options }) =>
+            cookieStore.set(name, value, options)
+          )
+        } catch {
+          // The `setAll` method was called from a Server Component.
+          // This can be ignored if you have middleware refreshing
+          // user sessions.
+        }
+      },
+    },
+    auth: {
+      persistSession: false,
+      autoRefreshToken: false,
+      detectSessionInUrl: false,
+      flowType: 'pkce',
+      debug: process.env.NODE_ENV === 'development'
+    },
+    global: {
+      headers: {
+        'X-Client-Info': 'armazem-sao-joaquim-server',
+      }
+    }
+  })
+}
+
+// Cliente para middleware
+export function createMiddlewareClient(
+  request: NextRequest,
+  response: NextResponse
+) {
+  if (!isSupabaseConfigured()) {
+    console.warn('⚠️ Supabase não configurado, usando cliente mock')
+    return createMockClient() as any
+  }
+
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+
+  console.log('🔧 MIDDLEWARE CLIENT: Criando cliente Supabase para middleware...')
+
+  return createSSRServerClient<Database>(supabaseUrl, supabaseAnonKey, {
+    cookies: {
+      getAll() {
+        const cookies = request.cookies.getAll()
+        console.log('🍪 MIDDLEWARE CLIENT: getAll() chamado - cookies:', cookies.map(c => c.name))
+        return cookies
+      },
+      setAll(cookiesToSet: Array<{ name: string; value: string; options?: any }>) {
+        console.log('🍪 MIDDLEWARE CLIENT: setAll() chamado - cookies:', cookiesToSet.map(c => c.name))
+        cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
+        cookiesToSet.forEach(({ name, value, options }) =>
+          response.cookies.set(name, value, options)
+        )
+      },
+    },
+    auth: {
+      persistSession: false,
+      autoRefreshToken: false,
+      detectSessionInUrl: false,
+      flowType: 'pkce',
+      storageKey: 'armazem-sao-joaquim-auth', // IMPORTANTE: Mesma key do cliente
+      debug: process.env.NODE_ENV === 'development'
+    },
+    global: {
+      headers: {
+        'X-Client-Info': 'armazem-sao-joaquim-middleware',
+      }
+    }
+  })
+}
+
+// Cliente legado para backward compatibility
+export const supabase = createClient()
+
+// Funções auxiliares
 export const getSupabaseStatus = async () => {
   if (!isSupabaseConfigured()) {
     return {
-      status: 'not_configured',
-      message: 'Supabase não está configurado',
-      timestamp: new Date().toISOString()
+      configured: false,
+      connected: false,
+      error: 'Supabase não configurado'
     }
   }
 
   try {
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('id')
-      .limit(1)
-
-    if (error && error.code !== 'PGRST116') { // PGRST116 = tabela não encontrada (ok para teste)
-      throw error
-    }
-
+    const client = createClient()
+    const { data, error } = await client.from('users').select('count').limit(1)
+    
     return {
-      status: 'connected',
-      message: 'Supabase conectado com sucesso',
-      timestamp: new Date().toISOString()
+      configured: true,
+      connected: !error,
+      error: error?.message
     }
   } catch (error: any) {
     return {
-      status: 'error',
-      message: error.message || 'Erro desconhecido',
-      timestamp: new Date().toISOString()
+      configured: true,
+      connected: false,
+      error: error.message
     }
   }
 }
 
-// Função auxiliar para logout forçado
 export const forceLogout = async () => {
   try {
-    console.log('🔄 Forçando logout...')
+    const client = createClient()
+    await client.auth.signOut()
     
-    // Tentar logout normal primeiro
-    await supabase.auth.signOut({ scope: 'local' })
-    
-    // Limpar storage local
     if (typeof window !== 'undefined') {
-      localStorage.removeItem('armazem-sao-joaquim-auth')
-      localStorage.removeItem('sb-enolssforaepnrpfrima-auth-token')
+      // Clear all auth related localStorage
+      Object.keys(localStorage).forEach(key => {
+        if (key.includes('supabase') || key.includes('auth') || key.includes('armazem')) {
+          localStorage.removeItem(key)
+        }
+      })
       sessionStorage.clear()
-      
-      // Limpar cookies relacionados ao Supabase
-      document.cookie.split(";").forEach(function(c) { 
-        document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); 
-      });
     }
     
-    console.log('✅ Logout forçado realizado')
     return { success: true }
-  } catch (error) {
-    console.error('❌ Erro no logout forçado:', error)
-    return { success: false, error }
+  } catch (error: any) {
+    console.error('Erro no logout forçado:', error)
+    return { success: false, error: error.message }
   }
 }
 
-// Exportar cliente
-export { supabase }
-
-// Função para obter cliente (compatibilidade)
+// Compatibilidade com código existente
 export const getSupabaseClient = () => supabase
-
-// Função para criar cliente mock (para testes)
 export const createMockSupabaseClient = () => createMockClient()
-
-export default supabase

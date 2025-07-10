@@ -3,42 +3,58 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useSupabase } from '@/components/providers/SupabaseProvider'
+import { useAdminApi } from '@/lib/hooks/useAdminApi'
 import { Database } from '@/types/database.types'
+import { useAdmin } from '@/hooks/useAdmin'
 
 type BlogPost = Database['public']['Tables']['blog_posts']['Row']
 
 export default function BlogManagementPage() {
   const { supabase } = useSupabase()
+  const { adminFetch } = useAdminApi()
   const [blogPosts, setBlogPosts] = useState<BlogPost[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const { isAdmin, loading: adminLoading } = useAdmin()
   
-  // Fetch blog posts
+  // Fetch blog posts usando API admin para evitar problemas com RLS
   const fetchBlogPosts = async () => {
     try {
       setLoading(true)
-      const { data, error } = await supabase
-        .from('blog_posts')
-        .select('*')
-        .order('created_at', { ascending: false })
-      
-      if (error) {
-        console.error('Error fetching blog posts:', error)
-        setError('Erro ao carregar posts do blog')
-      } else {
-        setBlogPosts(data || [])
-      }
-    } catch (err) {
-      console.error('Unexpected error:', err)
-      setError('Erro inesperado ao carregar posts')
+      setError(null)
+      // Usar adminFetch para garantir autenticação
+      const data = await adminFetch('/api/admin/blog')
+      setBlogPosts(data.posts || [])
+    } catch (err: any) {
+      setError(err?.message || 'Erro desconhecido ao carregar posts')
+      setBlogPosts([])
     } finally {
       setLoading(false)
     }
   }
 
   useEffect(() => {
-    fetchBlogPosts()
-  }, [supabase])
+    if (!adminLoading && isAdmin) {
+      fetchBlogPosts()
+    }
+  }, [adminLoading, isAdmin])
+
+  if (adminLoading) {
+    return (
+      <div className="flex justify-center items-center min-h-64">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+        <span className="ml-2 text-gray-600">Verificando permissões...</span>
+      </div>
+    )
+  }
+  if (!isAdmin) {
+    return (
+      <div className="bg-red-50 border border-red-200 rounded-lg p-6">
+        <h2 className="text-xl font-semibold text-red-800 mb-2">Acesso negado</h2>
+        <p className="text-red-700">Você não tem permissão para acessar esta página.</p>
+      </div>
+    )
+  }
 
   const handleDelete = async (postId: string, postTitle: string) => {
     if (!confirm(`Tem certeza que deseja excluir o post "${postTitle}"? Esta ação não pode ser desfeita.`)) {
@@ -46,15 +62,9 @@ export default function BlogManagementPage() {
     }
 
     try {
-      const response = await fetch(`/api/admin/blog/${postId}`, {
-        method: 'DELETE',
-        credentials: 'include'
+      await adminFetch(`/api/admin/blog/${postId}`, {
+        method: 'DELETE'
       })
-
-      if (!response.ok) {
-        const data = await response.json()
-        throw new Error(data.error || 'Failed to delete blog post')
-      }
 
       // Refresh the blog posts list
       await fetchBlogPosts()

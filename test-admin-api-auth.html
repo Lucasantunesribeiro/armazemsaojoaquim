@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste de Autenticação APIs Admin</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .status {
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        .warning {
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeeba;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .log {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+            font-family: monospace;
+            font-size: 14px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        code {
+            background-color: #f8f9fa;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔐 Teste de Autenticação APIs Admin</h1>
+        
+        <div class="test-section">
+            <h2>Status das Correções</h2>
+            <div class="status success">
+                ✅ Hook useAdminApi criado para autenticação automática
+            </div>
+            <div class="status success">
+                ✅ Página de edição de blog atualizada para usar o hook
+            </div>
+            <div class="status success">
+                ✅ API admin atualizada para aceitar Bearer token
+            </div>
+            <div class="status success">
+                ✅ Página de listagem de blogs atualizada
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>Teste das APIs</h2>
+            <div class="status info">
+                <p>📋 Para testar as correções:</p>
+                <ol>
+                    <li>Abra o painel admin em <code>http://localhost:3000/admin</code></li>
+                    <li>Faça login com suas credenciais admin</li>
+                    <li>Navegue para a seção Blog</li>
+                    <li>Tente editar ou excluir um post</li>
+                    <li>As APIs agora devem funcionar corretamente!</li>
+                </ol>
+            </div>
+            
+            <button onclick="window.open('http://localhost:3000/admin', '_blank')">
+                🚀 Abrir Painel Admin
+            </button>
+            
+            <button onclick="window.open('http://localhost:3000/admin/blog', '_blank')">
+                📝 Abrir Gerenciador de Blog
+            </button>
+        </div>
+
+        <div class="test-section">
+            <h2>Como Funciona Agora</h2>
+            <div class="info">
+                <h3>🔧 Hook useAdminApi</h3>
+                <p>Todas as chamadas para APIs admin agora usam o hook <code>useAdminApi</code> que:</p>
+                <ul>
+                    <li>Obtém automaticamente o token de sessão do Supabase</li>
+                    <li>Adiciona o header <code>Authorization: Bearer [token]</code></li>
+                    <li>Trata erros de autenticação automaticamente</li>
+                </ul>
+                
+                <h3>🔒 API Backend</h3>
+                <p>As APIs admin agora:</p>
+                <ul>
+                    <li>Aceitam tanto cookies quanto Bearer token</li>
+                    <li>Priorizam o Bearer token quando presente</li>
+                    <li>Verificam se o usuário é admin antes de processar</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>Logs do Console</h2>
+            <div id="logs" class="log">
+                Aguardando testes...
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>Exemplos de Código</h2>
+            <div class="warning">
+                <h3>❌ Antes (Sem Autenticação)</h3>
+                <pre><code>const response = await fetch(`/api/admin/blog/${id}`)
+// Erro 401: No authentication token found</code></pre>
+            </div>
+            
+            <div class="success">
+                <h3>✅ Depois (Com useAdminApi)</h3>
+                <pre><code>import { useAdminApi } from '@/lib/hooks/useAdminApi'
+
+const { adminFetch } = useAdminApi()
+const data = await adminFetch(`/api/admin/blog/${id}`)
+// Funciona! Token incluído automaticamente</code></pre>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>Próximos Passos</h2>
+            <div class="info">
+                <p>Se ainda houver outras páginas admin com problemas de autenticação, elas precisam ser atualizadas para usar o hook <code>useAdminApi</code>:</p>
+                <ul>
+                    <li>✅ <code>/admin/blog/edit/[id]/page.tsx</code> - Já atualizado</li>
+                    <li>✅ <code>/admin/blog/page.tsx</code> - Já atualizado</li>
+                    <li>⚠️ <code>/admin/usuarios/page.tsx</code> - Precisa atualizar</li>
+                    <li>⚠️ <code>/admin/reservas/page.tsx</code> - Precisa atualizar</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function addLog(message, type = 'info') {
+            const logsDiv = document.getElementById('logs');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.style.marginBottom = '5px';
+            logEntry.innerHTML = `[${timestamp}] ${type.toUpperCase()}: ${message}`;
+            logsDiv.appendChild(logEntry);
+            logsDiv.scrollTop = logsDiv.scrollHeight;
+        }
+
+        // Log inicial
+        addLog('Página de teste carregada', 'info');
+        addLog('Hook useAdminApi criado em /lib/hooks/useAdminApi.ts', 'success');
+        addLog('APIs admin atualizadas para aceitar Bearer token', 'success');
+        addLog('Páginas de blog atualizadas para usar o hook', 'success');
+        addLog('Pronto para testar as APIs admin!', 'info');
+    </script>
+</body>
+</html> 

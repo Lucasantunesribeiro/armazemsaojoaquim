@@ -1,12 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
+import { createServerClient } from '@/lib/supabase'
 import { cookies } from 'next/headers'
 
 export async function GET(request: NextRequest) {
   try {
     console.log('🔍 API test-auth: Iniciando teste de autenticação...')
     
-    const supabase = createServerComponentClient({ cookies })
+    const cookieStore = cookies()
+    const supabase = createServerClient(cookieStore)
+    
     const results: any = {}
 
     // 1. Verificar sessão
@@ -93,12 +95,12 @@ export async function GET(request: NextRequest) {
       results.allUsersInTable = { error: error.message }
     }
 
-    // 6. Headers e cookies info
+    // 6. Headers e cookies info  
     const cookieHeader = request.headers.get('cookie')
     results.cookies = {
       hasCookies: !!cookieHeader,
       cookieCount: cookieHeader ? cookieHeader.split(';').length : 0,
-      hasAuthCookie: cookieHeader?.includes('sb-') || false
+      hasAuthCookie: cookieHeader?.includes('armazem-sao-joaquim-auth') || false
     }
 
     console.log('✅ API test-auth: Resultados:', results)

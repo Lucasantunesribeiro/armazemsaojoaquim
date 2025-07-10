@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useSupabase } from '@/components/providers/SupabaseProvider'
 import { Database } from '@/types/database.types'
+import ImageUpload from '@/components/admin/ImageUpload'
 
 type BlogPostInsert = Database['public']['Tables']['blog_posts']['Insert']
 
@@ -96,6 +97,14 @@ export default function NewBlogPostPage() {
     // Form will be submitted with published: false
   }
 
+  // Handler para mudança de imagem
+  const handleImageChange = (imagePath: string) => {
+    setFormData(prev => ({
+      ...prev,
+      featured_image: imagePath
+    }))
+  }
+
   return (
     <div className="max-w-4xl mx-auto">
       <div className="mb-8">
@@ -163,28 +172,11 @@ export default function NewBlogPostPage() {
             </div>
 
             {/* Featured Image */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Imagem de Destaque
-              </label>
-              <input
-                type="url"
-                name="featured_image"
-                value={formData.featured_image || ''}
-                onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white"
-                placeholder="https://..."
-              />
-              {formData.featured_image && (
-                <div className="mt-2">
-                  <img
-                    src={formData.featured_image}
-                    alt="Preview"
-                    className="h-32 w-48 object-cover rounded-md"
-                  />
-                </div>
-              )}
-            </div>
+            <ImageUpload
+              currentImage={formData.featured_image || ''}
+              onImageChange={handleImageChange}
+              label="Imagem de Destaque"
+            />
           </div>
         </div>
 

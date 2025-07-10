@@ -1,213 +1,446 @@
-import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
-import { cookies } from 'next/headers'
-import Link from 'next/link'
-import { Database } from '@/types/database.types'
+'use client'
 
-type MenuItem = Database['public']['Tables']['menu_items']['Row']
-type MenuCategory = Database['public']['Tables']['menu_categories']['Row']
+import { useState, useEffect } from 'react'
+import { useAdminApi } from '@/lib/hooks/useAdminApi'
+import { Plus, Edit, Trash2, Star, Eye, EyeOff } from 'lucide-react'
+import Image from 'next/image'
 
-export default async function MenuManagementPage() {
-  const supabase = createServerComponentClient<Database>({ cookies })
-  
-  // Fetch menu items and categories
-  const { data: menuItems, error: menuError } = await supabase
-    .from('menu_items')
-    .select('*')
-    .order('name')
-  
-  const { data: categories, error: categoriesError } = await supabase
-    .from('menu_categories')
-    .select('*')
-    .order('display_order')
-  
-  if (menuError || categoriesError) {
-    console.error('Error fetching menu data:', menuError || categoriesError)
-  }
-  
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('pt-BR', {
-      style: 'currency',
-      currency: 'BRL'
-    }).format(price)
-  }
-  
-  const getCategoryName = (categoryId: string) => {
-    if (!categories || !Array.isArray(categories)) {
-      return 'Sem categoria'
-    }
+interface MenuItem {
+  id: string
+  name: string
+  description: string
+  price: string
+  category: string
+  available: boolean
+  featured: boolean
+  allergens: string[]
+  image_url?: string
+  created_at: string
+  updated_at: string
+}
+
+interface Category {
+  id: string
+  name: string
+}
+
+export default function AdminMenu() {
+  const { adminFetch } = useAdminApi()
+  const [menuItems, setMenuItems] = useState<MenuItem[]>([])
+  const [categories, setCategories] = useState<Category[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
+  const [showForm, setShowForm] = useState(false)
+  const [editingItem, setEditingItem] = useState<MenuItem | null>(null)
+  const [filter, setFilter] = useState<string>('all')
+
+  // Form data
+  const [formData, setFormData] = useState({
+    name: '',
+    description: '',
+    price: '',
+    category: '',
+    available: true,
+    featured: false,
+    allergens: '',
+    image_url: ''
+  })
+
+  useEffect(() => {
+    loadData()
+  }, [])
+
+  const loadData = async () => {
     try {
-      const category = categories.find((c: any) => c && c.id === categoryId) as any
-      return (category && category.name) ? category.name : 'Sem categoria'
-    } catch {
-      return 'Sem categoria'
+      setLoading(true)
+      setError('')
+      const [itemsData, categoriesData] = await Promise.all([
+        adminFetch('/api/admin/menu'),
+        adminFetch('/api/admin/categorias')
+      ])
+      setMenuItems(itemsData)
+      setCategories(categoriesData)
+    } catch (error) {
+      if (error instanceof Error) setError(error.message)
+      else setError('Erro ao carregar dados')
+    } finally {
+      setLoading(false)
     }
   }
-  
-  return (
-    <div>
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-          Gerenciar Menu
-        </h1>
-        <Link
-          href="/admin/menu/new"
-          className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors flex items-center"
-        >
-          <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-          </svg>
-          Novo Item
-        </Link>
-      </div>
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    try {
+      const submitData = {
+        ...formData,
+        price: parseFloat(formData.price).toFixed(2),
+        allergens: formData.allergens.split(',').map(a => a.trim()).filter(a => a)
+      }
+
+      if (editingItem) {
+        await adminFetch(`/api/admin/menu/${editingItem.id}`, {
+          method: 'PUT',
+          body: JSON.stringify(submitData)
+        })
+      } else {
+        await adminFetch('/api/admin/menu', {
+          method: 'POST',
+          body: JSON.stringify(submitData)
+        })
+      }
       
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        {/* Categories Summary */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-            Categorias
-          </h2>
-          <div className="space-y-2">
-            {(categories && Array.isArray(categories)) ? categories.map((category: any) => (
-              <div key={category.id} className="flex justify-between items-center p-2 bg-gray-50 dark:bg-gray-700 rounded">
-                <span className="text-sm text-gray-900 dark:text-white">{category.name}</span>
-                <span className="text-xs text-gray-500 dark:text-gray-400">
-                  {(menuItems && Array.isArray(menuItems)) ? menuItems.filter((item: any) => item.category === category.id).length : 0} itens
-                </span>
-              </div>
-            )) : (
-              <div className="text-sm text-gray-500 dark:text-gray-400">
-                Nenhuma categoria encontrada
-              </div>
-            )}
-          </div>
-          <Link
-            href="/admin/categories"
-            className="mt-4 block text-center bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white px-4 py-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors text-sm"
-          >
-            Gerenciar Categorias
-          </Link>
+      setShowForm(false)
+      setEditingItem(null)
+      resetForm()
+      loadData()
+    } catch (error) {
+      if (error instanceof Error) setError(error.message)
+      else setError('Erro ao salvar item')
+    }
+  }
+
+  const resetForm = () => {
+    setFormData({
+      name: '',
+      description: '',
+      price: '',
+      category: '',
+      available: true,
+      featured: false,
+      allergens: '',
+      image_url: ''
+    })
+  }
+
+  const handleEdit = (item: MenuItem) => {
+    setEditingItem(item)
+    setFormData({
+      name: item.name,
+      description: item.description,
+      price: item.price,
+      category: item.category,
+      available: item.available,
+      featured: item.featured,
+      allergens: Array.isArray(item.allergens) ? item.allergens.join(', ') : '',
+      image_url: item.image_url || ''
+    })
+    setShowForm(true)
+  }
+
+  const handleDelete = async (id: string) => {
+    if (!confirm('Tem certeza que deseja excluir este item?')) return
+    
+    try {
+      await adminFetch(`/api/admin/menu/${id}`, { method: 'DELETE' })
+      loadData()
+    } catch (error) {
+      if (error instanceof Error) setError(error.message)
+      else setError('Erro ao excluir item')
+    }
+  }
+
+  const toggleAvailable = async (id: string, available: boolean) => {
+    try {
+      await adminFetch(`/api/admin/menu/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify({ available: !available })
+      })
+      loadData()
+    } catch (error) {
+      if (error instanceof Error) setError(error.message)
+      else setError('Erro ao atualizar disponibilidade')
+    }
+  }
+
+  const filteredItems = menuItems.filter(item => {
+    if (filter === 'all') return true
+    if (filter === 'available') return item.available
+    if (filter === 'featured') return item.featured
+    return item.category === filter
+  })
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600 dark:text-gray-400">Carregando menu...</p>
         </div>
-        
-        {/* Menu Items List */}
-        <div className="lg:col-span-3">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
-            <div className="px-6 py-4 bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-                Itens do Menu ({menuItems?.length || 0})
-              </h2>
-            </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex justify-between items-center">
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Menu</h1>
+        <button
+          onClick={() => {
+            setShowForm(true)
+            setEditingItem(null)
+            resetForm()
+          }}
+          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded flex items-center"
+        >
+          <Plus className="h-5 w-5 mr-2" />
+          Novo Item
+        </button>
+      </div>
+
+      {error && (
+        <div className="bg-red-100 dark:bg-red-900 border border-red-400 dark:border-red-600 text-red-700 dark:text-red-300 px-4 py-3 rounded">
+          {error}
+        </div>
+      )}
+
+      {/* Filters */}
+      <div className="flex flex-wrap gap-2">
+        <FilterButton active={filter === 'all'} onClick={() => setFilter('all')} label="Todos" />
+        <FilterButton active={filter === 'available'} onClick={() => setFilter('available')} label="Disponíveis" />
+        <FilterButton active={filter === 'featured'} onClick={() => setFilter('featured')} label="Em Destaque" />
+        {categories.map(cat => (
+          <FilterButton
+            key={cat.id}
+            active={filter === cat.name}
+            onClick={() => setFilter(cat.name)}
+            label={cat.name}
+          />
+        ))}
+      </div>
+
+      {/* Form Modal */}
+      {showForm && (
+        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+          <div className="relative top-10 mx-auto p-5 border max-w-2xl shadow-lg rounded-md bg-white dark:bg-gray-800">
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">
+              {editingItem ? 'Editar Item' : 'Novo Item'}
+            </h3>
             
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-gray-50 dark:bg-gray-700">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                      Item
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                      Categoria
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                      Preço
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                      Status
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                      Ações
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                  {(menuItems && Array.isArray(menuItems)) ? menuItems.map((item: any) => (
-                    <tr key={item.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center">
-                          {item.image_url && (
-                            <div className="flex-shrink-0 h-10 w-10 mr-4">
-                              <img
-                                className="h-10 w-10 rounded-full object-cover"
-                                src={item.image_url}
-                                alt={item.name}
-                              />
-                            </div>
-                          )}
-                          <div>
-                            <div className="text-sm font-medium text-gray-900 dark:text-white">
-                              {item.name}
-                            </div>
-                            <div className="text-sm text-gray-500 dark:text-gray-400 max-w-xs truncate">
-                              {item.description}
-                            </div>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                        {getCategoryName(item.category)}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
-                        {formatPrice(item.price)}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center space-x-2">
-                          <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                            item.available 
-                              ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' 
-                              : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
-                          }`}>
-                            {item.available ? 'Disponível' : 'Indisponível'}
-                          </span>
-                          {item.featured && (
-                            <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
-                              Destaque
-                            </span>
-                          )}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                        <Link
-                          href={`/admin/menu/${item.id}`}
-                          className="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300"
-                        >
-                          Editar
-                        </Link>
-                        <button className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300">
-                          Excluir
-                        </button>
-                      </td>
-                    </tr>
-                  )) : null}
-                </tbody>
-              </table>
-            </div>
-            
-            {(!menuItems || menuItems.length === 0) && (
-              <div className="text-center py-12">
-                <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-                <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-white">
-                  Nenhum item no menu
-                </h3>
-                <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                  Comece adicionando um novo item ao menu.
-                </p>
-                <div className="mt-6">
-                  <Link
-                    href="/admin/menu/new"
-                    className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700"
-                  >
-                    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                    </svg>
-                    Adicionar Item
-                  </Link>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Nome</label>
+                  <input
+                    type="text"
+                    value={formData.name}
+                    onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                    className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    required
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Preço (R$)</label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    value={formData.price}
+                    onChange={(e) => setFormData(prev => ({ ...prev, price: e.target.value }))}
+                    className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    required
+                  />
                 </div>
               </div>
-            )}
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Descrição</label>
+                <textarea
+                  value={formData.description}
+                  onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  rows={3}
+                  required
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Categoria</label>
+                <select
+                  value={formData.category}
+                  onChange={(e) => setFormData(prev => ({ ...prev, category: e.target.value }))}
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  required
+                >
+                  <option value="">Selecione uma categoria</option>
+                  {categories.map(cat => (
+                    <option key={cat.id} value={cat.name}>{cat.name}</option>
+                  ))}
+                </select>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Alérgenos (separados por vírgula)</label>
+                <input
+                  type="text"
+                  value={formData.allergens}
+                  onChange={(e) => setFormData(prev => ({ ...prev, allergens: e.target.value }))}
+                  placeholder="Ex: glúten, laticínios, nozes"
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">URL da Imagem</label>
+                <input
+                  type="url"
+                  value={formData.image_url}
+                  onChange={(e) => setFormData(prev => ({ ...prev, image_url: e.target.value }))}
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                />
+              </div>
+              
+              <div className="flex space-x-4">
+                <label className="flex items-center">
+                  <input
+                    type="checkbox"
+                    checked={formData.available}
+                    onChange={(e) => setFormData(prev => ({ ...prev, available: e.target.checked }))}
+                    className="mr-2"
+                  />
+                  <span className="text-gray-700 dark:text-gray-300">Disponível</span>
+                </label>
+                
+                <label className="flex items-center">
+                  <input
+                    type="checkbox"
+                    checked={formData.featured}
+                    onChange={(e) => setFormData(prev => ({ ...prev, featured: e.target.checked }))}
+                    className="mr-2"
+                  />
+                  <span className="text-gray-700 dark:text-gray-300">Em Destaque</span>
+                </label>
+              </div>
+              
+              <div className="flex justify-end space-x-2">
+                <button
+                  type="button"
+                  onClick={() => setShowForm(false)}
+                  className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-600 rounded-md hover:bg-gray-300 dark:hover:bg-gray-500"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700"
+                >
+                  {editingItem ? 'Atualizar' : 'Criar'}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
+      )}
+
+      {/* Lista de Itens */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {filteredItems.map((item) => (
+          <div key={item.id} className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
+            {item.image_url && (
+              <div className="relative h-48">
+                <Image
+                  src={item.image_url}
+                  alt={item.name}
+                  fill
+                  className="object-cover"
+                  loading="eager"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                />
+                {item.featured && (
+                  <div className="absolute top-2 right-2">
+                    <Star className="h-6 w-6 text-yellow-500 fill-current" />
+                  </div>
+                )}
+              </div>
+            )}
+            
+            <div className="p-4">
+              <div className="flex justify-between items-start mb-2">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{item.name}</h3>
+                <span className="text-lg font-bold text-green-600">
+                  R$ {parseFloat(item.price).toFixed(2)}
+                </span>
+              </div>
+              
+              <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">{item.description}</p>
+              
+              <div className="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400 mb-3">
+                <span className="bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">{item.category}</span>
+                <div className="flex items-center space-x-1">
+                  {item.available ? (
+                    <Eye className="h-4 w-4 text-green-500" />
+                  ) : (
+                    <EyeOff className="h-4 w-4 text-red-500" />
+                  )}
+                  {item.featured && <Star className="h-4 w-4 text-yellow-500" />}
+                </div>
+              </div>
+              
+              {item.allergens && item.allergens.length > 0 && (
+                <div className="mb-3">
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    Alérgenos: {Array.isArray(item.allergens) ? item.allergens.join(', ') : item.allergens}
+                  </p>
+                </div>
+              )}
+              
+              <div className="flex justify-between items-center">
+                <button
+                  onClick={() => toggleAvailable(item.id, item.available)}
+                  className={`text-sm px-3 py-1 rounded ${
+                    item.available 
+                      ? 'bg-red-100 text-red-800 hover:bg-red-200 dark:bg-red-900 dark:text-red-300' 
+                      : 'bg-green-100 text-green-800 hover:bg-green-200 dark:bg-green-900 dark:text-green-300'
+                  }`}
+                >
+                  {item.available ? 'Desabilitar' : 'Habilitar'}
+                </button>
+                
+                <div className="flex space-x-2">
+                  <button
+                    onClick={() => handleEdit(item)}
+                    className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300"
+                  >
+                    <Edit className="h-5 w-5" />
+                  </button>
+                  <button
+                    onClick={() => handleDelete(item.id)}
+                    className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
+                  >
+                    <Trash2 className="h-5 w-5" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
       </div>
+      
+      {filteredItems.length === 0 && (
+        <div className="text-center py-12">
+          <p className="text-gray-500 dark:text-gray-400">Nenhum item encontrado para este filtro</p>
+        </div>
+      )}
     </div>
+  )
+}
+
+// Componente auxiliar
+function FilterButton({ active, onClick, label }: { 
+  active: boolean; 
+  onClick: () => void; 
+  label: string 
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
+        active
+          ? 'bg-blue-500 text-white'
+          : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+      }`}
+    >
+      {label}
+    </button>
   )
 }

@@ -1,96 +1,168 @@
 'use client'
 
+import { createClient } from '@/lib/supabase'
+import { Session, User, AuthChangeEvent } from '@supabase/supabase-js'
 import { createContext, useContext, useEffect, useState } from 'react'
-import { User } from '@supabase/supabase-js'
-import { supabase } from '../../lib/supabase'
 
 interface SupabaseContextType {
   user: User | null
+  session: Session | null
   loading: boolean
-  supabase: typeof supabase
-  isClient: boolean
-  userRole: string | null
   isAdmin: boolean
+  supabase: ReturnType<typeof createClient>
 }
 
-const SupabaseContext = createContext<SupabaseContextType>({
-  user: null,
-  loading: true,
-  supabase,
-  isClient: false,
-  userRole: null,
-  isAdmin: false,
-})
+const SupabaseContext = createContext<SupabaseContextType | undefined>(undefined)
 
-export const useSupabase = () => {
-  const context = useContext(SupabaseContext)
-  if (!context) {
-    throw new Error('useSupabase must be used within SupabaseProvider')
-  }
-  return context
-}
-
-export function SupabaseProvider({ children }: { children: React.ReactNode }) {
+export default function SupabaseProvider({
+  children,
+}: {
+  children: React.ReactNode
+}) {
   const [user, setUser] = useState<User | null>(null)
+  const [session, setSession] = useState<Session | null>(null)
   const [loading, setLoading] = useState(true)
-  const [isClient, setIsClient] = useState(false)
-  const [userRole, setUserRole] = useState<string | null>(null)
   const [isAdmin, setIsAdmin] = useState(false)
+  const supabase = createClient()
+
+  // Function to check admin status using API (bypasses RLS)
+  const checkAdminStatus = async (session: Session) => {
+    try {
+      console.log('🔍 SupabaseProvider: Verificando status admin via API...')
+      
+      const response = await fetch('/api/admin/check-role', {
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`,
+          'Content-Type': 'application/json'
+        }
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        console.log('✅ SupabaseProvider: Status admin recebido:', {
+          isAdmin: data.isAdmin,
+          method: data.method,
+          role: data.role
+        })
+        return data.isAdmin
+      } else {
+        console.log('⚠️ SupabaseProvider: Falha ao verificar admin status:', response.status)
+        
+        // Fallback: check by email
+        const emailAdmin = session.user.email === 'armazemsaojoaquimoficial@gmail.com'
+        console.log('🔄 SupabaseProvider: Usando fallback por email:', emailAdmin)
+        return emailAdmin
+      }
+    } catch (error) {
+      console.error('❌ SupabaseProvider: Erro ao verificar admin status:', error)
+      
+      // Fallback: check by email
+      const emailAdmin = session.user.email === 'armazemsaojoaquimoficial@gmail.com'
+      console.log('🔄 SupabaseProvider: Usando fallback por email após erro:', emailAdmin)
+      return emailAdmin
+    }
+  }
 
   useEffect(() => {
-    setIsClient(true)
-  }, [])
-
-  useEffect(() => {
-    if (!isClient) return
+    console.log('🔍 SupabaseProvider: Inicializando provider...')
 
     // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }: { data: { session: any } }) => {
-      setUser(session?.user ?? null)
-      setLoading(false)
-    }).catch((error: unknown) => {
-      console.error('Erro ao obter sessão:', error)
-      setLoading(false)
-    })
+    const getInitialSession = async () => {
+      try {
+        const { data: { session: initialSession }, error } = await supabase.auth.getSession()
+        
+        console.log('📊 SupabaseProvider: Sessão inicial:', {
+          hasSession: !!initialSession,
+          userEmail: initialSession?.user?.email,
+          userId: initialSession?.user?.id,
+          error: error?.message
+        })
+
+        if (initialSession) {
+          setSession(initialSession)
+          setUser(initialSession.user)
+          
+          // Check admin status using API
+          const adminStatus = await checkAdminStatus(initialSession)
+          setIsAdmin(adminStatus)
+          
+          console.log('✅ SupabaseProvider: Estado inicial definido:', {
+            userEmail: initialSession.user.email,
+            isAdmin: adminStatus
+          })
+        } else {
+          console.log('❌ SupabaseProvider: Nenhuma sessão inicial encontrada')
+        }
+      } catch (error: any) {
+        console.error('❌ SupabaseProvider: Erro ao obter sessão inicial:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    getInitialSession()
 
     // Listen for auth changes
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event: any, session: any) => {
-      setUser(session?.user ?? null)
-      setLoading(false)
-    })
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event: AuthChangeEvent, newSession: Session | null) => {
+        console.log('🔄 SupabaseProvider: Auth state change:', {
+          event,
+          hasSession: !!newSession,
+          userEmail: newSession?.user?.email,
+          userId: newSession?.user?.id
+        })
 
-    return () => subscription.unsubscribe()
-  }, [isClient])
+        setSession(newSession)
+        setUser(newSession?.user ?? null)
+        
+        if (newSession?.user) {
+          // Check admin status using API
+          const adminStatus = await checkAdminStatus(newSession)
+          setIsAdmin(adminStatus)
+          
+          console.log('✅ SupabaseProvider: Estado atualizado:', {
+            event,
+            userEmail: newSession.user.email,
+            isAdmin: adminStatus
+          })
+        } else {
+          setIsAdmin(false)
+          console.log('❌ SupabaseProvider: Usuário deslogado')
+        }
+        
+        setLoading(false)
+      }
+    )
 
-  // Check admin role based on email (since users table doesn't exist)
-  useEffect(() => {
-    if (!user) {
-      setUserRole(null)
-      setIsAdmin(false)
-      return
+    return () => {
+      console.log('🧹 SupabaseProvider: Limpando subscription')
+      subscription.unsubscribe()
     }
-    
-    // Check if user is admin based on email
-    const adminEmails = ['armazemsaojoaquimoficial@gmail.com']
-    const isUserAdmin = adminEmails.includes(user.email || '')
-    
-    console.log('🔍 SupabaseProvider: Verificando admin:', {
-      userEmail: user.email,
-      isUserAdmin,
-      adminEmails
+  }, [supabase])
+
+  // Debug info
+  useEffect(() => {
+    console.log('🔍 SupabaseProvider: Estado atual:', {
+      loading,
+      hasUser: !!user,
+      userEmail: user?.email,
+      userId: user?.id,
+      isAdmin,
+      hasSession: !!session
     })
-    
-    setUserRole(isUserAdmin ? 'admin' : 'user')
-    setIsAdmin(isUserAdmin)
-  }, [user])
+  }, [loading, user, session, isAdmin])
 
   return (
-    <SupabaseContext.Provider value={{ user, loading, supabase, isClient, userRole, isAdmin }}>
+    <SupabaseContext.Provider value={{ user, session, loading, isAdmin, supabase }}>
       {children}
     </SupabaseContext.Provider>
   )
 }
 
-export default SupabaseProvider
+export const useSupabase = () => {
+  const context = useContext(SupabaseContext)
+  if (context === undefined) {
+    throw new Error('useSupabase must be used within a SupabaseProvider')
+  }
+  return context
+}

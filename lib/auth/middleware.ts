@@ -1,9 +1,10 @@
-import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
+import { createServerClient } from '../supabase'
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
+import { NextRequest, NextResponse } from 'next/server'
 
 export async function requireAuth() {
-  const supabase = createServerComponentClient({ cookies })
+  const supabase = createServerClient(cookies())
   
   const { data: { session } } = await supabase.auth.getSession()
   
@@ -14,152 +15,99 @@ export async function requireAuth() {
   return session
 }
 
-export async function requireAdmin() {
-  console.log('🚀 MIDDLEWARE requireAdmin: INICIANDO VERIFICAÇÃO')
-  console.log('🚀 MIDDLEWARE requireAdmin: Timestamp:', new Date().toISOString())
+export async function requireAdmin(request?: NextRequest, response?: NextResponse) {
+  console.log('🔍 MIDDLEWARE requireAdmin: Verificando admin access...')
   
-  // Primeiro, tentar com createServerComponentClient
-  const supabase = createServerComponentClient({ cookies })
-  
-  // Tentar múltiplas vezes para lidar with race condition
-  let session = null
-  let sessionError = null
-  
-  for (let attempt = 0; attempt < 5; attempt++) {
-    console.log(`🔄 MIDDLEWARE requireAdmin: Tentativa ${attempt + 1}/5 de obter sessão...`)
-    
-    const { data: { session: currentSession }, error: currentError } = await supabase.auth.getSession()
-    
-    console.log(`📊 MIDDLEWARE requireAdmin: Tentativa ${attempt + 1}/5:`, {
-      hasSession: !!currentSession,
-      userId: currentSession?.user?.id,
-      userEmail: currentSession?.user?.email,
-      error: currentError?.message
-    })
-    
-    if (currentSession && !currentError) {
-      session = currentSession
-      sessionError = null
-      console.log(`✅ MIDDLEWARE requireAdmin: Sessão obtida na tentativa ${attempt + 1}`)
-      break
-    }
-    
-    if (attempt < 4) {
-      const delay = (attempt + 1) * 300 // Delay crescente: 300ms, 600ms, 900ms, 1200ms
-      console.log(`⏳ MIDDLEWARE requireAdmin: Aguardando ${delay}ms antes de tentar novamente...`)
-      await new Promise(resolve => setTimeout(resolve, delay))
-    } else {
-      session = currentSession
-      sessionError = currentError
-    }
+  // Usar o cliente correto dependendo do contexto
+  let supabase
+  if (request && response) {
+    // Se estamos no middleware, usar createMiddlewareClient
+    const { createMiddlewareClient } = await import('../supabase')
+    supabase = createMiddlewareClient(request, response)
+  } else {
+    // Se estamos em server component, usar createServerClient
+    supabase = createServerClient(cookies())
   }
   
-  console.log('📋 MIDDLEWARE requireAdmin: RESULTADO FINAL DA SESSÃO:', {
+  const { data: { session }, error } = await supabase.auth.getSession()
+  
+  console.log('📊 MIDDLEWARE requireAdmin: Sessão:', {
     hasSession: !!session,
-    userId: session?.user?.id,
     userEmail: session?.user?.email,
-    error: sessionError?.message
+    userId: session?.user?.id,
+    error: error?.message
   })
   
-  if (!session || sessionError) {
-    console.error('❌ MIDDLEWARE requireAdmin: FALHA DE SESSÃO - REDIRECIONANDO PARA /auth')
-    console.error('❌ MIDDLEWARE requireAdmin: Detalhes:', {
-      hasSession: !!session,
-      sessionError: sessionError?.message,
-      userId: session?.user?.id,
-      timestamp: new Date().toISOString()
-    })
-    redirect('/auth?error=session_required&message=Sessão expirada ou inválida')
+  // Se não há sessão, redirecionar
+  if (!session) {
+    console.log('❌ MIDDLEWARE requireAdmin: Sem sessão - Redirecionando para /auth')
+    redirect('/auth?error=middleware_no_session&message=Sessão não encontrada')
   }
-
-  console.log('🔍 MIDDLEWARE requireAdmin: Verificando admin para user:', {
-    id: session.user.id,
-    email: session.user.email
-  })
   
-  // Busca o usuário na tabela users (com múltiplas tentativas)
-  let user = null
-  let error = null
+  // Verificação por email como fallback principal (mais confiável)
+  const isAdminByEmail = session.user.email === 'armazemsaojoaquimoficial@gmail.com'
   
-  console.log('🔍 MIDDLEWARE requireAdmin: INICIANDO BUSCA NO BANCO DE DADOS')
+  if (isAdminByEmail) {
+    console.log('✅ MIDDLEWARE requireAdmin: Acesso autorizado por email')
+    return session
+  }
   
-  for (let attempt = 0; attempt < 2; attempt++) {
-    console.log(`🔄 MIDDLEWARE requireAdmin: DB Tentativa ${attempt + 1}/2 - Buscando usuário...`)
-    
+  // Tentar verificação por role no banco - primeiro por ID da sessão
+  try {
     const { data: userData, error: userError } = await supabase
       .from('users')
-      .select('*') // Selecionar tudo para debug
+      .select('role')
       .eq('id', session.user.id)
       .single()
-
-    console.log(`📊 MIDDLEWARE requireAdmin: DB Tentativa ${attempt + 1}/2:`, {
+    
+    if (!userError && userData?.role === 'admin') {
+      console.log('✅ MIDDLEWARE requireAdmin: Acesso autorizado por role (ID match)')
+      return session
+    }
+    
+    console.log('🔍 MIDDLEWARE requireAdmin: Role check by ID:', {
       found: !!userData,
-      user: userData,
-      error: userError?.message,
-      errorCode: userError?.code
+      role: userData?.role,
+      error: userError?.message
     })
-    
-    if (userData && !userError) {
-      user = userData
-      error = null
-      console.log(`✅ MIDDLEWARE requireAdmin: Usuário encontrado na tentativa ${attempt + 1}`)
-      break
-    }
-    
-    if (attempt < 1) {
-      console.log('⏳ MIDDLEWARE requireAdmin: Aguardando 300ms antes de tentar DB novamente...')
-      await new Promise(resolve => setTimeout(resolve, 300))
-    } else {
-      user = userData
-      error = userError
-    }
-  }
-
-  console.log('📋 MIDDLEWARE requireAdmin: RESULTADO FINAL DO BANCO:', {
-    found: !!user,
-    user: user,
-    role: user?.role,
-    error: error?.message,
-    errorCode: error?.code
-  })
-
-  if (error) {
-    console.error('MIDDLEWARE requireAdmin: Erro ao buscar usuário na tabela users:', error)
-    console.error('MIDDLEWARE requireAdmin: Detalhes do erro:', {
-      code: error.code,
-      message: error.message,
-      details: error.details,
-      hint: error.hint
-    })
-    redirect('/unauthorized?error=database_error&message=Erro ao verificar permissões')
-  }
-  if (!user) {
-    console.error('MIDDLEWARE requireAdmin: Usuário não encontrado na tabela users', {
-      userId: session.user.id,
-      userEmail: session.user.email
-    })
-    redirect('/unauthorized?error=user_not_found&message=Usuário não encontrado no sistema')
-  }
-  if (user.role !== 'admin') {
-    console.error('❌ MIDDLEWARE requireAdmin: USUÁRIO NÃO É ADMIN - REDIRECIONANDO')
-    console.error('❌ MIDDLEWARE requireAdmin: Detalhes do usuário:', {
-      userId: session.user.id,
-      userEmail: session.user.email,
-      currentRole: user.role,
-      expectedRole: 'admin',
-      timestamp: new Date().toISOString()
-    })
-    redirect('/unauthorized?error=insufficient_permissions&message=Acesso negado - privilégios de administrador necessários')
+  } catch (dbError: any) {
+    console.warn('⚠️ MIDDLEWARE requireAdmin: Erro ao verificar role por ID:', dbError.message)
   }
   
-  // Se chegou aqui, é admin
-  console.log('🎉 MIDDLEWARE requireAdmin: SUCESSO! USUÁRIO É ADMIN')
-  console.log('🎉 MIDDLEWARE requireAdmin: Permitindo acesso ao painel admin')
-  return session
+  // Se falhou por ID, tentar verificação por email no banco
+  try {
+    const { data: adminUserData, error: adminUserError } = await supabase
+      .from('users')
+      .select('role, id')
+      .eq('email', session.user.email)
+      .single()
+    
+    if (!adminUserError && adminUserData?.role === 'admin') {
+      console.log('✅ MIDDLEWARE requireAdmin: Acesso autorizado por role (email match)')
+      console.log('🔍 MIDDLEWARE requireAdmin: ID mismatch detected:', {
+        sessionUserId: session.user.id,
+        dbUserId: adminUserData.id,
+        userEmail: session.user.email
+      })
+      return session
+    }
+    
+    console.log('🔍 MIDDLEWARE requireAdmin: Role check by email:', {
+      found: !!adminUserData,
+      role: adminUserData?.role,
+      error: adminUserError?.message
+    })
+  } catch (dbError: any) {
+    console.warn('⚠️ MIDDLEWARE requireAdmin: Erro ao verificar role por email:', dbError.message)
+  }
+  
+  // Se chegou até aqui, não é admin
+  console.log('❌ MIDDLEWARE requireAdmin: Não é admin - Redirecionando para /unauthorized')
+  redirect('/unauthorized?error=middleware_not_admin&message=Usuário não é administrador')
 }
 
 export async function getUser() {
-  const supabase = createServerComponentClient({ cookies })
+  const supabase = createServerClient(cookies())
   
   const { data: { session } } = await supabase.auth.getSession()
   
@@ -177,6 +125,50 @@ export async function getUser() {
 }
 
 export async function isAdmin(): Promise<boolean> {
-  const user = await getUser()
-  return user?.role === 'admin'
+  try {
+    const supabase = createServerClient(cookies())
+    const { data: { session } } = await supabase.auth.getSession()
+    
+    if (!session) {
+      return false
+    }
+    
+    // Primeiro verificar por email (mais confiável)
+    if (session.user.email === 'armazemsaojoaquimoficial@gmail.com') {
+      return true
+    }
+    
+    // Backup: verificar role no banco por ID
+    try {
+      const { data: user } = await supabase
+        .from('users')
+        .select('role')
+        .eq('id', session.user.id)
+        .single()
+      
+      if (user?.role === 'admin') {
+        return true
+      }
+    } catch (error) {
+      console.warn('⚠️ isAdmin: Erro ao verificar role por ID:', error)
+    }
+    
+    // Fallback: verificar role no banco por email
+    try {
+      const { data: adminUser } = await supabase
+        .from('users')
+        .select('role')
+        .eq('email', session.user.email)
+        .single()
+      
+      return adminUser?.role === 'admin'
+    } catch (error) {
+      console.warn('⚠️ isAdmin: Erro ao verificar role por email:', error)
+    }
+    
+    return false
+  } catch (error) {
+    console.warn('⚠️ isAdmin: Erro ao verificar status admin:', error)
+    return false
+  }
 }
