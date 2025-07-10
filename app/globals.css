@@ -547,6 +547,39 @@ body {
   border-radius: 4px;
 }
 
+/* Remove outline dos links da navegação quando clicados */
+nav a:focus:not(:focus-visible) {
+  outline: none !important;
+}
+
+/* Remove outline dos links da navegação apenas no click, mantendo acessibilidade */
+nav a:focus {
+  outline: none !important;
+}
+
+/* Remove outline específico para botões e links clicáveis na navegação */
+nav button:focus:not(:focus-visible),
+nav a:focus:not(:focus-visible),
+header nav a:focus:not(:focus-visible),
+header nav button:focus:not(:focus-visible) {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Mantém o outline apenas para navegação por teclado */
+nav a:focus-visible {
+  outline: 2px solid theme('colors.amber.500');
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Garante que links e botões do header não tenham outline no click */
+header a:focus:not(:focus-visible),
+header button:focus:not(:focus-visible) {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
 /* Enhanced image loading and optimization */
 img {
   max-width: 100%;
