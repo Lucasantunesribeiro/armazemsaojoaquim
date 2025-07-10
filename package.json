@@ -36,6 +36,8 @@
     "diagnose": "node scripts/test-api.js",
     "test:supabase": "node scripts/test-supabase.js",
     "test:email": "node scripts/test-email.js",
+    "test:smtp": "node scripts/test-smtp-configuration.js",
+    "smtp:test": "node scripts/test-smtp-configuration.js",
     "setup:admin": "tsx scripts/setup-admin.ts"
   },
   "engines": {
