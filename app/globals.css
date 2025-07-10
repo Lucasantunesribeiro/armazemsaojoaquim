@@ -1708,3 +1708,262 @@ select:focus {
     --border: #000000;
   }
 }
+
+/* Admin Mobile Optimizations */
+@media (max-width: 768px) {
+  /* Reduce excessive padding in admin layout */
+  .admin-container {
+    padding: 0.75rem !important;
+  }
+
+  /* Optimize admin cards spacing */
+  .admin-card {
+    padding: 1rem !important;
+    margin-bottom: 0.75rem !important;
+  }
+
+  /* Reduce table cell padding */
+  .admin-table td, .admin-table th {
+    padding: 0.5rem !important;
+  }
+
+  /* Optimize form elements spacing */
+  .admin-form .form-group {
+    margin-bottom: 1rem !important;
+  }
+
+  /* Reduce button group spacing */
+  .admin-button-group {
+    gap: 0.5rem !important;
+  }
+
+  /* Optimize stats grid spacing */
+  .admin-stats-grid {
+    gap: 0.75rem !important;
+  }
+
+  /* Compact navbar spacing */
+  .admin-nav {
+    padding: 0.5rem 1rem !important;
+  }
+
+  /* Reduce section spacing */
+  .admin-section {
+    margin-bottom: 1.5rem !important;
+    padding: 1rem !important;
+  }
+
+  /* Optimize modal spacing */
+  .admin-modal {
+    padding: 1rem !important;
+    margin: 1rem !important;
+  }
+
+  /* Compact input spacing */
+  .admin-input, .admin-textarea, .admin-select {
+    padding: 0.5rem 0.75rem !important;
+    margin-bottom: 0.75rem !important;
+  }
+
+  /* Reduce header spacing */
+  .admin-header {
+    padding: 1rem !important;
+    margin-bottom: 1rem !important;
+  }
+
+  /* Optimize sidebar spacing */
+  .admin-sidebar {
+    padding: 0.75rem !important;
+  }
+
+  /* Compact dashboard widgets */
+  .admin-widget {
+    padding: 0.75rem !important;
+    margin-bottom: 0.75rem !important;
+  }
+}
+
+/* Global admin responsiveness improvements */
+@media (max-width: 640px) {
+  /* Force full width on small screens */
+  .admin-full-mobile {
+    width: 100% !important;
+    max-width: none !important;
+  }
+
+  /* Hide decorative elements on mobile */
+  .admin-hide-mobile {
+    display: none !important;
+  }
+
+  /* Stack elements vertically */
+  .admin-stack-mobile {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+
+  /* Reduce text sizes slightly */
+  .admin-text-mobile {
+    font-size: 0.875rem !important;
+    line-height: 1.25rem !important;
+  }
+
+  /* Compact padding for all admin content */
+  [class*="admin-"] {
+    padding-left: min(1rem, 4vw) !important;
+    padding-right: min(1rem, 4vw) !important;
+  }
+}
+
+/* Specific improvements for admin tables */
+@media (max-width: 768px) {
+  .admin-table-container {
+    overflow-x: auto !important;
+    margin: 0 -1rem !important;
+    padding: 0 1rem !important;
+  }
+
+  .admin-table {
+    min-width: 600px !important;
+    font-size: 0.875rem !important;
+  }
+
+  .admin-table th,
+  .admin-table td {
+    padding: 0.5rem 0.25rem !important;
+    white-space: nowrap !important;
+  }
+
+  /* Hide less important columns on mobile */
+  .admin-table .hide-mobile {
+    display: none !important;
+  }
+}
+
+/* Admin form optimizations */
+@media (max-width: 768px) {
+  .admin-form {
+    padding: 1rem !important;
+  }
+
+  .admin-form-row {
+    flex-direction: column !important;
+    gap: 0.75rem !important;
+  }
+
+  .admin-form-group {
+    margin-bottom: 1rem !important;
+  }
+
+  .admin-form-group label {
+    margin-bottom: 0.25rem !important;
+    font-size: 0.875rem !important;
+  }
+
+  .admin-form-group input,
+  .admin-form-group select,
+  .admin-form-group textarea {
+    padding: 0.5rem !important;
+    font-size: 1rem !important; /* Prevent zoom on iOS */
+  }
+
+  .admin-form-actions {
+    flex-direction: column !important;
+    gap: 0.5rem !important;
+    margin-top: 1rem !important;
+  }
+
+  .admin-form-actions button {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+}
+
+/* Admin navigation improvements */
+@media (max-width: 768px) {
+  .admin-nav-mobile {
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 50 !important;
+    background: white !important;
+    border-top: 1px solid #e5e7eb !important;
+    padding: 0.5rem !important;
+  }
+
+  .admin-nav-mobile.dark {
+    background: #1f2937 !important;
+    border-top-color: #374151 !important;
+  }
+
+  .admin-nav-mobile-item {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    padding: 0.25rem !important;
+    font-size: 0.75rem !important;
+    text-align: center !important;
+  }
+
+  .admin-nav-mobile-icon {
+    width: 1.25rem !important;
+    height: 1.25rem !important;
+    margin-bottom: 0.125rem !important;
+  }
+
+  /* Add bottom padding to main content to avoid overlap */
+  .admin-main-mobile {
+    padding-bottom: 4rem !important;
+  }
+}
+
+/* Utility classes for admin responsiveness */
+.admin-responsive-text {
+  font-size: clamp(0.875rem, 2vw, 1rem) !important;
+}
+
+.admin-responsive-padding {
+  padding: clamp(0.5rem, 2vw, 1.5rem) !important;
+}
+
+.admin-responsive-margin {
+  margin: clamp(0.5rem, 2vw, 1rem) !important;
+}
+
+.admin-responsive-gap {
+  gap: clamp(0.5rem, 2vw, 1rem) !important;
+}
+
+/* Fix for common admin spacing issues */
+.admin-compact {
+  padding: 0.75rem !important;
+  margin: 0.5rem 0 !important;
+}
+
+.admin-compact-mobile {
+  @apply admin-compact;
+}
+
+@media (min-width: 768px) {
+  .admin-compact-mobile {
+    padding: 1.5rem !important;
+    margin: 1rem 0 !important;
+  }
+}
+
+/* Admin card improvements */
+.admin-card-mobile {
+  border-radius: 0.5rem !important;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1) !important;
+  margin-bottom: 0.75rem !important;
+  overflow: hidden !important;
+}
+
+@media (max-width: 640px) {
+  .admin-card-mobile {
+    border-radius: 0.375rem !important;
+    margin-left: -0.5rem !important;
+    margin-right: -0.5rem !important;
+  }
+}

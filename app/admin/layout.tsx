@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase'
 import { User, AuthChangeEvent, Session } from '@supabase/supabase-js'
+import { Menu, X } from 'lucide-react'
 
 export default function AdminLayout({
   children,
@@ -105,12 +106,19 @@ export default function AdminLayout({
     } catch (error: any) {
       console.error('❌ AdminLayout: Erro geral:', error)
       
-      // If it's a general error but user email is admin, try to continue
-      if (session?.user?.email === 'armazemsaojoaquimoficial@gmail.com') {
-        console.log('⚠️ AdminLayout: Erro geral mas email é admin - tentando continuar')
-        setUser(session.user)
-        setIsAdmin(true)
-      } else {
+      // Get session again for error handling
+      try {
+        const { data: { session: currentSession } } = await supabase.auth.getSession()
+        
+        // If it's a general error but user email is admin, try to continue
+        if (currentSession?.user?.email === 'armazemsaojoaquimoficial@gmail.com') {
+          console.log('⚠️ AdminLayout: Erro geral mas email é admin - tentando continuar')
+          setUser(currentSession.user)
+          setIsAdmin(true)
+        } else {
+          setError('Erro na autenticação: ' + error.message)
+        }
+      } catch {
         setError('Erro na autenticação: ' + error.message)
       }
     } finally {
@@ -188,21 +196,22 @@ export default function AdminLayout({
     )
   }
 
-  // Renderizar layout admin com navegação
+  // Renderizar layout admin com navegação responsiva
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <AdminNavbar user={user} />
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6 py-4 sm:py-6">
         {children}
       </main>
     </div>
   )
 }
 
-// Navbar do Admin
+// Navbar do Admin Responsiva
 function AdminNavbar({ user }: { user: User }) {
   const router = useRouter()
   const supabase = createClient()
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
 
   const handleLogout = async () => {
     try {
@@ -213,49 +222,129 @@ function AdminNavbar({ user }: { user: User }) {
     }
   }
 
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen)
+  }
+
+  const closeMenu = () => {
+    setIsMenuOpen(false)
+  }
+
   return (
     <nav className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
-          <div className="flex items-center space-x-8">
-            <h1 className="text-xl font-bold text-gray-900 dark:text-white">
-              Admin - Armazém São Joaquim
+      <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6">
+        <div className="flex justify-between items-center h-14 sm:h-16">
+          {/* Logo/Title */}
+          <div className="flex items-center">
+            <h1 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white truncate">
+              <span className="hidden sm:inline">Admin - Armazém São Joaquim</span>
+              <span className="sm:hidden">Admin - Armazém</span>
             </h1>
-            
-            <div className="hidden md:flex space-x-4">
-              <NavLink href="/admin" label="Dashboard" />
-              <NavLink href="/admin/reservas" label="Reservas" />
-              <NavLink href="/admin/usuarios" label="Usuários" />
-              <NavLink href="/admin/menu" label="Menu" />
-              <NavLink href="/admin/blog" label="Blog" />
-            </div>
           </div>
 
-          <div className="flex items-center space-x-4">
-            <span className="text-sm text-gray-600 dark:text-gray-400">
+          {/* Desktop Navigation */}
+          <div className="hidden lg:flex items-center space-x-1">
+            <NavLink href="/admin" label="Dashboard" />
+            <NavLink href="/admin/reservas" label="Reservas" />
+            <NavLink href="/admin/usuarios" label="Usuários" />
+            <NavLink href="/admin/menu" label="Menu" />
+            <NavLink href="/admin/blog" label="Blog" />
+          </div>
+
+          {/* Desktop User Info & Logout */}
+          <div className="hidden md:flex items-center space-x-2 lg:space-x-4">
+            <span className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 truncate max-w-32 lg:max-w-none">
               {user.email}
             </span>
             <button
               onClick={handleLogout}
-              className="bg-red-500 hover:bg-red-700 text-white px-4 py-2 rounded text-sm"
+              className="bg-red-500 hover:bg-red-700 text-white px-3 py-2 rounded text-xs sm:text-sm transition-colors"
             >
               Logout
             </button>
           </div>
+
+          {/* Mobile menu button */}
+          <div className="md:hidden flex items-center space-x-2">
+            <button
+              onClick={toggleMenu}
+              className="p-2 rounded-md text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              aria-label="Menu"
+            >
+              {isMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </button>
+          </div>
+
+          {/* Tablet Navigation (between md and lg) */}
+          <div className="hidden md:flex lg:hidden items-center space-x-1">
+            <NavLink href="/admin" label="Dashboard" compact />
+            <NavLink href="/admin/reservas" label="Reservas" compact />
+            <NavLink href="/admin/usuarios" label="Usuários" compact />
+            <NavLink href="/admin/menu" label="Menu" compact />
+            <NavLink href="/admin/blog" label="Blog" compact />
+          </div>
         </div>
+
+        {/* Mobile Navigation Menu */}
+        {isMenuOpen && (
+          <div className="md:hidden border-t border-gray-200 dark:border-gray-700 py-2">
+            <div className="flex flex-col space-y-1">
+              <MobileNavLink href="/admin" label="Dashboard" onClick={closeMenu} />
+              <MobileNavLink href="/admin/reservas" label="Reservas" onClick={closeMenu} />
+              <MobileNavLink href="/admin/usuarios" label="Usuários" onClick={closeMenu} />
+              <MobileNavLink href="/admin/menu" label="Menu" onClick={closeMenu} />
+              <MobileNavLink href="/admin/blog" label="Blog" onClick={closeMenu} />
+              
+              {/* Mobile User Info */}
+              <div className="border-t border-gray-200 dark:border-gray-700 pt-2 mt-2">
+                <div className="px-3 py-2">
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Logado como:</p>
+                  <p className="text-sm text-gray-700 dark:text-gray-300 truncate">{user.email}</p>
+                </div>
+                <button
+                  onClick={handleLogout}
+                  className="w-full text-left px-3 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                >
+                  Logout
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </nav>
   )
 }
 
-// Link de navegação
-function NavLink({ href, label }: { href: string; label: string }) {
+// Link de navegação desktop/tablet
+function NavLink({ href, label, compact = false }: { href: string; label: string; compact?: boolean }) {
   const router = useRouter()
   
   return (
     <button
       onClick={() => router.push(href)}
-      className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors"
+      className={`text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors ${
+        compact ? 'px-2 py-2 text-xs' : 'px-3 py-2 text-sm'
+      } font-medium`}
+    >
+      {compact && label.length > 8 ? label.substring(0, 8) + '...' : label}
+    </button>
+  )
+}
+
+// Link de navegação mobile
+function MobileNavLink({ href, label, onClick }: { href: string; label: string; onClick: () => void }) {
+  const router = useRouter()
+  
+  const handleClick = () => {
+    router.push(href)
+    onClick()
+  }
+  
+  return (
+    <button
+      onClick={handleClick}
+      className="w-full text-left px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white transition-colors"
     >
       {label}
     </button>

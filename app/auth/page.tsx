@@ -138,21 +138,31 @@ export default function AuthPage() {
       if (error) {
         console.error('❌ Login Error:', error)
         
-        // Detectar conta não confirmada
-        if (error.message?.includes('Email not confirmed') || 
-            error.message?.includes('Invalid login credentials')) {
-          
-          // Verificar se é um email recém-registrado
-          const recentEmail = localStorage.getItem('recent_registration_email')
-          if (recentEmail === data.email) {
-            toast.error('📧 Conta ainda não confirmada!\n\nVerifique seu email e clique no link de confirmação.')
-            setShowResendConfirmation(true)
-            setResendEmail(data.email)
-            return
-          }
+        // Tratar diferentes tipos de erro
+        if (error.message?.includes('Invalid login credentials')) {
+          toast.error('❌ Usuário ou senha incorretos!\n\nVerifique suas credenciais e tente novamente.')
+          return
         }
         
-        toast.error(`Erro no login: ${error.message}`)
+        if (error.message?.includes('Email not confirmed')) {
+          toast.error('📧 Conta ainda não confirmada!\n\nVerifique seu email e clique no link de confirmação.')
+          setShowResendConfirmation(true)
+          setResendEmail(data.email)
+          return
+        }
+        
+        if (error.message?.includes('Too many requests')) {
+          toast.error('⏰ Muitas tentativas de login!\n\nAguarde alguns minutos antes de tentar novamente.')
+          return
+        }
+        
+        if (error.message?.includes('User not found')) {
+          toast.error('❌ Usuário não encontrado!\n\nVerifique o email ou crie uma nova conta.')
+          return
+        }
+        
+        // Erro genérico
+        toast.error(`❌ Erro no login!\n\n${error.message}`)
         return
       }
 
@@ -183,7 +193,7 @@ export default function AuthPage() {
 
     } catch (error) {
       console.error('❌ Erro inesperado no login:', error)
-      toast.error('Erro inesperado. Tente novamente.')
+      toast.error('❌ Erro inesperado!\n\nTente novamente em alguns instantes.')
     } finally {
       setLoading(false)
     }

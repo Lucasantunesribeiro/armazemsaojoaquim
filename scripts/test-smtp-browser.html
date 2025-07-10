@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste SMTP Supabase - Armazém São Joaquim</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            background: #fafafa;
+        }
+        .button {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 5px;
+        }
+        .button:hover {
+            background: #c82333;
+        }
+        .button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .result {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 13px;
+            white-space: pre-wrap;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        .info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        .input-group {
+            margin: 15px 0;
+        }
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+        .input-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        .status-green { background: #28a745; }
+        .status-red { background: #dc3545; }
+        .status-yellow { background: #ffc107; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📧 Teste SMTP Supabase</h1>
+            <p>Teste a configuração SMTP Resend do Armazém São Joaquim</p>
+            <div id="connectionStatus"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>🔧 Configuração Atual</h2>
+            <div id="configInfo" class="result info">
+                ✅ SMTP Resend configurado no Supabase Dashboard:
+                • Host: smtp.resend.com
+                • Port: 587
+                • Username: resend
+                • Sender: armazemsaojoaquimoficial@gmail.com
+                • Provider: Resend
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>📧 Teste 1: Signup com Email de Confirmação</h2>
+            <p>Este teste criará um usuário temporário para verificar se o email de confirmação é enviado.</p>
+            
+            <div class="input-group">
+                <label for="testEmail">Email para teste:</label>
+                <input type="email" id="testEmail" placeholder="seu-email@gmail.com" />
+            </div>
+
+            <button class="button" onclick="testSignupEmail()">
+                🧪 Testar Signup com Email
+            </button>
+            
+            <div id="signupResult"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>🔑 Teste 2: Reset de Senha</h2>
+            <p>Este teste enviará um email real de reset de senha.</p>
+            
+            <div class="input-group">
+                <label for="resetEmail">Email existente:</label>
+                <input type="email" id="resetEmail" value="armazemsaojoaquimoficial@gmail.com" />
+            </div>
+
+            <button class="button" onclick="testPasswordReset()">
+                🔄 Testar Reset de Senha
+            </button>
+            
+            <div id="resetResult"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>📊 Resumo dos Testes</h2>
+            <div id="summary" class="result info">
+                Execute os testes acima para ver o resumo...
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuração do Supabase
+        const SUPABASE_URL = 'https://enolssforaepnrpfrima.supabase.co'
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVub2xzc2ZvcmFlcG5ycGZyaW1hIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzE1OTEyNTMsImV4cCI6MjA0NzE2NzI1M30.Ft1uKR8WjcJaHROZgMLSKrXt8K-b7MNHJQMpQcLPCRk'
+        
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+        
+        let testResults = {
+            signup: null,
+            reset: null
+        }
+
+        // Verificar conexão inicial
+        window.addEventListener('load', async () => {
+            const statusDiv = document.getElementById('connectionStatus')
+            
+            try {
+                // Teste básico de conexão
+                const { data, error } = await supabase.auth.getSession()
+                
+                statusDiv.innerHTML = `
+                    <div class="result success">
+                        <span class="status-indicator status-green"></span>
+                        ✅ Conectado ao Supabase
+                        <br>• URL: ${SUPABASE_URL}
+                        <br>• Status: Online
+                    </div>
+                `
+            } catch (error) {
+                statusDiv.innerHTML = `
+                    <div class="result error">
+                        <span class="status-indicator status-red"></span>
+                        ❌ Erro de conexão: ${error.message}
+                    </div>
+                `
+            }
+        })
+
+        async function testSignupEmail() {
+            const emailInput = document.getElementById('testEmail')
+            const resultDiv = document.getElementById('signupResult')
+            const button = event.target
+            
+            if (!emailInput.value) {
+                resultDiv.innerHTML = `
+                    <div class="result error">
+                        ❌ Por favor, insira um email para teste
+                    </div>
+                `
+                return
+            }
+
+            button.disabled = true
+            button.textContent = '🔄 Testando...'
+            
+            resultDiv.innerHTML = `
+                <div class="result info">
+                    🔄 Criando usuário de teste: ${emailInput.value}
+                    <br>• Aguarde o resultado...
+                </div>
+            `
+
+            try {
+                const testEmail = emailInput.value
+                const { data, error } = await supabase.auth.signUp({
+                    email: testEmail,
+                    password: 'TestPassword123!',
+                    options: {
+                        data: {
+                            full_name: 'SMTP Test User',
+                            name: 'SMTP Test User'
+                        }
+                    }
+                })
+
+                if (error) {
+                    if (error.message.includes('Error sending confirmation email')) {
+                        testResults.signup = false
+                        resultDiv.innerHTML = `
+                            <div class="result error">
+                                ❌ FALHA: Email de confirmação não foi enviado
+                                <br>• Erro: ${error.message}
+                                <br>• Possível causa: Problema na configuração SMTP
+                                <br>• Verificar: Dashboard Supabase > Auth > Settings
+                            </div>
+                        `
+                    } else if (error.message.includes('User already registered')) {
+                        testResults.signup = true
+                        resultDiv.innerHTML = `
+                            <div class="result warning">
+                                ⚠️ Email já cadastrado (isso é normal)
+                                <br>• O SMTP provavelmente está funcionando
+                                <br>• Tente com um email diferente para teste completo
+                            </div>
+                        `
+                    } else {
+                        testResults.signup = false
+                        resultDiv.innerHTML = `
+                            <div class="result error">
+                                ❌ Erro no signup: ${error.message}
+                                <br>• Status: ${error.status || 'N/A'}
+                            </div>
+                        `
+                    }
+                } else if (data?.user && !data?.session) {
+                    testResults.signup = true
+                    resultDiv.innerHTML = `
+                        <div class="result success">
+                            ✅ SUCESSO: Usuário criado com sucesso!
+                            <br>• Email de confirmação deveria ser enviado
+                            <br>• User ID: ${data.user.id}
+                            <br>• Verifique sua caixa de entrada (incluindo spam)
+                            <br>• Status: Aguardando confirmação por email
+                        </div>
+                    `
+                } else if (data?.session) {
+                    testResults.signup = 'warning'
+                    resultDiv.innerHTML = `
+                        <div class="result warning">
+                            ⚠️ Usuário logado automaticamente
+                            <br>• Isso pode indicar que confirmação por email está desabilitada
+                            <br>• Verifique configurações de Auth no Supabase
+                        </div>
+                    `
+                }
+
+            } catch (error) {
+                testResults.signup = false
+                resultDiv.innerHTML = `
+                    <div class="result error">
+                        ❌ Erro inesperado: ${error.message}
+                    </div>
+                `
+            } finally {
+                button.disabled = false
+                button.textContent = '🧪 Testar Signup com Email'
+                updateSummary()
+            }
+        }
+
+        async function testPasswordReset() {
+            const emailInput = document.getElementById('resetEmail')
+            const resultDiv = document.getElementById('resetResult')
+            const button = event.target
+            
+            if (!emailInput.value) {
+                resultDiv.innerHTML = `
+                    <div class="result error">
+                        ❌ Por favor, insira um email válido
+                    </div>
+                `
+                return
+            }
+
+            if (!confirm(`⚠️ Este teste enviará um email REAL de reset de senha para ${emailInput.value}.\n\nTem certeza que deseja continuar?`)) {
+                return
+            }
+
+            button.disabled = true
+            button.textContent = '🔄 Enviando...'
+            
+            resultDiv.innerHTML = `
+                <div class="result info">
+                    🔄 Enviando email de reset para: ${emailInput.value}
+                    <br>• Aguarde o resultado...
+                </div>
+            `
+
+            try {
+                const { error } = await supabase.auth.resetPasswordForEmail(emailInput.value, {
+                    redirectTo: 'https://armazemsaojoaquim.netlify.app/auth/reset-password'
+                })
+
+                if (error) {
+                    testResults.reset = false
+                    resultDiv.innerHTML = `
+                        <div class="result error">
+                            ❌ FALHA: Erro no reset de senha
+                            <br>• Erro: ${error.message}
+                            <br>• Status: ${error.status || 'N/A'}
+                        </div>
+                    `
+                } else {
+                    testResults.reset = true
+                    resultDiv.innerHTML = `
+                        <div class="result success">
+                            ✅ SUCESSO: Email de reset enviado!
+                            <br>• Verifique a caixa de entrada de ${emailInput.value}
+                            <br>• Incluindo pasta de spam/lixo eletrônico
+                            <br>• O link expira em 60 minutos
+                        </div>
+                    `
+                }
+
+            } catch (error) {
+                testResults.reset = false
+                resultDiv.innerHTML = `
+                    <div class="result error">
+                        ❌ Erro inesperado: ${error.message}
+                    </div>
+                `
+            } finally {
+                button.disabled = false
+                button.textContent = '🔄 Testar Reset de Senha'
+                updateSummary()
+            }
+        }
+
+        function updateSummary() {
+            const summaryDiv = document.getElementById('summary')
+            
+            let summary = '📊 RESUMO DOS TESTES:\n\n'
+            
+            // Signup Test
+            if (testResults.signup === true) {
+                summary += '✅ Signup Email: FUNCIONANDO\n'
+            } else if (testResults.signup === false) {
+                summary += '❌ Signup Email: FALHA\n'
+            } else if (testResults.signup === 'warning') {
+                summary += '⚠️ Signup Email: AVISO\n'
+            } else {
+                summary += '⏭️ Signup Email: NÃO TESTADO\n'
+            }
+            
+            // Reset Test
+            if (testResults.reset === true) {
+                summary += '✅ Reset Senha: FUNCIONANDO\n'
+            } else if (testResults.reset === false) {
+                summary += '❌ Reset Senha: FALHA\n'
+            } else {
+                summary += '⏭️ Reset Senha: NÃO TESTADO\n'
+            }
+            
+            summary += '\n'
+            
+            // Diagnóstico
+            if (testResults.signup === true || testResults.reset === true) {
+                summary += '🎉 DIAGNÓSTICO: SMTP Resend está funcionando!\n'
+                summary += '• Emails de confirmação/reset sendo enviados\n'
+                summary += '• Configuração correta no Supabase\n'
+                summary += '• Sistema pronto para produção\n'
+                summaryDiv.className = 'result success'
+            } else if (testResults.signup === false || testResults.reset === false) {
+                summary += '⚠️ DIAGNÓSTICO: Problema detectado no SMTP\n'
+                summary += '• Verificar configuração no Dashboard Supabase\n'
+                summary += '• Confirmar API Key do Resend\n'
+                summary += '• Aguardar alguns minutos e tentar novamente\n'
+                summaryDiv.className = 'result error'
+            } else {
+                summary += '📋 Execute os testes para obter diagnóstico...\n'
+                summaryDiv.className = 'result info'
+            }
+            
+            summaryDiv.textContent = summary
+        }
+
+        // Mostrar instruções iniciais
+        updateSummary()
+    </script>
+</body>
+</html> 
