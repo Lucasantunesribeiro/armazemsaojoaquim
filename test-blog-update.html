@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste de Atualização Blog Post</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        textarea {
+            height: 100px;
+            resize: vertical;
+        }
+        button {
+            background-color: #007cba;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-right: 10px;
+        }
+        button:hover {
+            background-color: #005a87;
+        }
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        .status {
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        .logs {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 15px;
+            margin-top: 20px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .checkbox-group input {
+            width: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Teste de Atualização Blog Post</h1>
+        
+        <div id="status" class="status info">
+            Digite os dados do post e clique em "Testar Atualização" para verificar se a API está funcionando.
+        </div>
+
+        <div class="form-group">
+            <label for="postId">ID do Post:</label>
+            <input type="text" id="postId" value="eba7ad99-df5c-40e8-a3fb-597e7945c4d6" placeholder="UUID do post">
+        </div>
+
+        <div class="form-group">
+            <label for="title">Título:</label>
+            <input type="text" id="title" value="Teste de Atualização" placeholder="Título do post">
+        </div>
+
+        <div class="form-group">
+            <label for="slug">Slug:</label>
+            <input type="text" id="slug" value="teste-de-atualizacao" placeholder="url-amigavel">
+        </div>
+
+        <div class="form-group">
+            <label for="content">Conteúdo:</label>
+            <textarea id="content" placeholder="Conteúdo do post">Este é um teste de atualização do post através da API.
+
+## Seção de Teste
+
+Esta é uma atualização de teste para verificar se a API está funcionando corretamente.
+
+### Logs de Debug
+
+- Verificando autenticação
+- Validando dados
+- Atualizando no banco</textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="excerpt">Resumo:</label>
+            <textarea id="excerpt" style="height: 60px;" placeholder="Resumo do post">Este é um post de teste para verificar a API de atualização.</textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="featuredImage">Imagem de Destaque:</label>
+            <input type="url" id="featuredImage" placeholder="https://...">
+        </div>
+
+        <div class="form-group">
+            <div class="checkbox-group">
+                <input type="checkbox" id="published">
+                <label for="published">Publicado</label>
+            </div>
+        </div>
+
+        <button onclick="login()">1. Fazer Login</button>
+        <button onclick="testGet()">2. Testar GET</button>
+        <button onclick="testUpdate()" id="updateBtn">3. Testar Atualização</button>
+        <button onclick="clearLogs()">Limpar Logs</button>
+
+        <div id="logs" class="logs">Aguardando ação...</div>
+    </div>
+
+    <script>
+        let authToken = null;
+        
+        function log(message) {
+            const logs = document.getElementById('logs');
+            const timestamp = new Date().toLocaleTimeString();
+            logs.textContent += `[${timestamp}] ${message}\n`;
+            logs.scrollTop = logs.scrollHeight;
+        }
+
+        function showStatus(message, type = 'info') {
+            const status = document.getElementById('status');
+            status.className = `status ${type}`;
+            status.textContent = message;
+        }
+
+        function clearLogs() {
+            document.getElementById('logs').textContent = 'Logs limpos...\n';
+        }
+
+        async function login() {
+            log('🔐 Iniciando processo de login...');
+            
+            const email = prompt('Email do admin:', 'armazemsaojoaquimoficial@gmail.com');
+            const password = prompt('Senha:');
+            
+            if (!email || !password) {
+                log('❌ Login cancelado');
+                return;
+            }
+
+            try {
+                log('📡 Fazendo requisição de login...');
+                const response = await fetch('/auth/callback', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: email,
+                        password: password
+                    })
+                });
+
+                log(`📊 Resposta do login: ${response.status} ${response.statusText}`);
+                
+                if (response.ok) {
+                    // Try to get session from supabase
+                    log('✅ Login realizado, obtendo token...');
+                    await getSupabaseSession();
+                } else {
+                    const errorData = await response.text();
+                    log(`❌ Erro no login: ${errorData}`);
+                    showStatus('Erro no login', 'error');
+                }
+            } catch (error) {
+                log(`❌ Erro de rede no login: ${error.message}`);
+                showStatus('Erro de rede no login', 'error');
+            }
+        }
+
+        async function getSupabaseSession() {
+            try {
+                log('🔍 Tentando obter sessão do Supabase...');
+                
+                // Try manual token input as fallback
+                const manualToken = prompt('Cole o token do Supabase aqui (opcional, pode cancelar):');
+                if (manualToken && manualToken.trim()) {
+                    authToken = manualToken.trim();
+                    log('✅ Token manual configurado');
+                    showStatus('Token configurado manualmente', 'success');
+                    return;
+                }
+                
+                log('ℹ️ Para obter o token:');
+                log('1. Abra as DevTools (F12)');
+                log('2. Vá para Application > Local Storage');
+                log('3. Procure por chave do Supabase contendo access_token');
+                log('4. Copie o valor e use no teste');
+                
+                showStatus('Configure o token manualmente para continuar', 'info');
+                
+            } catch (error) {
+                log(`❌ Erro ao obter sessão: ${error.message}`);
+                showStatus('Erro ao obter sessão', 'error');
+            }
+        }
+
+        async function testGet() {
+            const postId = document.getElementById('postId').value;
+            
+            if (!postId) {
+                log('❌ ID do post é obrigatório');
+                showStatus('ID do post é obrigatório', 'error');
+                return;
+            }
+
+            if (!authToken) {
+                log('❌ Token de autenticação necessário. Faça login primeiro.');
+                showStatus('Token necessário. Faça login primeiro.', 'error');
+                return;
+            }
+
+            try {
+                log(`📡 Testando GET para post: ${postId}`);
+                
+                const response = await fetch(`/api/admin/blog/${postId}`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`,
+                        'Content-Type': 'application/json',
+                    }
+                });
+
+                log(`📊 Resposta GET: ${response.status} ${response.statusText}`);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    log('✅ GET bem-sucedido:');
+                    log(JSON.stringify(data, null, 2));
+                    
+                    // Fill form with received data
+                    if (data.post) {
+                        document.getElementById('title').value = data.post.title || '';
+                        document.getElementById('slug').value = data.post.slug || '';
+                        document.getElementById('content').value = data.post.content || '';
+                        document.getElementById('excerpt').value = data.post.excerpt || '';
+                        document.getElementById('featuredImage').value = data.post.featured_image || '';
+                        document.getElementById('published').checked = data.post.published || false;
+                        log('📝 Formulário preenchido com dados do post');
+                    }
+                    
+                    showStatus('GET realizado com sucesso', 'success');
+                } else {
+                    const errorData = await response.json().catch(() => ({}));
+                    log(`❌ Erro no GET: ${JSON.stringify(errorData, null, 2)}`);
+                    showStatus(`Erro no GET: ${response.status}`, 'error');
+                }
+            } catch (error) {
+                log(`❌ Erro de rede no GET: ${error.message}`);
+                showStatus('Erro de rede no GET', 'error');
+            }
+        }
+
+        async function testUpdate() {
+            const postId = document.getElementById('postId').value;
+            const title = document.getElementById('title').value;
+            const slug = document.getElementById('slug').value;
+            const content = document.getElementById('content').value;
+            const excerpt = document.getElementById('excerpt').value;
+            const featuredImage = document.getElementById('featuredImage').value;
+            const published = document.getElementById('published').checked;
+
+            if (!postId || !title || !slug || !content) {
+                log('❌ Campos obrigatórios: ID, Título, Slug e Conteúdo');
+                showStatus('Preencha todos os campos obrigatórios', 'error');
+                return;
+            }
+
+            if (!authToken) {
+                log('❌ Token de autenticação necessário. Faça login primeiro.');
+                showStatus('Token necessário. Faça login primeiro.', 'error');
+                return;
+            }
+
+            const updateData = {
+                title: title,
+                slug: slug,
+                content: content,
+                excerpt: excerpt || null,
+                featured_image: featuredImage || null,
+                published: published
+            };
+
+            try {
+                log('📡 Iniciando teste de atualização...');
+                log('📝 Dados a serem enviados:');
+                log(JSON.stringify(updateData, null, 2));
+                
+                const updateBtn = document.getElementById('updateBtn');
+                updateBtn.disabled = true;
+                updateBtn.textContent = 'Testando...';
+
+                const response = await fetch(`/api/admin/blog/${postId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`,
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(updateData)
+                });
+
+                log(`📊 Resposta da atualização: ${response.status} ${response.statusText}`);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    log('✅ Atualização bem-sucedida!');
+                    log(JSON.stringify(data, null, 2));
+                    showStatus('Post atualizado com sucesso!', 'success');
+                } else {
+                    const errorData = await response.json().catch(async () => {
+                        const text = await response.text();
+                        return { error: 'Response not JSON', body: text };
+                    });
+                    log(`❌ Erro na atualização:`);
+                    log(JSON.stringify(errorData, null, 2));
+                    showStatus(`Erro na atualização: ${response.status}`, 'error');
+                }
+            } catch (error) {
+                log(`❌ Erro de rede na atualização: ${error.message}`);
+                showStatus('Erro de rede na atualização', 'error');
+            } finally {
+                const updateBtn = document.getElementById('updateBtn');
+                updateBtn.disabled = false;
+                updateBtn.textContent = '3. Testar Atualização';
+            }
+        }
+
+        // Auto-generate slug from title
+        document.getElementById('title').addEventListener('input', function(e) {
+            const title = e.target.value;
+            const slug = title
+                .toLowerCase()
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .replace(/[^a-z0-9\s-]/g, '')
+                .replace(/\s+/g, '-')
+                .replace(/-+/g, '-')
+                .trim();
+            document.getElementById('slug').value = slug;
+        });
+
+        log('📋 Página carregada. Siga os passos:');
+        log('1. Faça login');
+        log('2. Teste GET para carregar dados existentes');
+        log('3. Modifique os dados se necessário');
+        log('4. Teste a atualização');
+    </script>
+</body>
+</html> 

@@ -3,7 +3,9 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useSupabase } from '@/components/providers/SupabaseProvider'
+import { useAdminApi } from '@/lib/hooks/useAdminApi'
 import { Database } from '@/types/database.types'
+import ImageUpload from '@/components/admin/ImageUpload'
 
 type BlogPost = Database['public']['Tables']['blog_posts']['Row']
 type BlogPostUpdate = Database['public']['Tables']['blog_posts']['Update']
@@ -15,6 +17,7 @@ interface Props {
 export default function EditBlogPostPage({ params }: Props) {
   const { supabase, user } = useSupabase()
   const router = useRouter()
+  const { adminFetch } = useAdminApi()
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -33,39 +36,9 @@ export default function EditBlogPostPage({ params }: Props) {
     const fetchPost = async () => {
       try {
         console.log('📝 Frontend: Iniciando busca do post para edição...')
-        console.log('📝 Frontend: Cookies disponíveis:', document.cookie.split(';').map(c => c.trim().split('=')[0]))
         
-        const response = await fetch(`/api/admin/blog/${params.id}?t=${Date.now()}`, {
-          credentials: 'include',
-          cache: 'no-store',
-          headers: {
-            'Content-Type': 'application/json',
-          }
-        })
-        
-        console.log('📝 Frontend: Resposta da API:', {
-          status: response.status,
-          statusText: response.statusText,
-          headers: Object.fromEntries(response.headers.entries())
-        })
-        
-        const data = await response.json()
+        const data = await adminFetch(`/api/admin/blog/${params.id}`)
         console.log('📝 Frontend: Dados recebidos:', data)
-
-        if (!response.ok) {
-          console.error('❌ Frontend: Erro na resposta:', {
-            status: response.status,
-            statusText: response.statusText,
-            error: data.error
-          })
-          
-          if (response.status === 401) {
-            console.log('🔄 Frontend: Redirecionando para auth devido a 401...')
-            router.push('/auth?error=unauthorized&message=Faça login para continuar')
-            return
-          }
-          throw new Error(data.error || 'Failed to fetch blog post')
-        }
 
         const postData = data.post
         setPost(postData)
@@ -80,13 +53,19 @@ export default function EditBlogPostPage({ params }: Props) {
       } catch (err) {
         console.error('Error fetching blog post:', err)
         setError(err instanceof Error ? err.message : 'Failed to load blog post')
+        
+        // Se o erro for de sessão, redirecionar para login
+        if (err instanceof Error && (err.message.includes('No active session') || err.message.includes('401'))) {
+          console.log('🔄 Frontend: Redirecionando para auth devido a erro de sessão...')
+          router.push('/auth?error=unauthorized&message=Faça login para continuar')
+        }
       } finally {
         setLoading(false)
       }
     }
 
     fetchPost()
-  }, [params.id])
+  }, [params.id, adminFetch, router])
 
   const generateSlug = (title: string) => {
     return title
@@ -105,30 +84,20 @@ export default function EditBlogPostPage({ params }: Props) {
     setError(null)
 
     try {
-      const response = await fetch(`/api/admin/blog/${params.id}`, {
+      const data = await adminFetch(`/api/admin/blog/${params.id}`, {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
         body: JSON.stringify(formData),
       })
-
-      const data = await response.json()
-
-      if (!response.ok) {
-        if (response.status === 401) {
-          router.push('/auth?error=unauthorized&message=Faça login para continuar')
-          return
-        }
-        throw new Error(data.error || 'Failed to update blog post')
-      }
 
       alert('Post atualizado com sucesso!')
       router.push('/admin/blog')
     } catch (err) {
       console.error('Error updating blog post:', err)
       setError(err instanceof Error ? err.message : 'Failed to update blog post')
+      
+      if (err instanceof Error && (err.message.includes('No active session') || err.message.includes('401'))) {
+        router.push('/auth?error=unauthorized&message=Faça login para continuar')
+      }
     } finally {
       setSaving(false)
     }
@@ -158,26 +127,28 @@ export default function EditBlogPostPage({ params }: Props) {
     }
 
     try {
-      const response = await fetch(`/api/admin/blog/${params.id}`, {
-        method: 'DELETE',
-        credentials: 'include'
+      await adminFetch(`/api/admin/blog/${params.id}`, {
+        method: 'DELETE'
       })
-
-      if (!response.ok) {
-        if (response.status === 401) {
-          router.push('/auth?error=unauthorized&message=Faça login para continuar')
-          return
-        }
-        const data = await response.json()
-        throw new Error(data.error || 'Failed to delete blog post')
-      }
 
       alert('Post excluído com sucesso!')
       router.push('/admin/blog')
     } catch (err) {
       console.error('Error deleting blog post:', err)
       setError(err instanceof Error ? err.message : 'Failed to delete blog post')
+      
+      if (err instanceof Error && (err.message.includes('No active session') || err.message.includes('401'))) {
+        router.push('/auth?error=unauthorized&message=Faça login para continuar')
+      }
     }
+  }
+
+  // Handler para mudança de imagem
+  const handleImageChange = (imagePath: string) => {
+    setFormData(prev => ({
+      ...prev,
+      featured_image: imagePath
+    }))
   }
 
   if (loading) {
@@ -273,28 +244,11 @@ export default function EditBlogPostPage({ params }: Props) {
             </div>
 
             {/* Featured Image */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Imagem de Destaque
-              </label>
-              <input
-                type="url"
-                name="featured_image"
-                value={formData.featured_image}
-                onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white"
-                placeholder="https://..."
-              />
-              {formData.featured_image && (
-                <div className="mt-2">
-                  <img
-                    src={formData.featured_image}
-                    alt="Preview"
-                    className="h-32 w-48 object-cover rounded-md"
-                  />
-                </div>
-              )}
-            </div>
+            <ImageUpload
+              currentImage={formData.featured_image}
+              onImageChange={handleImageChange}
+              label="Imagem de Destaque"
+            />
           </div>
         </div>
 

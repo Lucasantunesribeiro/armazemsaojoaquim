@@ -1,7 +1,7 @@
 'use client'
 
 import { ReactNode } from 'react'
-import { SupabaseProvider } from './SupabaseProvider'
+import SupabaseProvider from './SupabaseProvider'
 import { ThemeProvider } from './ThemeProvider'
 import { MobileMenuProvider } from './MobileMenuProvider'
 

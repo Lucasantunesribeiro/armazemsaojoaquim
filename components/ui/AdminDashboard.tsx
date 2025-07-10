@@ -12,6 +12,7 @@ import {
   Eye, MessageSquare, Heart, Award, Target, Zap, Activity, Shield
 } from 'lucide-react'
 import { useAnalytics } from '@/lib/hooks/useAnalytics'
+import { useAdminApi } from '@/lib/hooks/useAdminApi'
 // import { useReviews } from '@/lib/hooks/useReviews'
 // import { useEvents } from '@/lib/hooks/useEvents'
 // import { useLoyalty } from '@/lib/hooks/useLoyalty'
@@ -472,6 +473,48 @@ export default function AdminDashboard({ className = '' }: AdminDashboardProps) 
     }
   }
 
+  const { adminFetch } = useAdminApi()
+  const [entityCounts, setEntityCounts] = useState({
+    users: null as number | null,
+    reservas: null as number | null,
+    reservasAtivas: null as number | null,
+    menuItems: null as number | null,
+    blogPosts: null as number | null,
+    categories: null as number | null,
+    loading: true
+  })
+
+  useEffect(() => {
+    let isMounted = true
+    async function fetchCounts() {
+      try {
+        // Fetch counts from the updated API endpoints
+        const [users, reservas, reservasAtivas, menuItems, blogPosts, categories] = await Promise.all([
+          adminFetch('/api/admin/users/count'),
+          adminFetch('/api/admin/reservas/count'),
+          adminFetch('/api/admin/reservas/count?status=ativa'),
+          adminFetch('/api/admin/menu/count'),
+          adminFetch('/api/admin/blog/count'),
+          adminFetch('/api/admin/categories/count'),
+        ])
+        if (isMounted) setEntityCounts({
+          users: users.count,
+          reservas: reservas.count,
+          reservasAtivas: reservasAtivas.count,
+          menuItems: menuItems.count,
+          blogPosts: blogPosts.count,
+          categories: categories.count,
+          loading: false
+        })
+      } catch (error) {
+        console.error('Error fetching dashboard counts:', error)
+        if (isMounted) setEntityCounts((prev) => ({ ...prev, loading: false }))
+      }
+    }
+    fetchCounts()
+    return () => { isMounted = false }
+  }, [adminFetch])
+
   const handleRefresh = async () => {
     setRefreshing(true)
     // Simular refresh
@@ -515,6 +558,46 @@ export default function AdminDashboard({ className = '' }: AdminDashboardProps) 
             <Download className="w-4 h-4" />
             Exportar
           </Button>
+        </div>
+      </div>
+
+      {/* Grid de entidades */}
+      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-6 mb-8">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+          <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">Usuários</h3>
+          <p className="text-3xl font-bold text-blue-600 dark:text-blue-400 mt-2">
+            {entityCounts.loading ? <span className="animate-pulse">...</span> : entityCounts.users ?? '-'}
+          </p>
+        </div>
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+          <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">Reservas</h3>
+          <p className="text-3xl font-bold text-green-600 dark:text-green-400 mt-2">
+            {entityCounts.loading ? <span className="animate-pulse">...</span> : entityCounts.reservas ?? '-'}
+          </p>
+        </div>
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+          <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">Reservas Ativas</h3>
+          <p className="text-3xl font-bold text-orange-600 dark:text-orange-400 mt-2">
+            {entityCounts.loading ? <span className="animate-pulse">...</span> : entityCounts.reservasAtivas ?? '-'}
+          </p>
+        </div>
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+          <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">Itens do Menu</h3>
+          <p className="text-3xl font-bold text-purple-600 dark:text-purple-400 mt-2">
+            {entityCounts.loading ? <span className="animate-pulse">...</span> : entityCounts.menuItems ?? '-'}
+          </p>
+        </div>
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+          <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">Posts do Blog</h3>
+          <p className="text-3xl font-bold text-indigo-600 dark:text-indigo-400 mt-2">
+            {entityCounts.loading ? <span className="animate-pulse">...</span> : entityCounts.blogPosts ?? '-'}
+          </p>
+        </div>
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+          <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">Categorias</h3>
+          <p className="text-3xl font-bold text-teal-600 dark:text-teal-400 mt-2">
+            {entityCounts.loading ? <span className="animate-pulse">...</span> : entityCounts.categories ?? '-'}
+          </p>
         </div>
       </div>
 

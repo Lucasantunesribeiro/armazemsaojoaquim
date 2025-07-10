@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useSupabase } from '@/components/providers/SupabaseProvider'
+import { useAdminApi } from '@/lib/hooks/useAdminApi'
 
 type User = {
   id: string
@@ -17,6 +18,7 @@ type User = {
 
 export default function UsersManagementPage() {
   const { supabase } = useSupabase()
+  const { adminFetch } = useAdminApi()
   const [users, setUsers] = useState<User[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -28,25 +30,10 @@ export default function UsersManagementPage() {
   const fetchUsers = async () => {
     try {
       setLoading(true)
+      setError(null)
       
-      // Usar a nova API de admin para buscar usuários
-      const response = await fetch('/api/admin/users', {
-        credentials: 'include'
-      })
-
-      if (!response.ok) {
-        if (response.status === 401) {
-          setError('Não autorizado. Faça login novamente.')
-          return
-        }
-        if (response.status === 403) {
-          setError('Acesso negado. Apenas administradores podem visualizar usuários.')
-          return
-        }
-        throw new Error('Erro ao carregar usuários')
-      }
-
-      const data = await response.json()
+      // Usar adminFetch para requisição autenticada
+      const data = await adminFetch('/api/admin/users')
       
       // Converter profiles em formato de usuário
       const usersList: User[] = (data.users || []).map((profile: any) => ({
@@ -62,7 +49,7 @@ export default function UsersManagementPage() {
       setUsers(usersList)
     } catch (err) {
       console.error('Error fetching users:', err)
-      setError('Erro ao carregar usuários')
+      setError(err instanceof Error ? err.message : 'Erro ao carregar usuários')
     } finally {
       setLoading(false)
     }
