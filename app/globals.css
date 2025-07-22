@@ -2021,3 +2021,111 @@ select:focus {
     transition: none !important;
   }
 }
+
+/* Toast and Notification Animations */
+@keyframes toast-progress {
+  from {
+    width: 100%;
+  }
+  to {
+    width: 0%;
+  }
+}
+
+@keyframes slide-in-right {
+  from {
+    transform: translateX(100%) scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes slide-out-right {
+  from {
+    transform: translateX(0) scale(1);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(100%) scale(0.95);
+    opacity: 0;
+  }
+}
+
+@keyframes modal-backdrop-enter {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes modal-content-enter {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes progress-fill {
+  from {
+    width: 0%;
+  }
+  to {
+    width: 100%;
+  }
+}
+
+.animate-toast-progress {
+  animation: toast-progress linear forwards;
+}
+
+.animate-slide-in-right {
+  animation: slide-in-right 0.3s ease-out forwards;
+}
+
+.animate-slide-out-right {
+  animation: slide-out-right 0.3s ease-in forwards;
+}
+
+.animate-modal-backdrop-enter {
+  animation: modal-backdrop-enter 0.2s ease-out forwards;
+}
+
+.animate-modal-content-enter {
+  animation: modal-content-enter 0.3s ease-out forwards;
+}
+
+.animate-progress-fill {
+  animation: progress-fill linear forwards;
+}
+
+/* Toast responsive adjustments */
+@media (max-width: 640px) {
+  .toast-container {
+    left: 0.5rem !important;
+    right: 0.5rem !important;
+    top: 0.5rem !important;
+    max-width: calc(100vw - 1rem) !important;
+  }
+}
+
+/* Notification system accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .animate-toast-progress,
+  .animate-slide-in-right, 
+  .animate-slide-out-right,
+  .animate-modal-backdrop-enter,
+  .animate-modal-content-enter,
+  .animate-progress-fill {
+    animation: none !important;
+    transition: none !important;
+  }
+}
