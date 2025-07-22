@@ -45,3 +45,12 @@ next-env.d.ts
 # Local Netlify folder
 .netlify
 .env.local
+
+# explicacao.md
+explicacao.md
+
+# claude
+.claude
+
+#cursor
+.cursor
