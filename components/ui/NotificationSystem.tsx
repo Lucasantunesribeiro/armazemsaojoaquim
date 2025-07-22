@@ -2,7 +2,6 @@
 
 import React from 'react'
 import { ToastContainer } from './Toast'
-import WelcomeModal from './WelcomeModal'
 import ProgressModal from './ProgressModal'
 
 /**
@@ -19,7 +18,7 @@ export const NotificationSystem: React.FC = () => {
       <ToastContainer />
       
       {/* Welcome modal for new users */}
-      <WelcomeModal />
+      {/* <WelcomeModal /> */}
       
       {/* Progress modal for long operations */}
       <ProgressModal />
