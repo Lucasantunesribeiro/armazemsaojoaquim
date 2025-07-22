@@ -1,14 +1,13 @@
 'use client'
 
 import React from 'react'
-import { useToast, useAuthMessages, useAdminNotifications, useWelcomeMessage, useNotifications } from '@/components/providers/NotificationProvider'
+import { useToast, useAuthMessages, useAdminNotifications, useNotifications } from '@/components/providers/NotificationProvider'
 import { Bell, Calendar, Users, ChefHat, AlertTriangle, Sparkles } from 'lucide-react'
 
 export default function NotificationsDemoPage() {
   const toast = useToast()
   const authMessages = useAuthMessages()
   const adminNotifications = useAdminNotifications()
-  const { showWelcome } = useWelcomeMessage()
   const { showProgress, hideProgress } = useNotifications()
 
   const testToasts = () => {
@@ -55,25 +54,7 @@ export default function NotificationsDemoPage() {
   }
 
   const testWelcomeModal = () => {
-    showWelcome({
-      show: true,
-      type: 'first-visit',
-      content: {
-        title: '👋 Bem-vindo ao Sistema de Demo!',
-        subtitle: 'Teste das Notificações',
-        message: 'Esta é uma demonstração completa do sistema de notificações implementado.',
-        features: [
-          '🎯 Notificações toast elegantes',
-          '🔔 Central de notificações admin',
-          '💬 Mensagens contextuais de auth',
-          '⭐ Modal de boas-vindas interativo'
-        ],
-        actions: [
-          { label: 'Explorar Dashboard', href: '/admin', variant: 'primary' },
-          { label: 'Ver Documentação', href: '#docs', variant: 'secondary' }
-        ]
-      }
-    })
+    alert('Funcionalidade de boas-vindas foi removida')
   }
 
   const testProgressModal = () => {
