@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase'
 import { User, AuthChangeEvent, Session } from '@supabase/supabase-js'
 import { Menu, X } from 'lucide-react'
+import AdminNotificationCenter from '@/components/ui/AdminNotificationCenter'
 
 export default function AdminLayout({
   children,
@@ -253,6 +254,7 @@ function AdminNavbar({ user }: { user: User }) {
 
           {/* Desktop User Info & Logout */}
           <div className="hidden md:flex items-center space-x-2 lg:space-x-4">
+            <AdminNotificationCenter />
             <span className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 truncate max-w-32 lg:max-w-none">
               {user.email}
             </span>

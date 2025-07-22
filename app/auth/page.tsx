@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import toast from 'react-hot-toast'
+import { useToast, useAuthMessages, useNotifications } from '@/components/providers/NotificationProvider'
 import Button from '../../components/ui/Button'
 import Input from '../../components/ui/Input'
 import { Card, CardContent, CardHeader } from '../../components/ui/Card'
@@ -51,6 +51,9 @@ export default function AuthPage() {
 
   const router = useRouter()
   const supabase = createClient
+  const toast = useToast()
+  const authMessages = useAuthMessages()
+  const { showProgress, hideProgress } = useNotifications()
 
   // Verificar se há erro na URL
   useEffect(() => {
@@ -62,14 +65,14 @@ export default function AuthPage() {
     
     if (error) {
       if (error === 'link_expired') {
-        toast.error('🔗 Link expirado!\n\nO link de redefinição de senha expirou. Solicite um novo link abaixo.')
+        authMessages.error('link_expired', 'O link de redefinição de senha expirou. Solicite um novo link abaixo.')
         setShowForgotPassword(true)
       } else if (error === 'session_required') {
-        toast.error('🔐 Sessão expirada!\n\nFaça login novamente para acessar a área administrativa.')
+        authMessages.error('session_expired', 'Faça login novamente para acessar a área administrativa.')
       } else if (error === 'session_expired') {
-        toast.error('⏰ Sua sessão expirou!\n\nPor favor, faça login novamente.')
+        authMessages.error('session_expired', 'Sua sessão expirou. Por favor, faça login novamente.')
       } else {
-        toast.error(`Erro de autenticação: ${decodeURIComponent(message || error)}`)
+        authMessages.error('server-error', decodeURIComponent(message || error))
       }
       // Limpar o erro da URL
       window.history.replaceState({}, document.title, window.location.pathname)
@@ -140,35 +143,35 @@ export default function AuthPage() {
         
         // Tratar diferentes tipos de erro
         if (error.message?.includes('Invalid login credentials')) {
-          toast.error('❌ Usuário ou senha incorretos!\n\nVerifique suas credenciais e tente novamente.')
+          authMessages.error('invalid-credentials')
           return
         }
         
         if (error.message?.includes('Email not confirmed')) {
-          toast.error('📧 Conta ainda não confirmada!\n\nVerifique seu email e clique no link de confirmação.')
+          authMessages.error('email-not-confirmed')
           setShowResendConfirmation(true)
           setResendEmail(data.email)
           return
         }
         
         if (error.message?.includes('Too many requests')) {
-          toast.error('⏰ Muitas tentativas de login!\n\nAguarde alguns minutos antes de tentar novamente.')
+          authMessages.error('too-many-requests')
           return
         }
         
         if (error.message?.includes('User not found')) {
-          toast.error('❌ Usuário não encontrado!\n\nVerifique o email ou crie uma nova conta.')
+          authMessages.error('user-not-found')
           return
         }
         
         // Erro genérico
-        toast.error(`❌ Erro no login!\n\n${error.message}`)
+        authMessages.error('server-error', error.message)
         return
       }
 
       if (authData.user) {
         console.log('✅ Login realizado com sucesso!')
-        toast.success('🎉 Login realizado com sucesso!')
+        toast.success('Login realizado com sucesso!', '🎉 Bem-vindo!')
         
         // Limpar dados de registro recente
         localStorage.removeItem('recent_registration_email')
@@ -193,7 +196,7 @@ export default function AuthPage() {
 
     } catch (error) {
       console.error('❌ Erro inesperado no login:', error)
-      toast.error('❌ Erro inesperado!\n\nTente novamente em alguns instantes.')
+      authMessages.error('network-error', 'Tente novamente em alguns instantes.')
     } finally {
       setLoading(false)
     }
@@ -201,6 +204,10 @@ export default function AuthPage() {
 
   const handleRegister = async (data: RegisterForm) => {
     setLoading(true)
+    
+    // Iniciar progresso
+    showProgress('creating', 'Preparando sua conta...', 10)
+    
     try {
       // Verificar rate limit ativo
       const rateLimitTimestamp = localStorage.getItem('supabase_rate_limit_timestamp')
@@ -213,7 +220,8 @@ export default function AuthPage() {
         // Se ainda não passou 2 horas e é o mesmo email
         if (hoursWaited < 2 && rateLimitEmail === data.email) {
           const remainingMinutes = Math.ceil((2 * 60) - (timeSinceRateLimit / (1000 * 60)))
-          toast.error(`⏰ Rate limit ativo!\n\nAguarde mais ${remainingMinutes} minutos ou use um email diferente.`)
+          hideProgress()
+          authMessages.error('too-many-requests', `Aguarde mais ${remainingMinutes} minutos ou use um email diferente.`)
           setLoading(false)
           return
         }
@@ -231,6 +239,9 @@ export default function AuthPage() {
         environment: window.location.hostname !== 'localhost' ? 'production' : 'development'
       })
 
+      // Atualizar progresso - criando conta
+      showProgress('creating', 'Criando sua conta...', 30)
+
       // SEMPRE usar signup público para garantir verificação por email
       const { data: authData, error } = await supabase.auth.signUp({
         email: data.email,
@@ -242,6 +253,9 @@ export default function AuthPage() {
           }
         }
       })
+
+      // Atualizar progresso - processando
+      showProgress('sending', 'Processando cadastro...', 60)
 
       if (error) {
         console.error('❌ Registration Error:', error)
