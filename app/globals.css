@@ -1967,3 +1967,57 @@ select:focus {
     margin-right: -0.5rem !important;
   }
 }
+
+/* Dashboard Admin Cards */
+.navigable-stats-card {
+  @apply transition-all duration-200 ease-out;
+  @apply transform-gpu will-change-transform;
+}
+
+.navigable-stats-card:hover {
+  @apply scale-[1.02] -translate-y-1;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.dark .navigable-stats-card:hover {
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+}
+
+.navigable-stats-card:active {
+  @apply scale-[0.98] translate-y-0;
+  transition-duration: 100ms;
+}
+
+.navigable-stats-card:focus {
+  @apply outline-none ring-2 ring-offset-2 ring-blue-500;
+}
+
+.dark .navigable-stats-card:focus {
+  @apply ring-offset-gray-800;
+}
+
+.navigable-stats-card .navigation-indicator {
+  @apply opacity-0 transition-opacity duration-200;
+}
+
+.navigable-stats-card:hover .navigation-indicator {
+  @apply opacity-100;
+}
+
+.navigating-card {
+  @apply opacity-75 scale-[0.98];
+  pointer-events: none;
+}
+
+.card-icon-loading {
+  @apply transition-all duration-200;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .navigable-stats-card,
+  .navigable-stats-card:hover,
+  .navigable-stats-card:active {
+    transform: none !important;
+    transition: none !important;
+  }
+}

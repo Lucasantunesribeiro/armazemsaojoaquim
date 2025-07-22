@@ -13,9 +13,6 @@ export function useAdminApi() {
       throw new Error('No active session')
     }
 
-    console.log('🔐 useAdminApi: Making authenticated request to:', url)
-    console.log('🔑 useAdminApi: Using token:', session.access_token.substring(0, 20) + '...')
-    console.log('🍪 useAdminApi: Document cookies:', document.cookie)
 
     // Preparar headers (não definir Content-Type para FormData)
     const headers: Record<string, string> = {
@@ -36,12 +33,10 @@ export function useAdminApi() {
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}))
-      console.error('❌ useAdminApi: Request failed:', response.status, errorData)
       throw new Error(errorData.error || `HTTP error! status: ${response.status}`)
     }
 
     const data = await response.json()
-    console.log('✅ useAdminApi: Request successful')
     return data
   }, [supabase])
 

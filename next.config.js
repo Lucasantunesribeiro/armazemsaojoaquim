@@ -110,6 +110,9 @@ const nextConfig = {
 
   // Configurações para Netlify
   trailingSlash: false,
+  
+  // Configuração para build
+  output: 'standalone',
 }
 
 module.exports = nextConfig

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { useAdminApi } from '@/lib/hooks/useAdminApi'
 import { Calendar, Clock, Users, Mail, Phone, CheckCircle, AlertCircle, X } from 'lucide-react'
 
@@ -20,10 +21,19 @@ interface Reservation {
 
 export default function AdminReservas() {
   const { adminFetch } = useAdminApi()
+  const searchParams = useSearchParams()
   const [reservas, setReservas] = useState<Reservation[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
-  const [filter, setFilter] = useState<'all' | 'active' | 'today'>('all')
+  const [filter, setFilter] = useState<'all' | 'active' | 'today' | 'pending'>('all')
+
+  // Inicializar filtro baseado nos query parameters
+  useEffect(() => {
+    const filterParam = searchParams.get('filter')
+    if (filterParam && ['today', 'pending', 'active'].includes(filterParam)) {
+      setFilter(filterParam as 'all' | 'active' | 'today' | 'pending')
+    }
+  }, [searchParams])
 
   useEffect(() => {
     loadReservas()
@@ -82,10 +92,25 @@ export default function AdminReservas() {
         return reserva.status === 'confirmada' || reserva.status === 'pendente'
       case 'today':
         return reserva.data === today
+      case 'pending':
+        return reserva.status === 'pendente'
       default:
         return true
     }
   })
+
+  const getFilterTitle = () => {
+    switch (filter) {
+      case 'today':
+        return 'Reservas de Hoje'
+      case 'pending':
+        return 'Reservas Pendentes'
+      case 'active':
+        return 'Reservas Ativas'
+      default:
+        return 'Todas as Reservas'
+    }
+  }
 
   if (loading) {
     return (
@@ -119,7 +144,16 @@ export default function AdminReservas() {
     <div className="space-y-4 sm:space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">Reservas</h1>
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
+            {getFilterTitle()}
+          </h1>
+          {filter !== 'all' && (
+            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+              Filtro aplicado automaticamente via dashboard
+            </p>
+          )}
+        </div>
         <div className="flex flex-wrap gap-2">
           <FilterButton
             active={filter === 'all'}
@@ -135,6 +169,11 @@ export default function AdminReservas() {
             active={filter === 'today'}
             onClick={() => setFilter('today')}
             label="Hoje"
+          />
+          <FilterButton
+            active={filter === 'pending'}
+            onClick={() => setFilter('pending')}
+            label="Pendentes"
           />
         </div>
       </div>
@@ -168,7 +207,7 @@ export default function AdminReservas() {
       </div>
 
       {/* Lista de Reservas */}
-      <div className="bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
         <div className="px-4 sm:px-6 py-4 border-b border-gray-200 dark:border-gray-700">
           <h2 className="text-lg font-medium text-gray-900 dark:text-white">
             {filteredReservas.length} reserva(s) encontrada(s)

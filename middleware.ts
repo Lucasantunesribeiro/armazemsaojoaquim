@@ -5,13 +5,8 @@ import type { NextRequest } from 'next/server'
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
   
-  console.log('🔍 MIDDLEWARE: Iniciando para:', pathname)
-  
   try {
-    // Log cookies disponíveis
     const allCookies = request.cookies.getAll()
-    console.log('🍪 MIDDLEWARE: Total cookies:', allCookies.length)
-    console.log('🍪 MIDDLEWARE: Cookies disponíveis:', allCookies.map(c => `${c.name}: ${c.value.substring(0, 50)}...`))
     
     // Procurar especificamente pelo cookie de sessão
     const sessionCookies = allCookies.filter(c => 
@@ -19,7 +14,6 @@ export async function middleware(request: NextRequest) {
       c.name.includes('sb-') || 
       c.name.includes('supabase')
     )
-    console.log('🍪 MIDDLEWARE: Session cookies encontrados:', sessionCookies.map(c => c.name))
     
     // Create response (this will be modified with cookies)
     const response = NextResponse.next()
@@ -27,39 +21,13 @@ export async function middleware(request: NextRequest) {
     // Create Supabase client with detailed cookie logging
     const supabase = createMiddlewareClient(request, response)
     
-    // Log detalhado antes de getSession
-    console.log('🔍 MIDDLEWARE: Chamando getSession()...')
-    
     // Refresh session if expired - required for Server Components
     const { data: { session }, error } = await supabase.auth.getSession()
     
-    console.log('📊 MIDDLEWARE: Session check detalhado:', {
-      hasSession: !!session,
-      userEmail: session?.user?.email,
-      userId: session?.user?.id,
-      tokenType: session?.token_type,
-      expiresAt: session?.expires_at,
-      error: error?.message,
-      pathname,
-      timestamp: new Date().toISOString()
-    })
-    
-    // Se não há sessão, log mais detalhado
-    if (!session) {
-      console.log('❌ MIDDLEWARE: Sessão não encontrada - detalhes:', {
-        cookieCount: allCookies.length,
-        sessionCookieCount: sessionCookies.length,
-        error: error?.message,
-        pathname
-      })
-    }
     
     // Admin routes protection
     if (pathname.startsWith('/admin')) {
-      console.log('🔐 MIDDLEWARE: Verificando acesso admin para:', pathname)
-      
       if (!session) {
-        console.log('❌ MIDDLEWARE: Sem sessão - Redirecionando para /auth')
         const redirectUrl = request.nextUrl.clone()
         redirectUrl.pathname = '/auth'
         redirectUrl.searchParams.set('message', 'É necessário fazer login para acessar o painel administrativo')
@@ -93,19 +61,16 @@ export async function middleware(request: NextRequest) {
             }
           }
         } catch (dbError) {
-          console.warn('⚠️ MIDDLEWARE: Erro ao verificar role:', dbError)
+          // Silent error handling in production
         }
       }
       
       if (!isAdmin) {
-        console.log('❌ MIDDLEWARE: Usuário não é admin - Redirecionando para /unauthorized')
         const redirectUrl = request.nextUrl.clone()
         redirectUrl.pathname = '/unauthorized'
         redirectUrl.searchParams.set('message', 'Apenas administradores podem acessar esta área')
         return NextResponse.redirect(redirectUrl)
       }
-      
-      console.log('✅ MIDDLEWARE: Acesso admin autorizado para:', session.user.email)
     }
     
     return response

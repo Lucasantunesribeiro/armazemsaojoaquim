@@ -122,16 +122,48 @@ export class EmailService {
         reply_to: reservationData.email, // Permite resposta direta para o cliente
         to: [destinationEmail],
         subject: `🔔 Nova Reserva Confirmada - ${reservationData.nome}`,
-        react: AdminNotification({
-          nome: reservationData.nome,
-          email: reservationData.email,
-          telefone: reservationData.telefone,
-          data: reservationData.data,
-          horario: reservationData.horario,
-          pessoas: reservationData.pessoas,
-          observacoes: reservationData.observacoes,
-          reservationId: reservationData.id,
-        }) as any,
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <div style="background-color: #dc3545; color: white; padding: 20px; text-align: center;">
+              <h1 style="margin: 0; font-size: 24px;">🔔 Nova Reserva Confirmada</h1>
+              <p style="margin: 5px 0 0 0; font-size: 14px; opacity: 0.9;">Armazém São Joaquim - Sistema de Reservas</p>
+            </div>
+            
+            <div style="padding: 30px 20px; background-color: #ffffff;">
+              <div style="background-color: #d4edda; border: 1px solid #c3e6cb; border-radius: 8px; padding: 15px; margin: 0 0 25px 0;">
+                <p style="margin: 0; font-size: 16px; color: #155724; font-weight: bold;">✅ Uma nova reserva foi confirmada pelo cliente!</p>
+              </div>
+              
+              <div style="background-color: #f8f9fa; border: 1px solid #e9ecef; border-radius: 8px; padding: 20px; margin: 20px 0;">
+                <h3 style="color: #dc3545; margin-top: 0;">👤 Dados do Cliente</h3>
+                <ul style="list-style: none; padding: 0; margin: 0;">
+                  <li style="margin-bottom: 10px;"><strong>Nome Completo:</strong> ${reservationData.nome}</li>
+                  <li style="margin-bottom: 10px;"><strong>E-mail:</strong> <a href="mailto:${reservationData.email}" style="color: #007bff; margin-left: 5px;">${reservationData.email}</a></li>
+                  <li style="margin-bottom: 10px;"><strong>Telefone:</strong> <a href="tel:${reservationData.telefone}" style="color: #007bff; margin-left: 5px;">${reservationData.telefone}</a></li>
+                </ul>
+              </div>
+              
+              <div style="background-color: #fff3cd; border: 1px solid #ffeaa7; border-radius: 8px; padding: 20px; margin: 20px 0;">
+                <h3 style="color: #856404; margin-top: 0;">📅 Detalhes da Reserva</h3>
+                <ul style="list-style: none; padding: 0; margin: 0;">
+                  <li style="margin-bottom: 10px;"><strong>📅 Data:</strong> ${new Date(reservationData.data).toLocaleDateString('pt-BR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</li>
+                  <li style="margin-bottom: 10px;"><strong>🕐 Horário:</strong> ${reservationData.horario}</li>
+                  <li style="margin-bottom: 10px;"><strong>👥 Número de Pessoas:</strong> ${reservationData.pessoas} ${reservationData.pessoas === 1 ? 'pessoa' : 'pessoas'}</li>
+                  <li style="margin-bottom: 10px;"><strong>🆔 ID da Reserva:</strong> ${reservationData.id}</li>
+                  ${reservationData.observacoes ? `<li style="margin-bottom: 10px;"><strong>📝 Observações:</strong> ${reservationData.observacoes}</li>` : ''}
+                </ul>
+              </div>
+            </div>
+            
+            <div style="background-color: #f8f9fa; padding: 20px; text-align: center; font-size: 12px; color: #666;">
+              <p style="margin: 0 0 10px 0;">
+                <strong>Sistema de Reservas - Armazém São Joaquim</strong><br/>
+                Este email foi enviado automaticamente quando o cliente confirmou a reserva.
+              </p>
+              <p style="margin: 0;">Data/Hora do envio: ${new Date().toLocaleString('pt-BR')}</p>
+            </div>
+          </div>
+        `,
       });
 
       if (error) {
