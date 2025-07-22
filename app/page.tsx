@@ -1,7 +1,6 @@
 import { Suspense } from 'react'
 import dynamic from 'next/dynamic'
 import { ClientHeroSection } from '@/components/ClientComponents'
-import WelcomeHandler from '@/components/ui/WelcomeHandler'
 
 // Lazy load non-critical sections
 const LazyAboutSection = dynamic(() => import('@/components/sections/AboutSection'), {
@@ -38,9 +37,6 @@ const SectionSeparator = () => (
 export default function HomePage() {
   return (
     <main className="min-h-screen bg-white dark:bg-slate-900">
-      {/* Sistema de boas-vindas */}
-      <WelcomeHandler />
-      
       {/* Hero Section - Tela cheia */}
       <Suspense fallback={<SectionFallback />}>
         <ClientHeroSection />

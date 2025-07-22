@@ -35,21 +35,6 @@ export interface AdminNotification extends Notification {
   category: 'reservation' | 'user' | 'menu' | 'blog' | 'system'
 }
 
-export interface WelcomeMessage {
-  show: boolean
-  type: 'first-visit' | 'returning-user'
-  content: {
-    title: string
-    subtitle?: string
-    message: string
-    features?: string[]
-    actions?: Array<{
-      label: string
-      href: string
-      variant: 'primary' | 'secondary'
-    }>
-  }
-}
 
 interface NotificationContextType {
   // Notifications
@@ -64,11 +49,6 @@ interface NotificationContextType {
   showAdminNotification: (notification: Omit<AdminNotification, 'id' | 'timestamp'>) => string
   removeAdminNotification: (id: string) => void
   clearAdminNotifications: () => void
-  
-  // Welcome Messages
-  welcomeMessage: WelcomeMessage | null
-  showWelcome: (message: WelcomeMessage) => void
-  hideWelcome: () => void
   
   // Auth Messages
   showAuthSuccess: (message: string, action?: { label: string; onClick: () => void }) => void
@@ -90,7 +70,6 @@ interface NotificationProviderProps {
 export function NotificationProvider({ children }: NotificationProviderProps) {
   const [notifications, setNotifications] = useState<Notification[]>([])
   const [adminNotifications, setAdminNotifications] = useState<AdminNotification[]>([])
-  const [welcomeMessage, setWelcomeMessage] = useState<WelcomeMessage | null>(null)
   const [progressState, setProgressState] = useState<{ 
     visible: boolean
     stage: string
@@ -167,17 +146,6 @@ export function NotificationProvider({ children }: NotificationProviderProps) {
     setAdminNotifications([])
   }, [])
 
-  // Welcome messages
-  const showWelcome = useCallback((message: WelcomeMessage) => {
-    setWelcomeMessage(message)
-  }, [])
-
-  const hideWelcome = useCallback(() => {
-    setWelcomeMessage(null)
-    // Mark as seen in localStorage
-    localStorage.setItem('welcome-message-seen', 'true')
-    localStorage.setItem('last-visit', new Date().toISOString())
-  }, [])
 
   // Auth messages
   const authErrorMessages = {
@@ -281,11 +249,6 @@ export function NotificationProvider({ children }: NotificationProviderProps) {
     removeAdminNotification,
     clearAdminNotifications,
     
-    // Welcome messages
-    welcomeMessage,
-    showWelcome,
-    hideWelcome,
-    
     // Auth messages
     showAuthSuccess,
     showAuthError,
@@ -345,60 +308,6 @@ export function useToast() {
   }
 }
 
-export function useWelcomeMessage() {
-  const { welcomeMessage, showWelcome, hideWelcome } = useNotifications()
-  
-  const checkAndShowWelcome = useCallback(() => {
-    const hasSeenWelcome = localStorage.getItem('welcome-message-seen')
-    const lastVisit = localStorage.getItem('last-visit')
-    const isFirstVisit = !hasSeenWelcome
-    
-    if (isFirstVisit) {
-      showWelcome({
-        show: true,
-        type: 'first-visit',
-        content: {
-          title: '👋 Bem-vindo ao Armazém São Joaquim!',
-          subtitle: 'Tradição e Sabor em Santa Teresa',
-          message: 'Há mais de 30 anos servindo a melhor culinária brasileira em um ambiente único e acolhedor.',
-          features: [
-            '🍽️ Cardápio tradicional brasileiro',
-            '📅 Sistema de reservas online', 
-            '🏔️ Vista deslumbrante de Santa Teresa',
-            '👨‍🍳 Pratos preparados com ingredientes frescos'
-          ],
-          actions: [
-            { label: 'Ver Cardápio', href: '/menu', variant: 'primary' },
-            { label: 'Fazer Reserva', href: '/reservas', variant: 'secondary' }
-          ]
-        }
-      })
-    } else if (lastVisit) {
-      const daysSinceLastVisit = Math.floor((Date.now() - new Date(lastVisit).getTime()) / (1000 * 60 * 60 * 24))
-      
-      if (daysSinceLastVisit >= 7) {
-        showWelcome({
-          show: true,
-          type: 'returning-user',
-          content: {
-            title: '😊 Que bom te ver novamente!',
-            message: 'Pronto para mais uma experiência gastronômica única?',
-            actions: [
-              { label: 'Nova Reserva', href: '/reservas', variant: 'primary' }
-            ]
-          }
-        })
-      }
-    }
-  }, [showWelcome])
-  
-  return {
-    welcomeMessage,
-    showWelcome,
-    hideWelcome,
-    checkAndShowWelcome
-  }
-}
 
 export function useAuthMessages() {
   const { showAuthSuccess, showAuthError, showAuthWarning } = useNotifications()
