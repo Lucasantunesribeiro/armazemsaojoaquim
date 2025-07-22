@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { useAdminApi } from '@/lib/hooks/useAdminApi'
 import { 
   Users, 
@@ -12,7 +13,9 @@ import {
   Clock,
   CheckCircle,
   AlertCircle,
-  Plus
+  Plus,
+  ArrowRight,
+  Loader2
 } from 'lucide-react'
 
 interface DashboardStats {
@@ -24,7 +27,17 @@ interface DashboardStats {
   totalMenuItems: number
 }
 
+interface DashboardCard {
+  title: string
+  value: number
+  icon: React.ReactNode
+  route: string
+  description: string
+  color: 'blue' | 'green' | 'yellow' | 'red' | 'purple' | 'orange'
+}
+
 export default function AdminDashboard() {
+  const router = useRouter()
   const { adminFetch } = useAdminApi()
   const [stats, setStats] = useState<DashboardStats>({
     totalUsers: 0,
@@ -36,6 +49,7 @@ export default function AdminDashboard() {
   })
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [navigating, setNavigating] = useState<string | null>(null)
 
   useEffect(() => {
     loadStats()
@@ -55,6 +69,75 @@ export default function AdminDashboard() {
       setLoading(false)
     }
   }
+
+  const handleCardClick = async (route: string, cardTitle: string) => {
+    try {
+      setNavigating(cardTitle)
+      
+      // Pequeno delay para feedback visual
+      await new Promise(resolve => setTimeout(resolve, 150))
+      
+      router.push(route)
+    } catch (error) {
+      console.error('Erro na navegação:', error)
+      setNavigating(null)
+    }
+  }
+
+  // Configuração dos cards com rotas
+  const dashboardCards: DashboardCard[] = [
+    {
+      title: "Usuários",
+      value: stats.totalUsers,
+      icon: <Users className="h-6 w-6" />,
+      route: "/admin/usuarios",
+      description: "Total cadastrados",
+      color: "blue"
+    },
+    {
+      title: "Reservas",
+      value: stats.totalReservas,
+      icon: <Calendar className="h-6 w-6" />,
+      route: "/admin/reservas",
+      description: "Total de reservas",
+      color: "green"
+    },
+    {
+      title: "Hoje",
+      value: stats.reservasHoje,
+      icon: <Clock className="h-6 w-6" />,
+      route: "/admin/reservas?filter=today",
+      description: "Reservas hoje",
+      color: "yellow"
+    },
+    {
+      title: "Pendentes",
+      value: stats.reservasPendentes,
+      icon: <AlertCircle className="h-6 w-6" />,
+      route: "/admin/reservas?filter=pending",
+      description: "Aguardando confirmação",
+      color: "red"
+    }
+  ]
+
+  const contentCards: DashboardCard[] = [
+    {
+      title: "Posts do Blog",
+      value: stats.totalBlogPosts,
+      icon: <FileText className="h-6 w-6" />,
+      route: "/admin/blog",
+      description: "Artigos publicados",
+      color: "purple"
+    },
+    {
+      title: "Itens do Menu",
+      value: stats.totalMenuItems,
+      icon: <ChefHat className="h-6 w-6" />,
+      route: "/admin/menu",
+      description: "Pratos disponíveis",
+      color: "orange"
+    }
+  ]
 
   if (loading) {
     return (
@@ -98,54 +181,37 @@ export default function AdminDashboard() {
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-        <StatsCard
-          title="Usuários"
-          value={stats.totalUsers}
-          icon={<Users className="h-6 w-6" />}
-          color="blue"
-          description="Total cadastrados"
-        />
-        <StatsCard
-          title="Reservas"
-          value={stats.totalReservas}
-          icon={<Calendar className="h-6 w-6" />}
-          color="green"
-          description="Total de reservas"
-        />
-        <StatsCard
-          title="Hoje"
-          value={stats.reservasHoje}
-          icon={<Clock className="h-6 w-6" />}
-          color="yellow"
-          description="Reservas hoje"
-        />
-        <StatsCard
-          title="Pendentes"
-          value={stats.reservasPendentes}
-          icon={<AlertCircle className="h-6 w-6" />}
-          color="red"
-          description="Aguardando confirmação"
-        />
+        {dashboardCards.map((card) => (
+          <NavigableStatsCard
+            key={card.title}
+            title={card.title}
+            value={card.value}
+            icon={card.icon}
+            color={card.color}
+            description={card.description}
+            route={card.route}
+            isNavigating={navigating === card.title}
+            onClick={() => handleCardClick(card.route, card.title)}
+          />
+        ))}
       </div>
 
       {/* Content Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-        <StatsCard
-          title="Posts do Blog"
-          value={stats.totalBlogPosts}
-          icon={<FileText className="h-6 w-6" />}
-          color="purple"
-          description="Artigos publicados"
-          large
-        />
-        <StatsCard
-          title="Itens do Menu"
-          value={stats.totalMenuItems}
-          icon={<ChefHat className="h-6 w-6" />}
-          color="orange"
-          description="Pratos disponíveis"
-          large
-        />
+        {contentCards.map((card) => (
+          <NavigableStatsCard
+            key={card.title}
+            title={card.title}
+            value={card.value}
+            icon={card.icon}
+            color={card.color}
+            description={card.description}
+            route={card.route}
+            isNavigating={navigating === card.title}
+            onClick={() => handleCardClick(card.route, card.title)}
+            large
+          />
+        ))}
       </div>
 
       {/* Quick Actions */}
@@ -217,42 +283,118 @@ export default function AdminDashboard() {
 
 // Components
 
-interface StatsCardProps {
+interface NavigableStatsCardProps {
   title: string
   value: number
   icon: React.ReactNode
   color: 'blue' | 'green' | 'yellow' | 'red' | 'purple' | 'orange'
   description: string
+  route: string
+  isNavigating: boolean
+  onClick: () => void
   large?: boolean
 }
 
-function StatsCard({ title, value, icon, color, description, large }: StatsCardProps) {
+function NavigableStatsCard({ 
+  title, 
+  value, 
+  icon, 
+  color, 
+  description, 
+  route, 
+  isNavigating, 
+  onClick, 
+  large 
+}: NavigableStatsCardProps) {
   const colorClasses = {
-    blue: 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400',
-    green: 'bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400',
-    yellow: 'bg-yellow-50 dark:bg-yellow-900/20 text-yellow-600 dark:text-yellow-400',
-    red: 'bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400',
-    purple: 'bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400',
-    orange: 'bg-orange-50 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400'
+    blue: {
+      icon: 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400',
+      hover: 'hover:bg-blue-50 dark:hover:bg-blue-900/10 hover:border-blue-200 dark:hover:border-blue-700',
+      shadow: 'hover:shadow-blue-100 dark:hover:shadow-blue-900/20'
+    },
+    green: {
+      icon: 'bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400',
+      hover: 'hover:bg-green-50 dark:hover:bg-green-900/10 hover:border-green-200 dark:hover:border-green-700',
+      shadow: 'hover:shadow-green-100 dark:hover:shadow-green-900/20'
+    },
+    yellow: {
+      icon: 'bg-yellow-50 dark:bg-yellow-900/20 text-yellow-600 dark:text-yellow-400',
+      hover: 'hover:bg-yellow-50 dark:hover:bg-yellow-900/10 hover:border-yellow-200 dark:hover:border-yellow-700',
+      shadow: 'hover:shadow-yellow-100 dark:hover:shadow-yellow-900/20'
+    },
+    red: {
+      icon: 'bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400',
+      hover: 'hover:bg-red-50 dark:hover:bg-red-900/10 hover:border-red-200 dark:hover:border-red-700',
+      shadow: 'hover:shadow-red-100 dark:hover:shadow-red-900/20'
+    },
+    purple: {
+      icon: 'bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400',
+      hover: 'hover:bg-purple-50 dark:hover:bg-purple-900/10 hover:border-purple-200 dark:hover:border-purple-700',
+      shadow: 'hover:shadow-purple-100 dark:hover:shadow-purple-900/20'
+    },
+    orange: {
+      icon: 'bg-orange-50 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400',
+      hover: 'hover:bg-orange-50 dark:hover:bg-orange-900/10 hover:border-orange-200 dark:hover:border-orange-700',
+      shadow: 'hover:shadow-orange-100 dark:hover:shadow-orange-900/20'
+    }
+  }
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault()
+      if (!isNavigating) {
+        onClick()
+      }
+    }
   }
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 sm:p-6">
+    <div
+      role="button"
+      tabIndex={0}
+      aria-label={`Navegar para ${title} - ${description}`}
+      title={`Clique para ver ${title}`}
+      className={`
+        navigable-stats-card bg-white dark:bg-gray-800 rounded-lg shadow border border-transparent p-4 sm:p-6
+        cursor-pointer select-none group
+        ${colorClasses[color].hover}
+        ${isNavigating ? 'navigating-card' : ''}
+      `}
+      onClick={onClick}
+      onKeyDown={handleKeyDown}
+    >
       <div className="flex items-center">
-        <div className={`p-2 sm:p-3 rounded-lg ${colorClasses[color]}`}>
-          {icon}
+        <div className={`p-2 sm:p-3 rounded-lg ${colorClasses[color].icon}`}>
+          {isNavigating ? (
+            <Loader2 className="h-6 w-6 animate-spin card-icon-loading" />
+          ) : (
+            icon
+          )}
         </div>
         <div className="ml-3 sm:ml-4 flex-1 min-w-0">
-          <p className="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400 truncate">
-            {title}
-          </p>
-          <p className={`font-bold text-gray-900 dark:text-white ${large ? 'text-2xl sm:text-3xl' : 'text-xl sm:text-2xl'}`}>
+          <div className="flex items-center justify-between">
+            <p className="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400 truncate">
+              {title}
+            </p>
+            <ArrowRight className="h-4 w-4 text-gray-400 dark:text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity duration-200 ml-2" />
+          </div>
+          <p className={`font-bold text-gray-900 dark:text-white transition-all duration-200 ${
+            large ? 'text-2xl sm:text-3xl' : 'text-xl sm:text-2xl'
+          } ${isNavigating ? 'opacity-75' : ''}`}>
             {value}
           </p>
           <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
-            {description}
+            {isNavigating ? 'Carregando...' : description}
           </p>
         </div>
+      </div>
+      
+      {/* Indicador visual de navegação */}
+      <div className="navigation-indicator flex items-center justify-end mt-2 transition-opacity duration-200">
+        <span className="text-xs text-gray-500 dark:text-gray-400 mr-1">
+          Clique para navegar
+        </span>
+        <ArrowRight className="h-3 w-3 text-gray-400 dark:text-gray-500" />
       </div>
     </div>
   )

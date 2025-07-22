@@ -28,7 +28,6 @@ export default function ImageUpload({
     setUploading(true)
 
     try {
-      console.log('🔄 ImageUpload: Iniciando upload:', file.name)
       
       // Criar preview local
       const previewUrl = URL.createObjectURL(file)
@@ -43,7 +42,6 @@ export default function ImageUpload({
         body: formData,
       })
 
-      console.log('✅ ImageUpload: Upload concluído:', response)
       
       // Atualizar com o path final
       setPreview(response.path)
@@ -53,7 +51,6 @@ export default function ImageUpload({
       URL.revokeObjectURL(previewUrl)
 
     } catch (error: any) {
-      console.error('❌ ImageUpload: Erro no upload:', error)
       setError(error.message || 'Erro ao fazer upload da imagem')
       setPreview(currentImage || '')
     } finally {
