@@ -29,27 +29,21 @@ export async function GET(request: NextRequest) {
       }
     )
     
-    // Verificar se é admin
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user || user.user_metadata?.role !== 'admin') {
-      return NextResponse.json(
-        { error: 'Acesso negado' },
-        { status: 403 }
-      )
-    }
-
-    // Chamar função RPC para obter estatísticas
-    const { data: stats, error } = await supabase.rpc('get_dashboard_stats')
+    const { data: rooms, error } = await supabase
+      .from('pousada_rooms')
+      .select('*')
+      .eq('available', true)
+      .order('type', { ascending: true })
 
     if (error) {
-      console.error('Erro ao buscar estatísticas:', error)
+      console.error('Erro ao buscar quartos:', error)
       return NextResponse.json(
-        { error: 'Erro ao carregar estatísticas' },
+        { error: 'Erro ao carregar quartos' },
         { status: 500 }
       )
     }
 
-    return NextResponse.json({ success: true, data: stats })
+    return NextResponse.json(rooms || [])
   } catch (error) {
     console.error('Erro interno:', error)
     return NextResponse.json(

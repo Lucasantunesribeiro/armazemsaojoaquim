@@ -16,10 +16,10 @@ const RESERVATIONS_ENABLED = false
 
 const navLinks: Array<{ name: string; href: string; requiresAuth?: boolean; external?: boolean, target?: string }> = [
   { name: 'Início', href: '/' },
-  { name: 'Acesse o Cardápio', href: '/images/Cardapio.pdf', external: true, target: '_blank' },
-  { name: 'Menu', href: '/menu' },
-  // Temporariamente desabilitado - TODO: Reativar sistema de reservas
-  // { name: 'Reservas', href: '/reservas', requiresAuth: true },
+  { name: 'Restaurante', href: '/menu' },
+  { name: 'Café', href: '/cafe' },
+  { name: 'Pousada', href: '/pousada' },
+  { name: 'Galeria', href: '/galeria' },
   { name: 'Blog', href: '/blog' },
 ]
 

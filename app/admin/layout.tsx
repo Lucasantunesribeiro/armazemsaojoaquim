@@ -249,6 +249,8 @@ function AdminNavbar({ user }: { user: User }) {
             <NavLink href="/admin/reservas" label="Reservas" />
             <NavLink href="/admin/usuarios" label="Usuários" />
             <NavLink href="/admin/menu" label="Menu" />
+            <NavLink href="/admin/pousada" label="Pousada" />
+            <NavLink href="/admin/cafe" label="Café" />
             <NavLink href="/admin/blog" label="Blog" />
           </div>
 
@@ -283,6 +285,8 @@ function AdminNavbar({ user }: { user: User }) {
             <NavLink href="/admin/reservas" label="Reservas" compact />
             <NavLink href="/admin/usuarios" label="Usuários" compact />
             <NavLink href="/admin/menu" label="Menu" compact />
+            <NavLink href="/admin/pousada" label="Pousada" compact />
+            <NavLink href="/admin/cafe" label="Café" compact />
             <NavLink href="/admin/blog" label="Blog" compact />
           </div>
         </div>
@@ -295,6 +299,8 @@ function AdminNavbar({ user }: { user: User }) {
               <MobileNavLink href="/admin/reservas" label="Reservas" onClick={closeMenu} />
               <MobileNavLink href="/admin/usuarios" label="Usuários" onClick={closeMenu} />
               <MobileNavLink href="/admin/menu" label="Menu" onClick={closeMenu} />
+              <MobileNavLink href="/admin/pousada" label="Pousada" onClick={closeMenu} />
+              <MobileNavLink href="/admin/cafe" label="Café" onClick={closeMenu} />
               <MobileNavLink href="/admin/blog" label="Blog" onClick={closeMenu} />
               
               {/* Mobile User Info */}

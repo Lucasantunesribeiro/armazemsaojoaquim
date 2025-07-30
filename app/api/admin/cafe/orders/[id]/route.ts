@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 
-export async function GET(request: NextRequest) {
+export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     const cookieStore = await cookies()
     
@@ -38,18 +38,36 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    // Chamar função RPC para obter estatísticas
-    const { data: stats, error } = await supabase.rpc('get_dashboard_stats')
+    const body = await request.json()
+    const { status } = body
+
+    if (!status) {
+      return NextResponse.json(
+        { error: 'Status é obrigatório' },
+        { status: 400 }
+      )
+    }
+
+    const { data: order, error } = await supabase
+      .from('cafe_orders')
+      .update({ status })
+      .eq('id', params.id)
+      .select()
+      .single()
 
     if (error) {
-      console.error('Erro ao buscar estatísticas:', error)
+      console.error('Erro ao atualizar pedido:', error)
       return NextResponse.json(
-        { error: 'Erro ao carregar estatísticas' },
+        { error: 'Erro ao atualizar pedido' },
         { status: 500 }
       )
     }
 
-    return NextResponse.json({ success: true, data: stats })
+    return NextResponse.json({ 
+      success: true, 
+      order,
+      message: 'Status do pedido atualizado com sucesso!' 
+    })
   } catch (error) {
     console.error('Erro interno:', error)
     return NextResponse.json(

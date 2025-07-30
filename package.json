@@ -41,12 +41,16 @@
     "setup:admin": "tsx scripts/setup-admin.ts"
   },
   "engines": {
-    "node": "20.x",
+    "node": ">=20.x",
     "npm": ">=10.0.0"
   },
   "dependencies": {
     "@emailjs/browser": "^4.4.1",
     "@hookform/resolvers": "3.3.2",
+    "@radix-ui/react-dialog": "^1.0.5",
+    "@radix-ui/react-select": "^2.0.0",
+    "@radix-ui/react-separator": "^1.0.3",
+    "@radix-ui/react-switch": "^1.0.3",
     "@supabase/ssr": "^0.5.2",
     "@supabase/supabase-js": "^2.50.3",
     "@tailwindcss/forms": "0.5.7",
@@ -84,9 +88,10 @@
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^14.3.1",
     "@types/bcryptjs": "^2.4.6",
+    "@types/jest": "^29.5.12",
     "bcryptjs": "^2.4.3",
     "dotenv": "^16.6.1",
-    "eslint": "^8.57.1",
+    "eslint": "^9.0.0",
     "eslint-config-next": "14.0.4",
     "jest": "^29.7.0",
     "tsx": "^4.7.0"

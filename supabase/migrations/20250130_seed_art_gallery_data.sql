@@ -1,0 +1,34 @@
+-- Dados de exemplo para a galeria de arte
+INSERT INTO art_gallery (title, artist, description, price, image_url, category, dimensions, year_created, historical_context, stock_quantity, featured) VALUES
+
+-- Santa Teresa Histórica
+('Bondinho de Santa Teresa', 'Augusto Mota', 'Fotografia histórica do icônico bondinho subindo as ladeiras de Santa Teresa, capturando a essência do transporte que conecta o bairro ao centro da cidade desde 1896.', 450.00, '/images/galeria/bondinho_santa_teresa.jpg', 'SANTA_TERESA_HISTORICA', '40x60cm', 1985, 'O bondinho de Santa Teresa é um dos símbolos mais queridos do Rio de Janeiro. Esta imagem captura não apenas um meio de transporte, mas um pedaço vivo da história carioca.', 3, true),
+
+('Casarão Colonial da Rua Almirante Alexandrino', 'Maria Santos', 'Aquarela detalhada de um dos casarões históricos mais preservados de Santa Teresa, com suas características arquitetônicas coloniais e jardins exuberantes.', 380.00, '/images/galeria/casarao_colonial.jpg', 'SANTA_TERESA_HISTORICA', '50x70cm', 2020, 'Os casarões de Santa Teresa são testemunhas silenciosas da história do Rio. Cada janela, cada portão conta uma história de famílias que ajudaram a construir a identidade do bairro.', 2, true),
+
+('Largo dos Guimarães ao Entardecer', 'João Silva', 'Óleo sobre tela retratando o famoso largo no final da tarde, com suas luzes acendendo e a vida boêmia começando a pulsar pelas ruas de paralelepípedo.', 620.00, '/images/galeria/largo_guimaraes.jpg', 'SANTA_TERESA_HISTORICA', '60x80cm', 2019, 'O Largo dos Guimarães é o coração pulsante de Santa Teresa. Este local concentra a vida cultural e boêmia do bairro, sendo ponto de encontro de artistas e intelectuais.', 1, true),
+
+('Escadaria Selarón Vista de Santa Teresa', 'Carlos Mendoza', 'Perspectiva única da famosa escadaria colorida vista do alto de Santa Teresa, mostrando a conexão visual entre os bairros de Santa Teresa e Lapa.', 520.00, '/images/galeria/escadaria_selaron.jpg', 'SANTA_TERESA_HISTORICA', '45x65cm', 2018, 'A Escadaria Selarón, obra do artista chileno Jorge Selarón, é vista de Santa Teresa como uma ponte colorida entre mundos, conectando a boemia do alto à efervescência da Lapa.', 2, false),
+
+-- Rio Antigo
+('Glória e Flamengo - Anos 1920', 'Arquivo Histórico', 'Fotografia em sépia mostrando a praia do Flamengo e o bairro da Glória nos anos 1920, antes dos aterros que mudaram completamente a paisagem.', 340.00, '/images/galeria/rio_antigo_1920.jpg', 'RIO_ANTIGO', '35x50cm', 1920, 'Esta imagem nos transporta para um Rio de Janeiro que poucos conheceram. As praias ainda selvagens e os morros ainda cobertos de mata atlântica mostram uma cidade em transformação.', 4, false),
+
+('Mercado da Praça XV', 'Fotografias Maltez', 'Registro histórico do antigo mercado da Praça XV, com seus comerciantes e a movimentação típica do centro comercial do Rio Imperial.', 290.00, '/images/galeria/mercado_praca_xv.jpg', 'RIO_ANTIGO', '30x40cm', 1930, 'O mercado da Praça XV era o coração comercial do Rio Imperial. Aqui se encontravam produtos de todo o Brasil e do mundo, trazidos pelos navios que atracavam no porto.', 3, false),
+
+('Bonde na Rua Carioca', 'Coleção Particular', 'Fotografia de um bonde circulando pela Rua Carioca no centro do Rio, mostrando o movimento urbano e a arquitetura da época.', 410.00, '/images/galeria/bonde_rua_carioca.jpg', 'RIO_ANTIGO', '40x55cm', 1925, 'Os bondes eram a alma do transporte carioca. Esta imagem captura não apenas um meio de locomoção, mas todo um modo de vida urbano que definia o ritmo da cidade.', 2, true),
+
+-- Arte Contemporânea
+('Santa Teresa em Cores Vibrantes', 'Ana Beatriz', 'Interpretação contemporânea das ladeiras de Santa Teresa usando técnica mista com cores vibrantes que contrastam com o cinza urbano.', 680.00, '/images/galeria/santa_teresa_cores.jpg', 'ARTE_CONTEMPORANEA', '70x90cm', 2023, 'Esta obra busca capturar a energia e a criatividade que pulsa pelas ruas de Santa Teresa, transformando o cotidiano em arte através de cores que saltam da tela.', 1, true),
+
+('Fragmentos de Memória', 'Roberto Amaral', 'Colagem digital que mistura fotografias antigas de Santa Teresa com elementos gráficos contemporâneos, criando uma narrativa visual sobre tempo e memória.', 550.00, '/images/galeria/fragmentos_memoria.jpg', 'ARTE_CONTEMPORANEA', '50x70cm', 2022, 'Esta obra questiona como construímos nossas memórias urbanas, misturando o passado histórico com a percepção contemporânea do espaço.', 2, false),
+
+('Música nas Ruas', 'Fernanda Costa', 'Acrílico sobre tela inspirado na vida musical de Santa Teresa, com instrumentos e notas musicais se misturando à arquitetura do bairro.', 720.00, '/images/galeria/musica_ruas.jpg', 'ARTE_CONTEMPORANEA', '60x80cm', 2021, 'Santa Teresa sempre foi berço de artistas e músicos. Esta obra celebra a tradição musical do bairro, onde cada esquina pode se transformar em palco.', 1, false),
+
+-- Retratos do Bairro
+('Seu José do Bar da Esquina', 'Pedro Oliveira', 'Retrato em óleo de Seu José, figura conhecida de Santa Teresa que por décadas serviu cafezinho e conversas aos moradores do bairro.', 480.00, '/images/galeria/seu_jose_bar.jpg', 'RETRATOS_BAIRRO', '40x50cm', 2020, 'Seu José representa a alma acolhedora de Santa Teresa. Por décadas, seu bar foi ponto de encontro onde se discutia desde futebol até política, sempre regado a muito café.', 1, true),
+
+('Dona Maria das Flores', 'Lúcia Tavares', 'Aquarela retratando Dona Maria, vendedora de flores no Largo dos Guimarães, com seu sorriso característico e as flores coloridas que alegram o dia dos passantes.', 360.00, '/images/galeria/dona_maria_flores.jpg', 'RETRATOS_BAIRRO', '35x45cm', 2019, 'Dona Maria é parte da paisagem de Santa Teresa há mais de 20 anos. Suas flores não apenas decoram o largo, mas trazem alegria e cor para a vida de quem passa.', 2, false),
+
+('O Artista de Rua', 'Miguel Santos', 'Carvão sobre papel retratando um dos muitos artistas de rua que fazem de Santa Teresa seu ateliê a céu aberto.', 320.00, '/images/galeria/artista_rua.jpg', 'RETRATOS_BAIRRO', '30x40cm', 2021, 'Este retrato captura a essência criativa de Santa Teresa, onde a arte não se limita às galerias, mas transborda pelas ruas e praças do bairro.', 3, false),
+
+('Família na Janela', 'Teresa Gonzalez', 'Fotografia em preto e branco de uma família observando o movimento da rua de sua janela colonial, mostrando a intimidade da vida no bairro.', 280.00, '/images/galeria/familia_janela.jpg', 'RETRATOS_BAIRRO', '25x35cm', 2018, 'As janelas de Santa Teresa são como molduras que emolduram a vida cotidiana. Esta imagem captura um momento íntimo da vida familiar no bairro.', 4, false);

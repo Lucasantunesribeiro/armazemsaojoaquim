@@ -38,18 +38,20 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    // Chamar função RPC para obter estatísticas
-    const { data: stats, error } = await supabase.rpc('get_dashboard_stats')
+    const { data: orders, error } = await supabase
+      .from('cafe_orders')
+      .select('*')
+      .order('created_at', { ascending: false })
 
     if (error) {
-      console.error('Erro ao buscar estatísticas:', error)
+      console.error('Erro ao buscar pedidos:', error)
       return NextResponse.json(
-        { error: 'Erro ao carregar estatísticas' },
+        { error: 'Erro ao carregar pedidos' },
         { status: 500 }
       )
     }
 
-    return NextResponse.json({ success: true, data: stats })
+    return NextResponse.json(orders || [])
   } catch (error) {
     console.error('Erro interno:', error)
     return NextResponse.json(

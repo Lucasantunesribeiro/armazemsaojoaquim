@@ -29,27 +29,22 @@ export async function GET(request: NextRequest) {
       }
     )
     
-    // Verificar se é admin
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user || user.user_metadata?.role !== 'admin') {
-      return NextResponse.json(
-        { error: 'Acesso negado' },
-        { status: 403 }
-      )
-    }
-
-    // Chamar função RPC para obter estatísticas
-    const { data: stats, error } = await supabase.rpc('get_dashboard_stats')
+    const { data: products, error } = await supabase
+      .from('cafe_products')
+      .select('*')
+      .eq('available', true)
+      .order('category', { ascending: true })
+      .order('name', { ascending: true })
 
     if (error) {
-      console.error('Erro ao buscar estatísticas:', error)
+      console.error('Erro ao buscar produtos:', error)
       return NextResponse.json(
-        { error: 'Erro ao carregar estatísticas' },
+        { error: 'Erro ao carregar produtos' },
         { status: 500 }
       )
     }
 
-    return NextResponse.json({ success: true, data: stats })
+    return NextResponse.json(products || [])
   } catch (error) {
     console.error('Erro interno:', error)
     return NextResponse.json(

@@ -4,7 +4,7 @@ import { forwardRef } from 'react'
 import { cn } from '../../lib/utils'
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'outline' | 'ghost'
+  variant?: 'default' | 'primary' | 'secondary' | 'outline' | 'ghost'
   size?: 'sm' | 'md' | 'lg'
   loading?: boolean
   children: React.ReactNode
@@ -27,6 +27,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     const baseClasses = 'inline-flex items-center justify-center font-medium rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer border-0 text-center relative overflow-hidden touch-manipulation'
     
     const variants = {
+      default: 'bg-amarelo-armazem text-madeira-escura hover:bg-yellow-500 focus:ring-amarelo-armazem shadow-md hover:shadow-lg active:bg-yellow-600 active:transform active:scale-95 dark:bg-amber-500 dark:hover:bg-amber-600 dark:text-white',
       primary: 'bg-amarelo-armazem text-madeira-escura hover:bg-yellow-500 focus:ring-amarelo-armazem shadow-md hover:shadow-lg active:bg-yellow-600 active:transform active:scale-95 dark:bg-amber-500 dark:hover:bg-amber-600 dark:text-white',
       secondary: 'bg-madeira-escura text-white hover:bg-amber-900 focus:ring-madeira-escura shadow-md hover:shadow-lg active:bg-amber-800 active:transform active:scale-95 dark:bg-slate-700 dark:hover:bg-slate-600',
       outline: 'border-2 border-madeira-escura text-madeira-escura hover:bg-madeira-escura hover:text-white focus:ring-madeira-escura active:bg-amber-900 dark:border-amber-500 dark:text-amber-500 dark:hover:bg-amber-500 dark:hover:text-white',

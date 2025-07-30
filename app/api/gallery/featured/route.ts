@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
+import { Database } from '@/types/database.types'
 
 export async function GET(request: NextRequest) {
   try {
@@ -29,29 +30,32 @@ export async function GET(request: NextRequest) {
       }
     )
     
-    // Verificar se é admin
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user || user.user_metadata?.role !== 'admin') {
-      return NextResponse.json(
-        { error: 'Acesso negado' },
-        { status: 403 }
-      )
-    }
+    const { searchParams } = new URL(request.url)
+    const limit = searchParams.get('limit') || '6'
 
-    // Chamar função RPC para obter estatísticas
-    const { data: stats, error } = await supabase.rpc('get_dashboard_stats')
+    const { data: artworks, error } = await supabase
+      .from('art_gallery')
+      .select('*')
+      .eq('featured', true)
+      .gt('stock_quantity', 0)
+      .order('created_at', { ascending: false })
+      .limit(parseInt(limit))
 
     if (error) {
-      console.error('Erro ao buscar estatísticas:', error)
+      console.error('Erro ao buscar quadros em destaque:', error)
       return NextResponse.json(
-        { error: 'Erro ao carregar estatísticas' },
+        { error: 'Erro interno do servidor' },
         { status: 500 }
       )
     }
 
-    return NextResponse.json({ success: true, data: stats })
+    return NextResponse.json({
+      success: true,
+      data: artworks,
+      count: artworks?.length || 0
+    })
   } catch (error) {
-    console.error('Erro interno:', error)
+    console.error('Erro na API de quadros em destaque:', error)
     return NextResponse.json(
       { error: 'Erro interno do servidor' },
       { status: 500 }

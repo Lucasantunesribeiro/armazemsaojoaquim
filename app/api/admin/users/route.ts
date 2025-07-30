@@ -87,9 +87,14 @@ export async function GET(request: NextRequest) {
     console.log('📋 API /admin/users: Buscando usuários via função SECURITY DEFINER - página:', page, 'limite:', limit)
     
     // Use SECURITY DEFINER function for better performance and security
+    const search = searchParams.get('search') || null
+    const role = searchParams.get('role') || null
+    
     const { data: usersData, error } = await supabase.rpc('admin_get_users', {
-      page_num: page,
-      page_size: limit
+      page_size: limit,
+      page_number: page,
+      search_term: search,
+      role_filter: role
     })
 
     if (error) {
@@ -121,18 +126,19 @@ export async function GET(request: NextRequest) {
       })
     }
 
-    const users = usersData || []
-    const totalCount = users.length > 0 ? users[0].total_count : 0
+    // A nova função RPC retorna um objeto com users e pagination
+    const users = usersData?.users || []
+    const pagination = usersData?.pagination || { total_count: 0 }
     
     console.log('✅ API /admin/users: Usuários encontrados:', users.length)
-    console.log('✅ API /admin/users: Total de usuários:', totalCount)
+    console.log('✅ API /admin/users: Total de usuários:', pagination.total_count)
     
     // Log sample data for debugging
     if (users.length > 0) {
       console.log('📊 API /admin/users: Amostra dos dados:', {
         id: users[0].id,
         email: users[0].email,
-        name: users[0].name,
+        full_name: users[0].full_name,
         role: users[0].role,
         created_at: users[0].created_at
       })
@@ -142,18 +148,15 @@ export async function GET(request: NextRequest) {
       users: users.map(u => ({
         id: u.id,
         email: u.email,
-        name: u.name,
+        full_name: u.full_name,
         phone: u.phone,
         created_at: u.created_at,
         updated_at: u.updated_at,
-        role: u.role
+        role: u.role,
+        last_sign_in_at: u.last_sign_in_at,
+        email_confirmed_at: u.email_confirmed_at
       })),
-      pagination: {
-        page,
-        limit,
-        total: totalCount,
-        pages: Math.ceil(totalCount / limit)
-      },
+      pagination,
       source: 'security_definer'
     })
   } catch (error) {
