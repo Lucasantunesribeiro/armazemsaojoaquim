@@ -3,18 +3,22 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useSupabase } from '@/components/providers/SupabaseProvider'
+import { useAdminApi } from '@/lib/hooks/useAdminApi'
 import { Database } from '@/types/database.types'
 import ImageUpload from '@/components/admin/ImageUpload'
+import RichTextEditor from '@/components/admin/RichTextEditor'
 
 type BlogPostInsert = Database['public']['Tables']['blog_posts']['Insert']
 
 export default function NewBlogPostPage() {
   const { supabase, user } = useSupabase()
+  const { adminFetch } = useAdminApi()
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [formData, setFormData] = useState<BlogPostInsert>({
     title: '',
     content: '',
+    content_html: '',
     excerpt: '',
     featured_image: '',
     published: false,
@@ -84,6 +88,34 @@ export default function NewBlogPostPage() {
       if (name === 'title' && !formData.slug) {
         setFormData(prev => ({ ...prev, slug: generateSlug(value) }))
       }
+    }
+  }
+
+  // Handler para mudança do conteúdo do Rich Text Editor
+  const handleContentChange = (htmlContent: string) => {
+    setFormData(prev => ({ 
+      ...prev, 
+      content_html: htmlContent,
+      content: htmlContent // Manter content sincronizado por compatibilidade
+    }))
+  }
+
+  // Handler para upload de imagens no editor
+  const handleImageUpload = async (file: File): Promise<string> => {
+    const uploadFormData = new FormData()
+    uploadFormData.append('file', file)
+    uploadFormData.append('folder', 'blog-content')
+    
+    try {
+      const response = await adminFetch('/api/admin/upload/blog-image', {
+        method: 'POST',
+        body: uploadFormData,
+      })
+      
+      return response.url
+    } catch (error) {
+      console.error('Erro ao fazer upload da imagem:', error)
+      throw error
     }
   }
 
@@ -183,21 +215,16 @@ export default function NewBlogPostPage() {
         {/* Content */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 sm:p-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-4">
               Conteúdo do Post *
             </label>
-            <textarea
-              name="content"
-              value={formData.content}
-              onChange={handleInputChange}
-              required
-              rows={15}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white font-mono text-sm resize-y"
-              placeholder="Escreva o conteúdo do post em Markdown..."
+            <RichTextEditor
+              content={formData.content_html || ''}
+              onChange={handleContentChange}
+              onImageUpload={handleImageUpload}
+              placeholder="Comece a escrever seu artigo..."
+              minHeight="600px"
             />
-            <p className="mt-2 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
-              Você pode usar Markdown para formatar o texto (** para negrito, * para itálico, # para títulos, etc.)
-            </p>
           </div>
         </div>
 

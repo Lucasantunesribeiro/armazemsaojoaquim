@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
 
     // Processar upload
     const formData = await request.formData()
-    const file = formData.get('image') as File
+    const file = formData.get('file') as File
     
     if (!file) {
       return NextResponse.json(
@@ -105,12 +105,13 @@ export async function POST(request: NextRequest) {
     await writeFile(filePath, buffer)
     console.log('✅ API UPLOAD: Arquivo salvo em:', filePath)
 
-    // Retornar path para uso no frontend
-    const publicPath = `/images/blog/${fileName}`
+    // Retornar URL para uso no frontend
+    const publicUrl = `/images/blog/${fileName}`
     
     return NextResponse.json({
       success: true,
-      path: publicPath,
+      url: publicUrl,
+      path: publicUrl,
       fileName: fileName,
       originalName: file.name,
       size: file.size

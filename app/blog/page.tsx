@@ -145,7 +145,7 @@ export default async function BlogPage() {
                         className="object-cover group-hover:scale-105 transition-transform duration-500"
                         priority={true}
                         loading="eager"
-                        sizes="100vw"
+                        sizes="(max-width: 1024px) 100vw, 50vw"
                       />
                     ) : (
                       <div className="w-full h-full bg-gradient-to-br from-amber-200 via-orange-200 to-red-200 flex items-center justify-center">

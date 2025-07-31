@@ -23,6 +23,11 @@ import { supabase } from '../../../lib/supabase'
 import { blogCache } from '../../../lib/cache-manager'
 import { blogApi } from '@/lib/api'
 import { Tables } from '@/types/database.types'
+import ReadingProgressBar from '@/components/blog/ReadingProgressBar'
+import TableOfContents from '@/components/blog/TableOfContents'
+import SocialShareButtons from '@/components/blog/SocialShareButtons'
+import BackToTop from '@/components/blog/BackToTop'
+import BlogArticleLayout from '@/components/blog/BlogArticleLayout'
 
 type BlogPost = Tables<'blog_posts'>;
 
@@ -75,6 +80,8 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-50 via-white to-orange-50">
+      {/* Reading Progress Bar */}
+      <ReadingProgressBar />
       {/* Hero Section com Imagem */}
       <section className="relative h-[60vh] min-h-[400px] overflow-hidden">
         {/* Background Image */}
@@ -136,10 +143,27 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
       
       {/* Main Content */}
       <main className="container mx-auto px-4 py-16">
-        <article
-          className="prose lg:prose-xl max-w-4xl mx-auto"
-          dangerouslySetInnerHTML={{ __html: post.content }}
-        />
+        <BlogArticleLayout
+          title={post.title}
+          excerpt={post.excerpt}
+          author="Armazém São Joaquim"
+          publishedAt={post.published_at || post.created_at}
+          tags={post.tags ? post.tags.split(',').map(tag => tag.trim()) : []}
+          featuredImage={post.featured_image}
+        >
+          <div 
+            className="article-content"
+            dangerouslySetInnerHTML={{ __html: post.content_html || post.content }}
+          />
+        </BlogArticleLayout>
+        
+        {/* Social Share Section */}
+        <div className="max-w-4xl mx-auto mt-12">
+          <SocialShareButtons 
+            title={post.title}
+            excerpt={post.excerpt}
+          />
+        </div>
         
         {/* Other posts section */}
         {otherPosts.length > 0 && (
@@ -162,8 +186,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
                         fill
                         className="object-cover group-hover:scale-105 transition-transform duration-300"
                         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                        priority={true}
-                        loading="eager"
+                        loading="lazy"
                       />
                     )}
                   </div>
@@ -185,6 +208,10 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
           </section>
         )}
       </main>
+      
+      {/* Interactive Components */}
+      <TableOfContents />
+      <BackToTop />
     </div>
   )
 }

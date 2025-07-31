@@ -15,7 +15,9 @@ import {
   AlertCircle,
   Plus,
   ArrowRight,
-  Loader2
+  Loader2,
+  Bed,
+  Coffee
 } from 'lucide-react'
 
 interface DashboardStats {
@@ -242,11 +244,34 @@ export default function AdminDashboard() {
             color="purple"
           />
           <ActionCard
+            title="Gerenciar Pousada"
+            description="Quartos e reservas"
+            href="/admin/pousada"
+            icon={<Bed className="h-5 w-5" />}
+            color="yellow"
+          />
+        </div>
+      </div>
+
+      {/* New Sections */}
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 sm:p-6">
+        <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4 sm:mb-6">
+          Novos Recursos
+        </h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+          <ActionCard
+            title="Café do Armazém"
+            description="Produtos e pedidos do café"
+            href="/admin/cafe"
+            icon={<Coffee className="h-5 w-5" />}
+            color="purple"
+          />
+          <ActionCard
             title="Ver Usuários"
             description="Gerenciar usuários"
             href="/admin/usuarios"
             icon={<Users className="h-5 w-5" />}
-            color="yellow"
+            color="blue"
           />
         </div>
       </div>

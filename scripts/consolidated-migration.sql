@@ -15,8 +15,19 @@ DROP FUNCTION IF EXISTS admin_get_users_count();
 DROP FUNCTION IF EXISTS refresh_all_performance_caches();
 DROP FUNCTION IF EXISTS apply_performance_settings();
 
--- 2. Dropar view users se existir
-DROP VIEW IF EXISTS users;
+-- 2. Verificar e dropar users se existir (tabela ou view)
+DO $$
+BEGIN
+  -- Verificar se users é uma tabela
+  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'users' AND table_type = 'BASE TABLE') THEN
+    DROP TABLE IF EXISTS users CASCADE;
+  END IF;
+  
+  -- Verificar se users é uma view
+  IF EXISTS (SELECT 1 FROM information_schema.views WHERE table_name = 'users') THEN
+    DROP VIEW IF EXISTS users CASCADE;
+  END IF;
+END $$;
 
 -- 3. Criar tabela profiles se não existir
 CREATE TABLE IF NOT EXISTS profiles (
@@ -382,8 +393,11 @@ ALTER TABLE cafe_orders ENABLE ROW LEVEL SECURITY;
 ALTER TABLE art_gallery ENABLE ROW LEVEL SECURITY;
 ALTER TABLE art_orders ENABLE ROW LEVEL SECURITY;
 
--- 9. Criar políticas RLS básicas
+-- 9. Dropar políticas existentes e criar políticas RLS básicas
 -- Políticas para pousada_rooms
+DROP POLICY IF EXISTS "Todos podem ver quartos disponíveis" ON pousada_rooms;
+DROP POLICY IF EXISTS "Apenas admins podem gerenciar quartos" ON pousada_rooms;
+
 CREATE POLICY "Todos podem ver quartos disponíveis" ON pousada_rooms
   FOR SELECT USING (available = true);
 
@@ -397,6 +411,9 @@ CREATE POLICY "Apenas admins podem gerenciar quartos" ON pousada_rooms
   );
 
 -- Políticas para cafe_products
+DROP POLICY IF EXISTS "Todos podem ver produtos do café" ON cafe_products;
+DROP POLICY IF EXISTS "Apenas admins podem gerenciar produtos do café" ON cafe_products;
+
 CREATE POLICY "Todos podem ver produtos do café" ON cafe_products
   FOR SELECT USING (available = true);
 
@@ -410,6 +427,9 @@ CREATE POLICY "Apenas admins podem gerenciar produtos do café" ON cafe_products
   );
 
 -- Políticas para art_gallery
+DROP POLICY IF EXISTS "Todos podem ver arte disponível" ON art_gallery;
+DROP POLICY IF EXISTS "Apenas admins podem gerenciar galeria" ON art_gallery;
+
 CREATE POLICY "Todos podem ver arte disponível" ON art_gallery
   FOR SELECT USING (available = true);
 

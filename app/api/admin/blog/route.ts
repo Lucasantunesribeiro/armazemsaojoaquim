@@ -176,7 +176,7 @@ export async function POST(request: NextRequest) {
 
     const supabase = createServerClient(cookies())
     const body = await request.json()
-    const { title, content, excerpt, featured_image, published, slug } = body
+    const { title, content, content_html, excerpt, featured_image, published, slug } = body
 
     // Validate required fields
     if (!title || !content || !slug) {
@@ -216,6 +216,7 @@ export async function POST(request: NextRequest) {
     const postData = {
       title,
       content,
+      content_html: content_html || content, // Use content_html if provided, fallback to content
       excerpt: excerpt || null,
       featured_image: featured_image || null,
       published: published || false,

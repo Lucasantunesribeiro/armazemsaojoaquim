@@ -69,3 +69,15 @@ export function validatePhone(phone: string): boolean {
   const phoneRegex = /^\(\d{2}\)\s\d{5}-\d{4}$/
   return phoneRegex.test(phone)
 }
+
+export function estimateReadingTime(content: string): number {
+  // Remove HTML tags se houver
+  const plainText = content.replace(/<[^>]*>/g, '')
+  
+  // Contar palavras (média brasileira: 200 palavras por minuto)
+  const words = plainText.trim().split(/\s+/).length
+  const readingTime = Math.ceil(words / 200)
+  
+  // Mínimo de 1 minuto
+  return Math.max(readingTime, 1)
+}

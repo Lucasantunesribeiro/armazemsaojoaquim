@@ -106,7 +106,7 @@ export default function BlogPageClient({ initialPosts }: BlogPageClientProps) {
                     className="object-cover group-hover:scale-105 transition-transform duration-300"
                     priority={true}
                     loading="eager"
-                    sizes="100vw"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
                   />
                 ) : (
                   <div className="flex items-center justify-center h-full">
