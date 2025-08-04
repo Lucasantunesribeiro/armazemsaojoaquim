@@ -204,17 +204,12 @@ export function createMiddlewareClient(
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 
-  console.log('🔧 MIDDLEWARE CLIENT: Criando cliente Supabase para middleware...')
-
   return createSSRServerClient<Database>(supabaseUrl, supabaseAnonKey, {
     cookies: {
       getAll() {
-        const cookies = request.cookies.getAll()
-        console.log('🍪 MIDDLEWARE CLIENT: getAll() chamado - cookies:', cookies.map(c => c.name))
-        return cookies
+        return request.cookies.getAll()
       },
       setAll(cookiesToSet: Array<{ name: string; value: string; options?: any }>) {
-        console.log('🍪 MIDDLEWARE CLIENT: setAll() chamado - cookies:', cookiesToSet.map(c => c.name))
         cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
         cookiesToSet.forEach(({ name, value, options }) =>
           response.cookies.set(name, value, options)

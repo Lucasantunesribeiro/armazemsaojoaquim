@@ -42,7 +42,7 @@ const BottomNavigation = memo(() => {
           const active = isActive(item.href)
           
           return (
-            <Link
+            <Link prefetch={true}
               key={item.href}
               href={item.href}
               className={`

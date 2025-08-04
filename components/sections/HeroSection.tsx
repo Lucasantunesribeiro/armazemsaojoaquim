@@ -3,41 +3,43 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react'
 import Image from 'next/image'
 import { ChevronLeft, ChevronRight, MapPin, Clock, Phone } from 'lucide-react'
-
-const heroImages = [
-  {
-    src: '/images/armazem-fachada-historica.webp',
-    fallback: '/images/placeholder.jpg',
-    alt: 'Fachada histórica do Armazém São Joaquim',
-    title: 'Patrimônio Histórico',
-    subtitle: 'Desde 1854 preservando a história de Santa Teresa',
-    cta: 'Conheça Nossa História'
-  },
-  {
-    src: '/images/armazem-interior-aconchegante.webp',
-    fallback: '/images/placeholder.jpg',
-    alt: 'Interior aconchegante do restaurante',
-    title: 'Ambiente Acolhedor',
-    subtitle: 'Onde cada refeição é uma experiência única',
-    cta: 'Reserve Sua Mesa'
-  },
-  {
-    src: '/images/santa-teresa-vista-panoramica.webp',
-    fallback: '/images/placeholder.jpg',
-    alt: 'Vista panorâmica de Santa Teresa',
-    title: 'Vista Deslumbrante',
-    subtitle: 'O melhor de Santa Teresa em um só lugar',
-    cta: 'Explore o Bairro'
-  }
-]
-
-const quickInfo = [
-  { icon: MapPin, text: 'Santa Teresa, RJ', label: 'Localização', href: '#location' },
-  { icon: Clock, text: 'Ter-Dom: 12h-22h', label: 'Horário de funcionamento', href: '#hours' },
-  { icon: Phone, text: '(21) 98565-8443', label: 'Telefone para contato', href: 'tel:+5521985658443' }
-]
+import { useTranslations } from '@/contexts/LanguageContext'
 
 export default function HeroSection() {
+  const { t } = useTranslations()
+
+  const heroImages = [
+    {
+      src: '/images/armazem-fachada-historica.webp',
+      fallback: '/images/placeholder.jpg',
+      alt: 'Fachada histórica do Armazém São Joaquim',
+      title: t('home.history.title'),
+      subtitle: t('home.history.description'),
+      cta: t('home.hero.discoverMenu')
+    },
+    {
+      src: '/images/armazem-interior-aconchegante.webp',
+      fallback: '/images/placeholder.jpg',
+      alt: 'Interior aconchegante do restaurante',
+      title: t('home.hero.title'),
+      subtitle: t('home.hero.subtitle'),
+      cta: t('home.hero.makeReservation')
+    },
+    {
+      src: '/images/santa-teresa-vista-panoramica.webp',
+      fallback: '/images/placeholder.jpg',
+      alt: 'Vista panorâmica de Santa Teresa',
+      title: t('home.experience.title'),
+      subtitle: t('home.hero.description'),
+      cta: t('home.cta.visitUs')
+    }
+  ]
+
+  const quickInfo = [
+    { icon: MapPin, text: 'Santa Teresa, RJ', label: t('nav.contact'), href: '#location' },
+    { icon: Clock, text: 'Ter-Dom: 12h-22h', label: t('cafe.hours.title'), href: '#hours' },
+    { icon: Phone, text: '(21) 98565-8443', label: t('footer.phone'), href: 'tel:+5521985658443' }
+  ]
   const [currentSlide, setCurrentSlide] = useState(0)
   const [isAutoPlaying, setIsAutoPlaying] = useState(true)
   const [imageErrors, setImageErrors] = useState<Record<number, boolean>>({})
@@ -175,7 +177,7 @@ export default function HeroSection() {
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
       role="banner"
-      aria-label="Seção principal do Armazém São Joaquim"
+      aria-label={t('home.hero.sectionAriaLabel')}
     >
       {/* Background Images with Art Direction */}
       <div className="absolute inset-0">
@@ -212,7 +214,7 @@ export default function HeroSection() {
         <div className="absolute inset-0 bg-slate-900 flex items-center justify-center z-20">
           <div className="text-center text-white">
             <div className="w-12 h-12 border-2 border-amber-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-            <p className="text-sm font-medium">Carregando experiência...</p>
+            <p className="text-sm font-medium">{t('common.loading')}</p>
           </div>
         </div>
       )}
@@ -274,7 +276,7 @@ export default function HeroSection() {
               className="group bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-semibold text-sm sm:text-base transition-all duration-300 transform hover:scale-105 active:scale-95 shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 focus:ring-offset-black"
             >
               <span className="flex items-center justify-center space-x-2">
-                <span>Ver Cardápio</span>
+                <span>{t('home.hero.discoverMenu')}</span>
                 <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </span>
             </a>
@@ -295,7 +297,7 @@ export default function HeroSection() {
       <button
         onClick={prevSlide}
         className="absolute left-2 sm:left-4 lg:left-6 top-2/3 sm:top-1/2 transform -translate-y-1/2 z-20 bg-black/50 hover:bg-black/70 dark:bg-white/20 dark:hover:bg-white/30 text-white dark:text-white p-3 sm:p-3 md:p-4 rounded-full transition-all duration-300 hover:scale-110 active:scale-95 min-w-[48px] min-h-[48px] touch-manipulation backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-amber-500 group"
-        aria-label="Slide anterior"
+        aria-label={t('home.hero.previousSlide')}
       >
         <ChevronLeft className="w-5 h-5 sm:w-5 sm:h-5 md:w-6 md:h-6 group-hover:-translate-x-0.5 transition-transform" />
       </button>
@@ -303,16 +305,16 @@ export default function HeroSection() {
       <button
         onClick={nextSlide}
         className="absolute right-2 sm:right-4 lg:right-6 top-2/3 sm:top-1/2 transform -translate-y-1/2 z-20 bg-black/50 hover:bg-black/70 dark:bg-white/20 dark:hover:bg-white/30 text-white dark:text-white p-3 sm:p-3 md:p-4 rounded-full transition-all duration-300 hover:scale-110 active:scale-95 min-w-[48px] min-h-[48px] touch-manipulation backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-amber-500 group"
-        aria-label="Próximo slide"
+        aria-label={t('home.hero.nextSlide')}
       >
         <ChevronRight className="w-5 h-5 sm:w-5 sm:h-5 md:w-6 md:h-6 group-hover:translate-x-0.5 transition-transform" />
       </button>
 
       {/* Screen Reader Information */}
       <div className="sr-only">
-        <p>Slide {currentSlide + 1} de {heroImages.length}</p>
-        <p>Use as setas do teclado para navegar entre os slides</p>
-        <p>Pressione espaço para pausar/continuar a apresentação automática</p>
+        <p>{t('home.hero.slideInfo').replace('{{current}}', (currentSlide + 1).toString()).replace('{{total}}', heroImages.length.toString())}</p>
+        <p>{t('home.hero.keyboardNavigation')}</p>
+        <p>{t('home.hero.spacebarControl')}</p>
       </div>
     </section>
   )

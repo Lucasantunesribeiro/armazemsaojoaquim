@@ -28,91 +28,100 @@ const nextConfig = {
         port: '3000',
         pathname: '/**',
       },
-      // Para Netlify
+      // Para produção (Netlify)
       {
         protocol: 'https',
-        hostname: '**.netlify.app',
+        hostname: '*.netlify.app',
         pathname: '/**',
       },
-      // Para Vercel (caso necessário)
+      // Para Supabase Storage
       {
         protocol: 'https',
-        hostname: '**.vercel.app',
+        hostname: '*.supabase.co',
         pathname: '/**',
       },
-      // Para Supabase Storage - IMPORTANTE!
+      // Para outros domínios que possam ser necessários
       {
         protocol: 'https',
-        hostname: 'enolssforaepnrpfrima.supabase.co',
-        pathname: '/storage/v1/object/public/**',
-      },
-      // Para Supabase Storage - Render API (transformações)
-      {
-        protocol: 'https',
-        hostname: 'enolssforaepnrpfrima.supabase.co',
-        pathname: '/storage/v1/render/image/public/**',
-      },
-      // Para outros subdomínios do Supabase (caso necessário)
-      {
-        protocol: 'https',
-        hostname: '**.supabase.co',
-        pathname: '/storage/v1/object/public/**',
+        hostname: '**',
+        pathname: '/**',
       },
     ],
   },
 
-  // Configurações experimentais
-  experimental: {
-    optimizePackageImports: ['@radix-ui/react-icons', 'lucide-react', 'framer-motion'],
-    optimizeCss: true,
-    swcMinify: true,
-  },
+  // Configurações para pacotes externos do servidor
+  serverExternalPackages: ['@supabase/supabase-js'],
 
-  // Configurações de compilação
-  compiler: {
-    removeConsole: process.env.NODE_ENV === 'production',
+  // Configurações de experimental features
+  experimental: {
+    // Habilitar apenas features estáveis
+    optimizePackageImports: [
+      '@radix-ui/react-icons', 
+      'lucide-react',
+      'react-dom'
+    ],
+    optimizeCss: true,
+    serverMinification: true,
   },
 
   // Configurações de webpack
-  webpack: (config, { dev, isServer }) => {
-    // Configuração para SVGs
-    config.module.rules.push({
-      test: /\.svg$/,
-      use: ['@svgr/webpack'],
-    })
-
-    // Otimizações de bundle
-    if (!dev && !isServer) {
-      config.optimization.splitChunks = {
-        chunks: 'all',
-        cacheGroups: {
-          vendor: {
-            test: /[\\/]node_modules[\\/]/,
-            name: 'vendors',
-            chunks: 'all',
-          },
-          common: {
-            name: 'common',
-            minChunks: 2,
-            chunks: 'all',
-            enforce: true,
-          },
-        },
+  webpack: (config, { isServer }) => {
+    // Configurações específicas para o cliente
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+        net: false,
+        tls: false,
       }
     }
 
     return config
   },
 
-  // Configurações de build
-  reactStrictMode: true,
-  swcMinify: true,
+  // Configurações de headers
+  async headers() {
+    return [
+      {
+        source: '/(.*)',
+        headers: [
+          {
+            key: 'X-Frame-Options',
+            value: 'DENY',
+          },
+          {
+            key: 'X-Content-Type-Options',
+            value: 'nosniff',
+          },
+          {
+            key: 'Referrer-Policy',
+            value: 'origin-when-cross-origin',
+          },
+        ],
+      },
+    ]
+  },
 
-  // Configurações para Netlify
-  trailingSlash: false,
-  
-  // Configuração para build
-  output: 'standalone',
+  // Configurações de redirects
+  async redirects() {
+    return [
+      {
+        source: '/',
+        destination: '/pt',
+        permanent: false,
+      },
+    ]
+  },
+
+  // Configurações de rewrites
+  async rewrites() {
+    return [
+      {
+        source: '/api/:path*',
+        destination: '/api/:path*',
+      },
+    ]
+  },
 }
 
 module.exports = nextConfig

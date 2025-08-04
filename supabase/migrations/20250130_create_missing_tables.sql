@@ -332,22 +332,4 @@ CREATE TRIGGER update_availability_settings_updated_at BEFORE UPDATE ON availabi
 CREATE TRIGGER update_contact_messages_updated_at BEFORE UPDATE ON contact_messages
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
--- Função para criar perfil automaticamente
-CREATE OR REPLACE FUNCTION public.handle_new_profile()
-RETURNS trigger AS $$
-BEGIN
-  INSERT INTO public.profiles (id, email, full_name)
-  VALUES (
-    NEW.id,
-    NEW.email,
-    COALESCE(NEW.raw_user_meta_data->>'full_name', NEW.email)
-  );
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
-
--- Trigger para criar perfil automaticamente
-DROP TRIGGER IF EXISTS on_auth_user_created_profile ON auth.users;
-CREATE TRIGGER on_auth_user_created_profile
-  AFTER INSERT ON auth.users
-  FOR EACH ROW EXECUTE PROCEDURE public.handle_new_profile(); 
+-- Função para criar perfil automaticamente já está definida em add_missing_tables.sql 

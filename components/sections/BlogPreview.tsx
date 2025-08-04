@@ -12,22 +12,24 @@ import {
 	CardHeader,
 	CardTitle,
 } from '../ui/Card'
+import { useTranslations } from '@/contexts/LanguageContext'
 
 const BlogPreview = () => {
+	const { t } = useTranslations()
 	const [activeImageIndex, setActiveImageIndex] = useState(0)
 
 	const neighborhoodImages = [
 		{
 			src: '/images/santa-teresa-vista-panoramica.jpg',
-			alt: 'Vista panorâmica de Santa Teresa',
-			title: 'Santa Teresa Vista Aérea',
-			description: 'O charme colonial visto do alto',
+			alt: t('home.blogPreview.neighborhood.images.panoramic.alt'),
+			title: t('home.blogPreview.neighborhood.images.panoramic.title'),
+			description: t('home.blogPreview.neighborhood.images.panoramic.description'),
 		},
 		{
 			src: '/images/bondinho.jpg',
-			alt: 'Bondinho histórico de Santa Teresa',
-			title: 'Bondinho Histórico',
-			description: 'Símbolo do transporte tradicional',
+			alt: t('home.blogPreview.neighborhood.images.tram.alt'),
+			title: t('home.blogPreview.neighborhood.images.tram.title'),
+			description: t('home.blogPreview.neighborhood.images.tram.description'),
 		},
 	]
 
@@ -115,20 +117,19 @@ const BlogPreview = () => {
 					<div className="inline-flex items-center space-x-2 bg-amber-100 dark:bg-amber-900/30 border border-amber-300 dark:border-amber-700 rounded-full px-6 py-2 mb-6">
 						<Book className="w-4 h-4 text-amber-600 dark:text-amber-400" />
 						<span className="text-amber-800 dark:text-amber-300 text-sm font-semibold tracking-wide">
-							NOSSO BLOG
+							{t('home.blogPreview.badge')}
 						</span>
 					</div>
 
 					<h2 className="font-playfair text-4xl md:text-6xl font-bold text-slate-900 dark:text-white mb-6">
-						Histórias de{' '}
+						{t('home.blogPreview.title')}{' '}
 						<span className="text-amber-600 dark:text-amber-400">
-							Santa Teresa
+							{t('home.blogPreview.titleHighlight')}
 						</span>
 					</h2>
 
 					<p className="text-xl text-slate-600 dark:text-slate-300 max-w-3xl mx-auto leading-relaxed">
-						Mergulhe nas histórias, tradições e cultura que fazem de Santa
-						Teresa um dos bairros mais especiais do Rio de Janeiro.
+						{t('home.blogPreview.description')}
 					</p>
 				</div>
 
@@ -177,7 +178,7 @@ const BlogPreview = () => {
 												? 'bg-amber-600 dark:bg-amber-400 scale-125'
 												: 'bg-slate-300 dark:bg-slate-600 hover:bg-amber-400 dark:hover:bg-amber-500 hover:scale-110 active:scale-95'
 										}`}
-										aria-label={`Ver imagem ${index + 1}`}
+										aria-label={`${t('home.blogPreview.imageNav')} ${index + 1}`}
 									/>
 								))}
 							</div>
@@ -187,12 +188,10 @@ const BlogPreview = () => {
 						<div className="space-y-8">
 							<div className="text-center md:text-left">
 								<h3 className="font-playfair text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-6">
-									Descobrindo Santa Teresa
+									{t('home.blogPreview.neighborhood.title')}
 								</h3>
 								<p className="text-slate-600 dark:text-slate-300 text-lg mb-8">
-									Compartilhamos as histórias e curiosidades do bairro mais
-									boêmio do Rio de Janeiro, preservando a memória e tradições
-									locais.
+									{t('home.blogPreview.neighborhood.description')}
 								</p>
 							</div>
 
@@ -205,7 +204,7 @@ const BlogPreview = () => {
 										50+
 									</div>
 									<p className="text-sm font-medium text-slate-600 dark:text-slate-400">
-										Artigos Publicados
+										{t('home.blogPreview.stats.articles')}
 									</p>
 								</div>
 
@@ -217,7 +216,7 @@ const BlogPreview = () => {
 										200+
 									</div>
 									<p className="text-sm font-medium text-slate-600 dark:text-slate-400">
-										Fotos Históricas
+										{t('home.blogPreview.stats.photos')}
 									</p>
 								</div>
 							</div>
@@ -244,7 +243,7 @@ const BlogPreview = () => {
 										/>
 										<div className="absolute top-4 left-4">
 											<span className="bg-amber-500 text-white text-xs font-bold px-3 py-1 rounded-full">
-												DESTAQUE
+												{t('home.blogPreview.posts.featured')}
 											</span>
 										</div>
 									</div>
@@ -269,13 +268,13 @@ const BlogPreview = () => {
 												<Calendar className="w-4 h-4 mr-2" />
 												{formatDate(post.date)} • {post.author}
 											</div>
-											<Link href={`/blog/${post.slug}`} passHref>
+											<Link prefetch={true} href={`/blog/${post.slug}`} passHref>
 												<Button
 													variant="outline"
 													className="group"
-													aria-label={`Ler mais sobre ${post.title}`}
+													aria-label={`${t('home.blogPreview.posts.readMoreAria')} ${post.title}`}
 												>
-													Ler Mais
+													{t('home.blogPreview.posts.readMore')}
 													<ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
 												</Button>
 											</Link>
@@ -313,7 +312,7 @@ const BlogPreview = () => {
 											{post.category}
 										</span>
 									</div>
-									<Link href={`/blog/${post.slug}`} passHref>
+									<Link prefetch={true} href={`/blog/${post.slug}`} passHref>
 										<CardTitle className="p-6 pb-0 font-playfair text-xl font-bold text-slate-900 dark:text-white leading-tight group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">
 											{post.title}
 										</CardTitle>
@@ -326,13 +325,13 @@ const BlogPreview = () => {
 									<span className="text-slate-500 dark:text-slate-400 text-sm">
 										{post.author}
 									</span>
-									<Link href={`/blog/${post.slug}`} passHref>
+									<Link prefetch={true} href={`/blog/${post.slug}`} passHref>
 										<Button
 											variant="ghost"
 											size="sm"
 											className="text-amber-600 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-900/20 group"
 										>
-											Ler
+											{t('home.blogPreview.posts.read')}
 											<ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
 										</Button>
 									</Link>
@@ -345,16 +344,15 @@ const BlogPreview = () => {
 						<div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent transform -skew-x-12 animate-shimmer" />
 						<MapPin className="w-12 h-12 text-amber-400 mx-auto mb-6" />
 						<h3 className="font-playfair text-3xl md:text-4xl font-bold mb-6">
-							Explore Mais de Santa Teresa
+							{t('home.blogPreview.cta.title')}
 						</h3>
 						<p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
-							Descubra todas as histórias, curiosidades e segredos do bairro
-							mais charmoso do Rio de Janeiro.
+							{t('home.blogPreview.cta.description')}
 						</p>
-						<Link href="/blog" passHref>
+						<Link prefetch={true} href="/blog" passHref>
 							<Button size="lg" variant="primary">
 								<Book className="w-5 h-5 mr-2" />
-								Ver Todos os Artigos
+								{t('home.blogPreview.cta.button')}
 							</Button>
 						</Link>
 					</div>

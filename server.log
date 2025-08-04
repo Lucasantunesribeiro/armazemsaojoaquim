@@ -1,0 +1,1425 @@
+
+> armazem-sao-joaquim@0.1.0 dev
+> next dev
+
+  ▲ Next.js 14.2.30
+  - Local:        http://localhost:3000
+  - Environments: .env.local
+  - Experiments (use with caution):
+    · optimizeCss
+
+ ✓ Starting...
+ ✓ Ready in 8.1s
+ ○ Compiling /_not-found ...
+The user aborted a request.
+
+Retrying 1/3...
+ ✓ Compiled /_not-found in 12.4s (953 modules)
+GoTrueClient@0 (2.71.1) 2025-08-01T00:48:45.325Z #_acquireLock begin -1
+GoTrueClient@0 (2.71.1) 2025-08-01T00:48:45.326Z #_acquireLock lock acquired for storage key armazem-sao-joaquim-auth
+GoTrueClient@0 (2.71.1) 2025-08-01T00:48:45.327Z #_handleVisibilityChange()
+GoTrueClient@0 (2.71.1) 2025-08-01T00:48:45.327Z #onAuthStateChange() registered callback with id 9b0f728d-9a62-4237-a6c2-6eca0768c174
+GoTrueClient@1 (2.71.1) 2025-08-01T00:48:45.331Z #_acquireLock begin -1
+GoTrueClient@1 (2.71.1) 2025-08-01T00:48:45.331Z #_acquireLock lock acquired for storage key armazem-sao-joaquim-auth
+GoTrueClient@1 (2.71.1) 2025-08-01T00:48:45.331Z #_handleVisibilityChange()
+GoTrueClient@1 (2.71.1) 2025-08-01T00:48:45.332Z #onAuthStateChange() registered callback with id 2ddb4f7c-03e0-481d-b861-c71191bc1e31
+GoTrueClient@0 (2.71.1) 2025-08-01T00:48:45.341Z #_initialize() end
+GoTrueClient@1 (2.71.1) 2025-08-01T00:48:45.341Z #_initialize() end
+GoTrueClient@0 (2.71.1) 2025-08-01T00:48:45.341Z #_acquireLock lock released for storage key armazem-sao-joaquim-auth
+GoTrueClient@1 (2.71.1) 2025-08-01T00:48:45.342Z #_acquireLock lock released for storage key armazem-sao-joaquim-auth
+GoTrueClient@0 (2.71.1) 2025-08-01T00:48:45.342Z #_acquireLock end
+GoTrueClient@1 (2.71.1) 2025-08-01T00:48:45.342Z #_acquireLock end
+GoTrueClient@0 (2.71.1) 2025-08-01T00:48:45.342Z #_acquireLock begin -1
+GoTrueClient@0 (2.71.1) 2025-08-01T00:48:45.342Z #_acquireLock lock acquired for storage key armazem-sao-joaquim-auth
+GoTrueClient@0 (2.71.1) 2025-08-01T00:48:45.343Z #_useSession begin
+GoTrueClient@0 (2.71.1) 2025-08-01T00:48:45.343Z #__loadSession() begin
+GoTrueClient@1 (2.71.1) 2025-08-01T00:48:45.343Z #_acquireLock begin -1
+GoTrueClient@1 (2.71.1) 2025-08-01T00:48:45.343Z #_acquireLock lock acquired for storage key armazem-sao-joaquim-auth
+GoTrueClient@1 (2.71.1) 2025-08-01T00:48:45.343Z #_useSession begin
+GoTrueClient@1 (2.71.1) 2025-08-01T00:48:45.344Z #__loadSession() begin
+GoTrueClient@0 (2.71.1) 2025-08-01T00:48:45.344Z #_acquireLock lock released for storage key armazem-sao-joaquim-auth
+GoTrueClient@1 (2.71.1) 2025-08-01T00:48:45.344Z #_acquireLock lock released for storage key armazem-sao-joaquim-auth
+GoTrueClient@0 (2.71.1) 2025-08-01T00:48:45.344Z #getSession() session from storage null
+GoTrueClient@0 (2.71.1) 2025-08-01T00:48:45.344Z #__loadSession() end
+GoTrueClient@0 (2.71.1) 2025-08-01T00:48:45.344Z #_acquireLock end
+GoTrueClient@1 (2.71.1) 2025-08-01T00:48:45.345Z #getSession() session from storage null
+GoTrueClient@1 (2.71.1) 2025-08-01T00:48:45.345Z #__loadSession() end
+GoTrueClient@1 (2.71.1) 2025-08-01T00:48:45.345Z #_acquireLock end
+GoTrueClient@0 (2.71.1) 2025-08-01T00:48:45.345Z INITIAL_SESSION callback id 9b0f728d-9a62-4237-a6c2-6eca0768c174 session null
+GoTrueClient@1 (2.71.1) 2025-08-01T00:48:45.345Z INITIAL_SESSION callback id 2ddb4f7c-03e0-481d-b861-c71191bc1e31 session null
+GoTrueClient@0 (2.71.1) 2025-08-01T00:48:45.346Z #_useSession end
+GoTrueClient@1 (2.71.1) 2025-08-01T00:48:45.346Z #_useSession end
+GoTrueClient@2 (2.71.1) 2025-08-01T00:48:45.348Z #_acquireLock begin -1
+GoTrueClient@2 (2.71.1) 2025-08-01T00:48:45.348Z #_acquireLock lock acquired for storage key armazem-sao-joaquim-auth
+GoTrueClient@2 (2.71.1) 2025-08-01T00:48:45.348Z #_handleVisibilityChange()
+GoTrueClient@2 (2.71.1) 2025-08-01T00:48:45.348Z #onAuthStateChange() registered callback with id 5c56d738-aa4a-406e-a719-5eeede0c2b7c
+GoTrueClient@2 (2.71.1) 2025-08-01T00:48:45.350Z #_initialize() end
+GoTrueClient@2 (2.71.1) 2025-08-01T00:48:45.351Z #_acquireLock lock released for storage key armazem-sao-joaquim-auth
+GoTrueClient@2 (2.71.1) 2025-08-01T00:48:45.351Z #_acquireLock end
+GoTrueClient@2 (2.71.1) 2025-08-01T00:48:45.351Z #_acquireLock begin -1
+GoTrueClient@2 (2.71.1) 2025-08-01T00:48:45.351Z #_acquireLock lock acquired for storage key armazem-sao-joaquim-auth
+GoTrueClient@2 (2.71.1) 2025-08-01T00:48:45.351Z #_useSession begin
+GoTrueClient@2 (2.71.1) 2025-08-01T00:48:45.351Z #__loadSession() begin
+GoTrueClient@2 (2.71.1) 2025-08-01T00:48:45.351Z #_acquireLock lock released for storage key armazem-sao-joaquim-auth
+GoTrueClient@2 (2.71.1) 2025-08-01T00:48:45.352Z #getSession() session from storage null
+GoTrueClient@2 (2.71.1) 2025-08-01T00:48:45.352Z #__loadSession() end
+GoTrueClient@2 (2.71.1) 2025-08-01T00:48:45.352Z #_acquireLock end
+GoTrueClient@2 (2.71.1) 2025-08-01T00:48:45.352Z INITIAL_SESSION callback id 5c56d738-aa4a-406e-a719-5eeede0c2b7c session null
+GoTrueClient@2 (2.71.1) 2025-08-01T00:48:45.352Z #_useSession end
+GoTrueClient@0 (2.71.1) 2025-08-01T00:48:45.464Z #_acquireLock begin -1
+GoTrueClient@0 (2.71.1) 2025-08-01T00:48:45.464Z #_acquireLock lock acquired for storage key armazem-sao-joaquim-auth
+GoTrueClient@0 (2.71.1) 2025-08-01T00:48:45.465Z #_handleVisibilityChange()
+GoTrueClient@0 (2.71.1) 2025-08-01T00:48:45.466Z #onAuthStateChange() registered callback with id 41cc6a0a-1b50-4f70-96fc-68a9d6217729
+GoTrueClient@0 (2.71.1) 2025-08-01T00:48:45.469Z #_initialize() end
+GoTrueClient@0 (2.71.1) 2025-08-01T00:48:45.476Z #_acquireLock lock released for storage key armazem-sao-joaquim-auth
+GoTrueClient@0 (2.71.1) 2025-08-01T00:48:45.476Z #_acquireLock end
+GoTrueClient@0 (2.71.1) 2025-08-01T00:48:45.477Z #_acquireLock begin -1
+GoTrueClient@0 (2.71.1) 2025-08-01T00:48:45.477Z #_acquireLock lock acquired for storage key armazem-sao-joaquim-auth
+GoTrueClient@0 (2.71.1) 2025-08-01T00:48:45.477Z #_useSession begin
+GoTrueClient@0 (2.71.1) 2025-08-01T00:48:45.477Z #__loadSession() begin
+GoTrueClient@0 (2.71.1) 2025-08-01T00:48:45.478Z #_acquireLock lock released for storage key armazem-sao-joaquim-auth
+GoTrueClient@0 (2.71.1) 2025-08-01T00:48:45.478Z #getSession() session from storage null
+GoTrueClient@0 (2.71.1) 2025-08-01T00:48:45.478Z #__loadSession() end
+GoTrueClient@0 (2.71.1) 2025-08-01T00:48:45.478Z #_acquireLock end
+GoTrueClient@0 (2.71.1) 2025-08-01T00:48:45.479Z INITIAL_SESSION callback id 41cc6a0a-1b50-4f70-96fc-68a9d6217729 session null
+GoTrueClient@0 (2.71.1) 2025-08-01T00:48:45.479Z #_useSession end
+ ○ Compiling /api/health ...
+ GET /_next/static/css/app/layout.css?v=1754009297256 404 in 13096ms
+🔧 MIDDLEWARE CLIENT: Criando cliente Supabase para middleware...
+GoTrueClient@1 (2.71.1) 2025-08-01T00:48:45.556Z #_acquireLock begin -1
+GoTrueClient@1 (2.71.1) 2025-08-01T00:48:45.556Z #_acquireLock lock acquired for storage key armazem-sao-joaquim-auth
+GoTrueClient@1 (2.71.1) 2025-08-01T00:48:45.557Z #_handleVisibilityChange()
+GoTrueClient@1 (2.71.1) 2025-08-01T00:48:45.557Z #onAuthStateChange() registered callback with id 8ff508f1-f9b6-4eb0-a2f5-bdee436074cc
+GoTrueClient@1 (2.71.1) 2025-08-01T00:48:45.557Z #onAuthStateChange() registered callback with id 6392974a-9fd8-48fd-baaa-f4746c8ca7ae
+GoTrueClient@1 (2.71.1) 2025-08-01T00:48:45.557Z #_initialize() end
+GoTrueClient@1 (2.71.1) 2025-08-01T00:48:45.557Z #_acquireLock lock released for storage key armazem-sao-joaquim-auth
+GoTrueClient@1 (2.71.1) 2025-08-01T00:48:45.557Z #_acquireLock end
+GoTrueClient@1 (2.71.1) 2025-08-01T00:48:45.558Z #_acquireLock begin -1
+GoTrueClient@1 (2.71.1) 2025-08-01T00:48:45.558Z #_acquireLock lock acquired for storage key armazem-sao-joaquim-auth
+GoTrueClient@1 (2.71.1) 2025-08-01T00:48:45.558Z #_useSession begin
+GoTrueClient@1 (2.71.1) 2025-08-01T00:48:45.558Z #__loadSession() begin
+🍪 MIDDLEWARE CLIENT: getAll() chamado - cookies: [
+  '__stripe_mid',
+  'grafana_session',
+  'grafana_session_expiry',
+  'armazem-sao-joaquim-auth-code-verifier'
+]
+GoTrueClient@1 (2.71.1) 2025-08-01T00:48:45.559Z #_acquireLock begin -1
+GoTrueClient@1 (2.71.1) 2025-08-01T00:48:45.559Z #_acquireLock end
+GoTrueClient@1 (2.71.1) 2025-08-01T00:48:45.559Z #_acquireLock begin -1
+GoTrueClient@1 (2.71.1) 2025-08-01T00:48:45.559Z #_acquireLock end
+GoTrueClient@1 (2.71.1) 2025-08-01T00:48:45.560Z #_useSession begin
+GoTrueClient@1 (2.71.1) 2025-08-01T00:48:45.560Z #__loadSession() begin
+🍪 MIDDLEWARE CLIENT: getAll() chamado - cookies: [
+  '__stripe_mid',
+  'grafana_session',
+  'grafana_session_expiry',
+  'armazem-sao-joaquim-auth-code-verifier'
+]
+GoTrueClient@1 (2.71.1) 2025-08-01T00:48:45.560Z #_useSession begin
+GoTrueClient@1 (2.71.1) 2025-08-01T00:48:45.560Z #__loadSession() begin
+🍪 MIDDLEWARE CLIENT: getAll() chamado - cookies: [
+  '__stripe_mid',
+  'grafana_session',
+  'grafana_session_expiry',
+  'armazem-sao-joaquim-auth-code-verifier'
+]
+GoTrueClient@1 (2.71.1) 2025-08-01T00:48:45.561Z #getSession() session from storage null
+GoTrueClient@1 (2.71.1) 2025-08-01T00:48:45.561Z #__loadSession() end
+GoTrueClient@1 (2.71.1) 2025-08-01T00:48:45.561Z INITIAL_SESSION callback id 8ff508f1-f9b6-4eb0-a2f5-bdee436074cc session null
+GoTrueClient@1 (2.71.1) 2025-08-01T00:48:45.561Z #getSession() session from storage null
+GoTrueClient@1 (2.71.1) 2025-08-01T00:48:45.561Z #__loadSession() end
+GoTrueClient@1 (2.71.1) 2025-08-01T00:48:45.561Z #_useSession end
+GoTrueClient@1 (2.71.1) 2025-08-01T00:48:45.561Z INITIAL_SESSION callback id 6392974a-9fd8-48fd-baaa-f4746c8ca7ae session null
+GoTrueClient@1 (2.71.1) 2025-08-01T00:48:45.562Z #_useSession end
+GoTrueClient@1 (2.71.1) 2025-08-01T00:48:45.562Z #getSession() session from storage null
+GoTrueClient@1 (2.71.1) 2025-08-01T00:48:45.562Z #__loadSession() end
+GoTrueClient@1 (2.71.1) 2025-08-01T00:48:45.562Z #_useSession end
+GoTrueClient@1 (2.71.1) 2025-08-01T00:48:45.562Z #_acquireLock lock released for storage key armazem-sao-joaquim-auth
+GoTrueClient@1 (2.71.1) 2025-08-01T00:48:45.562Z #_acquireLock end
+ GET /_next/static/css/app/%5Blocale%5D/layout.css?v=1754009297256 404 in 13086ms
+<w> [webpack.cache.PackFileCacheStrategy] Serializing big strings (108kiB) impacts deserialization performance (consider using Buffer instead and decode when needed)
+ ✓ Compiled /[locale]/blog in 12.9s (440 modules)
+ ✓ Compiled in 3.5s (1292 modules)
+ GET /api/health 200 in 19019ms
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:05.911Z #_acquireLock begin -1
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:05.912Z #_acquireLock lock acquired for storage key armazem-sao-joaquim-auth
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:05.913Z #_handleVisibilityChange()
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:05.913Z #onAuthStateChange() registered callback with id f48d4f2b-2c07-4e8c-84c4-0f9767a31dad
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:05.922Z #_initialize() end
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:05.925Z #_acquireLock lock released for storage key armazem-sao-joaquim-auth
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:05.926Z #_acquireLock end
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:05.926Z #_acquireLock begin -1
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:05.926Z #_acquireLock lock acquired for storage key armazem-sao-joaquim-auth
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:05.926Z #_useSession begin
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:05.926Z #__loadSession() begin
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:05.927Z #_acquireLock lock released for storage key armazem-sao-joaquim-auth
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:05.927Z #getSession() session from storage null
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:05.927Z #__loadSession() end
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:05.927Z #_acquireLock end
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:05.927Z INITIAL_SESSION callback id f48d4f2b-2c07-4e8c-84c4-0f9767a31dad session null
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:05.927Z #_useSession end
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:05.963Z #_acquireLock begin -1
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:05.964Z #_acquireLock lock acquired for storage key armazem-sao-joaquim-auth
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:05.964Z #_handleVisibilityChange()
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:05.965Z #onAuthStateChange() registered callback with id b284e8d8-6dd4-4d2e-80c1-1769e437d28d
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:05.975Z #_initialize() end
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:05.975Z #_acquireLock lock released for storage key armazem-sao-joaquim-auth
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:05.975Z #_acquireLock end
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:05.975Z #_acquireLock begin -1
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:05.975Z #_acquireLock lock acquired for storage key armazem-sao-joaquim-auth
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:05.976Z #_useSession begin
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:05.976Z #__loadSession() begin
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:05.976Z #_acquireLock lock released for storage key armazem-sao-joaquim-auth
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:05.977Z #getSession() session from storage null
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:05.977Z #__loadSession() end
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:05.977Z #_acquireLock end
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:05.978Z INITIAL_SESSION callback id b284e8d8-6dd4-4d2e-80c1-1769e437d28d session null
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:05.978Z #_useSession end
+🔧 MIDDLEWARE CLIENT: Criando cliente Supabase para middleware...
+GoTrueClient@2 (2.71.1) 2025-08-01T00:49:06.007Z #_acquireLock begin -1
+GoTrueClient@2 (2.71.1) 2025-08-01T00:49:06.007Z #_acquireLock lock acquired for storage key armazem-sao-joaquim-auth
+GoTrueClient@2 (2.71.1) 2025-08-01T00:49:06.007Z #_handleVisibilityChange()
+GoTrueClient@2 (2.71.1) 2025-08-01T00:49:06.008Z #onAuthStateChange() registered callback with id 03e3089f-62de-4981-849d-5179aad2320e
+GoTrueClient@2 (2.71.1) 2025-08-01T00:49:06.008Z #onAuthStateChange() registered callback with id 5c4b1779-91f8-496d-9d38-46b02e8431d1
+GoTrueClient@2 (2.71.1) 2025-08-01T00:49:06.008Z #_initialize() end
+GoTrueClient@2 (2.71.1) 2025-08-01T00:49:06.008Z #_acquireLock lock released for storage key armazem-sao-joaquim-auth
+GoTrueClient@2 (2.71.1) 2025-08-01T00:49:06.008Z #_acquireLock end
+GoTrueClient@2 (2.71.1) 2025-08-01T00:49:06.009Z #_acquireLock begin -1
+GoTrueClient@2 (2.71.1) 2025-08-01T00:49:06.009Z #_acquireLock lock acquired for storage key armazem-sao-joaquim-auth
+GoTrueClient@2 (2.71.1) 2025-08-01T00:49:06.009Z #_useSession begin
+GoTrueClient@2 (2.71.1) 2025-08-01T00:49:06.009Z #__loadSession() begin
+🍪 MIDDLEWARE CLIENT: getAll() chamado - cookies: [
+  '__stripe_mid',
+  'grafana_session',
+  'grafana_session_expiry',
+  'armazem-sao-joaquim-auth-code-verifier'
+]
+GoTrueClient@2 (2.71.1) 2025-08-01T00:49:06.009Z #_acquireLock begin -1
+GoTrueClient@2 (2.71.1) 2025-08-01T00:49:06.010Z #_acquireLock end
+GoTrueClient@2 (2.71.1) 2025-08-01T00:49:06.010Z #_acquireLock begin -1
+GoTrueClient@2 (2.71.1) 2025-08-01T00:49:06.010Z #_acquireLock end
+GoTrueClient@2 (2.71.1) 2025-08-01T00:49:06.010Z #_useSession begin
+GoTrueClient@2 (2.71.1) 2025-08-01T00:49:06.010Z #__loadSession() begin
+🍪 MIDDLEWARE CLIENT: getAll() chamado - cookies: [
+  '__stripe_mid',
+  'grafana_session',
+  'grafana_session_expiry',
+  'armazem-sao-joaquim-auth-code-verifier'
+]
+GoTrueClient@2 (2.71.1) 2025-08-01T00:49:06.011Z #_useSession begin
+GoTrueClient@2 (2.71.1) 2025-08-01T00:49:06.011Z #__loadSession() begin
+🍪 MIDDLEWARE CLIENT: getAll() chamado - cookies: [
+  '__stripe_mid',
+  'grafana_session',
+  'grafana_session_expiry',
+  'armazem-sao-joaquim-auth-code-verifier'
+]
+GoTrueClient@2 (2.71.1) 2025-08-01T00:49:06.011Z #getSession() session from storage null
+GoTrueClient@2 (2.71.1) 2025-08-01T00:49:06.011Z #__loadSession() end
+GoTrueClient@2 (2.71.1) 2025-08-01T00:49:06.011Z INITIAL_SESSION callback id 03e3089f-62de-4981-849d-5179aad2320e session null
+GoTrueClient@2 (2.71.1) 2025-08-01T00:49:06.011Z #getSession() session from storage null
+GoTrueClient@2 (2.71.1) 2025-08-01T00:49:06.012Z #__loadSession() end
+GoTrueClient@2 (2.71.1) 2025-08-01T00:49:06.012Z #_useSession end
+GoTrueClient@2 (2.71.1) 2025-08-01T00:49:06.012Z INITIAL_SESSION callback id 5c4b1779-91f8-496d-9d38-46b02e8431d1 session null
+GoTrueClient@2 (2.71.1) 2025-08-01T00:49:06.012Z #_useSession end
+GoTrueClient@2 (2.71.1) 2025-08-01T00:49:06.012Z #getSession() session from storage null
+GoTrueClient@2 (2.71.1) 2025-08-01T00:49:06.013Z #__loadSession() end
+GoTrueClient@2 (2.71.1) 2025-08-01T00:49:06.013Z #_useSession end
+GoTrueClient@2 (2.71.1) 2025-08-01T00:49:06.013Z #_acquireLock lock released for storage key armazem-sao-joaquim-auth
+GoTrueClient@2 (2.71.1) 2025-08-01T00:49:06.013Z #_acquireLock end
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:06.154Z #_acquireLock begin -1
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:06.154Z #_acquireLock lock acquired for storage key armazem-sao-joaquim-auth
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:06.154Z #_useSession begin
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:06.155Z #__loadSession() begin
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:06.155Z #getSession() session from storage null
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:06.155Z #__loadSession() end
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:06.155Z #_useSession end
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:06.155Z #_acquireLock lock released for storage key armazem-sao-joaquim-auth
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:06.155Z #_acquireLock end
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:08.621Z #_acquireLock begin -1
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:08.622Z #_acquireLock lock acquired for storage key armazem-sao-joaquim-auth
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:08.622Z #_handleVisibilityChange()
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:08.623Z #onAuthStateChange() registered callback with id 2f9d4e84-6431-4df6-8bc5-e5bf448f6b31
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:08.634Z #_initialize() end
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:08.637Z #_acquireLock lock released for storage key armazem-sao-joaquim-auth
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:08.638Z #_acquireLock end
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:08.638Z #_acquireLock begin -1
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:08.638Z #_acquireLock lock acquired for storage key armazem-sao-joaquim-auth
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:08.638Z #_useSession begin
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:08.638Z #__loadSession() begin
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:08.639Z #_acquireLock lock released for storage key armazem-sao-joaquim-auth
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:08.639Z #getSession() session from storage null
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:08.639Z #__loadSession() end
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:08.639Z #_acquireLock end
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:08.640Z INITIAL_SESSION callback id 2f9d4e84-6431-4df6-8bc5-e5bf448f6b31 session null
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:08.640Z #_useSession end
+🔧 MIDDLEWARE CLIENT: Criando cliente Supabase para middleware...
+GoTrueClient@3 (2.71.1) 2025-08-01T00:49:20.826Z #_acquireLock begin -1
+GoTrueClient@3 (2.71.1) 2025-08-01T00:49:20.826Z #_acquireLock lock acquired for storage key armazem-sao-joaquim-auth
+GoTrueClient@3 (2.71.1) 2025-08-01T00:49:20.826Z #_handleVisibilityChange()
+GoTrueClient@3 (2.71.1) 2025-08-01T00:49:20.827Z #onAuthStateChange() registered callback with id 4ac80ba0-1a43-45b7-a751-2d12180e0ff7
+GoTrueClient@3 (2.71.1) 2025-08-01T00:49:20.827Z #onAuthStateChange() registered callback with id 2ad825bb-a442-4346-88f1-1df27d91a9b9
+GoTrueClient@3 (2.71.1) 2025-08-01T00:49:20.827Z #_initialize() end
+GoTrueClient@3 (2.71.1) 2025-08-01T00:49:20.827Z #_acquireLock lock released for storage key armazem-sao-joaquim-auth
+GoTrueClient@3 (2.71.1) 2025-08-01T00:49:20.827Z #_acquireLock end
+GoTrueClient@3 (2.71.1) 2025-08-01T00:49:20.827Z #_acquireLock begin -1
+GoTrueClient@3 (2.71.1) 2025-08-01T00:49:20.827Z #_acquireLock lock acquired for storage key armazem-sao-joaquim-auth
+GoTrueClient@3 (2.71.1) 2025-08-01T00:49:20.828Z #_useSession begin
+GoTrueClient@3 (2.71.1) 2025-08-01T00:49:20.828Z #__loadSession() begin
+🍪 MIDDLEWARE CLIENT: getAll() chamado - cookies: [
+  '__stripe_mid',
+  'grafana_session',
+  'grafana_session_expiry',
+  'armazem-sao-joaquim-auth-code-verifier'
+]
+GoTrueClient@3 (2.71.1) 2025-08-01T00:49:20.828Z #_acquireLock begin -1
+GoTrueClient@3 (2.71.1) 2025-08-01T00:49:20.828Z #_acquireLock end
+GoTrueClient@3 (2.71.1) 2025-08-01T00:49:20.829Z #_acquireLock begin -1
+GoTrueClient@3 (2.71.1) 2025-08-01T00:49:20.829Z #_acquireLock end
+GoTrueClient@3 (2.71.1) 2025-08-01T00:49:20.829Z #_useSession begin
+GoTrueClient@3 (2.71.1) 2025-08-01T00:49:20.829Z #__loadSession() begin
+🍪 MIDDLEWARE CLIENT: getAll() chamado - cookies: [
+  '__stripe_mid',
+  'grafana_session',
+  'grafana_session_expiry',
+  'armazem-sao-joaquim-auth-code-verifier'
+]
+GoTrueClient@3 (2.71.1) 2025-08-01T00:49:20.830Z #_useSession begin
+GoTrueClient@3 (2.71.1) 2025-08-01T00:49:20.830Z #__loadSession() begin
+🍪 MIDDLEWARE CLIENT: getAll() chamado - cookies: [
+  '__stripe_mid',
+  'grafana_session',
+  'grafana_session_expiry',
+  'armazem-sao-joaquim-auth-code-verifier'
+]
+GoTrueClient@3 (2.71.1) 2025-08-01T00:49:20.830Z #getSession() session from storage null
+GoTrueClient@3 (2.71.1) 2025-08-01T00:49:20.830Z #__loadSession() end
+GoTrueClient@3 (2.71.1) 2025-08-01T00:49:20.830Z INITIAL_SESSION callback id 4ac80ba0-1a43-45b7-a751-2d12180e0ff7 session null
+GoTrueClient@3 (2.71.1) 2025-08-01T00:49:20.830Z #getSession() session from storage null
+GoTrueClient@3 (2.71.1) 2025-08-01T00:49:20.831Z #__loadSession() end
+GoTrueClient@3 (2.71.1) 2025-08-01T00:49:20.831Z #_useSession end
+GoTrueClient@3 (2.71.1) 2025-08-01T00:49:20.831Z INITIAL_SESSION callback id 2ad825bb-a442-4346-88f1-1df27d91a9b9 session null
+GoTrueClient@3 (2.71.1) 2025-08-01T00:49:20.831Z #_useSession end
+GoTrueClient@3 (2.71.1) 2025-08-01T00:49:20.831Z #getSession() session from storage null
+GoTrueClient@3 (2.71.1) 2025-08-01T00:49:20.831Z #__loadSession() end
+GoTrueClient@3 (2.71.1) 2025-08-01T00:49:20.831Z #_useSession end
+GoTrueClient@3 (2.71.1) 2025-08-01T00:49:20.831Z #_acquireLock lock released for storage key armazem-sao-joaquim-auth
+GoTrueClient@3 (2.71.1) 2025-08-01T00:49:20.832Z #_acquireLock end
+🔧 MIDDLEWARE CLIENT: Criando cliente Supabase para middleware...
+GoTrueClient@4 (2.71.1) 2025-08-01T00:49:21.022Z #_acquireLock begin -1
+GoTrueClient@4 (2.71.1) 2025-08-01T00:49:21.022Z #_acquireLock lock acquired for storage key armazem-sao-joaquim-auth
+GoTrueClient@4 (2.71.1) 2025-08-01T00:49:21.022Z #_handleVisibilityChange()
+GoTrueClient@4 (2.71.1) 2025-08-01T00:49:21.022Z #onAuthStateChange() registered callback with id df5c9536-075c-4d58-9957-9da50f6bbf25
+GoTrueClient@4 (2.71.1) 2025-08-01T00:49:21.022Z #onAuthStateChange() registered callback with id 47dbf6fe-dd40-4366-9e3b-9ec6511bc982
+GoTrueClient@4 (2.71.1) 2025-08-01T00:49:21.023Z #_initialize() end
+GoTrueClient@4 (2.71.1) 2025-08-01T00:49:21.023Z #_acquireLock lock released for storage key armazem-sao-joaquim-auth
+GoTrueClient@4 (2.71.1) 2025-08-01T00:49:21.023Z #_acquireLock end
+GoTrueClient@4 (2.71.1) 2025-08-01T00:49:21.023Z #_acquireLock begin -1
+GoTrueClient@4 (2.71.1) 2025-08-01T00:49:21.023Z #_acquireLock lock acquired for storage key armazem-sao-joaquim-auth
+GoTrueClient@4 (2.71.1) 2025-08-01T00:49:21.024Z #_useSession begin
+GoTrueClient@4 (2.71.1) 2025-08-01T00:49:21.024Z #__loadSession() begin
+🍪 MIDDLEWARE CLIENT: getAll() chamado - cookies: [
+  '__stripe_mid',
+  'grafana_session',
+  'grafana_session_expiry',
+  'armazem-sao-joaquim-auth-code-verifier'
+]
+GoTrueClient@4 (2.71.1) 2025-08-01T00:49:21.024Z #_acquireLock begin -1
+GoTrueClient@4 (2.71.1) 2025-08-01T00:49:21.025Z #_acquireLock end
+GoTrueClient@4 (2.71.1) 2025-08-01T00:49:21.026Z #_acquireLock begin -1
+GoTrueClient@4 (2.71.1) 2025-08-01T00:49:21.026Z #_acquireLock end
+GoTrueClient@4 (2.71.1) 2025-08-01T00:49:21.026Z #_useSession begin
+GoTrueClient@4 (2.71.1) 2025-08-01T00:49:21.026Z #__loadSession() begin
+🍪 MIDDLEWARE CLIENT: getAll() chamado - cookies: [
+  '__stripe_mid',
+  'grafana_session',
+  'grafana_session_expiry',
+  'armazem-sao-joaquim-auth-code-verifier'
+]
+GoTrueClient@4 (2.71.1) 2025-08-01T00:49:21.026Z #_useSession begin
+GoTrueClient@4 (2.71.1) 2025-08-01T00:49:21.027Z #__loadSession() begin
+🍪 MIDDLEWARE CLIENT: getAll() chamado - cookies: [
+  '__stripe_mid',
+  'grafana_session',
+  'grafana_session_expiry',
+  'armazem-sao-joaquim-auth-code-verifier'
+]
+GoTrueClient@4 (2.71.1) 2025-08-01T00:49:21.027Z #getSession() session from storage null
+GoTrueClient@4 (2.71.1) 2025-08-01T00:49:21.027Z #__loadSession() end
+GoTrueClient@4 (2.71.1) 2025-08-01T00:49:21.027Z INITIAL_SESSION callback id df5c9536-075c-4d58-9957-9da50f6bbf25 session null
+GoTrueClient@4 (2.71.1) 2025-08-01T00:49:21.027Z #getSession() session from storage null
+GoTrueClient@4 (2.71.1) 2025-08-01T00:49:21.027Z #__loadSession() end
+GoTrueClient@4 (2.71.1) 2025-08-01T00:49:21.028Z #_useSession end
+GoTrueClient@4 (2.71.1) 2025-08-01T00:49:21.028Z INITIAL_SESSION callback id 47dbf6fe-dd40-4366-9e3b-9ec6511bc982 session null
+GoTrueClient@4 (2.71.1) 2025-08-01T00:49:21.028Z #_useSession end
+GoTrueClient@4 (2.71.1) 2025-08-01T00:49:21.028Z #getSession() session from storage null
+GoTrueClient@4 (2.71.1) 2025-08-01T00:49:21.028Z #__loadSession() end
+GoTrueClient@4 (2.71.1) 2025-08-01T00:49:21.028Z #_useSession end
+GoTrueClient@4 (2.71.1) 2025-08-01T00:49:21.029Z #_acquireLock lock released for storage key armazem-sao-joaquim-auth
+GoTrueClient@4 (2.71.1) 2025-08-01T00:49:21.029Z #_acquireLock end
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:21.185Z #_acquireLock begin -1
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:21.185Z #_acquireLock lock acquired for storage key armazem-sao-joaquim-auth
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:21.185Z #_useSession begin
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:21.185Z #__loadSession() begin
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:21.186Z #getSession() session from storage null
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:21.186Z #__loadSession() end
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:21.186Z #_useSession end
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:21.186Z #_acquireLock lock released for storage key armazem-sao-joaquim-auth
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:21.186Z #_acquireLock end
+ ⨯ Failed to generate static paths for /[locale]/blog:
+/mnt/d/Programacao/Armazem_saojoaquim/.next/server/vendor-chunks/next.js:172
+eval("\nObject.defineProperty(exports, \"__esModule\", ({\n    value: true\n}));\n0 && (0);\nfunction _export(target, all) {\n    for(var name in all)Object.defineProperty(target, name, {\n        enumerable: true,\n        get: all[name]\n    });\n}\n_export(exports, {\n    DynamicServerError: function() {\n        return DynamicServerError;\n    },\n    isDynamicServerError: function() {\n        return isDynamicServerError;\n    }\n});\nconst DYNAMIC_ERROR_CODE = \"DYNAMIC_SERVER_USAGE\";\nclass DynamicServerError extends Error {\n    constructor(description){\n        super(\"Dynamic server usage: \" + description);\n        this.description = description;\n        this.digest = DYNAMIC_ERROR_CODE;\n    }\n}\nfunction isDynamicServerError(err) {\n    if (typeof err !== \"object\" || err === null || !(\"digest\" in err) || typeof err.digest !== \"string\") {\n        return false;\n    }\n    return err.digest === DYNAMIC_ERROR_CODE;\n}\nif ((typeof exports.default === \"function\" || typeof exports.default === \"object\" && exports.default !== null) && typeof exports.default.__esModule === \"undefined\") {\n    Object.defineProperty(exports.default, \"__esModule\", {\n        value: true\n    });\n    Object.assign(exports.default, exports);\n    module.exports = exports.default;\n} //# sourceMappingURL=hooks-server-context.js.map\n//# sourceURL=[module]\n//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiKHNzcikvLi9ub2RlX21vZHVsZXMvbmV4dC9kaXN0L2NsaWVudC9jb21wb25lbnRzL2hvb2tzLXNlcnZlci1jb250ZXh0LmpzIiwibWFwcGluZ3MiOiI7Ozs7Ozs7Ozs7OztJQUVhQSxvQkFBa0I7ZUFBbEJBOztJQVFHQyxzQkFBb0I7ZUFBcEJB
+     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+SyntaxError: Invalid or unexpected token
+    at wrapSafe (node:internal/modules/cjs/loader:1472:18)
+    at Module._compile (node:internal/modules/cjs/loader:1501:20)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1613:10)
+    at Module.load (node:internal/modules/cjs/loader:1275:32)
+    at Module._load (node:internal/modules/cjs/loader:1096:12)
+    at Module.require (node:internal/modules/cjs/loader:1298:19)
+    at mod.require (/mnt/d/Programacao/Armazem_saojoaquim/node_modules/next/dist/server/require-hook.js:65:28)
+    at require (node:internal/modules/helpers:182:18)
+    at __webpack_require__.f.require (/mnt/d/Programacao/Armazem_saojoaquim/.next/server/webpack-runtime.js:203:28)
+    at /mnt/d/Programacao/Armazem_saojoaquim/.next/server/webpack-runtime.js:116:40 {
+  type: 'SyntaxError'
+}
+ ⨯ Failed to generate static paths for /[locale]/blog:
+/mnt/d/Programacao/Armazem_saojoaquim/.next/server/vendor-chunks/next.js:172
+eval("\nObject.defineProperty(exports, \"__esModule\", ({\n    value: true\n}));\n0 && (0);\nfunction _export(target, all) {\n    for(var name in all)Object.defineProperty(target, name, {\n        enumerable: true,\n        get: all[name]\n    });\n}\n_export(exports, {\n    DynamicServerError: function() {\n        return DynamicServerError;\n    },\n    isDynamicServerError: function() {\n        return isDynamicServerError;\n    }\n});\nconst DYNAMIC_ERROR_CODE = \"DYNAMIC_SERVER_USAGE\";\nclass DynamicServerError extends Error {\n    constructor(description){\n        super(\"Dynamic server usage: \" + description);\n        this.description = description;\n        this.digest = DYNAMIC_ERROR_CODE;\n    }\n}\nfunction isDynamicServerError(err) {\n    if (typeof err !== \"object\" || err === null || !(\"digest\" in err) || typeof err.digest !== \"string\") {\n        return false;\n    }\n    return err.digest === DYNAMIC_ERROR_CODE;\n}\nif ((typeof exports.default === \"function\" || typeof exports.default === \"object\" && exports.default !== null) && typeof exports.default.__esModule === \"undefined\") {\n    Object.defineProperty(exports.default, \"__esModule\", {\n        value: true\n    });\n    Object.assign(exports.default, exports);\n    module.exports = exports.default;\n} //# sourceMappingURL=hooks-server-context.js.map\n//# sourceURL=[module]\n//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiKHNzcikvLi9ub2RlX21vZHVsZXMvbmV4dC9kaXN0L2NsaWVudC9jb21wb25lbnRzL2hvb2tzLXNlcnZlci1jb250ZXh0LmpzIiwibWFwcGluZ3MiOiI7Ozs7Ozs7Ozs7OztJQUVhQSxvQkFBa0I7ZUFBbEJBOztJQVFHQyxzQkFBb0I7ZUFBcEJB
+     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+SyntaxError: Invalid or unexpected token
+    at wrapSafe (node:internal/modules/cjs/loader:1472:18)
+    at Module._compile (node:internal/modules/cjs/loader:1501:20)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1613:10)
+    at Module.load (node:internal/modules/cjs/loader:1275:32)
+    at Module._load (node:internal/modules/cjs/loader:1096:12)
+    at Module.require (node:internal/modules/cjs/loader:1298:19)
+    at mod.require (/mnt/d/Programacao/Armazem_saojoaquim/node_modules/next/dist/server/require-hook.js:65:28)
+    at require (node:internal/modules/helpers:182:18)
+    at __webpack_require__.f.require (/mnt/d/Programacao/Armazem_saojoaquim/.next/server/webpack-runtime.js:203:28)
+    at /mnt/d/Programacao/Armazem_saojoaquim/.next/server/webpack-runtime.js:116:40 {
+  type: 'SyntaxError'
+}
+ ✓ Compiled /api/admin/dashboard in 381ms (2303 modules)
+🔧 MIDDLEWARE CLIENT: Criando cliente Supabase para middleware...
+GoTrueClient@5 (2.71.1) 2025-08-01T00:49:22.734Z #_acquireLock begin -1
+GoTrueClient@5 (2.71.1) 2025-08-01T00:49:22.734Z #_acquireLock lock acquired for storage key armazem-sao-joaquim-auth
+GoTrueClient@5 (2.71.1) 2025-08-01T00:49:22.734Z #_handleVisibilityChange()
+GoTrueClient@5 (2.71.1) 2025-08-01T00:49:22.735Z #onAuthStateChange() registered callback with id 49541178-826c-4e49-9beb-0bddc980cf84
+GoTrueClient@5 (2.71.1) 2025-08-01T00:49:22.735Z #onAuthStateChange() registered callback with id ae082207-8f52-4487-ba27-d3e4d41fc03e
+GoTrueClient@5 (2.71.1) 2025-08-01T00:49:22.735Z #_initialize() end
+GoTrueClient@5 (2.71.1) 2025-08-01T00:49:22.735Z #_acquireLock lock released for storage key armazem-sao-joaquim-auth
+GoTrueClient@5 (2.71.1) 2025-08-01T00:49:22.736Z #_acquireLock end
+GoTrueClient@5 (2.71.1) 2025-08-01T00:49:22.736Z #_acquireLock begin -1
+GoTrueClient@5 (2.71.1) 2025-08-01T00:49:22.736Z #_acquireLock lock acquired for storage key armazem-sao-joaquim-auth
+GoTrueClient@5 (2.71.1) 2025-08-01T00:49:22.736Z #_useSession begin
+GoTrueClient@5 (2.71.1) 2025-08-01T00:49:22.736Z #__loadSession() begin
+🍪 MIDDLEWARE CLIENT: getAll() chamado - cookies: [
+  '__stripe_mid',
+  'grafana_session',
+  'grafana_session_expiry',
+  'armazem-sao-joaquim-auth-code-verifier'
+]
+GoTrueClient@5 (2.71.1) 2025-08-01T00:49:22.737Z #_acquireLock begin -1
+GoTrueClient@5 (2.71.1) 2025-08-01T00:49:22.737Z #_acquireLock end
+GoTrueClient@5 (2.71.1) 2025-08-01T00:49:22.737Z #_acquireLock begin -1
+GoTrueClient@5 (2.71.1) 2025-08-01T00:49:22.737Z #_acquireLock end
+GoTrueClient@5 (2.71.1) 2025-08-01T00:49:22.738Z #_useSession begin
+GoTrueClient@5 (2.71.1) 2025-08-01T00:49:22.738Z #__loadSession() begin
+🍪 MIDDLEWARE CLIENT: getAll() chamado - cookies: [
+  '__stripe_mid',
+  'grafana_session',
+  'grafana_session_expiry',
+  'armazem-sao-joaquim-auth-code-verifier'
+]
+GoTrueClient@5 (2.71.1) 2025-08-01T00:49:22.738Z #_useSession begin
+GoTrueClient@5 (2.71.1) 2025-08-01T00:49:22.738Z #__loadSession() begin
+🍪 MIDDLEWARE CLIENT: getAll() chamado - cookies: [
+  '__stripe_mid',
+  'grafana_session',
+  'grafana_session_expiry',
+  'armazem-sao-joaquim-auth-code-verifier'
+]
+GoTrueClient@5 (2.71.1) 2025-08-01T00:49:22.739Z #getSession() session from storage null
+GoTrueClient@5 (2.71.1) 2025-08-01T00:49:22.739Z #__loadSession() end
+GoTrueClient@5 (2.71.1) 2025-08-01T00:49:22.739Z INITIAL_SESSION callback id 49541178-826c-4e49-9beb-0bddc980cf84 session null
+GoTrueClient@5 (2.71.1) 2025-08-01T00:49:22.739Z #getSession() session from storage null
+GoTrueClient@5 (2.71.1) 2025-08-01T00:49:22.739Z #__loadSession() end
+GoTrueClient@5 (2.71.1) 2025-08-01T00:49:22.739Z #_useSession end
+GoTrueClient@5 (2.71.1) 2025-08-01T00:49:22.739Z INITIAL_SESSION callback id ae082207-8f52-4487-ba27-d3e4d41fc03e session null
+GoTrueClient@5 (2.71.1) 2025-08-01T00:49:22.739Z #_useSession end
+GoTrueClient@5 (2.71.1) 2025-08-01T00:49:22.740Z #getSession() session from storage null
+GoTrueClient@5 (2.71.1) 2025-08-01T00:49:22.740Z #__loadSession() end
+GoTrueClient@5 (2.71.1) 2025-08-01T00:49:22.740Z #_useSession end
+GoTrueClient@5 (2.71.1) 2025-08-01T00:49:22.740Z #_acquireLock lock released for storage key armazem-sao-joaquim-auth
+GoTrueClient@5 (2.71.1) 2025-08-01T00:49:22.740Z #_acquireLock end
+📊 API /admin/dashboard: DASHBOARD STATS REQUEST - 2025-08-01T00:49:22.958Z
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:22.959Z #_acquireLock begin -1
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:22.959Z #_acquireLock lock acquired for storage key armazem-sao-joaquim-auth
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:22.960Z #_handleVisibilityChange()
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:22.961Z #onAuthStateChange() registered callback with id 197c04f7-d4d2-4ba4-a7b4-a74a4d7947ad
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:22.961Z #onAuthStateChange() registered callback with id 426f7f7f-7eed-448a-bfd2-d6d55c7d7cb3
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:22.961Z #_initialize() end
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:22.961Z #_acquireLock lock released for storage key armazem-sao-joaquim-auth
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:22.961Z #_acquireLock end
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:22.961Z #_acquireLock begin -1
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:22.961Z #_acquireLock lock acquired for storage key armazem-sao-joaquim-auth
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:22.962Z #_useSession begin
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:22.962Z #__loadSession() begin
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:22.962Z #_acquireLock begin -1
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:22.962Z #_acquireLock end
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:22.962Z #_acquireLock begin -1
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:22.963Z #_acquireLock end
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:22.963Z #_useSession begin
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:22.963Z #__loadSession() begin
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:22.963Z #_useSession begin
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:22.963Z #__loadSession() begin
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:22.963Z #getSession() session from storage null
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:22.963Z #__loadSession() end
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:22.964Z INITIAL_SESSION callback id 197c04f7-d4d2-4ba4-a7b4-a74a4d7947ad session null
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:22.964Z #getSession() session from storage null
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:22.964Z #__loadSession() end
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:22.964Z #_useSession end
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:22.964Z INITIAL_SESSION callback id 426f7f7f-7eed-448a-bfd2-d6d55c7d7cb3 session null
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:22.964Z #_useSession end
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:22.964Z #getSession() session from storage null
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:22.965Z #__loadSession() end
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:22.965Z #_useSession end
+❌ API /admin/dashboard: No session
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:22.965Z #_acquireLock lock released for storage key armazem-sao-joaquim-auth
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:22.966Z #_acquireLock end
+ GET /api/admin/dashboard 401 in 688ms
+ ○ Compiling /[locale]/blog/[slug] ...
+ ✓ Compiled /[locale]/blog/[slug] in 951ms (3589 modules)
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:24.212Z #_acquireLock begin -1
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:24.212Z #_acquireLock lock acquired for storage key armazem-sao-joaquim-auth
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:24.212Z #_handleVisibilityChange()
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:24.213Z #onAuthStateChange() registered callback with id fa376ddf-fa37-4d82-8524-f728f546bea1
+GoTrueClient@1 (2.71.1) 2025-08-01T00:49:24.217Z #_acquireLock begin -1
+GoTrueClient@1 (2.71.1) 2025-08-01T00:49:24.217Z #_acquireLock lock acquired for storage key armazem-sao-joaquim-auth
+GoTrueClient@1 (2.71.1) 2025-08-01T00:49:24.217Z #_handleVisibilityChange()
+GoTrueClient@1 (2.71.1) 2025-08-01T00:49:24.217Z #onAuthStateChange() registered callback with id affba11a-be5a-415d-98bd-6501a59df559
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:24.228Z #_initialize() end
+GoTrueClient@1 (2.71.1) 2025-08-01T00:49:24.228Z #_initialize() end
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:24.228Z #_acquireLock lock released for storage key armazem-sao-joaquim-auth
+GoTrueClient@1 (2.71.1) 2025-08-01T00:49:24.228Z #_acquireLock lock released for storage key armazem-sao-joaquim-auth
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:24.228Z #_acquireLock end
+GoTrueClient@1 (2.71.1) 2025-08-01T00:49:24.228Z #_acquireLock end
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:24.229Z #_acquireLock begin -1
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:24.229Z #_acquireLock lock acquired for storage key armazem-sao-joaquim-auth
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:24.229Z #_useSession begin
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:24.229Z #__loadSession() begin
+GoTrueClient@1 (2.71.1) 2025-08-01T00:49:24.230Z #_acquireLock begin -1
+GoTrueClient@1 (2.71.1) 2025-08-01T00:49:24.230Z #_acquireLock lock acquired for storage key armazem-sao-joaquim-auth
+GoTrueClient@1 (2.71.1) 2025-08-01T00:49:24.230Z #_useSession begin
+GoTrueClient@1 (2.71.1) 2025-08-01T00:49:24.230Z #__loadSession() begin
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:24.230Z #_acquireLock lock released for storage key armazem-sao-joaquim-auth
+GoTrueClient@1 (2.71.1) 2025-08-01T00:49:24.230Z #_acquireLock lock released for storage key armazem-sao-joaquim-auth
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:24.231Z #getSession() session from storage null
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:24.231Z #__loadSession() end
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:24.231Z #_acquireLock end
+GoTrueClient@1 (2.71.1) 2025-08-01T00:49:24.231Z #getSession() session from storage null
+GoTrueClient@1 (2.71.1) 2025-08-01T00:49:24.231Z #__loadSession() end
+GoTrueClient@1 (2.71.1) 2025-08-01T00:49:24.231Z #_acquireLock end
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:24.231Z INITIAL_SESSION callback id fa376ddf-fa37-4d82-8524-f728f546bea1 session null
+GoTrueClient@1 (2.71.1) 2025-08-01T00:49:24.232Z INITIAL_SESSION callback id affba11a-be5a-415d-98bd-6501a59df559 session null
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:24.232Z #_useSession end
+GoTrueClient@1 (2.71.1) 2025-08-01T00:49:24.232Z #_useSession end
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 654ms
+🔧 MIDDLEWARE CLIENT: Criando cliente Supabase para middleware...
+GoTrueClient@6 (2.71.1) 2025-08-01T00:49:25.072Z #_acquireLock begin -1
+GoTrueClient@6 (2.71.1) 2025-08-01T00:49:25.072Z #_acquireLock lock acquired for storage key armazem-sao-joaquim-auth
+GoTrueClient@6 (2.71.1) 2025-08-01T00:49:25.073Z #_handleVisibilityChange()
+GoTrueClient@6 (2.71.1) 2025-08-01T00:49:25.073Z #onAuthStateChange() registered callback with id 90d8b98d-9787-4ee1-92fd-2ae371b0e2cb
+GoTrueClient@6 (2.71.1) 2025-08-01T00:49:25.073Z #onAuthStateChange() registered callback with id a5da1e8c-fdc5-4778-9ce5-901a8858cbb1
+GoTrueClient@6 (2.71.1) 2025-08-01T00:49:25.073Z #_initialize() end
+GoTrueClient@6 (2.71.1) 2025-08-01T00:49:25.073Z #_acquireLock lock released for storage key armazem-sao-joaquim-auth
+GoTrueClient@6 (2.71.1) 2025-08-01T00:49:25.074Z #_acquireLock end
+GoTrueClient@6 (2.71.1) 2025-08-01T00:49:25.074Z #_acquireLock begin -1
+GoTrueClient@6 (2.71.1) 2025-08-01T00:49:25.074Z #_acquireLock lock acquired for storage key armazem-sao-joaquim-auth
+GoTrueClient@6 (2.71.1) 2025-08-01T00:49:25.074Z #_useSession begin
+GoTrueClient@6 (2.71.1) 2025-08-01T00:49:25.074Z #__loadSession() begin
+🍪 MIDDLEWARE CLIENT: getAll() chamado - cookies: [
+  '__stripe_mid',
+  'grafana_session',
+  'grafana_session_expiry',
+  'armazem-sao-joaquim-auth-code-verifier'
+]
+GoTrueClient@6 (2.71.1) 2025-08-01T00:49:25.075Z #_acquireLock begin -1
+GoTrueClient@6 (2.71.1) 2025-08-01T00:49:25.075Z #_acquireLock end
+GoTrueClient@6 (2.71.1) 2025-08-01T00:49:25.075Z #_acquireLock begin -1
+GoTrueClient@6 (2.71.1) 2025-08-01T00:49:25.075Z #_acquireLock end
+GoTrueClient@6 (2.71.1) 2025-08-01T00:49:25.075Z #_useSession begin
+GoTrueClient@6 (2.71.1) 2025-08-01T00:49:25.075Z #__loadSession() begin
+🍪 MIDDLEWARE CLIENT: getAll() chamado - cookies: [
+  '__stripe_mid',
+  'grafana_session',
+  'grafana_session_expiry',
+  'armazem-sao-joaquim-auth-code-verifier'
+]
+GoTrueClient@6 (2.71.1) 2025-08-01T00:49:25.076Z #_useSession begin
+GoTrueClient@6 (2.71.1) 2025-08-01T00:49:25.076Z #__loadSession() begin
+🍪 MIDDLEWARE CLIENT: getAll() chamado - cookies: [
+  '__stripe_mid',
+  'grafana_session',
+  'grafana_session_expiry',
+  'armazem-sao-joaquim-auth-code-verifier'
+]
+GoTrueClient@6 (2.71.1) 2025-08-01T00:49:25.076Z #getSession() session from storage null
+GoTrueClient@6 (2.71.1) 2025-08-01T00:49:25.076Z #__loadSession() end
+GoTrueClient@6 (2.71.1) 2025-08-01T00:49:25.077Z INITIAL_SESSION callback id 90d8b98d-9787-4ee1-92fd-2ae371b0e2cb session null
+GoTrueClient@6 (2.71.1) 2025-08-01T00:49:25.077Z #getSession() session from storage null
+GoTrueClient@6 (2.71.1) 2025-08-01T00:49:25.077Z #__loadSession() end
+GoTrueClient@6 (2.71.1) 2025-08-01T00:49:25.077Z #_useSession end
+GoTrueClient@6 (2.71.1) 2025-08-01T00:49:25.077Z INITIAL_SESSION callback id a5da1e8c-fdc5-4778-9ce5-901a8858cbb1 session null
+GoTrueClient@6 (2.71.1) 2025-08-01T00:49:25.077Z #_useSession end
+GoTrueClient@6 (2.71.1) 2025-08-01T00:49:25.078Z #getSession() session from storage null
+GoTrueClient@6 (2.71.1) 2025-08-01T00:49:25.078Z #__loadSession() end
+GoTrueClient@6 (2.71.1) 2025-08-01T00:49:25.078Z #_useSession end
+GoTrueClient@6 (2.71.1) 2025-08-01T00:49:25.078Z #_acquireLock lock released for storage key armazem-sao-joaquim-auth
+GoTrueClient@6 (2.71.1) 2025-08-01T00:49:25.078Z #_acquireLock end
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:26.214Z #_acquireLock begin -1
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:26.215Z #_acquireLock lock acquired for storage key armazem-sao-joaquim-auth
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:26.216Z #_handleVisibilityChange()
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:26.217Z #onAuthStateChange() registered callback with id 84aef020-2afa-4d03-8c4b-af6ce4b175bc
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:26.217Z #_initialize() end
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:26.221Z #_acquireLock lock released for storage key armazem-sao-joaquim-auth
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:26.221Z #_acquireLock end
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:26.221Z #_acquireLock begin -1
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:26.221Z #_acquireLock lock acquired for storage key armazem-sao-joaquim-auth
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:26.221Z #_useSession begin
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:26.221Z #__loadSession() begin
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:26.221Z #_acquireLock begin -1
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:26.221Z #_acquireLock end
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:26.222Z #_useSession begin
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:26.222Z #__loadSession() begin
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:26.222Z #getSession() session from storage null
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:26.222Z #__loadSession() end
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:26.222Z INITIAL_SESSION callback id 84aef020-2afa-4d03-8c4b-af6ce4b175bc session null
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:26.222Z #getSession() session from storage null
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:26.222Z #__loadSession() end
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:26.222Z #_useSession end
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:26.222Z #_useSession end
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:26.222Z #_acquireLock lock released for storage key armazem-sao-joaquim-auth
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:26.256Z #_acquireLock end
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:26.510Z #_acquireLock begin -1
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:26.510Z #_acquireLock lock acquired for storage key armazem-sao-joaquim-auth
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:26.510Z #_useSession begin
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:26.510Z #__loadSession() begin
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:26.510Z #getSession() session from storage null
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:26.510Z #__loadSession() end
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:26.510Z #_useSession end
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:26.510Z #_acquireLock lock released for storage key armazem-sao-joaquim-auth
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:26.510Z #_acquireLock end
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:26.601Z #_acquireLock begin -1
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:26.602Z #_acquireLock lock acquired for storage key armazem-sao-joaquim-auth
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:26.602Z #_handleVisibilityChange()
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:26.602Z #onAuthStateChange() registered callback with id 2a39e573-4f3f-42fe-addc-257b54fc61dd
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:26.602Z #_initialize() end
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:26.602Z #_acquireLock lock released for storage key armazem-sao-joaquim-auth
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:26.603Z #_acquireLock end
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:26.603Z #_acquireLock begin -1
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:26.603Z #_acquireLock lock acquired for storage key armazem-sao-joaquim-auth
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:26.603Z #_useSession begin
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:26.603Z #__loadSession() begin
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:26.603Z #_acquireLock lock released for storage key armazem-sao-joaquim-auth
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:26.604Z #getSession() session from storage null
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:26.604Z #__loadSession() end
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:26.604Z #_acquireLock end
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:26.604Z INITIAL_SESSION callback id 2a39e573-4f3f-42fe-addc-257b54fc61dd session null
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:26.604Z #_useSession end
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:26.606Z #_acquireLock begin -1
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:26.606Z #_acquireLock lock acquired for storage key armazem-sao-joaquim-auth
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:26.606Z #_useSession begin
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:26.606Z #__loadSession() begin
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:26.606Z #getSession() session from storage null
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:26.606Z #__loadSession() end
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:26.607Z #_useSession end
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:26.607Z #_acquireLock lock released for storage key armazem-sao-joaquim-auth
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:26.607Z #_acquireLock end
+🔧 MIDDLEWARE CLIENT: Criando cliente Supabase para middleware...
+GoTrueClient@7 (2.71.1) 2025-08-01T00:49:26.647Z #_acquireLock begin -1
+GoTrueClient@7 (2.71.1) 2025-08-01T00:49:26.647Z #_acquireLock lock acquired for storage key armazem-sao-joaquim-auth
+GoTrueClient@7 (2.71.1) 2025-08-01T00:49:26.647Z #_handleVisibilityChange()
+GoTrueClient@7 (2.71.1) 2025-08-01T00:49:26.648Z #onAuthStateChange() registered callback with id dad753b1-16f5-4821-808d-4dc0ab6ca021
+GoTrueClient@7 (2.71.1) 2025-08-01T00:49:26.648Z #onAuthStateChange() registered callback with id b2780100-cf8e-4514-a8b4-11e55cc989ba
+GoTrueClient@7 (2.71.1) 2025-08-01T00:49:26.648Z #_initialize() end
+GoTrueClient@7 (2.71.1) 2025-08-01T00:49:26.648Z #_acquireLock lock released for storage key armazem-sao-joaquim-auth
+GoTrueClient@7 (2.71.1) 2025-08-01T00:49:26.648Z #_acquireLock end
+GoTrueClient@7 (2.71.1) 2025-08-01T00:49:26.649Z #_acquireLock begin -1
+GoTrueClient@7 (2.71.1) 2025-08-01T00:49:26.649Z #_acquireLock lock acquired for storage key armazem-sao-joaquim-auth
+GoTrueClient@7 (2.71.1) 2025-08-01T00:49:26.649Z #_useSession begin
+GoTrueClient@7 (2.71.1) 2025-08-01T00:49:26.649Z #__loadSession() begin
+🍪 MIDDLEWARE CLIENT: getAll() chamado - cookies: [
+  '__stripe_mid',
+  'grafana_session',
+  'grafana_session_expiry',
+  'armazem-sao-joaquim-auth-code-verifier'
+]
+GoTrueClient@7 (2.71.1) 2025-08-01T00:49:26.649Z #_acquireLock begin -1
+GoTrueClient@7 (2.71.1) 2025-08-01T00:49:26.650Z #_acquireLock end
+GoTrueClient@7 (2.71.1) 2025-08-01T00:49:26.650Z #_acquireLock begin -1
+GoTrueClient@7 (2.71.1) 2025-08-01T00:49:26.650Z #_acquireLock end
+GoTrueClient@7 (2.71.1) 2025-08-01T00:49:26.650Z #_useSession begin
+GoTrueClient@7 (2.71.1) 2025-08-01T00:49:26.650Z #__loadSession() begin
+🍪 MIDDLEWARE CLIENT: getAll() chamado - cookies: [
+  '__stripe_mid',
+  'grafana_session',
+  'grafana_session_expiry',
+  'armazem-sao-joaquim-auth-code-verifier'
+]
+GoTrueClient@7 (2.71.1) 2025-08-01T00:49:26.651Z #_useSession begin
+GoTrueClient@7 (2.71.1) 2025-08-01T00:49:26.651Z #__loadSession() begin
+🍪 MIDDLEWARE CLIENT: getAll() chamado - cookies: [
+  '__stripe_mid',
+  'grafana_session',
+  'grafana_session_expiry',
+  'armazem-sao-joaquim-auth-code-verifier'
+]
+GoTrueClient@7 (2.71.1) 2025-08-01T00:49:26.651Z #getSession() session from storage null
+GoTrueClient@7 (2.71.1) 2025-08-01T00:49:26.652Z #__loadSession() end
+GoTrueClient@7 (2.71.1) 2025-08-01T00:49:26.652Z INITIAL_SESSION callback id dad753b1-16f5-4821-808d-4dc0ab6ca021 session null
+GoTrueClient@7 (2.71.1) 2025-08-01T00:49:26.652Z #getSession() session from storage null
+GoTrueClient@7 (2.71.1) 2025-08-01T00:49:26.652Z #__loadSession() end
+GoTrueClient@7 (2.71.1) 2025-08-01T00:49:26.652Z #_useSession end
+GoTrueClient@7 (2.71.1) 2025-08-01T00:49:26.652Z INITIAL_SESSION callback id b2780100-cf8e-4514-a8b4-11e55cc989ba session null
+GoTrueClient@7 (2.71.1) 2025-08-01T00:49:26.653Z #_useSession end
+GoTrueClient@7 (2.71.1) 2025-08-01T00:49:26.653Z #getSession() session from storage null
+GoTrueClient@7 (2.71.1) 2025-08-01T00:49:26.653Z #__loadSession() end
+GoTrueClient@7 (2.71.1) 2025-08-01T00:49:26.653Z #_useSession end
+GoTrueClient@7 (2.71.1) 2025-08-01T00:49:26.654Z #_acquireLock lock released for storage key armazem-sao-joaquim-auth
+GoTrueClient@7 (2.71.1) 2025-08-01T00:49:26.654Z #_acquireLock end
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:26.839Z #_acquireLock begin -1
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:26.839Z #_acquireLock lock acquired for storage key armazem-sao-joaquim-auth
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:26.840Z #_useSession begin
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:26.840Z #__loadSession() begin
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:26.840Z #getSession() session from storage null
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:26.840Z #__loadSession() end
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:26.840Z #_useSession end
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:26.841Z #_acquireLock lock released for storage key armazem-sao-joaquim-auth
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:26.841Z #_acquireLock end
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:26.842Z #_acquireLock begin -1
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:26.842Z #_acquireLock lock acquired for storage key armazem-sao-joaquim-auth
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:26.843Z #_useSession begin
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:26.843Z #__loadSession() begin
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:26.843Z #_acquireLock begin -1
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:26.843Z #_acquireLock end
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:26.844Z #getSession() session from storage null
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:26.844Z #__loadSession() end
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:26.844Z #_useSession end
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:26.844Z #_useSession begin
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:26.844Z #__loadSession() begin
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:26.844Z #getSession() session from storage null
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:26.844Z #__loadSession() end
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:26.844Z #_useSession end
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:26.845Z #_acquireLock lock released for storage key armazem-sao-joaquim-auth
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:26.845Z #_acquireLock end
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:27.235Z #_acquireLock begin -1
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:27.236Z #_acquireLock lock acquired for storage key armazem-sao-joaquim-auth
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:27.236Z #_handleVisibilityChange()
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:27.237Z #onAuthStateChange() registered callback with id 8d08d42a-29d9-44b3-a530-2727efeeacd9
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:27.246Z #_initialize() end
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:27.249Z #_acquireLock lock released for storage key armazem-sao-joaquim-auth
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:27.250Z #_acquireLock end
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:27.250Z #_acquireLock begin -1
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:27.250Z #_acquireLock lock acquired for storage key armazem-sao-joaquim-auth
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:27.250Z #_useSession begin
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:27.250Z #__loadSession() begin
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:27.251Z #_acquireLock lock released for storage key armazem-sao-joaquim-auth
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:27.251Z #getSession() session from storage null
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:27.251Z #__loadSession() end
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:27.251Z #_acquireLock end
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:27.251Z INITIAL_SESSION callback id 8d08d42a-29d9-44b3-a530-2727efeeacd9 session null
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:27.251Z #_useSession end
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:27.259Z #_acquireLock begin -1
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:27.259Z #_acquireLock lock acquired for storage key armazem-sao-joaquim-auth
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:27.259Z #_useSession begin
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:27.259Z #__loadSession() begin
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:27.260Z #getSession() session from storage null
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:27.260Z #__loadSession() end
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:27.261Z #_useSession end
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:27.261Z #_acquireLock lock released for storage key armazem-sao-joaquim-auth
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:27.261Z #_acquireLock end
+GoTrueClient@2 (2.71.1) 2025-08-01T00:49:27.272Z #_acquireLock begin -1
+GoTrueClient@2 (2.71.1) 2025-08-01T00:49:27.272Z #_acquireLock lock acquired for storage key armazem-sao-joaquim-auth
+GoTrueClient@2 (2.71.1) 2025-08-01T00:49:27.273Z #_handleVisibilityChange()
+GoTrueClient@2 (2.71.1) 2025-08-01T00:49:27.273Z #onAuthStateChange() registered callback with id 4b46e1ad-29df-4c00-9ecb-8f5433e08334
+GoTrueClient@2 (2.71.1) 2025-08-01T00:49:27.318Z #_initialize() end
+GoTrueClient@2 (2.71.1) 2025-08-01T00:49:27.318Z #_acquireLock lock released for storage key armazem-sao-joaquim-auth
+GoTrueClient@2 (2.71.1) 2025-08-01T00:49:27.318Z #_acquireLock end
+GoTrueClient@2 (2.71.1) 2025-08-01T00:49:27.318Z #_acquireLock begin -1
+GoTrueClient@2 (2.71.1) 2025-08-01T00:49:27.318Z #_acquireLock lock acquired for storage key armazem-sao-joaquim-auth
+GoTrueClient@2 (2.71.1) 2025-08-01T00:49:27.319Z #_useSession begin
+GoTrueClient@2 (2.71.1) 2025-08-01T00:49:27.319Z #__loadSession() begin
+GoTrueClient@2 (2.71.1) 2025-08-01T00:49:27.319Z #_acquireLock lock released for storage key armazem-sao-joaquim-auth
+GoTrueClient@2 (2.71.1) 2025-08-01T00:49:27.319Z #getSession() session from storage null
+GoTrueClient@2 (2.71.1) 2025-08-01T00:49:27.319Z #__loadSession() end
+GoTrueClient@2 (2.71.1) 2025-08-01T00:49:27.319Z #_acquireLock end
+GoTrueClient@2 (2.71.1) 2025-08-01T00:49:27.320Z INITIAL_SESSION callback id 4b46e1ad-29df-4c00-9ecb-8f5433e08334 session null
+GoTrueClient@2 (2.71.1) 2025-08-01T00:49:27.320Z #_useSession end
+ GET /en/blog 200 in 2337ms
+GoTrueClient@3 (2.71.1) 2025-08-01T00:49:27.507Z #_acquireLock begin -1
+GoTrueClient@3 (2.71.1) 2025-08-01T00:49:27.507Z #_acquireLock lock acquired for storage key armazem-sao-joaquim-auth
+GoTrueClient@3 (2.71.1) 2025-08-01T00:49:27.507Z #_handleVisibilityChange()
+GoTrueClient@3 (2.71.1) 2025-08-01T00:49:27.508Z #onAuthStateChange() registered callback with id 4d3d80c1-270e-4fcc-8d00-260ca509f83b
+GoTrueClient@3 (2.71.1) 2025-08-01T00:49:27.510Z #_initialize() end
+GoTrueClient@3 (2.71.1) 2025-08-01T00:49:27.510Z #_acquireLock lock released for storage key armazem-sao-joaquim-auth
+GoTrueClient@3 (2.71.1) 2025-08-01T00:49:27.510Z #_acquireLock end
+GoTrueClient@3 (2.71.1) 2025-08-01T00:49:27.510Z #_acquireLock begin -1
+GoTrueClient@3 (2.71.1) 2025-08-01T00:49:27.511Z #_acquireLock lock acquired for storage key armazem-sao-joaquim-auth
+GoTrueClient@3 (2.71.1) 2025-08-01T00:49:27.511Z #_useSession begin
+GoTrueClient@3 (2.71.1) 2025-08-01T00:49:27.511Z #__loadSession() begin
+GoTrueClient@3 (2.71.1) 2025-08-01T00:49:27.511Z #_acquireLock lock released for storage key armazem-sao-joaquim-auth
+GoTrueClient@3 (2.71.1) 2025-08-01T00:49:27.511Z #getSession() session from storage null
+GoTrueClient@3 (2.71.1) 2025-08-01T00:49:27.511Z #__loadSession() end
+GoTrueClient@3 (2.71.1) 2025-08-01T00:49:27.512Z #_acquireLock end
+GoTrueClient@3 (2.71.1) 2025-08-01T00:49:27.512Z INITIAL_SESSION callback id 4d3d80c1-270e-4fcc-8d00-260ca509f83b session null
+GoTrueClient@3 (2.71.1) 2025-08-01T00:49:27.512Z #_useSession end
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 58ms
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:28.971Z #_acquireLock begin -1
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:28.972Z #_acquireLock lock acquired for storage key armazem-sao-joaquim-auth
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:28.972Z #_handleVisibilityChange()
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:28.973Z #onAuthStateChange() registered callback with id 74576f94-41fe-4289-8577-e13695da117b
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:28.973Z #_initialize() end
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:28.977Z #_acquireLock lock released for storage key armazem-sao-joaquim-auth
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:28.977Z #_acquireLock end
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:28.977Z #_acquireLock begin -1
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:28.977Z #_acquireLock lock acquired for storage key armazem-sao-joaquim-auth
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:28.977Z #_useSession begin
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:28.977Z #__loadSession() begin
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:28.978Z #_acquireLock begin -1
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:28.978Z #_acquireLock end
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:28.978Z #_useSession begin
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:28.978Z #__loadSession() begin
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:28.978Z #getSession() session from storage null
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:28.978Z #__loadSession() end
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:28.978Z INITIAL_SESSION callback id 74576f94-41fe-4289-8577-e13695da117b session null
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:28.978Z #getSession() session from storage null
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:28.978Z #__loadSession() end
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:28.978Z #_useSession end
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:28.979Z #_useSession end
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:28.979Z #_acquireLock lock released for storage key armazem-sao-joaquim-auth
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:29.009Z #_acquireLock end
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:29.101Z #_acquireLock begin -1
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:29.101Z #_acquireLock lock acquired for storage key armazem-sao-joaquim-auth
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:29.101Z #_useSession begin
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:29.101Z #__loadSession() begin
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:29.101Z #getSession() session from storage null
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:29.101Z #__loadSession() end
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:29.101Z #_useSession end
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:29.101Z #_acquireLock lock released for storage key armazem-sao-joaquim-auth
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:29.101Z #_acquireLock end
+ ✓ Compiled /api/cafe/products in 303ms (2321 modules)
+Erro ao buscar produtos: {
+  code: '42501',
+  details: null,
+  hint: null,
+  message: 'permission denied for table users'
+}
+ GET /api/cafe/products 500 in 627ms
+🔧 MIDDLEWARE CLIENT: Criando cliente Supabase para middleware...
+GoTrueClient@8 (2.71.1) 2025-08-01T00:49:34.146Z #_acquireLock begin -1
+GoTrueClient@8 (2.71.1) 2025-08-01T00:49:34.146Z #_acquireLock lock acquired for storage key armazem-sao-joaquim-auth
+GoTrueClient@8 (2.71.1) 2025-08-01T00:49:34.146Z #_handleVisibilityChange()
+GoTrueClient@8 (2.71.1) 2025-08-01T00:49:34.146Z #onAuthStateChange() registered callback with id 6f107ed3-64f2-4e87-9df5-d4d8b349f4ae
+GoTrueClient@8 (2.71.1) 2025-08-01T00:49:34.147Z #onAuthStateChange() registered callback with id cb6fbb5a-b701-490d-bf7f-c137c2ad83c5
+GoTrueClient@8 (2.71.1) 2025-08-01T00:49:34.147Z #_initialize() end
+GoTrueClient@8 (2.71.1) 2025-08-01T00:49:34.147Z #_acquireLock lock released for storage key armazem-sao-joaquim-auth
+GoTrueClient@8 (2.71.1) 2025-08-01T00:49:34.147Z #_acquireLock end
+GoTrueClient@8 (2.71.1) 2025-08-01T00:49:34.148Z #_acquireLock begin -1
+GoTrueClient@8 (2.71.1) 2025-08-01T00:49:34.148Z #_acquireLock lock acquired for storage key armazem-sao-joaquim-auth
+GoTrueClient@8 (2.71.1) 2025-08-01T00:49:34.148Z #_useSession begin
+GoTrueClient@8 (2.71.1) 2025-08-01T00:49:34.148Z #__loadSession() begin
+🍪 MIDDLEWARE CLIENT: getAll() chamado - cookies: [
+  '__stripe_mid',
+  'grafana_session',
+  'grafana_session_expiry',
+  'armazem-sao-joaquim-auth-code-verifier'
+]
+GoTrueClient@8 (2.71.1) 2025-08-01T00:49:34.149Z #_acquireLock begin -1
+GoTrueClient@8 (2.71.1) 2025-08-01T00:49:34.149Z #_acquireLock end
+GoTrueClient@8 (2.71.1) 2025-08-01T00:49:34.149Z #_acquireLock begin -1
+GoTrueClient@8 (2.71.1) 2025-08-01T00:49:34.149Z #_acquireLock end
+GoTrueClient@8 (2.71.1) 2025-08-01T00:49:34.149Z #_useSession begin
+GoTrueClient@8 (2.71.1) 2025-08-01T00:49:34.149Z #__loadSession() begin
+🍪 MIDDLEWARE CLIENT: getAll() chamado - cookies: [
+  '__stripe_mid',
+  'grafana_session',
+  'grafana_session_expiry',
+  'armazem-sao-joaquim-auth-code-verifier'
+]
+GoTrueClient@8 (2.71.1) 2025-08-01T00:49:34.150Z #_useSession begin
+GoTrueClient@8 (2.71.1) 2025-08-01T00:49:34.150Z #__loadSession() begin
+🍪 MIDDLEWARE CLIENT: getAll() chamado - cookies: [
+  '__stripe_mid',
+  'grafana_session',
+  'grafana_session_expiry',
+  'armazem-sao-joaquim-auth-code-verifier'
+]
+GoTrueClient@8 (2.71.1) 2025-08-01T00:49:34.150Z #getSession() session from storage null
+GoTrueClient@8 (2.71.1) 2025-08-01T00:49:34.150Z #__loadSession() end
+GoTrueClient@8 (2.71.1) 2025-08-01T00:49:34.150Z INITIAL_SESSION callback id 6f107ed3-64f2-4e87-9df5-d4d8b349f4ae session null
+GoTrueClient@8 (2.71.1) 2025-08-01T00:49:34.151Z #getSession() session from storage null
+GoTrueClient@8 (2.71.1) 2025-08-01T00:49:34.151Z #__loadSession() end
+GoTrueClient@8 (2.71.1) 2025-08-01T00:49:34.151Z #_useSession end
+GoTrueClient@8 (2.71.1) 2025-08-01T00:49:34.151Z INITIAL_SESSION callback id cb6fbb5a-b701-490d-bf7f-c137c2ad83c5 session null
+GoTrueClient@8 (2.71.1) 2025-08-01T00:49:34.152Z #_useSession end
+GoTrueClient@8 (2.71.1) 2025-08-01T00:49:34.152Z #getSession() session from storage null
+GoTrueClient@8 (2.71.1) 2025-08-01T00:49:34.152Z #__loadSession() end
+GoTrueClient@8 (2.71.1) 2025-08-01T00:49:34.152Z #_useSession end
+GoTrueClient@8 (2.71.1) 2025-08-01T00:49:34.152Z #_acquireLock lock released for storage key armazem-sao-joaquim-auth
+GoTrueClient@8 (2.71.1) 2025-08-01T00:49:34.152Z #_acquireLock end
+GoTrueClient@1 (2.71.1) 2025-08-01T00:49:34.339Z #_acquireLock begin -1
+GoTrueClient@1 (2.71.1) 2025-08-01T00:49:34.339Z #_acquireLock lock acquired for storage key armazem-sao-joaquim-auth
+GoTrueClient@1 (2.71.1) 2025-08-01T00:49:34.340Z #_handleVisibilityChange()
+GoTrueClient@1 (2.71.1) 2025-08-01T00:49:34.340Z #onAuthStateChange() registered callback with id 3f3d0003-521d-4d34-879c-89015fc382ce
+GoTrueClient@1 (2.71.1) 2025-08-01T00:49:34.342Z #_initialize() end
+GoTrueClient@1 (2.71.1) 2025-08-01T00:49:34.342Z #_acquireLock lock released for storage key armazem-sao-joaquim-auth
+GoTrueClient@1 (2.71.1) 2025-08-01T00:49:34.343Z #_acquireLock end
+GoTrueClient@1 (2.71.1) 2025-08-01T00:49:34.343Z #_acquireLock begin -1
+GoTrueClient@1 (2.71.1) 2025-08-01T00:49:34.343Z #_acquireLock lock acquired for storage key armazem-sao-joaquim-auth
+GoTrueClient@1 (2.71.1) 2025-08-01T00:49:34.343Z #_useSession begin
+GoTrueClient@1 (2.71.1) 2025-08-01T00:49:34.343Z #__loadSession() begin
+GoTrueClient@1 (2.71.1) 2025-08-01T00:49:34.344Z #_acquireLock lock released for storage key armazem-sao-joaquim-auth
+GoTrueClient@1 (2.71.1) 2025-08-01T00:49:34.344Z #getSession() session from storage null
+GoTrueClient@1 (2.71.1) 2025-08-01T00:49:34.344Z #__loadSession() end
+GoTrueClient@1 (2.71.1) 2025-08-01T00:49:34.345Z #_acquireLock end
+GoTrueClient@1 (2.71.1) 2025-08-01T00:49:34.345Z INITIAL_SESSION callback id 3f3d0003-521d-4d34-879c-89015fc382ce session null
+GoTrueClient@1 (2.71.1) 2025-08-01T00:49:34.346Z #_useSession end
+🔧 MIDDLEWARE CLIENT: Criando cliente Supabase para middleware...
+GoTrueClient@9 (2.71.1) 2025-08-01T00:49:34.376Z #_acquireLock begin -1
+GoTrueClient@9 (2.71.1) 2025-08-01T00:49:34.377Z #_acquireLock lock acquired for storage key armazem-sao-joaquim-auth
+GoTrueClient@9 (2.71.1) 2025-08-01T00:49:34.377Z #_handleVisibilityChange()
+GoTrueClient@9 (2.71.1) 2025-08-01T00:49:34.377Z #onAuthStateChange() registered callback with id 225a58cc-80a8-4426-8b47-10c2cc021b46
+GoTrueClient@9 (2.71.1) 2025-08-01T00:49:34.377Z #onAuthStateChange() registered callback with id 0032ece8-db6d-4eee-9f0e-606bcc4f0893
+GoTrueClient@9 (2.71.1) 2025-08-01T00:49:34.378Z #_initialize() end
+GoTrueClient@9 (2.71.1) 2025-08-01T00:49:34.378Z #_acquireLock lock released for storage key armazem-sao-joaquim-auth
+GoTrueClient@9 (2.71.1) 2025-08-01T00:49:34.378Z #_acquireLock end
+GoTrueClient@9 (2.71.1) 2025-08-01T00:49:34.378Z #_acquireLock begin -1
+GoTrueClient@9 (2.71.1) 2025-08-01T00:49:34.378Z #_acquireLock lock acquired for storage key armazem-sao-joaquim-auth
+GoTrueClient@9 (2.71.1) 2025-08-01T00:49:34.379Z #_useSession begin
+GoTrueClient@9 (2.71.1) 2025-08-01T00:49:34.379Z #__loadSession() begin
+🍪 MIDDLEWARE CLIENT: getAll() chamado - cookies: [
+  '__stripe_mid',
+  'grafana_session',
+  'grafana_session_expiry',
+  'armazem-sao-joaquim-auth-code-verifier'
+]
+GoTrueClient@9 (2.71.1) 2025-08-01T00:49:34.379Z #_acquireLock begin -1
+GoTrueClient@9 (2.71.1) 2025-08-01T00:49:34.380Z #_acquireLock end
+GoTrueClient@9 (2.71.1) 2025-08-01T00:49:34.380Z #_acquireLock begin -1
+GoTrueClient@9 (2.71.1) 2025-08-01T00:49:34.380Z #_acquireLock end
+GoTrueClient@9 (2.71.1) 2025-08-01T00:49:34.380Z #_useSession begin
+GoTrueClient@9 (2.71.1) 2025-08-01T00:49:34.380Z #__loadSession() begin
+🍪 MIDDLEWARE CLIENT: getAll() chamado - cookies: [
+  '__stripe_mid',
+  'grafana_session',
+  'grafana_session_expiry',
+  'armazem-sao-joaquim-auth-code-verifier'
+]
+GoTrueClient@9 (2.71.1) 2025-08-01T00:49:34.381Z #_useSession begin
+GoTrueClient@9 (2.71.1) 2025-08-01T00:49:34.381Z #__loadSession() begin
+🍪 MIDDLEWARE CLIENT: getAll() chamado - cookies: [
+  '__stripe_mid',
+  'grafana_session',
+  'grafana_session_expiry',
+  'armazem-sao-joaquim-auth-code-verifier'
+]
+GoTrueClient@9 (2.71.1) 2025-08-01T00:49:34.382Z #getSession() session from storage null
+GoTrueClient@9 (2.71.1) 2025-08-01T00:49:34.382Z #__loadSession() end
+GoTrueClient@9 (2.71.1) 2025-08-01T00:49:34.382Z INITIAL_SESSION callback id 225a58cc-80a8-4426-8b47-10c2cc021b46 session null
+GoTrueClient@9 (2.71.1) 2025-08-01T00:49:34.382Z #getSession() session from storage null
+GoTrueClient@9 (2.71.1) 2025-08-01T00:49:34.382Z #__loadSession() end
+GoTrueClient@9 (2.71.1) 2025-08-01T00:49:34.382Z #_useSession end
+GoTrueClient@9 (2.71.1) 2025-08-01T00:49:34.383Z INITIAL_SESSION callback id 0032ece8-db6d-4eee-9f0e-606bcc4f0893 session null
+GoTrueClient@9 (2.71.1) 2025-08-01T00:49:34.383Z #_useSession end
+GoTrueClient@9 (2.71.1) 2025-08-01T00:49:34.383Z #getSession() session from storage null
+GoTrueClient@9 (2.71.1) 2025-08-01T00:49:34.383Z #__loadSession() end
+GoTrueClient@9 (2.71.1) 2025-08-01T00:49:34.383Z #_useSession end
+GoTrueClient@9 (2.71.1) 2025-08-01T00:49:34.384Z #_acquireLock lock released for storage key armazem-sao-joaquim-auth
+GoTrueClient@9 (2.71.1) 2025-08-01T00:49:34.384Z #_acquireLock end
+GoTrueClient@1 (2.71.1) 2025-08-01T00:49:34.533Z #_acquireLock begin -1
+GoTrueClient@1 (2.71.1) 2025-08-01T00:49:34.533Z #_acquireLock lock acquired for storage key armazem-sao-joaquim-auth
+GoTrueClient@1 (2.71.1) 2025-08-01T00:49:34.533Z #_useSession begin
+GoTrueClient@1 (2.71.1) 2025-08-01T00:49:34.533Z #__loadSession() begin
+GoTrueClient@1 (2.71.1) 2025-08-01T00:49:34.533Z #getSession() session from storage null
+GoTrueClient@1 (2.71.1) 2025-08-01T00:49:34.534Z #__loadSession() end
+GoTrueClient@1 (2.71.1) 2025-08-01T00:49:34.534Z #_useSession end
+GoTrueClient@1 (2.71.1) 2025-08-01T00:49:34.534Z #_acquireLock lock released for storage key armazem-sao-joaquim-auth
+GoTrueClient@1 (2.71.1) 2025-08-01T00:49:34.534Z #_acquireLock end
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:36.267Z #_acquireLock begin -1
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:36.268Z #_acquireLock lock acquired for storage key armazem-sao-joaquim-auth
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:36.268Z #_handleVisibilityChange()
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:36.269Z #onAuthStateChange() registered callback with id df0fa38b-ae44-4e8c-9965-e9bc7d1215ce
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:36.278Z #_initialize() end
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:36.281Z #_acquireLock lock released for storage key armazem-sao-joaquim-auth
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:36.282Z #_acquireLock end
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:36.282Z #_acquireLock begin -1
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:36.283Z #_acquireLock lock acquired for storage key armazem-sao-joaquim-auth
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:36.283Z #_useSession begin
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:36.283Z #__loadSession() begin
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:36.283Z #_acquireLock lock released for storage key armazem-sao-joaquim-auth
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:36.283Z #getSession() session from storage null
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:36.283Z #__loadSession() end
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:36.284Z #_acquireLock end
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:36.284Z INITIAL_SESSION callback id df0fa38b-ae44-4e8c-9965-e9bc7d1215ce session null
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:36.284Z #_useSession end
+🔧 MIDDLEWARE CLIENT: Criando cliente Supabase para middleware...
+GoTrueClient@10 (2.71.1) 2025-08-01T00:49:40.977Z #_acquireLock begin -1
+GoTrueClient@10 (2.71.1) 2025-08-01T00:49:40.978Z #_acquireLock lock acquired for storage key armazem-sao-joaquim-auth
+GoTrueClient@10 (2.71.1) 2025-08-01T00:49:40.978Z #_handleVisibilityChange()
+GoTrueClient@10 (2.71.1) 2025-08-01T00:49:40.978Z #onAuthStateChange() registered callback with id d3dce509-fb9b-4c5d-85ef-5e7c0b629a00
+GoTrueClient@10 (2.71.1) 2025-08-01T00:49:40.978Z #onAuthStateChange() registered callback with id 55f7192b-0ec7-4afd-a4ba-102e0f5f41a8
+GoTrueClient@10 (2.71.1) 2025-08-01T00:49:40.979Z #_initialize() end
+GoTrueClient@10 (2.71.1) 2025-08-01T00:49:40.979Z #_acquireLock lock released for storage key armazem-sao-joaquim-auth
+GoTrueClient@10 (2.71.1) 2025-08-01T00:49:40.979Z #_acquireLock end
+GoTrueClient@10 (2.71.1) 2025-08-01T00:49:40.979Z #_acquireLock begin -1
+GoTrueClient@10 (2.71.1) 2025-08-01T00:49:40.979Z #_acquireLock lock acquired for storage key armazem-sao-joaquim-auth
+GoTrueClient@10 (2.71.1) 2025-08-01T00:49:40.979Z #_useSession begin
+GoTrueClient@10 (2.71.1) 2025-08-01T00:49:40.979Z #__loadSession() begin
+🍪 MIDDLEWARE CLIENT: getAll() chamado - cookies: [
+  '__stripe_mid',
+  'grafana_session',
+  'grafana_session_expiry',
+  'armazem-sao-joaquim-auth-code-verifier'
+]
+GoTrueClient@10 (2.71.1) 2025-08-01T00:49:40.980Z #_acquireLock begin -1
+GoTrueClient@10 (2.71.1) 2025-08-01T00:49:40.980Z #_acquireLock end
+GoTrueClient@10 (2.71.1) 2025-08-01T00:49:40.980Z #_acquireLock begin -1
+GoTrueClient@10 (2.71.1) 2025-08-01T00:49:40.980Z #_acquireLock end
+GoTrueClient@10 (2.71.1) 2025-08-01T00:49:40.980Z #_useSession begin
+GoTrueClient@10 (2.71.1) 2025-08-01T00:49:40.981Z #__loadSession() begin
+🍪 MIDDLEWARE CLIENT: getAll() chamado - cookies: [
+  '__stripe_mid',
+  'grafana_session',
+  'grafana_session_expiry',
+  'armazem-sao-joaquim-auth-code-verifier'
+]
+GoTrueClient@10 (2.71.1) 2025-08-01T00:49:40.981Z #_useSession begin
+GoTrueClient@10 (2.71.1) 2025-08-01T00:49:40.981Z #__loadSession() begin
+🍪 MIDDLEWARE CLIENT: getAll() chamado - cookies: [
+  '__stripe_mid',
+  'grafana_session',
+  'grafana_session_expiry',
+  'armazem-sao-joaquim-auth-code-verifier'
+]
+GoTrueClient@10 (2.71.1) 2025-08-01T00:49:40.982Z #getSession() session from storage null
+GoTrueClient@10 (2.71.1) 2025-08-01T00:49:40.982Z #__loadSession() end
+GoTrueClient@10 (2.71.1) 2025-08-01T00:49:40.982Z INITIAL_SESSION callback id d3dce509-fb9b-4c5d-85ef-5e7c0b629a00 session null
+GoTrueClient@10 (2.71.1) 2025-08-01T00:49:40.982Z #getSession() session from storage null
+GoTrueClient@10 (2.71.1) 2025-08-01T00:49:40.982Z #__loadSession() end
+GoTrueClient@10 (2.71.1) 2025-08-01T00:49:40.983Z #_useSession end
+GoTrueClient@10 (2.71.1) 2025-08-01T00:49:40.983Z INITIAL_SESSION callback id 55f7192b-0ec7-4afd-a4ba-102e0f5f41a8 session null
+GoTrueClient@10 (2.71.1) 2025-08-01T00:49:40.983Z #_useSession end
+GoTrueClient@10 (2.71.1) 2025-08-01T00:49:40.983Z #getSession() session from storage null
+GoTrueClient@10 (2.71.1) 2025-08-01T00:49:40.983Z #__loadSession() end
+GoTrueClient@10 (2.71.1) 2025-08-01T00:49:40.983Z #_useSession end
+GoTrueClient@10 (2.71.1) 2025-08-01T00:49:40.983Z #_acquireLock lock released for storage key armazem-sao-joaquim-auth
+GoTrueClient@10 (2.71.1) 2025-08-01T00:49:40.984Z #_acquireLock end
+ ○ Compiling /[locale]/pousada ...
+ ✓ Compiled /[locale]/pousada in 942ms (3621 modules)
+🔧 MIDDLEWARE CLIENT: Criando cliente Supabase para middleware...
+GoTrueClient@11 (2.71.1) 2025-08-01T00:49:44.189Z #_acquireLock begin -1
+GoTrueClient@11 (2.71.1) 2025-08-01T00:49:44.190Z #_acquireLock lock acquired for storage key armazem-sao-joaquim-auth
+GoTrueClient@11 (2.71.1) 2025-08-01T00:49:44.190Z #_handleVisibilityChange()
+GoTrueClient@11 (2.71.1) 2025-08-01T00:49:44.190Z #onAuthStateChange() registered callback with id a6915f94-d431-48fb-9e98-9f93406504b5
+GoTrueClient@11 (2.71.1) 2025-08-01T00:49:44.190Z #onAuthStateChange() registered callback with id 99a116c4-ae1a-44b5-8578-27b1b9c10c76
+GoTrueClient@11 (2.71.1) 2025-08-01T00:49:44.191Z #_initialize() end
+GoTrueClient@11 (2.71.1) 2025-08-01T00:49:44.191Z #_acquireLock lock released for storage key armazem-sao-joaquim-auth
+GoTrueClient@11 (2.71.1) 2025-08-01T00:49:44.191Z #_acquireLock end
+GoTrueClient@11 (2.71.1) 2025-08-01T00:49:44.191Z #_acquireLock begin -1
+GoTrueClient@11 (2.71.1) 2025-08-01T00:49:44.191Z #_acquireLock lock acquired for storage key armazem-sao-joaquim-auth
+GoTrueClient@11 (2.71.1) 2025-08-01T00:49:44.192Z #_useSession begin
+GoTrueClient@11 (2.71.1) 2025-08-01T00:49:44.192Z #__loadSession() begin
+🍪 MIDDLEWARE CLIENT: getAll() chamado - cookies: [
+  '__stripe_mid',
+  'grafana_session',
+  'grafana_session_expiry',
+  'armazem-sao-joaquim-auth-code-verifier'
+]
+GoTrueClient@11 (2.71.1) 2025-08-01T00:49:44.192Z #_acquireLock begin -1
+GoTrueClient@11 (2.71.1) 2025-08-01T00:49:44.192Z #_acquireLock end
+GoTrueClient@11 (2.71.1) 2025-08-01T00:49:44.193Z #_acquireLock begin -1
+GoTrueClient@11 (2.71.1) 2025-08-01T00:49:44.193Z #_acquireLock end
+GoTrueClient@11 (2.71.1) 2025-08-01T00:49:44.193Z #_useSession begin
+GoTrueClient@11 (2.71.1) 2025-08-01T00:49:44.193Z #__loadSession() begin
+🍪 MIDDLEWARE CLIENT: getAll() chamado - cookies: [
+  '__stripe_mid',
+  'grafana_session',
+  'grafana_session_expiry',
+  'armazem-sao-joaquim-auth-code-verifier'
+]
+GoTrueClient@11 (2.71.1) 2025-08-01T00:49:44.194Z #_useSession begin
+GoTrueClient@11 (2.71.1) 2025-08-01T00:49:44.194Z #__loadSession() begin
+🍪 MIDDLEWARE CLIENT: getAll() chamado - cookies: [
+  '__stripe_mid',
+  'grafana_session',
+  'grafana_session_expiry',
+  'armazem-sao-joaquim-auth-code-verifier'
+]
+GoTrueClient@11 (2.71.1) 2025-08-01T00:49:44.194Z #getSession() session from storage null
+GoTrueClient@11 (2.71.1) 2025-08-01T00:49:44.195Z #__loadSession() end
+GoTrueClient@11 (2.71.1) 2025-08-01T00:49:44.195Z INITIAL_SESSION callback id a6915f94-d431-48fb-9e98-9f93406504b5 session null
+GoTrueClient@11 (2.71.1) 2025-08-01T00:49:44.195Z #getSession() session from storage null
+GoTrueClient@11 (2.71.1) 2025-08-01T00:49:44.195Z #__loadSession() end
+GoTrueClient@11 (2.71.1) 2025-08-01T00:49:44.195Z #_useSession end
+GoTrueClient@11 (2.71.1) 2025-08-01T00:49:44.195Z INITIAL_SESSION callback id 99a116c4-ae1a-44b5-8578-27b1b9c10c76 session null
+GoTrueClient@11 (2.71.1) 2025-08-01T00:49:44.195Z #_useSession end
+GoTrueClient@11 (2.71.1) 2025-08-01T00:49:44.196Z #getSession() session from storage null
+GoTrueClient@11 (2.71.1) 2025-08-01T00:49:44.196Z #__loadSession() end
+GoTrueClient@11 (2.71.1) 2025-08-01T00:49:44.196Z #_useSession end
+GoTrueClient@11 (2.71.1) 2025-08-01T00:49:44.196Z #_acquireLock lock released for storage key armazem-sao-joaquim-auth
+GoTrueClient@11 (2.71.1) 2025-08-01T00:49:44.196Z #_acquireLock end
+ ✓ Compiled /api/pousada/rooms in 400ms (2339 modules)
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:45.383Z #_acquireLock begin -1
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:45.383Z #_acquireLock lock acquired for storage key armazem-sao-joaquim-auth
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:45.384Z #_handleVisibilityChange()
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:45.385Z #onAuthStateChange() registered callback with id 5cf64645-ae87-477b-bbe7-6800a2e0fd54
+GoTrueClient@1 (2.71.1) 2025-08-01T00:49:45.388Z #_acquireLock begin -1
+GoTrueClient@1 (2.71.1) 2025-08-01T00:49:45.388Z #_acquireLock lock acquired for storage key armazem-sao-joaquim-auth
+GoTrueClient@1 (2.71.1) 2025-08-01T00:49:45.388Z #_handleVisibilityChange()
+GoTrueClient@1 (2.71.1) 2025-08-01T00:49:45.388Z #onAuthStateChange() registered callback with id 6dc912b7-9ffa-4cd9-a507-e01b00ce5007
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:45.400Z #_initialize() end
+GoTrueClient@1 (2.71.1) 2025-08-01T00:49:45.400Z #_initialize() end
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:45.400Z #_acquireLock lock released for storage key armazem-sao-joaquim-auth
+GoTrueClient@1 (2.71.1) 2025-08-01T00:49:45.400Z #_acquireLock lock released for storage key armazem-sao-joaquim-auth
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:45.400Z #_acquireLock end
+GoTrueClient@1 (2.71.1) 2025-08-01T00:49:45.401Z #_acquireLock end
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:45.401Z #_acquireLock begin -1
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:45.401Z #_acquireLock lock acquired for storage key armazem-sao-joaquim-auth
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:45.401Z #_useSession begin
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:45.402Z #__loadSession() begin
+GoTrueClient@1 (2.71.1) 2025-08-01T00:49:45.402Z #_acquireLock begin -1
+GoTrueClient@1 (2.71.1) 2025-08-01T00:49:45.402Z #_acquireLock lock acquired for storage key armazem-sao-joaquim-auth
+GoTrueClient@1 (2.71.1) 2025-08-01T00:49:45.402Z #_useSession begin
+GoTrueClient@1 (2.71.1) 2025-08-01T00:49:45.403Z #__loadSession() begin
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:45.403Z #_acquireLock lock released for storage key armazem-sao-joaquim-auth
+GoTrueClient@1 (2.71.1) 2025-08-01T00:49:45.403Z #_acquireLock lock released for storage key armazem-sao-joaquim-auth
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:45.403Z #getSession() session from storage null
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:45.403Z #__loadSession() end
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:45.404Z #_acquireLock end
+GoTrueClient@1 (2.71.1) 2025-08-01T00:49:45.404Z #getSession() session from storage null
+GoTrueClient@1 (2.71.1) 2025-08-01T00:49:45.404Z #__loadSession() end
+GoTrueClient@1 (2.71.1) 2025-08-01T00:49:45.404Z #_acquireLock end
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:45.404Z INITIAL_SESSION callback id 5cf64645-ae87-477b-bbe7-6800a2e0fd54 session null
+GoTrueClient@1 (2.71.1) 2025-08-01T00:49:45.404Z INITIAL_SESSION callback id 6dc912b7-9ffa-4cd9-a507-e01b00ce5007 session null
+GoTrueClient@0 (2.71.1) 2025-08-01T00:49:45.404Z #_useSession end
+GoTrueClient@1 (2.71.1) 2025-08-01T00:49:45.405Z #_useSession end
+GoTrueClient@2 (2.71.1) 2025-08-01T00:49:45.449Z #_acquireLock begin -1
+GoTrueClient@2 (2.71.1) 2025-08-01T00:49:45.449Z #_acquireLock lock acquired for storage key armazem-sao-joaquim-auth
+GoTrueClient@2 (2.71.1) 2025-08-01T00:49:45.450Z #_handleVisibilityChange()
+GoTrueClient@2 (2.71.1) 2025-08-01T00:49:45.450Z #onAuthStateChange() registered callback with id 898e5f3b-d00a-45ec-b130-339638f66472
+GoTrueClient@2 (2.71.1) 2025-08-01T00:49:45.451Z #_initialize() end
+GoTrueClient@2 (2.71.1) 2025-08-01T00:49:45.451Z #_acquireLock lock released for storage key armazem-sao-joaquim-auth
+GoTrueClient@2 (2.71.1) 2025-08-01T00:49:45.452Z #_acquireLock end
+GoTrueClient@2 (2.71.1) 2025-08-01T00:49:45.452Z #_acquireLock begin -1
+GoTrueClient@2 (2.71.1) 2025-08-01T00:49:45.452Z #_acquireLock lock acquired for storage key armazem-sao-joaquim-auth
+GoTrueClient@2 (2.71.1) 2025-08-01T00:49:45.452Z #_useSession begin
+GoTrueClient@2 (2.71.1) 2025-08-01T00:49:45.452Z #__loadSession() begin
+GoTrueClient@2 (2.71.1) 2025-08-01T00:49:45.452Z #_acquireLock lock released for storage key armazem-sao-joaquim-auth
+GoTrueClient@2 (2.71.1) 2025-08-01T00:49:45.453Z #getSession() session from storage null
+GoTrueClient@2 (2.71.1) 2025-08-01T00:49:45.453Z #__loadSession() end
+GoTrueClient@2 (2.71.1) 2025-08-01T00:49:45.453Z #_acquireLock end
+GoTrueClient@2 (2.71.1) 2025-08-01T00:49:45.453Z INITIAL_SESSION callback id 898e5f3b-d00a-45ec-b130-339638f66472 session null
+GoTrueClient@2 (2.71.1) 2025-08-01T00:49:45.453Z #_useSession end
+ GET /images/pousada/casarao-historico.jpg 404 in 921ms
+ ⨯ The requested resource isn't a valid image for /images/pousada/casarao-historico.jpg received text/html; charset=utf-8
+ GET /images/pousada/lobie-fachada.jpg 404 in 1000ms
+Erro ao buscar quartos: {
+  code: '42501',
+  details: null,
+  hint: null,
+  message: 'permission denied for table users'
+}
+ GET /api/pousada/rooms 500 in 1151ms
+Erro ao buscar quartos: {
+  code: '42501',
+  details: null,
+  hint: null,
+  message: 'permission denied for table users'
+}
+ GET /api/pousada/rooms 500 in 1475ms
+🔧 MIDDLEWARE CLIENT: Criando cliente Supabase para middleware...
+GoTrueClient@12 (2.71.1) 2025-08-01T00:49:49.563Z #_acquireLock begin -1
+GoTrueClient@12 (2.71.1) 2025-08-01T00:49:49.563Z #_acquireLock lock acquired for storage key armazem-sao-joaquim-auth
+GoTrueClient@12 (2.71.1) 2025-08-01T00:49:49.563Z #_handleVisibilityChange()
+GoTrueClient@12 (2.71.1) 2025-08-01T00:49:49.563Z #onAuthStateChange() registered callback with id 78854edf-7145-4386-a898-1f074186605a
+GoTrueClient@12 (2.71.1) 2025-08-01T00:49:49.564Z #onAuthStateChange() registered callback with id 2908f7e4-8273-4182-8f5b-dd13436b9926
+GoTrueClient@12 (2.71.1) 2025-08-01T00:49:49.564Z #_initialize() end
+GoTrueClient@12 (2.71.1) 2025-08-01T00:49:49.564Z #_acquireLock lock released for storage key armazem-sao-joaquim-auth
+GoTrueClient@12 (2.71.1) 2025-08-01T00:49:49.564Z #_acquireLock end
+GoTrueClient@12 (2.71.1) 2025-08-01T00:49:49.564Z #_acquireLock begin -1
+GoTrueClient@12 (2.71.1) 2025-08-01T00:49:49.564Z #_acquireLock lock acquired for storage key armazem-sao-joaquim-auth
+GoTrueClient@12 (2.71.1) 2025-08-01T00:49:49.565Z #_useSession begin
+GoTrueClient@12 (2.71.1) 2025-08-01T00:49:49.565Z #__loadSession() begin
+🍪 MIDDLEWARE CLIENT: getAll() chamado - cookies: [
+  '__stripe_mid',
+  'grafana_session',
+  'grafana_session_expiry',
+  'armazem-sao-joaquim-auth-code-verifier'
+]
+GoTrueClient@12 (2.71.1) 2025-08-01T00:49:49.565Z #_acquireLock begin -1
+GoTrueClient@12 (2.71.1) 2025-08-01T00:49:49.565Z #_acquireLock end
+GoTrueClient@12 (2.71.1) 2025-08-01T00:49:49.565Z #_acquireLock begin -1
+GoTrueClient@12 (2.71.1) 2025-08-01T00:49:49.566Z #_acquireLock end
+GoTrueClient@12 (2.71.1) 2025-08-01T00:49:49.566Z #_useSession begin
+GoTrueClient@12 (2.71.1) 2025-08-01T00:49:49.566Z #__loadSession() begin
+🍪 MIDDLEWARE CLIENT: getAll() chamado - cookies: [
+  '__stripe_mid',
+  'grafana_session',
+  'grafana_session_expiry',
+  'armazem-sao-joaquim-auth-code-verifier'
+]
+GoTrueClient@12 (2.71.1) 2025-08-01T00:49:49.566Z #_useSession begin
+GoTrueClient@12 (2.71.1) 2025-08-01T00:49:49.566Z #__loadSession() begin
+🍪 MIDDLEWARE CLIENT: getAll() chamado - cookies: [
+  '__stripe_mid',
+  'grafana_session',
+  'grafana_session_expiry',
+  'armazem-sao-joaquim-auth-code-verifier'
+]
+GoTrueClient@12 (2.71.1) 2025-08-01T00:49:49.567Z #getSession() session from storage null
+GoTrueClient@12 (2.71.1) 2025-08-01T00:49:49.567Z #__loadSession() end
+GoTrueClient@12 (2.71.1) 2025-08-01T00:49:49.567Z INITIAL_SESSION callback id 78854edf-7145-4386-a898-1f074186605a session null
+GoTrueClient@12 (2.71.1) 2025-08-01T00:49:49.567Z #getSession() session from storage null
+GoTrueClient@12 (2.71.1) 2025-08-01T00:49:49.567Z #__loadSession() end
+GoTrueClient@12 (2.71.1) 2025-08-01T00:49:49.567Z #_useSession end
+GoTrueClient@12 (2.71.1) 2025-08-01T00:49:49.568Z INITIAL_SESSION callback id 2908f7e4-8273-4182-8f5b-dd13436b9926 session null
+GoTrueClient@12 (2.71.1) 2025-08-01T00:49:49.568Z #_useSession end
+GoTrueClient@12 (2.71.1) 2025-08-01T00:49:49.568Z #getSession() session from storage null
+GoTrueClient@12 (2.71.1) 2025-08-01T00:49:49.568Z #__loadSession() end
+GoTrueClient@12 (2.71.1) 2025-08-01T00:49:49.568Z #_useSession end
+GoTrueClient@12 (2.71.1) 2025-08-01T00:49:49.568Z #_acquireLock lock released for storage key armazem-sao-joaquim-auth
+GoTrueClient@12 (2.71.1) 2025-08-01T00:49:49.568Z #_acquireLock end
+🔧 MIDDLEWARE CLIENT: Criando cliente Supabase para middleware...
+GoTrueClient@13 (2.71.1) 2025-08-01T00:49:49.778Z #_acquireLock begin -1
+GoTrueClient@13 (2.71.1) 2025-08-01T00:49:49.778Z #_acquireLock lock acquired for storage key armazem-sao-joaquim-auth
+GoTrueClient@13 (2.71.1) 2025-08-01T00:49:49.778Z #_handleVisibilityChange()
+GoTrueClient@13 (2.71.1) 2025-08-01T00:49:49.778Z #onAuthStateChange() registered callback with id 2272a5f7-b16c-4df1-beeb-682ffdb1d6b9
+GoTrueClient@13 (2.71.1) 2025-08-01T00:49:49.779Z #onAuthStateChange() registered callback with id e9918764-5127-4eee-b0d6-59958453b1f6
+GoTrueClient@13 (2.71.1) 2025-08-01T00:49:49.779Z #_initialize() end
+GoTrueClient@13 (2.71.1) 2025-08-01T00:49:49.779Z #_acquireLock lock released for storage key armazem-sao-joaquim-auth
+GoTrueClient@13 (2.71.1) 2025-08-01T00:49:49.779Z #_acquireLock end
+GoTrueClient@13 (2.71.1) 2025-08-01T00:49:49.779Z #_acquireLock begin -1
+GoTrueClient@13 (2.71.1) 2025-08-01T00:49:49.779Z #_acquireLock lock acquired for storage key armazem-sao-joaquim-auth
+GoTrueClient@13 (2.71.1) 2025-08-01T00:49:49.779Z #_useSession begin
+GoTrueClient@13 (2.71.1) 2025-08-01T00:49:49.779Z #__loadSession() begin
+🍪 MIDDLEWARE CLIENT: getAll() chamado - cookies: [
+  '__stripe_mid',
+  'grafana_session',
+  'grafana_session_expiry',
+  'armazem-sao-joaquim-auth-code-verifier'
+]
+GoTrueClient@13 (2.71.1) 2025-08-01T00:49:49.780Z #_acquireLock begin -1
+GoTrueClient@13 (2.71.1) 2025-08-01T00:49:49.780Z #_acquireLock end
+GoTrueClient@13 (2.71.1) 2025-08-01T00:49:49.780Z #_acquireLock begin -1
+GoTrueClient@13 (2.71.1) 2025-08-01T00:49:49.781Z #_acquireLock end
+GoTrueClient@13 (2.71.1) 2025-08-01T00:49:49.781Z #_useSession begin
+GoTrueClient@13 (2.71.1) 2025-08-01T00:49:49.781Z #__loadSession() begin
+🍪 MIDDLEWARE CLIENT: getAll() chamado - cookies: [
+  '__stripe_mid',
+  'grafana_session',
+  'grafana_session_expiry',
+  'armazem-sao-joaquim-auth-code-verifier'
+]
+GoTrueClient@13 (2.71.1) 2025-08-01T00:49:49.781Z #_useSession begin
+GoTrueClient@13 (2.71.1) 2025-08-01T00:49:49.782Z #__loadSession() begin
+🍪 MIDDLEWARE CLIENT: getAll() chamado - cookies: [
+  '__stripe_mid',
+  'grafana_session',
+  'grafana_session_expiry',
+  'armazem-sao-joaquim-auth-code-verifier'
+]
+GoTrueClient@13 (2.71.1) 2025-08-01T00:49:49.782Z #getSession() session from storage null
+GoTrueClient@13 (2.71.1) 2025-08-01T00:49:49.782Z #__loadSession() end
+GoTrueClient@13 (2.71.1) 2025-08-01T00:49:49.782Z INITIAL_SESSION callback id 2272a5f7-b16c-4df1-beeb-682ffdb1d6b9 session null
+GoTrueClient@13 (2.71.1) 2025-08-01T00:49:49.783Z #getSession() session from storage null
+GoTrueClient@13 (2.71.1) 2025-08-01T00:49:49.783Z #__loadSession() end
+GoTrueClient@13 (2.71.1) 2025-08-01T00:49:49.783Z #_useSession end
+GoTrueClient@13 (2.71.1) 2025-08-01T00:49:49.783Z INITIAL_SESSION callback id e9918764-5127-4eee-b0d6-59958453b1f6 session null
+GoTrueClient@13 (2.71.1) 2025-08-01T00:49:49.783Z #_useSession end
+GoTrueClient@13 (2.71.1) 2025-08-01T00:49:49.783Z #getSession() session from storage null
+GoTrueClient@13 (2.71.1) 2025-08-01T00:49:49.783Z #__loadSession() end
+GoTrueClient@13 (2.71.1) 2025-08-01T00:49:49.784Z #_useSession end
+GoTrueClient@13 (2.71.1) 2025-08-01T00:49:49.784Z #_acquireLock lock released for storage key armazem-sao-joaquim-auth
+GoTrueClient@13 (2.71.1) 2025-08-01T00:49:49.784Z #_acquireLock end
+GoTrueClient@3 (2.71.1) 2025-08-01T00:49:49.992Z #_acquireLock begin -1
+GoTrueClient@3 (2.71.1) 2025-08-01T00:49:49.993Z #_acquireLock lock acquired for storage key armazem-sao-joaquim-auth
+GoTrueClient@3 (2.71.1) 2025-08-01T00:49:49.993Z #_handleVisibilityChange()
+GoTrueClient@3 (2.71.1) 2025-08-01T00:49:49.993Z #onAuthStateChange() registered callback with id c9e1eaaa-c920-4074-9953-52c0da3e0e37
+GoTrueClient@3 (2.71.1) 2025-08-01T00:49:49.995Z #_initialize() end
+GoTrueClient@3 (2.71.1) 2025-08-01T00:49:49.995Z #_acquireLock lock released for storage key armazem-sao-joaquim-auth
+GoTrueClient@3 (2.71.1) 2025-08-01T00:49:49.996Z #_acquireLock end
+GoTrueClient@3 (2.71.1) 2025-08-01T00:49:49.996Z #_acquireLock begin -1
+GoTrueClient@3 (2.71.1) 2025-08-01T00:49:49.996Z #_acquireLock lock acquired for storage key armazem-sao-joaquim-auth
+GoTrueClient@3 (2.71.1) 2025-08-01T00:49:49.996Z #_useSession begin
+GoTrueClient@3 (2.71.1) 2025-08-01T00:49:49.996Z #__loadSession() begin
+GoTrueClient@3 (2.71.1) 2025-08-01T00:49:49.996Z #_acquireLock lock released for storage key armazem-sao-joaquim-auth
+GoTrueClient@3 (2.71.1) 2025-08-01T00:49:49.997Z #getSession() session from storage null
+GoTrueClient@3 (2.71.1) 2025-08-01T00:49:49.997Z #__loadSession() end
+GoTrueClient@3 (2.71.1) 2025-08-01T00:49:49.997Z #_acquireLock end
+GoTrueClient@3 (2.71.1) 2025-08-01T00:49:49.997Z INITIAL_SESSION callback id c9e1eaaa-c920-4074-9953-52c0da3e0e37 session null
+GoTrueClient@3 (2.71.1) 2025-08-01T00:49:49.997Z #_useSession end
+ GET /images/pousada/lobie-fachada.jpg 404 in 60ms
+GoTrueClient@4 (2.71.1) 2025-08-01T00:49:50.114Z #_acquireLock begin -1
+GoTrueClient@4 (2.71.1) 2025-08-01T00:49:50.114Z #_acquireLock lock acquired for storage key armazem-sao-joaquim-auth
+GoTrueClient@4 (2.71.1) 2025-08-01T00:49:50.114Z #_handleVisibilityChange()
+GoTrueClient@4 (2.71.1) 2025-08-01T00:49:50.114Z #onAuthStateChange() registered callback with id a805dfac-999e-4d4b-a635-09200669ff49
+GoTrueClient@4 (2.71.1) 2025-08-01T00:49:50.116Z #_initialize() end
+GoTrueClient@4 (2.71.1) 2025-08-01T00:49:50.116Z #_acquireLock lock released for storage key armazem-sao-joaquim-auth
+GoTrueClient@4 (2.71.1) 2025-08-01T00:49:50.116Z #_acquireLock end
+GoTrueClient@4 (2.71.1) 2025-08-01T00:49:50.116Z #_acquireLock begin -1
+GoTrueClient@4 (2.71.1) 2025-08-01T00:49:50.117Z #_acquireLock lock acquired for storage key armazem-sao-joaquim-auth
+GoTrueClient@4 (2.71.1) 2025-08-01T00:49:50.117Z #_useSession begin
+GoTrueClient@4 (2.71.1) 2025-08-01T00:49:50.117Z #__loadSession() begin
+GoTrueClient@4 (2.71.1) 2025-08-01T00:49:50.117Z #_acquireLock lock released for storage key armazem-sao-joaquim-auth
+GoTrueClient@4 (2.71.1) 2025-08-01T00:49:50.117Z #getSession() session from storage null
+GoTrueClient@4 (2.71.1) 2025-08-01T00:49:50.117Z #__loadSession() end
+GoTrueClient@4 (2.71.1) 2025-08-01T00:49:50.118Z #_acquireLock end
+GoTrueClient@4 (2.71.1) 2025-08-01T00:49:50.118Z INITIAL_SESSION callback id a805dfac-999e-4d4b-a635-09200669ff49 session null
+GoTrueClient@4 (2.71.1) 2025-08-01T00:49:50.118Z #_useSession end
+ GET /images/pousada/casarao-historico.jpg 404 in 120ms
+ ⨯ The requested resource isn't a valid image for /images/pousada/casarao-historico.jpg received text/html; charset=utf-8
+Erro ao buscar quartos: {
+  code: '42501',
+  details: null,
+  hint: null,
+  message: 'permission denied for table users'
+}
+ GET /api/pousada/rooms 500 in 205ms
+Erro ao buscar quartos: {
+  code: '42501',
+  details: null,
+  hint: null,
+  message: 'permission denied for table users'
+}
+ GET /api/pousada/rooms 500 in 239ms
+Erro ao buscar produtos: {
+  code: '42501',
+  details: null,
+  hint: null,
+  message: 'permission denied for table users'
+}
+ GET /api/cafe/products 500 in 185ms
+ ✓ Compiled /api/health/database in 1708ms (2339 modules)
+ GET /api/health/database 200 in 1918ms
+ ✓ Compiled /api/test-simple in 445ms (2341 modules)
+ GET /api/test-simple 200 in 631ms
+Erro ao buscar produtos: {
+  code: '42501',
+  details: null,
+  hint: null,
+  message: 'permission denied for table users'
+}
+ GET /api/cafe/products 500 in 281ms
+ ○ Compiling /_error ...
+🔧 MIDDLEWARE CLIENT: Criando cliente Supabase para middleware...
+GoTrueClient@14 (2.71.1) 2025-08-01T00:51:36.697Z #_acquireLock begin -1
+GoTrueClient@14 (2.71.1) 2025-08-01T00:51:36.697Z #_acquireLock lock acquired for storage key armazem-sao-joaquim-auth
+GoTrueClient@14 (2.71.1) 2025-08-01T00:51:36.697Z #_handleVisibilityChange()
+GoTrueClient@14 (2.71.1) 2025-08-01T00:51:36.698Z #onAuthStateChange() registered callback with id 75edb1df-a9a1-468f-8cf9-a86d5423d0de
+GoTrueClient@14 (2.71.1) 2025-08-01T00:51:36.698Z #onAuthStateChange() registered callback with id bb61399b-fdc5-4e8f-a852-ea009448bf39
+GoTrueClient@14 (2.71.1) 2025-08-01T00:51:36.698Z #_initialize() end
+GoTrueClient@14 (2.71.1) 2025-08-01T00:51:36.698Z #_acquireLock lock released for storage key armazem-sao-joaquim-auth
+GoTrueClient@14 (2.71.1) 2025-08-01T00:51:36.699Z #_acquireLock end
+GoTrueClient@14 (2.71.1) 2025-08-01T00:51:36.699Z #_acquireLock begin -1
+GoTrueClient@14 (2.71.1) 2025-08-01T00:51:36.699Z #_acquireLock lock acquired for storage key armazem-sao-joaquim-auth
+GoTrueClient@14 (2.71.1) 2025-08-01T00:51:36.699Z #_useSession begin
+GoTrueClient@14 (2.71.1) 2025-08-01T00:51:36.699Z #__loadSession() begin
+🍪 MIDDLEWARE CLIENT: getAll() chamado - cookies: [
+  '__stripe_mid',
+  'grafana_session',
+  'grafana_session_expiry',
+  'armazem-sao-joaquim-auth-code-verifier'
+]
+GoTrueClient@14 (2.71.1) 2025-08-01T00:51:36.700Z #_acquireLock begin -1
+GoTrueClient@14 (2.71.1) 2025-08-01T00:51:36.700Z #_acquireLock end
+GoTrueClient@14 (2.71.1) 2025-08-01T00:51:36.700Z #_acquireLock begin -1
+GoTrueClient@14 (2.71.1) 2025-08-01T00:51:36.701Z #_acquireLock end
+GoTrueClient@14 (2.71.1) 2025-08-01T00:51:36.701Z #_useSession begin
+GoTrueClient@14 (2.71.1) 2025-08-01T00:51:36.701Z #__loadSession() begin
+🍪 MIDDLEWARE CLIENT: getAll() chamado - cookies: [
+  '__stripe_mid',
+  'grafana_session',
+  'grafana_session_expiry',
+  'armazem-sao-joaquim-auth-code-verifier'
+]
+GoTrueClient@14 (2.71.1) 2025-08-01T00:51:36.701Z #_useSession begin
+GoTrueClient@14 (2.71.1) 2025-08-01T00:51:36.701Z #__loadSession() begin
+🍪 MIDDLEWARE CLIENT: getAll() chamado - cookies: [
+  '__stripe_mid',
+  'grafana_session',
+  'grafana_session_expiry',
+  'armazem-sao-joaquim-auth-code-verifier'
+]
+GoTrueClient@14 (2.71.1) 2025-08-01T00:51:36.702Z #getSession() session from storage null
+GoTrueClient@14 (2.71.1) 2025-08-01T00:51:36.702Z #__loadSession() end
+GoTrueClient@14 (2.71.1) 2025-08-01T00:51:36.702Z INITIAL_SESSION callback id 75edb1df-a9a1-468f-8cf9-a86d5423d0de session null
+GoTrueClient@14 (2.71.1) 2025-08-01T00:51:36.702Z #getSession() session from storage null
+GoTrueClient@14 (2.71.1) 2025-08-01T00:51:36.703Z #__loadSession() end
+GoTrueClient@14 (2.71.1) 2025-08-01T00:51:36.703Z #_useSession end
+GoTrueClient@14 (2.71.1) 2025-08-01T00:51:36.703Z INITIAL_SESSION callback id bb61399b-fdc5-4e8f-a852-ea009448bf39 session null
+GoTrueClient@14 (2.71.1) 2025-08-01T00:51:36.703Z #_useSession end
+GoTrueClient@14 (2.71.1) 2025-08-01T00:51:36.703Z #getSession() session from storage null
+GoTrueClient@14 (2.71.1) 2025-08-01T00:51:36.703Z #__loadSession() end
+GoTrueClient@14 (2.71.1) 2025-08-01T00:51:36.704Z #_useSession end
+GoTrueClient@14 (2.71.1) 2025-08-01T00:51:36.704Z #_acquireLock lock released for storage key armazem-sao-joaquim-auth
+GoTrueClient@14 (2.71.1) 2025-08-01T00:51:36.704Z #_acquireLock end
+ ✓ Compiled /_error in 1591ms (3828 modules)
+Time 4.046989
+ GET /api/test-tables 404 in 2419ms
+🔧 MIDDLEWARE CLIENT: Criando cliente Supabase para middleware...
+GoTrueClient@15 (2.71.1) 2025-08-01T00:51:38.190Z #_acquireLock begin -1
+GoTrueClient@15 (2.71.1) 2025-08-01T00:51:38.190Z #_acquireLock lock acquired for storage key armazem-sao-joaquim-auth
+GoTrueClient@15 (2.71.1) 2025-08-01T00:51:38.191Z #_handleVisibilityChange()
+GoTrueClient@15 (2.71.1) 2025-08-01T00:51:38.191Z #onAuthStateChange() registered callback with id b8307935-ed54-498e-b6ef-7b0c1d6f65b0
+GoTrueClient@15 (2.71.1) 2025-08-01T00:51:38.191Z #onAuthStateChange() registered callback with id 549121b8-bbf7-40a7-9e36-745601fac7e3
+GoTrueClient@15 (2.71.1) 2025-08-01T00:51:38.191Z #_initialize() end
+GoTrueClient@15 (2.71.1) 2025-08-01T00:51:38.191Z #_acquireLock lock released for storage key armazem-sao-joaquim-auth
+GoTrueClient@15 (2.71.1) 2025-08-01T00:51:38.191Z #_acquireLock end
+GoTrueClient@15 (2.71.1) 2025-08-01T00:51:38.192Z #_acquireLock begin -1
+GoTrueClient@15 (2.71.1) 2025-08-01T00:51:38.192Z #_acquireLock lock acquired for storage key armazem-sao-joaquim-auth
+GoTrueClient@15 (2.71.1) 2025-08-01T00:51:38.192Z #_useSession begin
+GoTrueClient@15 (2.71.1) 2025-08-01T00:51:38.192Z #__loadSession() begin
+🍪 MIDDLEWARE CLIENT: getAll() chamado - cookies: [
+  '__stripe_mid',
+  'grafana_session',
+  'grafana_session_expiry',
+  'armazem-sao-joaquim-auth-code-verifier'
+]
+GoTrueClient@15 (2.71.1) 2025-08-01T00:51:38.192Z #_acquireLock begin -1
+GoTrueClient@15 (2.71.1) 2025-08-01T00:51:38.192Z #_acquireLock end
+GoTrueClient@15 (2.71.1) 2025-08-01T00:51:38.193Z #_acquireLock begin -1
+GoTrueClient@15 (2.71.1) 2025-08-01T00:51:38.193Z #_acquireLock end
+GoTrueClient@15 (2.71.1) 2025-08-01T00:51:38.193Z #_useSession begin
+GoTrueClient@15 (2.71.1) 2025-08-01T00:51:38.193Z #__loadSession() begin
+🍪 MIDDLEWARE CLIENT: getAll() chamado - cookies: [
+  '__stripe_mid',
+  'grafana_session',
+  'grafana_session_expiry',
+  'armazem-sao-joaquim-auth-code-verifier'
+]
+GoTrueClient@15 (2.71.1) 2025-08-01T00:51:38.193Z #_useSession begin
+GoTrueClient@15 (2.71.1) 2025-08-01T00:51:38.194Z #__loadSession() begin
+🍪 MIDDLEWARE CLIENT: getAll() chamado - cookies: [
+  '__stripe_mid',
+  'grafana_session',
+  'grafana_session_expiry',
+  'armazem-sao-joaquim-auth-code-verifier'
+]
+GoTrueClient@15 (2.71.1) 2025-08-01T00:51:38.194Z #getSession() session from storage null
+GoTrueClient@15 (2.71.1) 2025-08-01T00:51:38.194Z #__loadSession() end
+GoTrueClient@15 (2.71.1) 2025-08-01T00:51:38.194Z INITIAL_SESSION callback id b8307935-ed54-498e-b6ef-7b0c1d6f65b0 session null
+GoTrueClient@15 (2.71.1) 2025-08-01T00:51:38.194Z #getSession() session from storage null
+GoTrueClient@15 (2.71.1) 2025-08-01T00:51:38.195Z #__loadSession() end
+GoTrueClient@15 (2.71.1) 2025-08-01T00:51:38.195Z #_useSession end
+GoTrueClient@15 (2.71.1) 2025-08-01T00:51:38.195Z INITIAL_SESSION callback id 549121b8-bbf7-40a7-9e36-745601fac7e3 session null
+GoTrueClient@15 (2.71.1) 2025-08-01T00:51:38.195Z #_useSession end
+GoTrueClient@15 (2.71.1) 2025-08-01T00:51:38.195Z #getSession() session from storage null
+GoTrueClient@15 (2.71.1) 2025-08-01T00:51:38.195Z #__loadSession() end
+GoTrueClient@15 (2.71.1) 2025-08-01T00:51:38.196Z #_useSession end
+GoTrueClient@15 (2.71.1) 2025-08-01T00:51:38.196Z #_acquireLock lock released for storage key armazem-sao-joaquim-auth
+GoTrueClient@15 (2.71.1) 2025-08-01T00:51:38.196Z #_acquireLock end

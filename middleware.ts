@@ -2,34 +2,65 @@ import { createMiddlewareClient } from './lib/supabase'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
+// Supported locales
+const locales = ['pt', 'en']
+const defaultLocale = 'pt'
+
+// Get locale from pathname
+function getLocale(pathname: string): string | null {
+  const segments = pathname.split('/')
+  const firstSegment = segments[1]
+  return locales.includes(firstSegment) ? firstSegment : null
+}
+
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
   
+  // Check if pathname has a locale
+  const pathnameHasLocale = locales.some(
+    (locale) => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`
+  )
+
+  // Redirect if there is no locale
+  if (!pathnameHasLocale) {
+    // Skip API routes, static files, and certain paths
+    if (
+      pathname.startsWith('/api/') ||
+      pathname.startsWith('/_next/') ||
+      pathname.startsWith('/favicon.ico') ||
+      pathname.includes('.')
+    ) {
+      return NextResponse.next()
+    }
+
+    // Redirect root to default locale
+    if (pathname === '/') {
+      return NextResponse.redirect(new URL(`/${defaultLocale}`, request.url))
+    }
+
+    // Redirect other paths to include default locale
+    return NextResponse.redirect(new URL(`/${defaultLocale}${pathname}`, request.url))
+  }
+
+  // Extract locale from pathname for further processing
+  const locale = getLocale(pathname)
+  const pathWithoutLocale = pathname.replace(`/${locale}`, '') || '/'
+  
   try {
-    const allCookies = request.cookies.getAll()
-    
-    // Procurar especificamente pelo cookie de sessão
-    const sessionCookies = allCookies.filter(c => 
-      c.name.includes('armazem-sao-joaquim-auth') || 
-      c.name.includes('sb-') || 
-      c.name.includes('supabase')
-    )
-    
     // Create response (this will be modified with cookies)
     const response = NextResponse.next()
     
-    // Create Supabase client with detailed cookie logging
+    // Create Supabase client
     const supabase = createMiddlewareClient(request, response)
     
     // Refresh session if expired - required for Server Components
     const { data: { session }, error } = await supabase.auth.getSession()
     
-    
-    // Admin routes protection
-    if (pathname.startsWith('/admin')) {
+    // Admin routes protection (check path without locale)
+    if (pathWithoutLocale.startsWith('/admin')) {
       if (!session) {
         const redirectUrl = request.nextUrl.clone()
-        redirectUrl.pathname = '/auth'
+        redirectUrl.pathname = `/${locale}/auth`
         redirectUrl.searchParams.set('message', 'É necessário fazer login para acessar o painel administrativo')
         return NextResponse.redirect(redirectUrl)
       }
@@ -67,7 +98,7 @@ export async function middleware(request: NextRequest) {
       
       if (!isAdmin) {
         const redirectUrl = request.nextUrl.clone()
-        redirectUrl.pathname = '/unauthorized'
+        redirectUrl.pathname = `/${locale}/unauthorized`
         redirectUrl.searchParams.set('message', 'Apenas administradores podem acessar esta área')
         return NextResponse.redirect(redirectUrl)
       }
@@ -76,12 +107,12 @@ export async function middleware(request: NextRequest) {
     return response
     
   } catch (error: any) {
-    console.error('❌ MIDDLEWARE: Erro:', error.message)
+    // Silent error handling for Edge Runtime compatibility
     
     // If there's an error and it's an admin route, redirect to auth
-    if (pathname.startsWith('/admin')) {
+    if (pathWithoutLocale.startsWith('/admin')) {
       const redirectUrl = request.nextUrl.clone()
-      redirectUrl.pathname = '/auth'
+      redirectUrl.pathname = `/${locale || defaultLocale}/auth`
       redirectUrl.searchParams.set('error', 'middleware_error')
       redirectUrl.searchParams.set('message', 'Erro na verificação de autenticação')
       return NextResponse.redirect(redirectUrl)
@@ -96,12 +127,12 @@ export const config = {
   matcher: [
     /*
      * Match all request paths except for the ones starting with:
+     * - api (API routes)
      * - _next/static (static files)
-     * - _next/image (image optimization files)
+     * - _next/image (image optimization files)  
      * - favicon.ico (favicon file)
-     * - .well-known (for security.txt or other security files)
-     * - api routes (they handle auth differently)
+     * - files with extensions (like .png, .jpg, etc.)
      */
-    '/((?!_next/static|_next/image|favicon.ico|\\.well-known|api).*)',
+    '/((?!api|_next/static|_next/image|favicon.ico|.*\\..*|manifest.json|sitemap.xml|robots.txt).*)',
   ],
 } 

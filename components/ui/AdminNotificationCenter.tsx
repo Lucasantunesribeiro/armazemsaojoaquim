@@ -185,7 +185,7 @@ export const AdminNotificationCenter: React.FC = () => {
                               {notification.actions.map((action, index) => (
                                 <div key={index}>
                                   {action.href ? (
-                                    <Link
+                                    <Link prefetch={true}
                                       href={action.href}
                                       onClick={() => setIsOpen(false)}
                                       className={`inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${

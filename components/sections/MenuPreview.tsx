@@ -6,8 +6,10 @@ import Image from 'next/image'
 import { ArrowRight, Wine, Coffee, Utensils, ChefHat, Star, Clock, Users, Sparkles } from 'lucide-react'
 import Button from '../ui/Button'
 import { cn } from '../../lib/utils'
+import { useTranslations } from '@/contexts/LanguageContext'
 
 const MenuPreview = () => {
+  const { t } = useTranslations()
   const [isVisible, setIsVisible] = useState(false)
   const [activeCategory, setActiveCategory] = useState(0)
   const sectionRef = useRef<HTMLDivElement>(null)
@@ -15,12 +17,12 @@ const MenuPreview = () => {
   const menuCategories = [
     {
       icon: ChefHat,
-      title: 'Aperitivos Especiais',
-      description: 'Entradas que despertam os sentidos com sabores únicos',
+      title: t('home.menuPreview.categories.appetizers.title'),
+      description: t('home.menuPreview.categories.appetizers.description'),
       items: [
-        { name: 'Patatas Bravas Armazém', price: 'R$ 25', description: 'Batatas douradas com aioli de páprica levemente picante' },
-        { name: 'Croqueta de Costela 12h', price: 'R$ 29', description: 'Costela bovina cozida lentamente, temperada e frita' },
-        { name: 'Ceviche Carioca', price: 'R$ 49', description: 'Tilápia marinada no limão com leite de coco, cebola roxa, pimenta dedo de moça, milho peruano, chips de batata' }
+        { name: t('home.menuPreview.categories.appetizers.items.patatas.name'), price: 'R$ 25', description: t('home.menuPreview.categories.appetizers.items.patatas.description') },
+        { name: t('home.menuPreview.categories.appetizers.items.croqueta.name'), price: 'R$ 29', description: t('home.menuPreview.categories.appetizers.items.croqueta.description') },
+        { name: t('home.menuPreview.categories.appetizers.items.ceviche.name'), price: 'R$ 49', description: t('home.menuPreview.categories.appetizers.items.ceviche.description') }
       ],
       gradient: 'from-red-500 to-pink-600',
       bgColor: 'bg-red-50',
@@ -28,12 +30,12 @@ const MenuPreview = () => {
     },
     {
       icon: Utensils,
-      title: 'Pratos Principais',
-      description: 'Gastronomia brasileira com técnicas contemporâneas',
+      title: t('home.menuPreview.categories.mains.title'),
+      description: t('home.menuPreview.categories.mains.description'),
       items: [
-        { name: 'Bife Ancho', price: 'R$ 130', description: 'Corte argentino com legumes grelhados e batatas bravas.' },
-        { name: 'Atum em Crosta', price: 'R$ 89', description: 'Selado com risotto de limão' },
-        { name: 'Polvo Grelhado Mediterrâneo', price: 'R$ 68', description: 'Com batatas confitadas' }
+        { name: t('home.menuPreview.categories.mains.items.ancho.name'), price: 'R$ 130', description: t('home.menuPreview.categories.mains.items.ancho.description') },
+        { name: t('home.menuPreview.categories.mains.items.tuna.name'), price: 'R$ 89', description: t('home.menuPreview.categories.mains.items.tuna.description') },
+        { name: t('home.menuPreview.categories.mains.items.octopus.name'), price: 'R$ 68', description: t('home.menuPreview.categories.mains.items.octopus.description') }
       ],
       gradient: 'from-amber-500 to-orange-600',
       bgColor: 'bg-amber-50',
@@ -41,12 +43,12 @@ const MenuPreview = () => {
     },
     {
       icon: Wine,
-      title: 'Feijoada Tradicional',
-      description: 'A autêntica feijoada brasileira do Armazém',
+      title: t('home.menuPreview.categories.feijoada.title'),
+      description: t('home.menuPreview.categories.feijoada.description'),
       items: [
-        { name: 'Feijoada Individual', price: 'R$ 45', description: 'Porção individual completa' },
-        { name: 'Feijoada para Dois', price: 'R$ 82', description: 'Ideal para compartilhar' },
-        { name: 'Buffet de Feijoada', price: 'R$ 55', description: 'Buffet livre aos sábados' }
+        { name: t('home.menuPreview.categories.feijoada.items.individual.name'), price: 'R$ 45', description: t('home.menuPreview.categories.feijoada.items.individual.description') },
+        { name: t('home.menuPreview.categories.feijoada.items.couple.name'), price: 'R$ 82', description: t('home.menuPreview.categories.feijoada.items.couple.description') },
+        { name: t('home.menuPreview.categories.feijoada.items.buffet.name'), price: 'R$ 55', description: t('home.menuPreview.categories.feijoada.items.buffet.description') }
       ],
       gradient: 'from-slate-600 to-slate-800',
       bgColor: 'bg-slate-50',
@@ -55,10 +57,10 @@ const MenuPreview = () => {
   ]
 
   const specialties = [
-    { icon: Star, title: 'Drinks Premiados', count: '12+' },
-    { icon: Coffee, title: 'Cafés Especiais', count: '8+' },
-    { icon: Wine, title: 'Vinhos Selecionados', count: '25+' },
-    { icon: Users, title: 'Pratos para Compartilhar', count: '6+' }
+    { icon: Star, title: t('home.menuPreview.specialties.drinks'), count: '12+' },
+    { icon: Coffee, title: t('home.menuPreview.specialties.coffees'), count: '8+' },
+    { icon: Wine, title: t('home.menuPreview.specialties.wines'), count: '25+' },
+    { icon: Users, title: t('home.menuPreview.specialties.sharing'), count: '6+' }
   ]
 
   useEffect(() => {
@@ -110,19 +112,19 @@ const MenuPreview = () => {
           )}>
             <div className="inline-flex items-center space-x-2 bg-amber-100 dark:bg-amber-900/40 border border-amber-200 dark:border-amber-700/50 rounded-full px-4 md:px-6 py-2 mb-4 md:mb-6">
               <Sparkles className="w-3 h-3 md:w-4 md:h-4 text-amber-600 dark:text-amber-400" />
-              <span className="text-amber-800 dark:text-amber-200 text-xs md:text-sm font-semibold tracking-wide">GASTRONOMIA ESPECIAL</span>
+              <span className="text-amber-800 dark:text-amber-200 text-xs md:text-sm font-semibold tracking-wide">{t('home.menuPreview.badge')}</span>
             </div>
 
             <h2 className="font-playfair text-3xl md:text-5xl lg:text-7xl font-bold bg-gradient-to-br from-slate-900 via-amber-900 to-amber-700 dark:from-white dark:via-amber-200 dark:to-amber-400 bg-clip-text text-transparent mb-4 md:mb-8 leading-tight px-2">
-              Sabores que Contam<br />
-              <span className="text-amber-600 dark:text-amber-400">Nossa História</span>
+              {t('home.menuPreview.title')}<br />
+              <span className="text-amber-600 dark:text-amber-400">{t('home.menuPreview.titleHighlight')}</span>
             </h2>
             
             <p className="text-base md:text-xl lg:text-2xl text-slate-600 dark:text-slate-300 max-w-4xl mx-auto leading-relaxed mb-8 md:mb-12 px-4">
-              Uma experiência gastronômica que combina tradição familiar e inovação contemporânea
+              {t('home.menuPreview.description')}
             </p>
 
-            <Link href="/menu" className="group inline-block">
+            <Link prefetch={true} href="/menu" className="group inline-block">
               <Button 
                 size="lg" 
                 className={cn(
@@ -134,7 +136,7 @@ const MenuPreview = () => {
                 )}
               >
                 <span className="flex items-center space-x-2">
-                  <span>Cardápio Completo</span>
+                  <span>{t('home.menuPreview.fullMenu')}</span>
                   <ArrowRight className="w-4 h-4 md:w-5 md:h-5 transition-transform group-hover:translate-x-1" />
                 </span>
               </Button>
@@ -295,19 +297,19 @@ const MenuPreview = () => {
               <div className="relative z-10 text-center text-white">
                 <div className="flex items-center justify-center space-x-2 mb-4 md:mb-6">
                   <Clock className="w-5 h-5 md:w-6 md:h-6 text-amber-400" />
-                  <span className="text-amber-200 font-semibold text-sm md:text-base">Experiência Gastronômica Completa</span>
+                  <span className="text-amber-200 font-semibold text-sm md:text-base">{t('home.menuPreview.cta.experience')}</span>
                 </div>
 
                 <h3 className="font-playfair text-2xl md:text-3xl lg:text-5xl font-bold mb-4 md:mb-6 leading-tight">
-                  Pronto para uma <span className="text-amber-400">experiência única</span>?
+                  {t('home.menuPreview.cta.title')} <span className="text-amber-400">{t('home.menuPreview.cta.titleHighlight')}</span>?
                 </h3>
                 
                 <p className="text-base md:text-lg lg:text-xl text-white/90 mb-6 md:mb-8 max-w-2xl mx-auto leading-relaxed px-4">
-                  Reserve sua mesa e desfrute da autenticidade culinária de Santa Teresa em um ambiente histórico incomparável
+                  {t('home.menuPreview.cta.description')}
                 </p>
 
                 <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center">
-                  <Link href="/reservas" className="group">
+                  <Link prefetch={true} href="/reservas" className="group">
                     <Button 
                       size="lg" 
                       className={cn(
@@ -320,12 +322,12 @@ const MenuPreview = () => {
                     >
                       <span className="flex items-center justify-center space-x-2">
                         <Users className="w-4 h-4 md:w-5 md:h-5" />
-                        <span>Reservar Mesa Agora</span>
+                        <span>{t('home.menuPreview.cta.reserveNow')}</span>
                       </span>
                     </Button>
                   </Link>
 
-                  <Link href="/menu" className="group">
+                  <Link prefetch={true} href="/menu" className="group">
                     <Button 
                       variant="outline" 
                       size="lg" 
@@ -339,7 +341,7 @@ const MenuPreview = () => {
                     >
                       <span className="flex items-center justify-center space-x-2">
                         <ChefHat className="w-4 h-4 md:w-5 md:h-5" />
-                        <span>Ver Cardápio Completo</span>
+                        <span>{t('home.menuPreview.cta.viewFullMenu')}</span>
                       </span>
                     </Button>
                   </Link>
@@ -352,7 +354,7 @@ const MenuPreview = () => {
           <div className="mt-12 md:mt-16 relative h-64 md:h-80 lg:h-96 rounded-2xl overflow-hidden shadow-2xl">
             <Image
               src="/images/produtos-venda.jpeg"
-              alt="Produtos artesanais e especiais à venda no Armazém São Joaquim"
+              alt={t('home.menuPreview.products.alt')}
               fill
               className="object-cover transition-transform duration-700 hover:scale-110"
               quality={90}
@@ -365,9 +367,9 @@ const MenuPreview = () => {
             {/* Floating Info Cards */}
             <div className="absolute bottom-4 md:bottom-6 left-4 md:left-6 right-4 md:right-6">
               <div className="bg-white/95 dark:bg-slate-800/95 backdrop-blur-sm rounded-xl p-3 md:p-4 shadow-lg">
-                <h4 className="font-semibold text-sm md:text-base text-slate-900 dark:text-white mb-1 md:mb-2">Produtos Especiais</h4>
+                <h4 className="font-semibold text-sm md:text-base text-slate-900 dark:text-white mb-1 md:mb-2">{t('home.menuPreview.products.title')}</h4>
                 <p className="text-xs md:text-sm text-slate-600 dark:text-slate-300">
-                  Desfrute de nossos produtos artesanais selecionados especialmente para você
+                  {t('home.menuPreview.products.description')}
                 </p>
               </div>
             </div>

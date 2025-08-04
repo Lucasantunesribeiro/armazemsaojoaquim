@@ -349,6 +349,46 @@ export function useAuthMessages() {
           console.log('Tentar reenviar email novamente')  
         }
       }
+    ),
+    
+    // Mensagens de erro específicas
+    'invalid-credentials': () => showAuthError(
+      'Credenciais inválidas',
+      'Email ou senha incorretos. Verifique suas credenciais e tente novamente.'
+    ),
+    
+    'email-not-confirmed': () => showAuthError(
+      'Email não confirmado',
+      'Sua conta ainda não foi confirmada. Verifique seu email e clique no link de confirmação.'
+    ),
+    
+    'too-many-requests': () => showAuthError(
+      'Muitas tentativas',
+      'Você fez muitas tentativas de login. Aguarde alguns minutos antes de tentar novamente.'
+    ),
+    
+    'user-not-found': () => showAuthError(
+      'Usuário não encontrado',
+      'Não encontramos uma conta com este email. Verifique o email ou crie uma nova conta.'
+    ),
+    
+    'server-error': (customMessage?: string) => showAuthError(
+      'Erro do servidor',
+      customMessage || 'Ocorreu um erro inesperado. Tente novamente em alguns instantes.'
+    ),
+    
+    'network-error': (customMessage?: string) => showAuthError(
+      'Erro de conexão',
+      customMessage || 'Problema de conexão. Verifique sua internet e tente novamente.'
+    ),
+    
+    'database-error': (customMessage?: string) => showAuthError(
+      'Erro no banco de dados',
+      customMessage || 'Problema técnico no banco de dados. Entre em contato com o suporte.'
+    ),
+    'url-config-error': (customMessage?: string) => showAuthError(
+      'Erro de configuração',
+      customMessage || 'Problema de configuração. Entre em contato com o suporte.'
     )
   }
 }

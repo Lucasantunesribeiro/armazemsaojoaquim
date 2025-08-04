@@ -19,7 +19,7 @@ const LogoSimple = ({
   const logoSize = isScrolled ? 36 : 40
 
   return (
-    <Link 
+    <Link prefetch={true} 
       href="/" 
       className={`group flex items-center gap-2 sm:gap-3 transition-all duration-200 ease-out focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 rounded-lg p-1 -m-1 ${className}`}
       aria-label="Armazém São Joaquim - Página inicial"

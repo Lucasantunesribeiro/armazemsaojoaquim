@@ -50,7 +50,7 @@ const Logo = memo(({
   const logoSize = getLogoSize()
 
   return (
-    <Link 
+    <Link prefetch={true} 
       href="/" 
       className={`
         group flex items-center gap-2 sm:gap-3

@@ -5,8 +5,10 @@ import { Award, MapPin, Clock, Users, Heart, Star, Camera, Calendar } from 'luci
 import Link from 'next/link'
 import Button from '../ui/Button'
 import ImageWithFallback from '../ImageWithFallback'
+import { useTranslations } from '@/contexts/LanguageContext'
 
 const AboutSection = () => {
+  const { t } = useTranslations()
   const [isVisible, setIsVisible] = useState(false)
   const [activeImageIndex, setActiveImageIndex] = useState(0)
   const [statsAnimated, setStatsAnimated] = useState(false)
@@ -15,55 +17,55 @@ const AboutSection = () => {
   const historicalImages = [
     {
       src: '/images/historia.webp',
-      alt: 'História do Armazém São Joaquim desde 1854',
-      title: 'Nossa História Centenária',
-      description: '170 anos preservando tradições gastronômicas'
+      alt: t('home.history.alt1'),
+      title: t('home.history.title1'),
+      description: t('home.history.description1')
     },
     {
       src: '/images/desenho-historico.webp',
-      alt: 'Desenho histórico do bairro de Santa Teresa',
-      title: 'Santa Teresa Histórica',
-      description: 'O charme colonial que preservamos'
+      alt: t('home.history.alt2'),
+      title: t('home.history.title2'),
+      description: t('home.history.description2')
     },
     {
       src: '/images/inicio-jornada.webp',
-      alt: 'Início da jornada do Armazém São Joaquim',
-      title: 'Início da Jornada',
-      description: 'De onde começou nossa tradição'
+      alt: t('home.history.alt3'),
+      title: t('home.history.title3'),
+      description: t('home.history.description3')
     }
   ]
 
   const heritageStats = [
-    { icon: Calendar, number: 170, suffix: ' anos', label: 'de História', color: 'text-amber-500 dark:text-amber-400' },
-    { icon: Heart, number: 1000, suffix: '+', label: 'Clientes Satisfeitos/mês', color: 'text-red-500 dark:text-red-400' },
-    { icon: Award, number: 4.8, suffix: '/5', label: 'Avaliação Média', color: 'text-green-500 dark:text-green-400' },
-    { icon: Users, number: 5, suffix: ' gerações', label: 'de Tradição Familiar', color: 'text-blue-500 dark:text-blue-400' }
+    { icon: Calendar, number: 170, suffix: t('home.about.stats.yearsSuffix'), label: t('home.about.stats.historyLabel'), color: 'text-amber-500 dark:text-amber-400' },
+    { icon: Heart, number: 1000, suffix: '+', label: t('home.about.stats.clientsLabel'), color: 'text-red-500 dark:text-red-400' },
+    { icon: Award, number: 4.8, suffix: '/5', label: t('home.about.stats.ratingLabel'), color: 'text-green-500 dark:text-green-400' },
+    { icon: Users, number: 5, suffix: t('home.about.stats.generationsSuffix'), label: t('home.about.stats.traditionLabel'), color: 'text-blue-500 dark:text-blue-400' }
   ]
 
   const features = [
     {
       icon: MapPin,
-      title: 'Localização Privilegiada',
-      description: 'No coração histórico de Santa Teresa, com vista para a cidade maravilhosa.',
-      highlight: 'Vista Única'
+      title: t('home.about.features.location.title'),
+      description: t('home.about.features.location.description'),
+      highlight: t('home.about.features.location.highlight')
     },
     {
       icon: Award,
-      title: 'Patrimônio Histórico',
-      description: 'Edificação preservada de 1854, mantendo a autenticidade colonial.',
-      highlight: 'Desde 1854'
+      title: t('home.about.features.heritage.title'),
+      description: t('home.about.features.heritage.description'),
+      highlight: t('home.about.features.heritage.highlight')
     },
     {
       icon: Heart,
-      title: 'Tradição Familiar',
-      description: 'Receitas e técnicas passadas através de gerações de chefs apaixonados.',
-      highlight: '5 Gerações'
+      title: t('home.about.features.tradition.title'),
+      description: t('home.about.features.tradition.description'),
+      highlight: t('home.about.features.tradition.highlight')
     },
     {
       icon: Star,
-      title: 'Experiência Autêntica',
-      description: 'Combinamos história, gastronomia e hospitalidade em cada detalhe.',
-      highlight: 'Experiência Única'
+      title: t('home.about.features.experience.title'),
+      description: t('home.about.features.experience.description'),
+      highlight: t('home.about.features.experience.highlight')
     }
   ]
 
@@ -139,16 +141,15 @@ const AboutSection = () => {
         <div className={`text-center mb-12 sm:mb-16 md:mb-20 transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
           <div className="inline-flex items-center space-x-2 bg-amber-100 dark:bg-amber-900/40 border border-amber-300 dark:border-amber-700/50 rounded-full px-4 sm:px-6 py-2 mb-4 sm:mb-6">
             <Award className="w-3 h-3 sm:w-4 sm:h-4 text-amber-600 dark:text-amber-400" />
-            <span className="text-amber-800 dark:text-amber-200 text-xs sm:text-sm font-semibold tracking-wide">NOSSA ESSÊNCIA</span>
+            <span className="text-amber-800 dark:text-amber-200 text-xs sm:text-sm font-semibold tracking-wide">{t('home.about.badge')}</span>
           </div>
           
           <h2 className="font-playfair text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 dark:text-white mb-4 sm:mb-6 leading-tight">
-            Uma Casa com <span className="text-amber-600 dark:text-amber-400">Memória</span>
+            {t('home.about.title.part1')} <span className="text-amber-600 dark:text-amber-400">{t('home.about.title.part2')}</span>
           </h2>
           
           <p className="text-base sm:text-lg md:text-xl text-slate-600 dark:text-slate-300 max-w-4xl mx-auto leading-relaxed px-2">
-            Desde 1854, o Armazém São Joaquim é mais que um restaurante — é um guardião das tradições gastronômicas 
-            de Santa Teresa, onde cada prato conta uma história e cada visita é uma viagem no tempo.
+            {t('home.about.description')}
           </p>
         </div>
 
@@ -194,7 +195,7 @@ const AboutSection = () => {
                         ? 'bg-amber-600 dark:bg-amber-400 scale-125' 
                         : 'bg-slate-300 dark:bg-slate-600 hover:bg-amber-400 dark:hover:bg-amber-500 hover:scale-110 active:scale-95'
                     }`}
-                    aria-label={`Ver imagem ${index + 1}`}
+                    aria-label={t('home.about.imageNav').replace('{{number}}', (index + 1).toString())}
                   />
                 ))}
               </div>
@@ -204,16 +205,14 @@ const AboutSection = () => {
             <div className="space-y-6 sm:space-y-8 order-1 lg:order-2">
               <div className="text-center lg:text-left">
                 <h3 className="font-playfair text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-900 dark:text-white mb-4 sm:mb-6">
-                  "En esta casa tenemos memoria"
+                  {t('home.about.motto')}
                 </h3>
                 <div className="w-16 h-1 bg-gradient-to-r from-amber-500 to-orange-500 mx-auto lg:mx-0 mb-4 sm:mb-6"></div>
                 <p className="text-base sm:text-lg text-slate-600 dark:text-slate-300 leading-relaxed mb-4 sm:mb-6">
-                  Esta frase, gravada em nossa entrada, resume nossa essência. Somos guardiões de 170 anos de história, 
-                  onde cada receita é um testemunho do tempo e cada ingrediente carrega a sabedoria de gerações passadas.
+                  {t('home.about.story.paragraph1')}
                 </p>
                 <p className="text-base sm:text-lg text-slate-600 dark:text-slate-300 leading-relaxed">
-                  Localizado no coração boêmio de Santa Teresa, nosso armazém preserva não apenas sabores autênticos, 
-                  mas também as histórias e tradições que fazem deste bairro um patrimônio cultural único do Rio de Janeiro.
+                  {t('home.about.story.paragraph2')}
                 </p>
               </div>
 
@@ -282,21 +281,20 @@ const AboutSection = () => {
             <Camera className="w-8 h-8 sm:w-12 sm:h-12 text-amber-400 mx-auto mb-4 sm:mb-6" />
             
             <h3 className="font-playfair text-2xl sm:text-3xl lg:text-4xl font-bold mb-4 sm:mb-6">
-              Venha Fazer Parte da Nossa História
+              {t('home.about.cta.title')}
             </h3>
             
             <p className="text-base sm:text-xl text-white/90 mb-6 sm:mb-8 max-w-2xl mx-auto">
-              Reserve sua mesa e experimente sabores que atravessaram 170 anos, 
-              em um ambiente onde cada detalhe conta nossa rica história.
+              {t('home.about.cta.description')}
             </p>
             
-            <Link href="/reservas">
+            <Link prefetch={true} href="/reservas">
               <Button 
                 size="lg" 
                 className="bg-amber-500 hover:bg-amber-600 text-white font-bold px-6 sm:px-8 py-3 sm:py-4 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
               >
                 <Calendar className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
-                Fazer Reserva
+                {t('home.about.cta.button')}
               </Button>
             </Link>
           </div>

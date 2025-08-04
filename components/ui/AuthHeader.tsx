@@ -41,7 +41,7 @@ export default function AuthHeader({
             {/* Navigation Links */}
             <div className="flex items-center space-x-6">
               {showBackButton && (
-                <Link 
+                <Link prefetch={true} 
                   href="/" 
                   className="inline-flex items-center text-amber-700 hover:text-amber-800 transition-colors group"
                 >
@@ -51,7 +51,7 @@ export default function AuthHeader({
                 </Link>
               )}
               
-              <Link 
+              <Link prefetch={true} 
                 href="/" 
                 className="inline-flex items-center text-amber-700 hover:text-amber-800 transition-colors"
               >
@@ -59,7 +59,7 @@ export default function AuthHeader({
                 <span className="hidden sm:inline font-medium">Início</span>
               </Link>
               
-              <Link 
+              <Link prefetch={true} 
                 href="tel:+5511999999999" 
                 className="inline-flex items-center text-amber-700 hover:text-amber-800 transition-colors"
               >
@@ -76,7 +76,7 @@ export default function AuthHeader({
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="py-3">
             <nav className="flex items-center space-x-2 text-sm">
-              <Link 
+              <Link prefetch={true} 
                 href="/" 
                 className="text-amber-600 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300 transition-colors"
               >

@@ -13,7 +13,7 @@ interface AuthButtonsProps {
 const AuthButtons = memo(({ isScrolled, onReservationClick, className = '' }: AuthButtonsProps) => {
   return (
     <div className={`flex items-center space-x-2 ${className}`}>
-      <Link
+      <Link prefetch={true}
         href="/auth"
         className={`
           inline-flex items-center justify-center px-4 py-2 text-sm font-semibold rounded-lg

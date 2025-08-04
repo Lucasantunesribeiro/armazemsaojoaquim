@@ -8,8 +8,10 @@ import Input from '../ui/Input'
 import toast from 'react-hot-toast'
 import { cn } from '../../lib/utils'
 import { useIntersectionObserver } from '../../lib/performance'
+import { useTranslations } from '@/contexts/LanguageContext'
 
 const ContactSection = () => {
+  const { t } = useTranslations()
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -32,7 +34,7 @@ const ContactSection = () => {
         },
         body: JSON.stringify({
           type: 'contact',
-          subject: `Nova mensagem de contato - ${formData.name}`,
+          subject: `${t('contact.form.emailSubject')} - ${formData.name}`,
           message: formData.message,
           name: formData.name,
           email: formData.email,
@@ -41,7 +43,7 @@ const ContactSection = () => {
       })
       
       if (response.ok) {
-        toast.success('Mensagem enviada com sucesso! Retornaremos em breve.')
+        toast.success(t('contact.form.success'))
         setFormData({ name: '', email: '', phone: '', message: '' })
       } else {
         // Check if response is JSON before parsing
@@ -50,16 +52,16 @@ const ContactSection = () => {
         if (contentType && contentType.includes('application/json')) {
           try {
             const errorData = await response.json()
-            throw new Error(errorData.error || 'Erro ao enviar mensagem')
+            throw new Error(errorData.error || t('contact.form.error'))
           } catch (jsonError) {
             console.error('Error parsing JSON error response:', jsonError)
-            throw new Error(`Erro ${response.status}: Falha no envio da mensagem`)
+            throw new Error(`${t('contact.form.error')} ${response.status}: ${t('contact.form.sendError')}`)
           }
         } else {
           // Response is not JSON (probably HTML error page)
           const errorText = await response.text()
           console.error('Non-JSON error response:', errorText)
-          throw new Error(`Erro ${response.status}: Serviço temporariamente indisponível`)
+          throw new Error(`${t('contact.form.error')} ${response.status}: ${t('contact.form.serviceUnavailable')}`)
         }
       }
     } catch (error) {
@@ -67,11 +69,11 @@ const ContactSection = () => {
       
       // Check if it's a network error
       if (error instanceof TypeError && error.message.includes('fetch')) {
-        toast.error('Erro de conexão. Verifique sua internet e tente novamente.')
+        toast.error(t('contact.form.networkError'))
       } else if (error instanceof Error) {
         toast.error(error.message)
       } else {
-        toast.error('Erro inesperado ao enviar mensagem. Tente novamente.')
+        toast.error(t('contact.form.unexpectedError'))
       }
     } finally {
       setLoading(false)
@@ -88,47 +90,47 @@ const ContactSection = () => {
   const contactInfo = [
     {
       icon: MapPin,
-      title: 'Localização',
-      content: ['Rua Almirante Alexandrino, 470', 'Santa Teresa, Rio de Janeiro - RJ', 'CEP: 20241-262'],
+      title: t('contact.info.location.title'),
+      content: [t('contact.info.location.address'), t('contact.info.location.neighborhood'), t('contact.info.location.zipcode')],
       gradient: 'from-red-500 to-pink-600',
       action: () => window.open('https://maps.google.com/?q=Rua+Almirante+Alexandrino,+470,+Santa+Teresa,+Rio+de+Janeiro', '_blank')
     },
     {
       icon: Phone,
-      title: 'Telefone & WhatsApp',
-      content: ['+55 21 98565-8443'],
+      title: t('contact.info.phone.title'),
+      content: [t('contact.info.phone.number')],
       gradient: 'from-green-500 to-emerald-600',
       action: () => window.open('tel:+5521985658443', '_blank')
     },
     {
       icon: Mail,
-      title: 'E-mail',
-      content: ['armazemsaojoaquimoficial@gmail.com'],
+      title: t('contact.info.email.title'),
+      content: [t('contact.info.email.address')],
       gradient: 'from-blue-500 to-indigo-600',
       action: () => window.open('mailto:armazemsaojoaquimoficial@gmail.com', '_blank')
     },
     {
       icon: Clock,
-      title: 'Horário',
-      content: ['Segunda a Sábado: 8:00 - 20:00', 'Domingo: Fechado'],
+      title: t('contact.info.hours.title'),
+      content: [t('contact.info.hours.weekdays'), t('contact.info.hours.sunday')],
       gradient: 'from-amber-500 to-orange-600'
     }
   ]
 
   const socialLinks = [
     {
-      name: 'Instagram',
+      name: t('contact.social.instagram.name'),
       icon: Instagram,
       url: 'https://www.instagram.com/armazemsaojoaquim/',
       gradient: 'from-purple-500 to-pink-600',
-      followers: '2.5K+'
+      followers: t('contact.social.instagram.followers')
     },
     {
-      name: 'Pousada',
+      name: t('contact.social.pousada.name'),
       icon: ExternalLink,
       url: 'https://vivapp.bukly.com/d/hotel_view/5041',
       gradient: 'from-blue-500 to-indigo-600',
-      followers: 'Reservas'
+      followers: t('contact.social.pousada.followers')
     }
   ]
 
@@ -172,15 +174,15 @@ const ContactSection = () => {
           )}>
             <div className="inline-flex items-center space-x-2 bg-amber-500/20 border border-amber-500/30 rounded-full px-6 py-2 mb-6">
               <Heart className="w-4 h-4 text-amber-600 dark:text-amber-400 fill-amber-600 dark:fill-amber-400" />
-              <span className="text-amber-800 dark:text-amber-200 text-sm font-semibold tracking-wide">VAMOS CONVERSAR</span>
+              <span className="text-amber-800 dark:text-amber-200 text-sm font-semibold tracking-wide">{t('contact.badge')}</span>
             </div>
 
             <h2 className="font-playfair text-4xl md:text-6xl lg:text-7xl font-bold text-slate-900 dark:text-white mb-8 leading-tight">
-              Venha nos <span className="text-amber-600 dark:text-amber-400">Visitar</span>
+              {t('contact.title')} <span className="text-amber-600 dark:text-amber-400">{t('contact.titleHighlight')}</span>
             </h2>
             
             <p className="text-xl md:text-2xl text-slate-700 dark:text-white/80 max-w-4xl mx-auto leading-relaxed">
-              Estamos no coração histórico de Santa Teresa, prontos para recebê-lo com a melhor hospitalidade carioca
+              {t('contact.description')}
             </p>
           </div>
 
@@ -239,7 +241,7 @@ const ContactSection = () => {
                 <div className="flex items-center space-x-3 mb-6">
                   <Star className="w-6 h-6 text-amber-600 dark:text-amber-400" />
                   <h3 className="font-playfair text-2xl font-bold text-slate-900 dark:text-white">
-                    Siga-nos & Reserve
+                    {t('contact.social.title')}
                   </h3>
                 </div>
                 
@@ -281,10 +283,10 @@ const ContactSection = () => {
                 <div className="mt-6 p-4 bg-amber-50 dark:bg-amber-500/10 rounded-2xl border border-amber-200 dark:border-amber-500/20">
                   <div className="flex items-center space-x-2 mb-2">
                     <Coffee className="w-4 h-4 text-amber-600 dark:text-amber-400" />
-                    <span className="text-amber-800 dark:text-amber-200 font-semibold text-sm">Dica Especial</span>
+                    <span className="text-amber-800 dark:text-amber-200 font-semibold text-sm">{t('contact.social.tip.title')}</span>
                   </div>
                   <p className="text-slate-600 dark:text-white/80 text-sm">
-                    Acompanhe nossas redes para eventos especiais, novidades do cardápio e promoções exclusivas
+                    {t('contact.social.tip.description')}
                   </p>
                 </div>
               </div>
@@ -299,7 +301,7 @@ const ContactSection = () => {
                 <div className="flex items-center space-x-3 mb-8">
                   <Send className="w-6 h-6 text-amber-600 dark:text-amber-400" />
                   <h3 className="font-playfair text-2xl font-bold text-slate-900 dark:text-white">
-                    Envie uma Mensagem
+                    {t('contact.form.title')}
                   </h3>
                 </div>
                 
@@ -307,14 +309,14 @@ const ContactSection = () => {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-amber-800 dark:text-amber-200 text-sm font-semibold mb-2">
-                        Nome completo *
+                        {t('contact.form.name')} *
                       </label>
                       <input
                         type="text"
                         name="name"
                         value={formData.name}
                         onChange={handleChange}
-                        placeholder="Seu nome"
+                        placeholder={t('contact.form.namePlaceholder')}
                         required
                         className={cn(
                           "w-full px-4 py-3 rounded-xl",
@@ -328,14 +330,14 @@ const ContactSection = () => {
                     
                     <div>
                       <label className="block text-amber-800 dark:text-amber-200 text-sm font-semibold mb-2">
-                        Telefone
+                        {t('contact.form.phone')}
                       </label>
                       <input
                         type="tel"
                         name="phone"
                         value={formData.phone}
                         onChange={handleChange}
-                        placeholder="(21) 99999-9999"
+                        placeholder={t('contact.form.phonePlaceholder')}
                         className={cn(
                           "w-full px-4 py-3 rounded-xl",
                           "bg-gray-50 dark:bg-white/10 backdrop-blur-sm border border-gray-300 dark:border-white/20",
@@ -349,14 +351,14 @@ const ContactSection = () => {
                   
                   <div>
                     <label className="block text-amber-800 dark:text-amber-200 text-sm font-semibold mb-2">
-                      E-mail *
+                      {t('contact.form.email')} *
                     </label>
                     <input
                       type="email"
                       name="email"
                       value={formData.email}
                       onChange={handleChange}
-                      placeholder="seu@email.com"
+                      placeholder={t('contact.form.emailPlaceholder')}
                       required
                       className={cn(
                         "w-full px-4 py-3 rounded-xl",
@@ -370,14 +372,14 @@ const ContactSection = () => {
                   
                   <div>
                     <label className="block text-amber-800 dark:text-amber-200 text-sm font-semibold mb-2">
-                      Mensagem *
+                      {t('contact.form.message')} *
                     </label>
                     <textarea
                       name="message"
                       value={formData.message}
                       onChange={handleChange}
                       rows={5}
-                      placeholder="Como podemos ajudá-lo? Conte-nos sobre sua dúvida, sugestão ou pedido especial..."
+                      placeholder={t('contact.form.messagePlaceholder')}
                       required
                       className={cn(
                         "w-full px-4 py-3 rounded-xl",
@@ -405,7 +407,7 @@ const ContactSection = () => {
                   >
                     <span className="flex items-center justify-center space-x-2">
                       <Send className="w-5 h-5" />
-                      <span>{loading ? 'Enviando...' : 'Enviar Mensagem'}</span>
+                      <span>{loading ? t('contact.form.sending') : t('contact.form.sendButton')}</span>
                     </span>
                   </Button>
                 </form>
@@ -413,10 +415,10 @@ const ContactSection = () => {
                 <div className="mt-8 p-4 bg-green-50 dark:bg-green-500/10 rounded-2xl border border-green-200 dark:border-green-500/20">
                   <div className="flex items-center space-x-2 mb-2">
                     <Calendar className="w-4 h-4 text-green-600 dark:text-green-400" />
-                    <span className="text-green-800 dark:text-green-200 font-semibold text-sm">Reservas Rápidas</span>
+                    <span className="text-green-800 dark:text-green-200 font-semibold text-sm">{t('contact.form.quickReservations.title')}</span>
                   </div>
                   <p className="text-slate-600 dark:text-white/80 text-sm mb-3">
-                    Para reservas urgentes, ligue diretamente ou use nosso WhatsApp
+                    {t('contact.form.quickReservations.description')}
                   </p>
                   <a
                     href="tel:+5521985658443"
@@ -427,7 +429,7 @@ const ContactSection = () => {
                     )}
                   >
                     <Phone className="w-4 h-4" />
-                    <span>Ligar Agora</span>
+                    <span>{t('contact.form.quickReservations.callNow')}</span>
                   </a>
                 </div>
               </div>
@@ -446,7 +448,7 @@ const ContactSection = () => {
                     allowFullScreen
 
                     referrerPolicy="no-referrer-when-downgrade"
-                    title="Localização do Armazém São Joaquim"
+                    title={t('contact.map.title')}
                     className="rounded-2xl"
                   />
                   
@@ -459,14 +461,14 @@ const ContactSection = () => {
                             <MapPin className="w-6 h-6 text-white" />
                           </div>
                           <div>
-                            <h4 className="font-bold text-slate-900 dark:text-white mb-1">Nossa Localização</h4>
+                            <h4 className="font-bold text-slate-900 dark:text-white mb-1">{t('contact.map.overlay.title')}</h4>
                             <p className="text-slate-600 dark:text-slate-300 text-sm mb-2">
-                              Rua Almirante Alexandrino, 470 - Santa Teresa<br />
-                              Rio de Janeiro - RJ, 20241-262
+                              {t('contact.info.location.address')} - {t('contact.info.location.neighborhood')}<br />
+                              {t('contact.info.location.zipcode')}
                             </p>
                             <div className="flex items-center space-x-4 text-xs">
                               <span className="text-amber-600 dark:text-amber-400 font-medium">
-                                📍 No coração histórico de Santa Teresa
+                                📍 {t('contact.map.overlay.description')}
                               </span>
                               <a
                                 href="https://maps.google.com/?q=Rua+Almirante+Alexandrino,+470+-+Santa+Teresa,+Rio+de+Janeiro+-+RJ"
@@ -474,7 +476,7 @@ const ContactSection = () => {
                                 rel="noopener noreferrer"
                                 className="bg-amber-500 hover:bg-amber-600 text-white px-3 py-1 rounded-lg transition-colors duration-200 pointer-events-auto"
                               >
-                                Ver no Maps
+                                {t('contact.map.overlay.viewOnMaps')}
                               </a>
                             </div>
                           </div>
@@ -488,7 +490,7 @@ const ContactSection = () => {
                 <div className="absolute inset-0 -z-10">
                   <Image
                     src="/images/endereco.jpg"
-                    alt="Localização do Armazém São Joaquim em Santa Teresa"
+                    alt={t('contact.map.fallbackAlt')}
                     fill
                     className="object-cover"
                     quality={90}

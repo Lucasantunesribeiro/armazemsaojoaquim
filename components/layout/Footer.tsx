@@ -7,7 +7,6 @@ import {
   Phone, 
   Mail,
   Clock,
-  Instagram,
   Facebook,
   Youtube,
   Heart,
@@ -20,28 +19,30 @@ import {
   Download,
   Shield,
   FileText,
-  HelpCircle,
-  MessageCircle
+  HelpCircle
 } from 'lucide-react'
+import { FaInstagram, FaWhatsapp, FaTiktok } from 'react-icons/fa'
 import Logo from '../atoms/Logo'
 import LogoSimple from '../atoms/LogoSimple'
 import NewsletterSignup from '../ui/NewsletterSignup'
 import MapButton from '../ui/MapButton'
 import { cn } from '../../lib/utils'
+import { useTranslations } from '@/contexts/LanguageContext'
 
 const Footer = () => {
   const currentYear = new Date().getFullYear()
+  const { t } = useTranslations()
 
   const navigationLinks = [
-    { name: 'Início', href: '/', icon: Coffee },
-    { name: 'Cardápio', href: '/menu', icon: Utensils },
-    { name: 'Reservas', href: '/reservas', icon: Calendar },
-    { name: 'Blog', href: '/blog', icon: FileText },
+    { name: t('nav.home'), href: '/', icon: Coffee },
+    { name: t('nav.restaurant'), href: '/menu', icon: Utensils },
+    { name: t('header.makeReservation'), href: '/reservas', icon: Calendar },
+    { name: t('nav.blog'), href: '/blog', icon: FileText },
   ]
 
   const utilityLinks = [
-    { name: 'Baixar Cardápio PDF', href: '/api/cardapio-pdf', icon: Download },
-    { name: 'WhatsApp', href: 'https://wa.me/5521985658443', icon: MessageCircle, external: true },
+    { name: t('footer.downloadMenu'), href: '/api/cardapio-pdf', icon: Download },
+    { name: t('footer.whatsapp'), href: 'https://wa.me/5521985658443', icon: FaWhatsapp, external: true },
   ]
 
   const legalLinks: { name: string; href: string }[] = [
@@ -55,23 +56,30 @@ const Footer = () => {
     {
       name: 'Instagram',
       href: 'https://instagram.com/armazemsaojoaquim',
-      icon: Instagram,
+      icon: FaInstagram,
       color: 'hover:text-pink-400',
       bgColor: 'hover:bg-pink-500/10'
     },
     {
-      name: 'Pousada',
-      href: 'https://vivapp.bukly.com/d/hotel_view/5041',
-      icon: ExternalLink,
+      name: 'WhatsApp',
+      href: 'https://wa.me/5521985658443',
+      icon: FaWhatsapp,
       color: 'hover:text-green-400',
       bgColor: 'hover:bg-green-500/10'
+    },
+    {
+      name: 'TikTok',
+      href: 'https://tiktok.com/@armazemsaojoaquim',
+      icon: FaTiktok,
+      color: 'hover:text-slate-900 dark:hover:text-white',
+      bgColor: 'hover:bg-slate-100 dark:hover:bg-slate-800'
     }
   ]
 
   const scheduleData = [
-    { day: 'Segunda-feira', hours: 'Fechado', closed: true },
-    { day: 'Terça a Sexta', hours: '12h - 22h', closed: false },
-    { day: 'Sábado e Domingo', hours: '12h - 23h', closed: false },
+    { day: t('footer.hours.monday'), hours: t('footer.hours.closed'), closed: true },
+    { day: t('footer.hours.tuesdayFriday'), hours: '12h - 22h', closed: false },
+    { day: t('footer.hours.weekends'), hours: '12h - 23h', closed: false },
   ]
 
   return (
@@ -141,10 +149,10 @@ const Footer = () => {
              <div className="text-center max-w-3xl mx-auto">
                <NewsletterSignup
                  variant="default"
-                 title="Não Perca Nossas Histórias"
-                 description="Receba as últimas novidades, receitas especiais, eventos exclusivos e histórias fascinantes do nosso patrimônio de 170 anos"
-                 placeholder="Digite seu melhor e-mail"
-                 buttonText="Inscrever-se"
+                 title={t('footer.newsletter.title')}
+                 description={t('footer.newsletter.description')}
+                 placeholder={t('footer.newsletter.placeholder')}
+                 buttonText={t('footer.newsletter.button')}
                />
              </div>
            </div>
@@ -222,7 +230,7 @@ const Footer = () => {
                   {navigationLinks.map((link) => {
                     const IconComponent = link.icon
                     return (
-                      <Link
+                      <Link prefetch={true}
                         key={link.name}
                         href={link.href}
                         className={cn(
@@ -316,7 +324,7 @@ const Footer = () => {
                 {/* Emergency Contact */}
                 <div className="bg-white/5 backdrop-blur-sm rounded-lg p-4 border border-white/10">
                   <h5 className="text-sm font-semibold text-amarelo-armazem font-inter mb-2 flex items-center">
-                    <MessageCircle className="w-4 h-4 mr-2" />
+                    <Phone className="w-4 h-4 mr-2" />
                     Contato Rápido
                   </h5>
                   <a 
@@ -329,8 +337,8 @@ const Footer = () => {
                       "transition-all duration-300 hover:scale-105"
                     )}
                   >
-                    <MessageCircle className="w-4 h-4" />
-                    <span>WhatsApp</span>
+                    <Phone className="w-4 h-4" />
+                    <span>{t('footer.whatsapp')}</span>
                   </a>
                 </div>
               </div>
@@ -406,10 +414,10 @@ const Footer = () => {
               <div className="text-center lg:text-left">
                 <p className="text-sm text-cinza-claro font-inter">
                   © {currentYear} <strong className="text-amarelo-armazem">Armazém São Joaquim</strong>. 
-                  Todos os direitos reservados.
+                  {t('footer.rightsReserved')}.
                 </p>
                 <p className="text-xs text-cinza-medio mt-1 font-inter">
-                  Patrimônio histórico preservado desde 1854 • Santa Teresa - RJ
+                  {t('footer.historicHeritage')}
                 </p>
               </div>
 
@@ -418,7 +426,7 @@ const Footer = () => {
               <div className="flex flex-wrap items-center justify-center gap-4 text-sm">
                 {legalLinks.map((link, index) => (
                   <React.Fragment key={link.name}>
-                    <Link 
+                    <Link prefetch={true} 
                       href={link.href} 
                       className="text-cinza-claro hover:text-amarelo-armazem transition-colors duration-300 font-inter"
                     >
@@ -436,11 +444,11 @@ const Footer = () => {
               <div className="flex items-center space-x-4">
                 <div className="flex items-center space-x-2 bg-white/10 backdrop-blur-sm rounded-full px-3 py-1 border border-white/20">
                   <Shield className="w-4 h-4 text-green-400" />
-                  <span className="text-xs text-cinza-claro font-inter">Site Seguro</span>
+                  <span className="text-xs text-cinza-claro font-inter">{t('footer.secureWebsite')}</span>
                 </div>
                 <div className="flex items-center space-x-2 bg-white/10 backdrop-blur-sm rounded-full px-3 py-1 border border-white/20">
                   <Heart className="w-4 h-4 text-vermelho-portas" />
-                  <span className="text-xs text-cinza-claro font-inter">Feito com ❤️</span>
+                  <span className="text-xs text-cinza-claro font-inter">{t('footer.madeWithLove')}</span>
                 </div>
               </div>
             </div>
@@ -450,7 +458,7 @@ const Footer = () => {
               {/* Location Map Embed */}
               <div className="text-center mb-8">
                 <h3 className="text-lg font-semibold text-amarelo-armazem font-playfair mb-4">
-                  📍 Nossa Localização
+                  📍 {t('footer.ourLocation')}
                 </h3>
                 <div className="max-w-2xl mx-auto rounded-xl overflow-hidden shadow-lg border border-white/10">
                   <iframe
@@ -477,9 +485,7 @@ const Footer = () => {
               {/* Company Description */}
               <div className="text-center">
                 <p className="text-xs text-cinza-medio font-inter leading-relaxed max-w-4xl mx-auto">
-                  O Armazém São Joaquim é mais do que um restaurante - é um pedaço vivo da história do Rio de Janeiro. 
-                  Localizado no charmoso bairro de Santa Teresa, oferecemos uma experiência gastronômica única 
-                  que combina tradição, sabor e memórias afetivas em cada prato servido.
+                  {t('footer.companyDescription')}
                 </p>
               </div>
             </div>

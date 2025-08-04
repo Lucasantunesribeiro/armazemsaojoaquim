@@ -82,7 +82,7 @@ const UserMenu = memo(({ user, isScrolled, onSignOut, onReservationClick, classN
               <h4 className="text-sm font-semibold text-madeira-escura dark:text-white font-inter">
                 Minhas Reservas
               </h4>
-              <Link
+              <Link prefetch={true}
                 href="/reservas"
                 className="text-xs text-amarelo-armazem hover:text-vermelho-portas font-inter transition-colors"
                 onClick={handleMenuClose}

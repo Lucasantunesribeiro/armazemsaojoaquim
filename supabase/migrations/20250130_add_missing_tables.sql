@@ -120,11 +120,11 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- Função para inserir usuário automático ao registrar
+-- Função para criar perfil automaticamente
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS trigger AS $$
 BEGIN
-  INSERT INTO public.users (id, email, full_name, role)
+  INSERT INTO public.profiles (id, email, full_name, role)
   VALUES (
     NEW.id,
     NEW.email,
@@ -135,7 +135,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
--- Trigger para criar usuário automaticamente
+-- Trigger para criar perfil automaticamente
 DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
 CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users

@@ -78,7 +78,7 @@ const NavLink = memo(({
   }
 
   return (
-    <Link
+    <Link prefetch={true}
       href={href}
       onClick={onClick}
       className={`

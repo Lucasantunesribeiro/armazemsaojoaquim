@@ -143,7 +143,7 @@ const Toast: React.FC<ToastProps> = ({ notification }) => {
               {notification.action && (
                 <div className="mt-3">
                   {notification.action.href ? (
-                    <Link
+                    <Link prefetch={true}
                       href={notification.action.href}
                       className="inline-flex items-center text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors"
                       onClick={handleAction}

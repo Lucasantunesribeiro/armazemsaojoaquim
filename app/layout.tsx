@@ -2,10 +2,6 @@ import type { Metadata, Viewport } from 'next'
 import { Inter, Playfair_Display } from 'next/font/google'
 import './globals.css'
 import { Providers } from '@/components/providers/Providers'
-import Header from '@/components/layout/Header'
-import Footer from '@/components/layout/Footer'
-import BottomNavigation from '@/components/ui/BottomNavigation'
-import { Toaster } from '@/components/ui/toaster'
 
 // Importar utilitário para suprimir warnings do Grammarly
 import '@/lib/suppress-warnings'
@@ -87,7 +83,6 @@ export default function RootLayout({
 }) {
   return (
     <html 
-      lang="pt-BR" 
       className={`${inter.variable} ${playfair.variable} scroll-smooth`}
       suppressHydrationWarning
     >
@@ -95,15 +90,7 @@ export default function RootLayout({
         className="min-h-screen bg-white dark:bg-slate-900 text-gray-900 dark:text-gray-100 antialiased"
         suppressHydrationWarning
       >
-        <Providers>
-          <Header />
-          <main className="min-h-screen main-content-mobile">
-            {children}
-          </main>
-          <Footer />
-          <BottomNavigation />
-          <Toaster />
-        </Providers>
+        {children}
       </body>
     </html>
   )
