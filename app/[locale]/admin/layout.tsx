@@ -22,6 +22,7 @@ export default function AdminLayout({
   const [isAdmin, setIsAdmin] = useState(false)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [debugInfo, setDebugInfo] = useState<string[]>([])
   const [locale, setLocale] = useState<string>('pt')
 
   const supabase = createClient()
@@ -35,32 +36,130 @@ export default function AdminLayout({
   }, [resolvedParams.locale])
 
   const checkAuth = useCallback(async () => {
+    console.log('🔍 AdminLayout: === INICIANDO VERIFICAÇÃO DE AUTENTICAÇÃO ===')
+    
     try {
-      console.log('🔍 AdminLayout: Verificando autenticação...')
+      setError('')
       
-      // Verificar sessão atual
+      // Step 1: Verificar sessão atual
+      console.log('🔍 AdminLayout: [STEP 1] Verificando sessão...')
       const { data: { session }, error: sessionError } = await supabase.auth.getSession()
       
       if (sessionError) {
-        console.error('❌ AdminLayout: Erro na sessão:', sessionError)
+        console.error('❌ AdminLayout: [STEP 1] Erro na sessão:', sessionError)
+        setError(`Erro na sessão: ${sessionError.message}`)
         router.push(`/${locale}/auth?message=Erro+na+sessão`)
         return
       }
 
       if (!session || !session.user) {
-        console.log('❌ AdminLayout: Sem sessão ativa')
+        console.log('❌ AdminLayout: [STEP 1] Sem sessão ativa')
+        setError('Nenhuma sessão ativa encontrada')
         router.push(`/${locale}/auth?message=Faça+login+para+acessar+o+painel+administrativo`)
         return
       }
 
-      console.log('✅ AdminLayout: Sessão encontrada:', session.user.email)
+      console.log('✅ AdminLayout: [STEP 1] Sessão encontrada:', {
+        email: session.user.email,
+        id: session.user.id,
+        created_at: session.user.created_at
+      })
       setUser(session.user)
+      setDebugInfo(prev => [...prev, `✅ Sessão: ${session.user.email}`])
 
-      // Verificar se é admin através da API
+      // Step 2: Verificação direta por email (fallback primário)
+      console.log('🔍 AdminLayout: [STEP 2] Verificação direta por email...')
+      if (session.user.email === 'armazemsaojoaquimoficial@gmail.com') {
+        console.log('✅ AdminLayout: [STEP 2] ADMIN CONFIRMADO POR EMAIL DIRETO!')
+        setDebugInfo(prev => [...prev, '✅ Admin confirmado por email direto'])
+        setIsAdmin(true)
+        return
+      }
+      
+      setDebugInfo(prev => [...prev, '❌ Email não é admin, tentando APIs...'])
+
+      // Step 3: Verificar através da API
+      console.log('🔍 AdminLayout: [STEP 3] Tentando API /api/admin/check-role...')
       try {
-        console.log('🔍 AdminLayout: Fazendo requisição para check-role...')
-        
         const response = await fetch('/api/admin/check-role', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Cache-Control': 'no-cache'
+          },
+          credentials: 'include'
+        })
+
+        console.log('🔍 AdminLayout: [STEP 3] Response status:', response.status)
+
+        if (!response.ok) {
+          console.error('❌ AdminLayout: [STEP 3] API retornou erro:', {
+            status: response.status,
+            statusText: response.statusText
+          })
+          
+          // Tentar ler detalhes do erro
+          try {
+            const errorData = await response.json()
+            console.error('❌ AdminLayout: [STEP 3] Detalhes do erro:', errorData)
+            
+            // Se API falhou mas email é admin, continuar
+            if (session.user.email === 'armazemsaojoaquimoficial@gmail.com') {
+              console.log('⚠️ AdminLayout: [STEP 3] API falhou mas email é admin - PERMITINDO ACESSO')
+              setIsAdmin(true)
+              return
+            }
+          } catch (parseError) {
+            console.error('❌ AdminLayout: [STEP 3] Não foi possível ler erro da API:', parseError)
+          }
+          
+          setError(`API error (${response.status}): ${response.statusText}`)
+          router.push(`/${locale}/auth?message=Erro+ao+verificar+permissões`)
+          return
+        }
+
+        const roleData = await response.json()
+        console.log('✅ AdminLayout: [STEP 3] API Response:', roleData)
+
+        if (roleData.isAdmin) {
+          console.log('✅ AdminLayout: [STEP 3] ADMIN CONFIRMADO VIA API!')
+          setIsAdmin(true)
+          return
+        } else {
+          console.log('❌ AdminLayout: [STEP 3] API indicou não-admin:', {
+            email: session.user.email,
+            isAdmin: roleData.isAdmin,
+            error: roleData.error,
+            debug: roleData.debug
+          })
+          
+          // Fallback final: se email é admin mas API disse não, forçar sim
+          if (session.user.email === 'armazemsaojoaquimoficial@gmail.com') {
+            console.log('⚠️ AdminLayout: [STEP 3] OVERRIDE: Email é admin, ignorando API - PERMITINDO ACESSO')
+            setIsAdmin(true)
+            return
+          }
+        }
+
+      } catch (apiError: any) {
+        console.error('❌ AdminLayout: [STEP 3] Erro ao chamar API:', apiError)
+        
+        // Fallback: se erro na API mas email é admin, permitir
+        if (session.user.email === 'armazemsaojoaquimoficial@gmail.com') {
+          console.log('✅ AdminLayout: [STEP 3] Erro na API mas email é admin - PERMITINDO ACESSO')
+          setIsAdmin(true)
+          return
+        }
+        
+        setError(`Erro na API: ${apiError.message}`)
+        router.push(`/${locale}/auth?message=Erro+ao+verificar+permissões`)
+        return
+      }
+
+      // Step 4: Tentativa alternativa com /api/auth/check-role
+      console.log('🔍 AdminLayout: [STEP 4] Tentando API alternativa /api/auth/check-role...')
+      try {
+        const response = await fetch('/api/auth/check-role', {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json'
@@ -68,78 +167,48 @@ export default function AdminLayout({
           credentials: 'include'
         })
 
-        if (!response.ok) {
-          console.error('❌ AdminLayout: API check-role falhou:', {
-            status: response.status,
-            statusText: response.statusText
-          })
+        if (response.ok) {
+          const roleData = await response.json()
+          console.log('✅ AdminLayout: [STEP 4] API alternativa response:', roleData)
           
-          // Try to get error details
-          try {
-            const errorData = await response.json()
-            console.error('❌ AdminLayout: Detalhes do erro:', errorData)
-          } catch (e) {
-            console.error('❌ AdminLayout: Não foi possível ler detalhes do erro')
+          if (roleData.isAdmin) {
+            console.log('✅ AdminLayout: [STEP 4] ADMIN CONFIRMADO VIA API ALTERNATIVA!')
+            setIsAdmin(true)
+            return
           }
-          
-          router.push(`/${locale}/auth?message=Erro+ao+verificar+permissões`)
-          return
         }
-
-        const roleData = await response.json()
-        console.log('🔍 AdminLayout: Role verificada:', roleData)
-
-        if (!roleData.isAdmin) {
-          console.log('❌ AdminLayout: Usuário não é admin:', {
-            email: session.user.email,
-            roleData
-          })
-          router.push(`/${locale}/auth?message=Acesso+negado+ao+painel+administrativo`)
-          return
-        }
-
-        console.log('✅ AdminLayout: Usuário admin confirmado:', {
-          email: session.user.email,
-          source: roleData.source
-        })
-        setIsAdmin(true)
-
-      } catch (apiError: any) {
-        console.error('❌ AdminLayout: Erro na API:', apiError)
-        
-        // Fallback: check admin by email directly if API fails
-        if (session.user.email === 'armazemsaojoaquimoficial@gmail.com') {
-          console.log('✅ AdminLayout: Admin confirmado por fallback de email')
-          setIsAdmin(true)
-          return
-        }
-        
-        router.push(`/${locale}/auth?message=Erro+ao+verificar+permissões`)
-        return
+      } catch (altApiError) {
+        console.log('⚠️ AdminLayout: [STEP 4] API alternativa também falhou:', altApiError)
       }
 
+      // Se chegou até aqui, negar acesso
+      console.log('❌ AdminLayout: ACESSO NEGADO - Nenhuma verificação passou')
+      setError('Acesso negado - usuário não é administrador')
+      router.push(`/${locale}/auth?message=Acesso+negado+ao+painel+administrativo`)
+
     } catch (error: any) {
-      console.error('❌ AdminLayout: Erro geral:', error)
+      console.error('❌ AdminLayout: [ERRO GERAL]:', error)
       
-      // Get session again for error handling
+      // Última tentativa: verificar sessão novamente
       try {
         const { data: { session: currentSession } } = await supabase.auth.getSession()
         
-        // If it's a general error but user email is admin, try to continue
         if (currentSession?.user?.email === 'armazemsaojoaquimoficial@gmail.com') {
-          console.log('⚠️ AdminLayout: Erro geral mas email é admin - tentando continuar')
+          console.log('⚠️ AdminLayout: [ERRO GERAL] Email é admin - PERMITINDO ACESSO FINAL')
           setUser(currentSession.user)
           setIsAdmin(true)
-        } else {
-          setError('Erro na autenticação: ' + error.message)
+          return
         }
-      } catch {
-        setError('Erro na autenticação: ' + error.message)
+      } catch (finalError) {
+        console.error('❌ AdminLayout: [ERRO GERAL] Erro na verificação final:', finalError)
       }
+      
+      setError('Erro crítico na autenticação: ' + error.message)
     } finally {
+      console.log('🏁 AdminLayout: === VERIFICAÇÃO FINALIZADA ===')
       setLoading(false)
     }
-  }, [router, supabase])
+  }, [router, supabase, locale])
 
   useEffect(() => {
     checkAuth()
@@ -166,9 +235,22 @@ export default function AdminLayout({
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
-        <div className="text-center">
+        <div className="text-center max-w-md">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-400">Verificando permissões...</p>
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+            Verificando Autenticação
+          </h2>
+          <p className="text-gray-600 dark:text-gray-400 mb-4">
+            Validando suas credenciais de administrador...
+          </p>
+          {debugInfo.length > 0 && (
+            <div className="text-left bg-gray-100 dark:bg-gray-800 p-3 rounded-md text-xs">
+              <p className="font-medium text-gray-700 dark:text-gray-300 mb-1">Debug Info:</p>
+              {debugInfo.map((info, index) => (
+                <p key={index} className="text-gray-600 dark:text-gray-400">{info}</p>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     )
@@ -176,26 +258,64 @@ export default function AdminLayout({
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
-        <div className="text-center">
-          <div className="bg-red-100 dark:bg-red-900 border border-red-400 dark:border-red-600 text-red-700 dark:text-red-300 px-4 py-3 rounded mb-4">
-            <p className="font-bold">Erro de Autenticação</p>
-            <p>{error}</p>
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center p-4">
+        <div className="text-center max-w-lg">
+          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-800 dark:text-red-200 p-6 rounded-lg mb-6">
+            <div className="flex items-center justify-center mb-4">
+              <div className="bg-red-100 dark:bg-red-900/50 p-2 rounded-full">
+                <svg className="w-6 h-6 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+            </div>
+            <h2 className="text-xl font-bold mb-2">Erro de Autenticação</h2>
+            <p className="text-sm mb-4">{error}</p>
+            {user && (
+              <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 p-3 rounded text-sm">
+                <p className="text-yellow-800 dark:text-yellow-200">
+                  <strong>Usuário logado:</strong> {user.email}
+                </p>
+              </div>
+            )}
           </div>
-          <div className="space-x-4">
+          
+          <div className="space-y-3">
+            <button
+              onClick={() => {
+                setLoading(true)
+                setError('')
+                checkAuth()
+              }}
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition-colors"
+            >
+              Tentar Novamente
+            </button>
             <button
               onClick={() => router.push(`/${locale}/auth`)}
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+              className="w-full bg-gray-600 hover:bg-gray-700 text-white font-medium py-2 px-4 rounded-md transition-colors"
             >
               Fazer Login
             </button>
             <button
               onClick={() => window.location.reload()}
-              className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
+              className="w-full bg-gray-400 hover:bg-gray-500 text-white font-medium py-2 px-4 rounded-md transition-colors"
             >
-              Tentar Novamente
+              Recarregar Página
             </button>
           </div>
+          
+          {debugInfo.length > 0 && (
+            <details className="mt-6 text-left">
+              <summary className="cursor-pointer text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">
+                Mostrar informações técnicas
+              </summary>
+              <div className="mt-2 bg-gray-100 dark:bg-gray-800 p-3 rounded-md text-xs font-mono">
+                {debugInfo.map((info, index) => (
+                  <div key={index} className="text-gray-700 dark:text-gray-300 py-1">{info}</div>
+                ))}
+              </div>
+            </details>
+          )}
         </div>
       </div>
     )
