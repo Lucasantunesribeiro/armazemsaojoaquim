@@ -1,10 +1,10 @@
 import { createServerClient } from '../supabase'
-import { cookies } from 'next/headers'
+// import { cookies } from 'next/headers' // Não necessário mais
 import { redirect } from 'next/navigation'
 import { NextRequest, NextResponse } from 'next/server'
 
 export async function requireAuth() {
-  const supabase = createServerClient(cookies())
+  const supabase = await createServerClient()
   
   const { data: { session } } = await supabase.auth.getSession()
   
@@ -26,7 +26,7 @@ export async function requireAdmin(request?: NextRequest, response?: NextRespons
     supabase = createMiddlewareClient(request, response)
   } else {
     // Se estamos em server component, usar createServerClient
-    supabase = createServerClient(cookies())
+    supabase = await createServerClient()
   }
   
   const { data: { session }, error } = await supabase.auth.getSession()
@@ -107,7 +107,7 @@ export async function requireAdmin(request?: NextRequest, response?: NextRespons
 }
 
 export async function getUser() {
-  const supabase = createServerClient(cookies())
+  const supabase = await createServerClient()
   
   const { data: { session } } = await supabase.auth.getSession()
   
@@ -126,7 +126,7 @@ export async function getUser() {
 
 export async function isAdmin(): Promise<boolean> {
   try {
-    const supabase = createServerClient(cookies())
+    const supabase = await createServerClient()
     const { data: { session } } = await supabase.auth.getSession()
     
     if (!session) {

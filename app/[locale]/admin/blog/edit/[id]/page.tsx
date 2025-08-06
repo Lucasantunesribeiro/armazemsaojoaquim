@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, use } from 'react'
 import { useRouter } from 'next/navigation'
 import { useSupabase } from '@/components/providers/SupabaseProvider'
 import { useAdminApi } from '@/lib/hooks/useAdminApi'
@@ -11,10 +11,13 @@ type BlogPost = Database['public']['Tables']['blog_posts']['Row']
 type BlogPostUpdate = Database['public']['Tables']['blog_posts']['Update']
 
 interface Props {
-  params: { id: string; locale: string }
+  params: Promise<{ id: string; locale: string }>
 }
 
 export default function EditBlogPostPage({ params }: Props) {
+  // Desempacotar params usando React.use()
+  const resolvedParams = use(params)
+
   const { supabase, user } = useSupabase()
   const router = useRouter()
   const { adminFetch } = useAdminApi()
@@ -32,14 +35,10 @@ export default function EditBlogPostPage({ params }: Props) {
     slug: ''
   })
 
-  // Resolver params async
+  // Definir locale diretamente dos params
   useEffect(() => {
-    const resolveParams = async () => {
-      const resolvedParams = await params
-      setLocale(resolvedParams.locale || 'pt')
-    }
-    resolveParams()
-  }, [params])
+    setLocale(resolvedParams.locale || 'pt')
+  }, [resolvedParams.locale])
 
   // Load blog post data
   useEffect(() => {
@@ -47,7 +46,7 @@ export default function EditBlogPostPage({ params }: Props) {
       try {
         console.log('📝 Frontend: Iniciando busca do post para edição...')
         
-        const data = await adminFetch(`/api/admin/blog/${params.id}`)
+        const data = await adminFetch(`/api/admin/blog/${resolvedParams.id}`)
         console.log('📝 Frontend: Dados recebidos:', data)
 
         const postData = data.post
@@ -75,7 +74,7 @@ export default function EditBlogPostPage({ params }: Props) {
     }
 
     fetchPost()
-  }, [params.id, adminFetch, router])
+  }, [resolvedParams.id, adminFetch, router])
 
   const generateSlug = (title: string) => {
     return title
@@ -94,7 +93,7 @@ export default function EditBlogPostPage({ params }: Props) {
     setError(null)
 
     try {
-      const data = await adminFetch(`/api/admin/blog/${params.id}`, {
+      const data = await adminFetch(`/api/admin/blog/${resolvedParams.id}`, {
         method: 'PUT',
         body: JSON.stringify(formData),
       })
@@ -137,7 +136,7 @@ export default function EditBlogPostPage({ params }: Props) {
     }
 
     try {
-      await adminFetch(`/api/admin/blog/${params.id}`, {
+      await adminFetch(`/api/admin/blog/${resolvedParams.id}`, {
         method: 'DELETE'
       })
 

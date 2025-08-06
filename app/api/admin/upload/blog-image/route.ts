@@ -1,5 +1,5 @@
 import { createServerClient } from '@/lib/supabase'
-import { cookies } from 'next/headers'
+// import { cookies } from 'next/headers' // Não necessário mais
 import { NextRequest, NextResponse } from 'next/server'
 import { writeFile, mkdir } from 'fs/promises'
 import path from 'path'
@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
     }
 
     const token = authHeader.substring(7)
-    const supabase = createServerClient(cookies())
+    const supabase = await createServerClient()
     
     // Verificar usuário admin
     const { data: { user }, error: userError } = await supabase.auth.getUser(token)

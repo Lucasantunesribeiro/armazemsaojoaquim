@@ -5,7 +5,6 @@ import Footer from '@/components/layout/Footer'
 import BottomNavigation from '@/components/ui/BottomNavigation'
 import { Toaster } from '@/components/ui/toaster'
 import { Providers } from '@/components/providers/Providers'
-import { LanguageProvider } from '@/contexts/LanguageContext'
 import '../globals.css'
 import { Suspense } from 'react'
 import Loading from '@/components/ui/Loading'
@@ -28,19 +27,17 @@ export default async function LocaleLayout({
 }: LocaleLayoutProps) {
   const { locale } = await params
   return (
-    <LanguageProvider>
-      <Providers>
-        <Header />
-        <main className="min-h-screen main-content-mobile">
-          <Suspense fallback={<Loading />}>
-            {children}
-          </Suspense>
-        </main>
-        <Footer />
-        <BottomNavigation />
-        <Toaster />
-      </Providers>
-    </LanguageProvider>
+    <>
+      <Header />
+      <main className="min-h-screen main-content-mobile">
+        <Suspense fallback={<Loading />}>
+          {children}
+        </Suspense>
+      </main>
+      <Footer />
+      <BottomNavigation />
+      <Toaster />
+    </>
   )
 }
 

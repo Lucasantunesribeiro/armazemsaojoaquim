@@ -2,12 +2,13 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
+import { use } from 'react'
 import { Card, CardContent, CardHeader } from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
 import { Shield, ArrowLeft } from 'lucide-react'
 
 interface UnauthorizedPageProps {
-  params: { locale: string }
+  params: Promise<{ locale: string }>
 }
 
 export default function UnauthorizedPage({ params }: UnauthorizedPageProps) {
@@ -16,13 +17,12 @@ export default function UnauthorizedPage({ params }: UnauthorizedPageProps) {
   const [locale, setLocale] = useState<string>('pt')
   const [message, setMessage] = useState<string>('')
 
+  // Desempacotar params usando React.use()
+  const resolvedParams = use(params)
+  
   useEffect(() => {
-    const resolveParams = async () => {
-      const resolvedParams = await params
-      setLocale(resolvedParams.locale || 'pt')
-    }
-    resolveParams()
-  }, [params])
+    setLocale(resolvedParams.locale || 'pt')
+  }, [resolvedParams.locale])
 
   useEffect(() => {
     const urlMessage = searchParams.get('message')

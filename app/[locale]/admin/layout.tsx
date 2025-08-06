@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
+import { use } from 'react'
 import { createClient } from '@/lib/supabase'
 import { User, AuthChangeEvent, Session } from '@supabase/supabase-js'
 import { Menu, X } from 'lucide-react'
@@ -9,7 +10,7 @@ import AdminNotificationCenter from '@/components/ui/AdminNotificationCenter'
 
 interface AdminLayoutProps {
   children: React.ReactNode
-  params: { locale: string }
+  params: Promise<{ locale: string }>
 }
 
 export default function AdminLayout({
@@ -25,14 +26,13 @@ export default function AdminLayout({
 
   const supabase = createClient()
 
-  // Resolver params async
+  // Desempacotar params usando React.use()
+  const resolvedParams = use(params)
+  
+  // Definir locale diretamente dos params
   useEffect(() => {
-    const resolveParams = async () => {
-      const resolvedParams = await params
-      setLocale(resolvedParams.locale || 'pt')
-    }
-    resolveParams()
-  }, [params])
+    setLocale(resolvedParams.locale || 'pt')
+  }, [resolvedParams.locale])
 
   const checkAuth = useCallback(async () => {
     try {

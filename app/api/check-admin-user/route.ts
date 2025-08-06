@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
-import { cookies } from 'next/headers'
+// import { cookies } from 'next/headers' // Não necessário mais
 
 export async function GET(request: NextRequest) {
   try {
     console.log('🔍 API check-admin-user: Verificando se usuário admin existe...')
     
-    const cookieStore = cookies()
+    const cookieStore = await cookies()
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,

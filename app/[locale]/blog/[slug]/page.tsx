@@ -43,7 +43,8 @@ async function getOtherPosts(currentSlug: string): Promise<BlogPost[]> {
 }
 
 export async function generateMetadata({ params }: BlogPostPageProps): Promise<Metadata> {
-  const post = await getBlogPost(params.slug)
+  const resolvedParams = await params
+  const post = await getBlogPost(resolvedParams.slug)
   
   if (!post) {
     return {
@@ -66,8 +67,9 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
 }
 
 export default async function BlogPostPage({ params }: BlogPostPageProps) {
-  const post = await getBlogPost(params.slug)
-  const otherPosts = await getOtherPosts(params.slug)
+  const resolvedParams = await params
+  const post = await getBlogPost(resolvedParams.slug)
+  const otherPosts = await getOtherPosts(resolvedParams.slug)
 
   if (!post) {
     notFound()

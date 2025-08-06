@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, use } from 'react'
 import { useRouter } from 'next/navigation'
 import { useSupabase } from '@/components/providers/SupabaseProvider'
 import { Database } from '@/types/database.types'
@@ -9,10 +9,13 @@ type MenuItem = Database['public']['Tables']['menu_items']['Row']
 type MenuCategory = Database['public']['Tables']['menu_categories']['Row']
 
 interface Props {
-  params: { id: string; locale: string }
+  params: Promise<{ id: string; locale: string }>
 }
 
 export default function EditMenuItemPage({ params }: Props) {
+  // Desempacotar params usando React.use()
+  const resolvedParams = use(params)
+
   const { supabase } = useSupabase()
   const router = useRouter()
   const [loading, setLoading] = useState(true)
@@ -37,19 +40,15 @@ export default function EditMenuItemPage({ params }: Props) {
     updated_at: ''
   })
 
-  // Resolver params async
+  // Definir locale diretamente dos params
   useEffect(() => {
-    const resolveParams = async () => {
-      const resolvedParams = await params
-      setLocale(resolvedParams.locale || 'pt')
-    }
-    resolveParams()
-  }, [params])
+    setLocale(resolvedParams.locale || 'pt')
+  }, [resolvedParams.locale])
 
   useEffect(() => {
     fetchCategories()
     fetchMenuItem()
-  }, [params.id])
+  }, [resolvedParams.id])
 
   const fetchCategories = async () => {
     const { data, error } = await supabase
@@ -69,7 +68,7 @@ export default function EditMenuItemPage({ params }: Props) {
       const { data, error } = await supabase
         .from('menu_items')
         .select('*')
-        .eq('id', params.id)
+        .eq('id', resolvedParams.id)
         .single()
 
       if (error) throw error
@@ -107,7 +106,7 @@ export default function EditMenuItemPage({ params }: Props) {
           nutritional_info: formData.nutritional_info,
           updated_at: new Date().toISOString()
         })
-        .eq('id', params.id)
+        .eq('id', (await params).id)
 
       if (error) throw error
 
@@ -150,7 +149,7 @@ export default function EditMenuItemPage({ params }: Props) {
       const { error } = await supabase
         .from('menu_items')
         .delete()
-        .eq('id', params.id)
+        .eq('id', (await params).id)
 
       if (error) throw error
 

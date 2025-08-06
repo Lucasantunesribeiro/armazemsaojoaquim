@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/Button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
 import { Separator } from '@/components/ui/separator'
-import { useTranslations } from '@/contexts/LanguageContext'
+import { useTranslations } from '@/hooks/useTranslations'
 
 interface Room {
   id: string

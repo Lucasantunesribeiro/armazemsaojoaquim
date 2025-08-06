@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '../../../lib/supabase'
-import { cookies } from 'next/headers'
+// import { cookies } from 'next/headers' // Não necessário mais
 
 export async function GET(request: NextRequest) {
   try {

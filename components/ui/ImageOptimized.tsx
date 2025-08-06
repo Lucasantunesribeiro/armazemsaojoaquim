@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useRef, useEffect, CSSProperties } from 'react'
+import { useState, useRef, useEffect, CSSProperties, memo } from 'react'
+import { useIntersectionObserver } from '@/hooks/useIntersectionObserver'
 
 interface ImageOptimizedProps {
   src: string
@@ -80,7 +81,7 @@ const generateBlurDataURL = (width: number = 10, height: number = 10): string =>
   return canvas.toDataURL('image/jpeg', 0.1)
 }
 
-export default function ImageOptimized({
+const ImageOptimized = memo(function ImageOptimized({
   src,
   alt,
   width,
@@ -88,21 +89,29 @@ export default function ImageOptimized({
   quality = 85,
   className = '',
   style,
-  priority = true,
+  priority = false, // Mudado para false por padrão para melhor performance
   placeholder = 'blur',
   blurDataURL,
   sizes,
   objectFit = 'cover',
   onLoad,
   onError,
-  loading = 'eager',
+  loading = 'lazy', // Mudado para lazy por padrão
   fetchPriority = 'auto',
 }: ImageOptimizedProps) {
   const [isLoaded, setIsLoaded] = useState(false)
   const [hasError, setHasError] = useState(false)
   const [currentSrc, setCurrentSrc] = useState('')
   const [modernFormat, setModernFormat] = useState<string>('')
+  const [shouldLoad, setShouldLoad] = useState(priority) // Só carrega se priority ou quando visível
   const imgRef = useRef<HTMLImageElement>(null)
+  
+  // Intersection Observer para lazy loading inteligente
+  const [containerRef, isIntersecting] = useIntersectionObserver({
+    threshold: 0.1,
+    freezeOnceVisible: true,
+    rootMargin: '100px' // Carrega 100px antes de ficar visível
+  })
 
   useEffect(() => {
     // Detectar suporte a formatos modernos
@@ -115,11 +124,18 @@ export default function ImageOptimized({
     }
   }, [])
 
+  // Trigger loading quando ficar visível ou for priority
   useEffect(() => {
-    if (modernFormat) {
+    if ((isIntersecting || priority) && !shouldLoad) {
+      setShouldLoad(true)
+    }
+  }, [isIntersecting, priority, shouldLoad])
+
+  useEffect(() => {
+    if (modernFormat && shouldLoad) {
       setCurrentSrc(getOptimizedSrc(src, modernFormat))
     }
-  }, [src, modernFormat])
+  }, [src, modernFormat, shouldLoad])
 
   const handleLoad = () => {
     setIsLoaded(true)
@@ -186,10 +202,14 @@ export default function ImageOptimized({
   }
 
   return (
-    <div className={`relative overflow-hidden ${className}`} style={{ width, height, ...style }}>
+    <div 
+      ref={containerRef as React.RefObject<HTMLDivElement>}
+      className={`relative overflow-hidden ${className}`} 
+      style={{ width, height, ...style }}
+    >
       {getPlaceholder()}
       
-      {currentSrc && (
+      {currentSrc && shouldLoad && (
         <img
           ref={imgRef}
           src={currentSrc}
@@ -206,12 +226,14 @@ export default function ImageOptimized({
           }}
           onLoad={handleLoad}
           onError={handleError}
-          loading="eager"
+          loading={priority ? 'eager' : 'lazy'}
           decoding="async"
           sizes={sizes}
-          fetchPriority={fetchPriority}
+          fetchPriority={priority ? 'high' : fetchPriority}
         />
       )}
     </div>
   )
-} 
+})
+
+export default ImageOptimized 

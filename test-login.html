@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>🚨 TESTE CRÍTICO - Supabase Schema Fix</title>
+    <style>
+        body { font-family: 'Courier New', monospace; margin: 40px; background: #1a1a1a; color: #00ff00; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .result { margin-top: 20px; padding: 20px; border-radius: 8px; border: 2px solid; }
+        .success { background: #0d4f0d; color: #00ff00; border-color: #00ff00; }
+        .error { background: #4f0d0d; color: #ff4444; border-color: #ff4444; }
+        .warning { background: #4f4f0d; color: #ffff00; border-color: #ffff00; }
+        pre { white-space: pre-wrap; word-wrap: break-word; font-size: 12px; }
+        button { padding: 15px 30px; font-size: 18px; margin: 10px 5px; background: #333; color: #00ff00; border: 2px solid #00ff00; cursor: pointer; }
+        button:hover { background: #00ff00; color: #000; }
+        input { padding: 12px; margin: 5px; width: 300px; background: #333; color: #00ff00; border: 1px solid #00ff00; }
+        .header { text-align: center; border: 3px solid #ff4444; padding: 20px; margin-bottom: 30px; }
+        .status { display: flex; gap: 20px; margin-bottom: 20px; }
+        .status-item { flex: 1; padding: 10px; border: 1px solid #666; text-align: center; }
+        .step-log { background: #2a2a2a; padding: 10px; margin: 10px 0; border-left: 4px solid #00ff00; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚨 SUPABASE SCHEMA FIX - TESTE CRÍTICO</h1>
+            <p><strong>PROBLEMA:</strong> Database error granting user - POST /auth/v1/token 500</p>
+            <p><strong>CORREÇÕES:</strong> RLS Policies + Trigger + Schema Validation</p>
+        </div>
+        
+        <div class="status" id="statusBar">
+            <div class="status-item">⏳ Aguardando teste...</div>
+        </div>
+        
+        <div>
+            <input type="email" id="email" placeholder="Email do Admin" value="armazemsaojoaquimoficial@gmail.com">
+            <input type="password" id="password" placeholder="Senha" value="admin123">
+            <button onclick="testLogin()">🚀 EXECUTAR TESTE CRÍTICO</button>
+            <button onclick="testSchema()">🔍 VERIFICAR SCHEMA</button>
+        </div>
+        
+        <div id="logs"></div>
+        <div id="result"></div>
+    </div>
+    
+    <script>
+        function addLog(message, type = 'info') {
+            const logsDiv = document.getElementById('logs');
+            const logClass = type === 'error' ? 'error' : type === 'success' ? 'success' : 'warning';
+            logsDiv.innerHTML += `<div class="step-log ${logClass}">[${new Date().toLocaleTimeString()}] ${message}</div>`;
+        }
+        
+        function updateStatus(status) {
+            document.getElementById('statusBar').innerHTML = `<div class="status-item">${status}</div>`;
+        }
+        
+        async function testSchema() {
+            addLog('🔍 Iniciando verificação de schema...', 'info');
+            updateStatus('🔍 Verificando schema...');
+            
+            try {
+                const response = await fetch('/api/test-supabase', {
+                    method: 'GET'
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    addLog('✅ Schema básico OK', 'success');
+                } else {
+                    addLog(`❌ Problema no schema: ${data.error}`, 'error');
+                }
+                
+                document.getElementById('result').innerHTML = `
+                    <div class="result ${data.success ? 'success' : 'error'}">
+                        <h3>📊 Resultado Verificação Schema:</h3>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    </div>
+                `;
+                
+            } catch (error) {
+                addLog(`❌ Erro na verificação: ${error.message}`, 'error');
+            }
+        }
+        
+        async function testLogin() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const resultDiv = document.getElementById('result');
+            
+            addLog('🚀 INICIANDO TESTE CRÍTICO DE LOGIN...', 'info');
+            updateStatus('🚀 Executando teste crítico...');
+            
+            resultDiv.innerHTML = '<div class="result warning">⏳ Executando teste crítico de autenticação...</div>';
+            
+            try {
+                addLog(`🔍 Testando login para: ${email}`, 'info');
+                
+                const response = await fetch('/api/test-login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    addLog('✅ LOGIN FUNCIONANDO! Schema corrigido com sucesso!', 'success');
+                    updateStatus('✅ TESTE PASSOU - Schema Corrigido!');
+                    
+                    addLog(`✅ Usuário: ${data.user.email}`, 'success');
+                    addLog(`✅ Profile Role: ${data.profile.role}`, 'success');
+                    addLog(`✅ Admin Role: ${data.admin.role || 'N/A'}`, 'success');
+                    addLog(`✅ Session: ${data.session.accessToken}`, 'success');
+                } else {
+                    addLog(`❌ TESTE FALHOU: ${data.error}`, 'error');
+                    addLog(`❌ Etapa: ${data.step || 'N/A'}`, 'error');
+                    updateStatus('❌ TESTE FALHOU - Verificar logs');
+                }
+                
+                const resultClass = data.success ? 'success' : 'error';
+                resultDiv.innerHTML = `
+                    <div class="result ${resultClass}">
+                        <h3>${data.success ? '🎯 SUCESSO - SCHEMA FUNCIONANDO!' : '🚨 FALHA NO TESTE'}</h3>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    </div>
+                `;
+                
+            } catch (error) {
+                addLog(`❌ ERRO CRÍTICO: ${error.message}`, 'error');
+                updateStatus('❌ ERRO CRÍTICO - Servidor não responde');
+                
+                resultDiv.innerHTML = `
+                    <div class="result error">
+                        <h3>🚨 ERRO CRÍTICO NA REQUISIÇÃO:</h3>
+                        <pre>${error.message}</pre>
+                    </div>
+                `;
+            }
+        }
+        
+        // Auto-executar teste na inicialização
+        window.onload = () => {
+            addLog('🌟 Sistema de teste carregado. Pronto para executar!', 'info');
+            setTimeout(() => {
+                testLogin();
+            }, 2000);
+        };
+    </script>
+</body>
+</html>

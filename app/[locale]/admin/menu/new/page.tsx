@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, use } from 'react'
 import { useRouter } from 'next/navigation'
 import { useSupabase } from '@/components/providers/SupabaseProvider'
 import { Database } from '@/types/database.types'
@@ -9,10 +9,13 @@ type MenuCategory = Database['public']['Tables']['menu_categories']['Row']
 type MenuItemInsert = Database['public']['Tables']['menu_items']['Insert']
 
 interface NewMenuItemPageProps {
-  params: { locale: string }
+  params: Promise<{ locale: string }>
 }
 
 export default function NewMenuItemPage({ params }: NewMenuItemPageProps) {
+  // Desempacotar params usando React.use()
+  const resolvedParams = use(params)
+
   const { supabase } = useSupabase()
   const router = useRouter()
   const [loading, setLoading] = useState(false)
@@ -34,10 +37,10 @@ export default function NewMenuItemPage({ params }: NewMenuItemPageProps) {
 
   // Resolver params async
   useEffect(() => {
-    const resolveParams = async () => {
-      const resolvedParams = await params
-      setLocale(resolvedParams.locale || 'pt')
-    }
+  // Definir locale diretamente dos params
+  useEffect(() => {
+    setLocale(resolvedParams.locale || 'pt')
+  }, [resolvedParams.locale])
     resolveParams()
   }, [params])
 

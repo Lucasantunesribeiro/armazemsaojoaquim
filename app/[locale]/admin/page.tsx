@@ -1,8 +1,10 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, Suspense } from 'react'
+import { use } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import dynamic from 'next/dynamic'
 import { useAdminApi } from '@/lib/hooks/useAdminApi'
 import { 
   Users, 
@@ -17,6 +19,17 @@ import {
   ArrowRight,
   Loader2
 } from 'lucide-react'
+
+// Lazy load heavy components
+const LazyActivitySection = dynamic(() => import('./components/ActivitySection'), {
+  loading: () => <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 animate-pulse h-48" />,
+  ssr: false
+})
+
+const LazyQuickActions = dynamic(() => import('./components/QuickActions'), {
+  loading: () => <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 animate-pulse h-32" />,
+  ssr: false
+})
 
 interface DashboardStats {
   totalUsers: number
@@ -37,7 +50,7 @@ interface DashboardCard {
 }
 
 interface AdminDashboardProps {
-  params: { locale: string }
+  params: Promise<{ locale: string }>
 }
 
 export default function AdminDashboard({ params }: AdminDashboardProps) {
@@ -54,14 +67,13 @@ export default function AdminDashboard({ params }: AdminDashboardProps) {
   const [loading, setLoading] = useState(true)
   const [locale, setLocale] = useState<string>('pt')
 
-  // Resolver params async
+  // Desempacotar params usando React.use()
+  const resolvedParams = use(params)
+  
+  // Definir locale diretamente dos params
   useEffect(() => {
-    const resolveParams = async () => {
-      const resolvedParams = await params
-      setLocale(resolvedParams.locale || 'pt')
-    }
-    resolveParams()
-  }, [params])
+    setLocale(resolvedParams.locale || 'pt')
+  }, [resolvedParams.locale])
   const [error, setError] = useState('')
   const [navigating, setNavigating] = useState<string | null>(null)
 
@@ -228,69 +240,15 @@ export default function AdminDashboard({ params }: AdminDashboardProps) {
         ))}
       </div>
 
-      {/* Quick Actions */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 sm:p-6">
-        <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4 sm:mb-6">
-          Ações Rápidas
-        </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-          <ActionCard
-            title="Nova Reserva"
-            description="Adicionar reserva manual"
-            href={`/${locale}/admin/reservas`}
-            icon={<Plus className="h-5 w-5" />}
-            color="blue"
-          />
-          <ActionCard
-            title="Novo Post"
-            description="Criar artigo do blog"
-            href={`/${locale}/admin/blog/new`}
-            icon={<FileText className="h-5 w-5" />}
-            color="green"
-          />
-          <ActionCard
-            title="Novo Prato"
-            description="Adicionar ao menu"
-            href={`/${locale}/admin/menu/new`}
-            icon={<ChefHat className="h-5 w-5" />}
-            color="purple"
-          />
-          <ActionCard
-            title="Ver Usuários"
-            description="Gerenciar usuários"
-            href={`/${locale}/admin/usuarios`}
-            icon={<Users className="h-5 w-5" />}
-            color="yellow"
-          />
-        </div>
-      </div>
+      {/* Quick Actions - Lazy Loaded */}
+      <Suspense fallback={<div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 animate-pulse h-32" />}>
+        <LazyQuickActions locale={locale} />
+      </Suspense>
 
-      {/* Recent Activity */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 sm:p-6">
-        <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4 sm:mb-6">
-          Atividade Recente
-        </h2>
-        <div className="space-y-3">
-          <ActivityItem
-            icon={<Calendar className="h-4 w-4 text-green-600" />}
-            title="Sistema funcionando normalmente"
-            time="Agora"
-            status="success"
-          />
-          <ActivityItem
-            icon={<TrendingUp className="h-4 w-4 text-blue-600" />}
-            title="Dashboard carregado com sucesso"
-            time="Há alguns segundos"
-            status="info"
-          />
-          <ActivityItem
-            icon={<CheckCircle className="h-4 w-4 text-green-600" />}
-            title="Todas as funcionalidades disponíveis"
-            time="Online"
-            status="success"
-          />
-        </div>
-      </div>
+      {/* Recent Activity - Lazy Loaded */}
+      <Suspense fallback={<div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 animate-pulse h-48" />}>
+        <LazyActivitySection />
+      </Suspense>
     </div>
   )
 }

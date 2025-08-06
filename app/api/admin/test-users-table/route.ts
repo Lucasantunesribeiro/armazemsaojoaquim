@@ -8,7 +8,7 @@ export async function GET(request: NextRequest) {
   console.log('🧪 TEST API: Testing users table access - ' + new Date().toISOString())
   
   try {
-    const cookieStore = cookies()
+    const cookieStore = await cookies()
     
     const supabase = createServerClient<Database>(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,

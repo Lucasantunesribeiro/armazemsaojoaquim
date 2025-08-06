@@ -5,7 +5,7 @@ import { Award, MapPin, Clock, Users, Heart, Star, Camera, Calendar } from 'luci
 import Link from 'next/link'
 import Button from '../ui/Button'
 import ImageWithFallback from '../ImageWithFallback'
-import { useTranslations } from '@/contexts/LanguageContext'
+import { useTranslations } from '@/hooks/useTranslations'
 
 const AboutSection = () => {
   const { t } = useTranslations()

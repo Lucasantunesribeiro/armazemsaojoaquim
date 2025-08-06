@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
-import { cookies } from 'next/headers'
+// import { cookies } from 'next/headers' // Não necessário mais
 import { Database } from '@/types/database.types'
 
 // API otimizada para análise de performance
@@ -10,7 +10,7 @@ export async function GET(request: NextRequest) {
   const startTime = Date.now()
   
   try {
-    const cookieStore = cookies()
+    const cookieStore = await cookies()
     
     const supabase = createServerClient<Database>(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -184,7 +184,7 @@ export async function POST(request: NextRequest) {
   console.log('🔄 API /admin/performance: REFRESH CACHES REQUEST - ' + new Date().toISOString())
   
   try {
-    const cookieStore = cookies()
+    const cookieStore = await cookies()
     
     const supabase = createServerClient<Database>(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,

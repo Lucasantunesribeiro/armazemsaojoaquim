@@ -499,6 +499,132 @@ export interface Translation {
     checkEmail: string
     passwordResetSent: string
   }
+
+  // Admin Panel
+  admin: {
+    dashboard: {
+      title: string
+      welcome: string
+      overview: string
+      quickActions: string
+      statistics: string
+      recentActivity: string
+    }
+    menu: {
+      title: string
+      addItem: string
+      editItem: string
+      deleteItem: string
+      categories: string
+      ingredients: string
+      price: string
+      available: string
+      description: string
+      image: string
+      actions: string
+    }
+    orders: {
+      title: string
+      newOrder: string
+      pending: string
+      confirmed: string
+      preparing: string
+      ready: string
+      delivered: string
+      cancelled: string
+      orderNumber: string
+      customer: string
+      total: string
+      date: string
+      status: string
+    }
+    reservations: {
+      title: string
+      newReservation: string
+      date: string
+      time: string
+      guests: string
+      name: string
+      phone: string
+      email: string
+      notes: string
+      status: string
+      confirmed: string
+      pending: string
+      cancelled: string
+    }
+    blog: {
+      title: string
+      addPost: string
+      editPost: string
+      publishPost: string
+      draftPost: string
+      deletePost: string
+      title_field: string
+      content: string
+      excerpt: string
+      author: string
+      category: string
+      tags: string
+      featuredImage: string
+      publishDate: string
+    }
+    users: {
+      title: string
+      addUser: string
+      editUser: string
+      deleteUser: string
+      name: string
+      email: string
+      role: string
+      status: string
+      active: string
+      inactive: string
+      admin: string
+      user: string
+      lastLogin: string
+    }
+    settings: {
+      title: string
+      general: string
+      appearance: string
+      notifications: string
+      security: string
+      language: string
+      timezone: string
+      currency: string
+    }
+    forms: {
+      save: string
+      cancel: string
+      delete: string
+      edit: string
+      add: string
+      update: string
+      create: string
+      required: string
+      optional: string
+      uploadImage: string
+      removeImage: string
+      selectFile: string
+      dragDropFile: string
+      maxFileSize: string
+      allowedFormats: string
+    }
+    messages: {
+      saveSuccess: string
+      saveError: string
+      deleteSuccess: string
+      deleteError: string
+      deleteConfirm: string
+      unsavedChanges: string
+      loading: string
+      noData: string
+      searchPlaceholder: string
+      itemsPerPage: string
+      showingResults: string
+    }
+  }
 }
 
 export const translations: Record<Language, Translation> = {
@@ -1200,6 +1326,10 @@ export const translations: Record<Language, Translation> = {
       email: 'E-mail',
       socialMedia: 'Redes Sociais',
       followUs: 'Siga-nos',
+      brandDescription: 'Desde 1854, preservamos a tradição gastronômica de Santa Teresa. Um patrimônio histórico que oferece experiências culinárias autênticas no coração do Rio de Janeiro.',
+      yearsOfHistory: 'anos de história',
+      culturalHeritage: 'Patrimônio Cultural',
+      artisanalCuisine: 'Culinária Artesanal',
       newsletter: {
         title: 'Não Perca Nossas Histórias',
         description: 'Receba as últimas novidades, receitas especiais, eventos exclusivos e histórias fascinantes do nosso patrimônio de 170 anos',
@@ -1256,6 +1386,131 @@ export const translations: Record<Language, Translation> = {
       signUpError: 'Erro ao criar conta',
       checkEmail: 'Verifique seu e-mail',
       passwordResetSent: 'E-mail de redefinição enviado'
+    },
+
+    admin: {
+      dashboard: {
+        title: 'Painel Administrativo',
+        welcome: 'Bem-vindo ao painel',
+        overview: 'Visão Geral',
+        quickActions: 'Ações Rápidas',
+        statistics: 'Estatísticas',
+        recentActivity: 'Atividade Recente'
+      },
+      menu: {
+        title: 'Cardápio',
+        addItem: 'Adicionar Item',
+        editItem: 'Editar Item',
+        deleteItem: 'Excluir Item',
+        categories: 'Categorias',
+        ingredients: 'Ingredientes',
+        price: 'Preço',
+        available: 'Disponível',
+        description: 'Descrição',
+        image: 'Imagem',
+        actions: 'Ações'
+      },
+      orders: {
+        title: 'Pedidos',
+        newOrder: 'Novo Pedido',
+        pending: 'Pendente',
+        confirmed: 'Confirmado',
+        preparing: 'Preparando',
+        ready: 'Pronto',
+        delivered: 'Entregue',
+        cancelled: 'Cancelado',
+        orderNumber: 'Número do Pedido',
+        customer: 'Cliente',
+        total: 'Total',
+        date: 'Data',
+        status: 'Status'
+      },
+      reservations: {
+        title: 'Reservas',
+        newReservation: 'Nova Reserva',
+        date: 'Data',
+        time: 'Horário',
+        guests: 'Pessoas',
+        name: 'Nome',
+        phone: 'Telefone',
+        email: 'E-mail',
+        notes: 'Observações',
+        status: 'Status',
+        confirmed: 'Confirmada',
+        pending: 'Pendente',
+        cancelled: 'Cancelada'
+      },
+      blog: {
+        title: 'Blog',
+        addPost: 'Adicionar Post',
+        editPost: 'Editar Post',
+        publishPost: 'Publicar Post',
+        draftPost: 'Salvar Rascunho',
+        deletePost: 'Excluir Post',
+        title_field: 'Título',
+        content: 'Conteúdo',
+        excerpt: 'Resumo',
+        author: 'Autor',
+        category: 'Categoria',
+        tags: 'Tags',
+        featuredImage: 'Imagem Destacada',
+        publishDate: 'Data de Publicação'
+      },
+      users: {
+        title: 'Usuários',
+        addUser: 'Adicionar Usuário',
+        editUser: 'Editar Usuário',
+        deleteUser: 'Excluir Usuário',
+        name: 'Nome',
+        email: 'E-mail',
+        role: 'Função',
+        status: 'Status',
+        active: 'Ativo',
+        inactive: 'Inativo',
+        admin: 'Administrador',
+        user: 'Usuário',
+        lastLogin: 'Último Acesso'
+      },
+      settings: {
+        title: 'Configurações',
+        general: 'Geral',
+        appearance: 'Aparência',
+        notifications: 'Notificações',
+        security: 'Segurança',
+        language: 'Idioma',
+        timezone: 'Fuso Horário',
+        currency: 'Moeda'
+      },
+      forms: {
+        save: 'Salvar',
+        cancel: 'Cancelar',
+        delete: 'Excluir',
+        edit: 'Editar',
+        add: 'Adicionar',
+        update: 'Atualizar',
+        create: 'Criar',
+        required: 'Obrigatório',
+        optional: 'Opcional',
+        uploadImage: 'Enviar Imagem',
+        removeImage: 'Remover Imagem',
+        selectFile: 'Selecionar Arquivo',
+        dragDropFile: 'Arraste e solte o arquivo aqui',
+        maxFileSize: 'Tamanho máximo',
+        allowedFormats: 'Formatos permitidos'
+      },
+      messages: {
+        saveSuccess: 'Salvo com sucesso!',
+        saveError: 'Erro ao salvar',
+        deleteSuccess: 'Excluído com sucesso!',
+        deleteError: 'Erro ao excluir',
+        deleteConfirm: 'Tem certeza que deseja excluir?',
+        unsavedChanges: 'Você tem alterações não salvas',
+        loading: 'Carregando...',
+        noData: 'Nenhum dado encontrado',
+        searchPlaceholder: 'Buscar...',
+        itemsPerPage: 'Itens por página',
+        showingResults: 'Mostrando resultados'
+      }
     }
   },
   
@@ -1946,6 +2201,10 @@ export const translations: Record<Language, Translation> = {
       email: 'Email',
       socialMedia: 'Social Media',
       followUs: 'Follow Us',
+      brandDescription: 'Since 1854, we have preserved the gastronomic tradition of Santa Teresa. A historic heritage that offers authentic culinary experiences in the heart of Rio de Janeiro.',
+      yearsOfHistory: 'years of history',
+      culturalHeritage: 'Cultural Heritage',
+      artisanalCuisine: 'Artisanal Cuisine',
       newsletter: {
         title: "Don't Miss Our Stories",
         description: 'Receive the latest news, special recipes, exclusive events and fascinating stories from our 170-year heritage',
@@ -2002,6 +2261,131 @@ export const translations: Record<Language, Translation> = {
       signUpError: 'Sign up error',
       checkEmail: 'Check your email',
       passwordResetSent: 'Password reset email sent'
+    },
+
+    admin: {
+      dashboard: {
+        title: 'Admin Dashboard',
+        welcome: 'Welcome to dashboard',
+        overview: 'Overview',
+        quickActions: 'Quick Actions',
+        statistics: 'Statistics',
+        recentActivity: 'Recent Activity'
+      },
+      menu: {
+        title: 'Menu',
+        addItem: 'Add Item',
+        editItem: 'Edit Item',
+        deleteItem: 'Delete Item',
+        categories: 'Categories',
+        ingredients: 'Ingredients',
+        price: 'Price',
+        available: 'Available',
+        description: 'Description',
+        image: 'Image',
+        actions: 'Actions'
+      },
+      orders: {
+        title: 'Orders',
+        newOrder: 'New Order',
+        pending: 'Pending',
+        confirmed: 'Confirmed',
+        preparing: 'Preparing',
+        ready: 'Ready',
+        delivered: 'Delivered',
+        cancelled: 'Cancelled',
+        orderNumber: 'Order Number',
+        customer: 'Customer',
+        total: 'Total',
+        date: 'Date',
+        status: 'Status'
+      },
+      reservations: {
+        title: 'Reservations',
+        newReservation: 'New Reservation',
+        date: 'Date',
+        time: 'Time',
+        guests: 'Guests',
+        name: 'Name',
+        phone: 'Phone',
+        email: 'Email',
+        notes: 'Notes',
+        status: 'Status',
+        confirmed: 'Confirmed',
+        pending: 'Pending',
+        cancelled: 'Cancelled'
+      },
+      blog: {
+        title: 'Blog',
+        addPost: 'Add Post',
+        editPost: 'Edit Post',
+        publishPost: 'Publish Post',
+        draftPost: 'Save Draft',
+        deletePost: 'Delete Post',
+        title_field: 'Title',
+        content: 'Content',
+        excerpt: 'Excerpt',
+        author: 'Author',
+        category: 'Category',
+        tags: 'Tags',
+        featuredImage: 'Featured Image',
+        publishDate: 'Publish Date'
+      },
+      users: {
+        title: 'Users',
+        addUser: 'Add User',
+        editUser: 'Edit User',
+        deleteUser: 'Delete User',
+        name: 'Name',
+        email: 'Email',
+        role: 'Role',
+        status: 'Status',
+        active: 'Active',
+        inactive: 'Inactive',
+        admin: 'Admin',
+        user: 'User',
+        lastLogin: 'Last Login'
+      },
+      settings: {
+        title: 'Settings',
+        general: 'General',
+        appearance: 'Appearance',
+        notifications: 'Notifications',
+        security: 'Security',
+        language: 'Language',
+        timezone: 'Timezone',
+        currency: 'Currency'
+      },
+      forms: {
+        save: 'Save',
+        cancel: 'Cancel',
+        delete: 'Delete',
+        edit: 'Edit',
+        add: 'Add',
+        update: 'Update',
+        create: 'Create',
+        required: 'Required',
+        optional: 'Optional',
+        uploadImage: 'Upload Image',
+        removeImage: 'Remove Image',
+        selectFile: 'Select File',
+        dragDropFile: 'Drag and drop file here',
+        maxFileSize: 'Max file size',
+        allowedFormats: 'Allowed formats'
+      },
+      messages: {
+        saveSuccess: 'Saved successfully!',
+        saveError: 'Error saving',
+        deleteSuccess: 'Deleted successfully!',
+        deleteError: 'Error deleting',
+        deleteConfirm: 'Are you sure you want to delete?',
+        unsavedChanges: 'You have unsaved changes',
+        loading: 'Loading...',
+        noData: 'No data found',
+        searchPlaceholder: 'Search...',
+        itemsPerPage: 'Items per page',
+        showingResults: 'Showing results'
+      }
     }
   }
 }

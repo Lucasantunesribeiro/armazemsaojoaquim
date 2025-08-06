@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@/lib/supabase'
-import { cookies } from 'next/headers'
+// import { cookies } from 'next/headers' // Não necessário mais
 import { Database } from '@/types/database.types'
 import { createClient } from '@supabase/supabase-js'
 
@@ -59,7 +59,7 @@ async function checkAdminAuth(request: NextRequest) {
     } else {
       // Fallback to cookie-based authentication
       console.log('🔍 API Blog: Tentando autenticação via cookies...')
-      const supabase = createServerClient(cookies())
+      const supabase = await createServerClient()
       const { data: sessionData, error } = await supabase.auth.getSession()
       
       if (error || !sessionData.session) {

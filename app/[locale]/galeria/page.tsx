@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/Input'
 import { Card } from '@/components/ui/Card'
 import SafeImage from '@/components/ui/SafeImage'
 import Loading from '@/components/ui/Loading'
-import { useTranslations } from '@/contexts/LanguageContext'
+import { useTranslations } from '@/hooks/useTranslations'
 
 interface Artwork {
   id: string

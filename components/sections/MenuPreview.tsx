@@ -6,7 +6,7 @@ import Image from 'next/image'
 import { ArrowRight, Wine, Coffee, Utensils, ChefHat, Star, Clock, Users, Sparkles } from 'lucide-react'
 import Button from '../ui/Button'
 import { cn } from '../../lib/utils'
-import { useTranslations } from '@/contexts/LanguageContext'
+import { useTranslations } from '@/hooks/useTranslations'
 
 const MenuPreview = () => {
   const { t } = useTranslations()

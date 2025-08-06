@@ -12,7 +12,7 @@ import { forceLogout } from '../../lib/supabase'
 import { useMobileMenu } from '../providers/MobileMenuProvider'
 import { useAdmin } from '@/hooks/useAdmin'
 import LanguageSwitcher from '../ui/LanguageSwitcher'
-import { useTranslations } from '@/contexts/LanguageContext'
+import { useTranslations } from '@/hooks/useTranslations'
 
 // TODO: Reativar sistema de reservas
 const RESERVATIONS_ENABLED = false
@@ -25,7 +25,7 @@ export default function Header() {
   const { theme, setTheme } = useTheme()
   const { isMobileMenuOpen, openMobileMenu, closeMobileMenu, toggleMobileMenu } = useMobileMenu()
   const { isAdmin } = useAdmin()
-  const { t } = useTranslations()
+  const { t, isReady } = useTranslations()
   const [isScrolled, setIsScrolled] = useState(false)
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false)
   const [isMounted, setIsMounted] = useState(false)
@@ -33,70 +33,14 @@ export default function Header() {
   const userMenuRef = useRef<HTMLDivElement>(null)
   const mobileMenuRef = useRef<HTMLDivElement>(null)
 
-  // Get current locale from pathname
-  const getCurrentLocale = () => {
-    if (pathname.startsWith('/en')) return 'en'
-    if (pathname.startsWith('/pt')) return 'pt'
-    return 'pt' // default
-  }
-
-  const currentLocale = getCurrentLocale()
-
-  // Dynamic navigation links with translations - preserving current locale
-  const navLinks = [
-    { name: t('nav.home'), href: `/${currentLocale}`, requiresAuth: false },
-    { name: t('nav.restaurant'), href: `/${currentLocale}/menu`, requiresAuth: false },
-    { name: t('nav.cafe'), href: `/${currentLocale}/cafe`, requiresAuth: false },
-    { name: t('nav.hotel'), href: `/${currentLocale}/pousada`, requiresAuth: false },
-    { name: t('nav.gallery'), href: `/${currentLocale}/galeria`, requiresAuth: false },
-    { name: t('nav.blog'), href: `/${currentLocale}/blog`, requiresAuth: false },
-  ]
-
+  // ALL HOOKS MUST BE CALLED BEFORE ANY CONDITIONAL RETURNS
   // Scroll handler
   const handleScroll = useCallback(() => {
     const scrolled = window.scrollY > 50
     setIsScrolled(scrolled)
   }, [])
 
-  // Handle logout
-  const handleLogout = async () => {
-    try {
-      console.log('🔄 Iniciando logout...')
-      
-      // Tentar logout normal primeiro
-      const { error } = await supabase.auth.signOut({ scope: 'local' })
-      
-      if (error) {
-        console.warn('⚠️ Erro no logout normal, usando logout forçado:', error)
-        await forceLogout()
-      }
-      
-      console.log('✅ Logout concluído')
-      setIsUserMenuOpen(false)
-      
-      // Opcional: recarregar a página para garantir limpeza completa
-      if (typeof window !== 'undefined') {
-        window.location.reload()
-      }
-    } catch (error) {
-      console.error('❌ Erro no logout:', error)
-      
-      // Fallback: usar logout forçado
-      await forceLogout()
-      setIsUserMenuOpen(false)
-      
-      if (typeof window !== 'undefined') {
-        window.location.reload()
-      }
-    }
-  }
-
-  // Toggle theme
-  const toggleTheme = () => {
-    setTheme(theme === 'dark' ? 'light' : 'dark')
-  }
-
-  // Effects
+  // Effects - MOVED BEFORE ANY CONDITIONAL RETURNS
   useEffect(() => {
     setIsMounted(true)
     setIsHydrated(true)
@@ -150,12 +94,84 @@ export default function Header() {
     }
   }, [isMobileMenuOpen])
 
+  // Get current locale from pathname
+  const getCurrentLocale = () => {
+    if (pathname.startsWith('/en')) return 'en'
+    if (pathname.startsWith('/pt')) return 'pt'
+    return 'pt' // default
+  }
+
+  const currentLocale = getCurrentLocale()
+
+  // Handle logout
+  const handleLogout = async () => {
+    try {
+      console.log('🔄 Iniciando logout...')
+      
+      // Tentar logout normal primeiro
+      const { error } = await supabase.auth.signOut({ scope: 'local' })
+      
+      if (error) {
+        console.warn('⚠️ Erro no logout normal, usando logout forçado:', error)
+        await forceLogout()
+      }
+      
+      console.log('✅ Logout concluído')
+      setIsUserMenuOpen(false)
+      
+      // Opcional: recarregar a página para garantir limpeza completa
+      if (typeof window !== 'undefined') {
+        window.location.reload()
+      }
+    } catch (error) {
+      console.error('❌ Erro no logout:', error)
+      
+      // Fallback: usar logout forçado
+      await forceLogout()
+      setIsUserMenuOpen(false)
+      
+      if (typeof window !== 'undefined') {
+        window.location.reload()
+      }
+    }
+  }
+
+  // Toggle theme
+  const toggleTheme = () => {
+    setTheme(theme === 'dark' ? 'light' : 'dark')
+  }
+
   // Check if link is active - considering locale
   const isActiveLink = (href: string) => {
     if (href === `/${currentLocale}`) {
       return pathname === `/${currentLocale}` || pathname === '/'
     }
     return pathname.startsWith(href)
+  }
+
+  // Wait for translations to be ready
+  if (!isReady) {
+    return (
+      <header className="fixed top-0 left-0 right-0 z-50 h-18 sm:h-20 bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl shadow-lg">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full">
+          <div className="flex items-center justify-between h-full">
+            <div className="flex-shrink-0">
+              <LogoSimple 
+                isScrolled={false}
+                showText={true}
+                className="transition-all duration-300"
+              />
+            </div>
+            <div className="hidden lg:flex items-center space-x-2">
+              {/* Placeholder for navigation */}
+            </div>
+            <div className="flex items-center space-x-2">
+              {/* Placeholder for actions */}
+            </div>
+          </div>
+        </div>
+      </header>
+    )
   }
 
   // Render loading state until hydrated
@@ -183,6 +199,16 @@ export default function Header() {
     )
   }
 
+  // Dynamic navigation links with translations - preserving current locale
+  const navLinks = [
+    { name: t('nav.home'), href: `/${currentLocale}`, requiresAuth: false },
+    { name: t('nav.restaurant'), href: `/${currentLocale}/menu`, requiresAuth: false },
+    { name: t('nav.cafe'), href: `/${currentLocale}/cafe`, requiresAuth: false },
+    { name: t('nav.hotel'), href: `/${currentLocale}/pousada`, requiresAuth: false },
+    { name: t('nav.gallery'), href: `/${currentLocale}/galeria`, requiresAuth: false },
+    { name: t('nav.blog'), href: `/${currentLocale}/blog`, requiresAuth: false },
+  ]
+
   return (
     <>
       <header className={`
@@ -206,7 +232,7 @@ export default function Header() {
 
             {/* Desktop Navigation */}
             <nav className={`hidden lg:flex items-center transition-all duration-300 ${isScrolled ? 'space-x-1' : 'space-x-2'}`}>
-                            {navLinks.map((link) => {
+              {navLinks.map((link) => {
                 const isActive = isActiveLink(link.href)
                 const requiresAuth = link.requiresAuth && !user
                 return (
@@ -243,51 +269,51 @@ export default function Header() {
             <div className="hidden lg:flex items-center space-x-2">
               {/* Social Media Links */}
               <div className="flex items-center space-x-1 mr-2">
-                                 <a
-                   href="https://instagram.com/armazemsaojoaquim"
-                   target="_blank"
-                   rel="noopener noreferrer"
-                   className={`
-                     relative p-2 rounded-xl transition-all duration-300 hover:scale-105
-                     ${isScrolled 
-                       ? 'text-slate-600 hover:text-pink-600 dark:text-slate-400 dark:hover:text-pink-400 hover:bg-pink-50 dark:hover:bg-pink-900/20' 
-                       : 'text-slate-700 hover:text-pink-600 dark:text-slate-300 dark:hover:text-pink-400 hover:bg-pink-50 dark:hover:bg-pink-900/20'
-                     }
-                   `}
-                   aria-label="Instagram @armazemsaojoaquim"
-                 >
-                   <FaInstagram className="w-4 h-4" />
-                 </a>
-                                 <a
-                   href="https://wa.me/5521985658443"
-                   target="_blank"
-                   rel="noopener noreferrer"
-                   className={`
-                     relative p-2 rounded-xl transition-all duration-300 hover:scale-105
-                     ${isScrolled 
-                       ? 'text-slate-600 hover:text-green-600 dark:text-slate-400 dark:hover:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/20' 
-                       : 'text-slate-700 hover:text-green-600 dark:text-slate-300 dark:hover:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/20'
-                     }
-                   `}
-                   aria-label="WhatsApp (21) 98565-8443"
-                 >
-                   <FaWhatsapp className="w-4 h-4" />
-                 </a>
-                                 <a
-                   href="https://tiktok.com/@armazemsaojoaquim"
-                   target="_blank"
-                   rel="noopener noreferrer"
-                   className={`
-                     relative p-2 rounded-xl transition-all duration-300 hover:scale-105
-                     ${isScrolled 
-                       ? 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800' 
-                       : 'text-slate-700 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800'
-                     }
-                   `}
-                   aria-label="TikTok @armazemsaojoaquim"
-                 >
-                   <FaTiktok className="w-4 h-4" />
-                 </a>
+                <a
+                  href="https://instagram.com/armazemsaojoaquim"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`
+                    relative p-2 rounded-xl transition-all duration-300 hover:scale-105
+                    ${isScrolled 
+                      ? 'text-slate-600 hover:text-pink-600 dark:text-slate-400 dark:hover:text-pink-400 hover:bg-pink-50 dark:hover:bg-pink-900/20' 
+                      : 'text-slate-700 hover:text-pink-600 dark:text-slate-300 dark:hover:text-pink-400 hover:bg-pink-50 dark:hover:bg-pink-900/20'
+                    }
+                  `}
+                  aria-label="Instagram @armazemsaojoaquim"
+                >
+                  <FaInstagram className="w-4 h-4" />
+                </a>
+                <a
+                  href="https://wa.me/5521985658443"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`
+                    relative p-2 rounded-xl transition-all duration-300 hover:scale-105
+                    ${isScrolled 
+                      ? 'text-slate-600 hover:text-green-600 dark:text-slate-400 dark:hover:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/20' 
+                      : 'text-slate-700 hover:text-green-600 dark:text-slate-300 dark:hover:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/20'
+                    }
+                  `}
+                  aria-label="WhatsApp (21) 98565-8443"
+                >
+                  <FaWhatsapp className="w-4 h-4" />
+                </a>
+                <a
+                  href="https://tiktok.com/@armazemsaojoaquim"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`
+                    relative p-2 rounded-xl transition-all duration-300 hover:scale-105
+                    ${isScrolled 
+                      ? 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800' 
+                      : 'text-slate-700 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800'
+                    }
+                  `}
+                  aria-label="TikTok @armazemsaojoaquim"
+                >
+                  <FaTiktok className="w-4 h-4" />
+                </a>
               </div>
 
               {/* Language Switcher */}
@@ -452,33 +478,33 @@ export default function Header() {
 
               {/* Mobile Actions */}
               <div className="space-y-4 pt-6 border-t border-slate-200 dark:border-slate-700">
-                                 {/* Social Media Links Mobile */}
-                 <div className="grid grid-cols-3 gap-4 mb-4">
-                   <a
-                     href="https://instagram.com/armazemsaojoaquim"
-                     target="_blank"
-                     rel="noopener noreferrer"
-                     className="flex items-center justify-center p-3 rounded-xl bg-pink-50 hover:bg-pink-100 dark:bg-pink-900/20 dark:hover:bg-pink-900/40 text-pink-600 dark:text-pink-400 transition-all duration-300"
-                   >
-                     <FaInstagram className="w-5 h-5" />
-                   </a>
-                   <a
-                     href="https://wa.me/5521985658443"
-                     target="_blank"
-                     rel="noopener noreferrer"
-                     className="flex items-center justify-center p-3 rounded-xl bg-green-50 hover:bg-green-100 dark:bg-green-900/20 dark:hover:bg-green-900/40 text-green-600 dark:text-green-400 transition-all duration-300"
-                   >
-                     <FaWhatsapp className="w-5 h-5" />
-                   </a>
-                   <a
-                     href="https://tiktok.com/@armazemsaojoaquim"
-                     target="_blank"
-                     rel="noopener noreferrer"
-                     className="flex items-center justify-center p-3 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition-all duration-300"
-                   >
-                     <FaTiktok className="w-5 h-5" />
-                   </a>
-                 </div>
+                {/* Social Media Links Mobile */}
+                <div className="grid grid-cols-3 gap-4 mb-4">
+                  <a
+                    href="https://instagram.com/armazemsaojoaquim"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-center p-3 rounded-xl bg-pink-50 hover:bg-pink-100 dark:bg-pink-900/20 dark:hover:bg-pink-900/40 text-pink-600 dark:text-pink-400 transition-all duration-300"
+                  >
+                    <FaInstagram className="w-5 h-5" />
+                  </a>
+                  <a
+                    href="https://wa.me/5521985658443"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-center p-3 rounded-xl bg-green-50 hover:bg-green-100 dark:bg-green-900/20 dark:hover:bg-green-900/40 text-green-600 dark:text-green-400 transition-all duration-300"
+                  >
+                    <FaWhatsapp className="w-5 h-5" />
+                  </a>
+                  <a
+                    href="https://tiktok.com/@armazemsaojoaquim"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-center p-3 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition-all duration-300"
+                  >
+                    <FaTiktok className="w-5 h-5" />
+                  </a>
+                </div>
 
                 {/* Language Switcher */}
                 <div className="flex items-center justify-between">

@@ -5,7 +5,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { Calendar, Clock, Search, BookOpen, ArrowRight } from 'lucide-react'
 import { formatDate } from '@/lib/utils'
-import { useTranslations } from '@/contexts/LanguageContext'
+import { useTranslations } from '@/hooks/useTranslations'
 
 interface BlogPost {
   id: string

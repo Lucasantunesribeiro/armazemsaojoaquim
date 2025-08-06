@@ -1,11 +1,12 @@
 {
   "compilerOptions": {
-    "target": "es2015",
+    "target": "ES2018",
     "lib": [
       "dom",
       "dom.iterable",
-      "es6",
-      "es2015"
+      "ES2018",
+      "ES2019",
+      "ES2020"
     ],
     "allowJs": true,
     "skipLibCheck": true,
@@ -19,6 +20,9 @@
     "jsx": "preserve",
     "incremental": true,
     "downlevelIteration": true,
+    "forceConsistentCasingInFileNames": true,
+    "useDefineForClassFields": true,
+    "allowSyntheticDefaultImports": true,
     "plugins": [
       {
         "name": "next"
@@ -28,20 +32,27 @@
     "paths": {
       "@/*": [
         "./*"
-      ]
+      ],
+      "@/components/*": ["components/*"],
+      "@/lib/*": ["lib/*"],
+      "@/types/*": ["types/*"],
+      "@/hooks/*": ["hooks/*"],
+      "@/app/*": ["app/*"]
     }
   },
   "include": [
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
-    ".next/types/**/*.ts",
-    "out/types/**/*.ts"
+    ".next/types/**/*.ts"
   ],
   "exclude": [
     "node_modules",
     ".next",
     "out",
-    "scripts"
+    "scripts",
+    "build.log",
+    "dev.log",
+    "server.log"
   ]
 }

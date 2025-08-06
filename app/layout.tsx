@@ -90,7 +90,9 @@ export default function RootLayout({
         className="min-h-screen bg-white dark:bg-slate-900 text-gray-900 dark:text-gray-100 antialiased"
         suppressHydrationWarning
       >
-        {children}
+        <Providers>
+          {children}
+        </Providers>
       </body>
     </html>
   )

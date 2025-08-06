@@ -12,7 +12,7 @@ import {
 	CardHeader,
 	CardTitle,
 } from '../ui/Card'
-import { useTranslations } from '@/contexts/LanguageContext'
+import { useTranslations } from '@/hooks/useTranslations'
 
 const BlogPreview = () => {
 	const { t } = useTranslations()

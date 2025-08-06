@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
-import { cookies } from 'next/headers'
+// import { cookies } from 'next/headers' // Não necessário mais
 import { Database } from '@/types/database.types'
 
 // GET - List all users (from public.users table) or get count
@@ -9,7 +9,7 @@ export async function GET(request: NextRequest) {
   try {
     console.log('🔍 API /admin/users: Iniciando verificação de autenticação...')
     
-    const cookieStore = cookies()
+    const cookieStore = await cookies()
     const allCookies = cookieStore.getAll()
     console.log('🍪 API /admin/users: Cookies encontrados:', allCookies.map(c => c.name))
     

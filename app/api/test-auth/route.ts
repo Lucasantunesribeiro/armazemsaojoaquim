@@ -1,13 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@/lib/supabase'
-import { cookies } from 'next/headers'
 
 export async function GET(request: NextRequest) {
   try {
     console.log('🔍 API test-auth: Iniciando teste de autenticação...')
     
-    const cookieStore = cookies()
-    const supabase = createServerClient(cookieStore)
+    const supabase = await createServerClient()
     
     const results: any = {}
 

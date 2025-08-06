@@ -1,32 +1,30 @@
 [build]
   command = "npm run build"
   publish = ".next"
+  functions = "netlify/functions"
 
 [build.environment]
   NODE_VERSION = "20"
   NPM_FLAGS = "--legacy-peer-deps"
   NODE_ENV = "production"
   NEXT_TELEMETRY_DISABLED = "1"
+  # Performance optimizations
+  NODE_OPTIONS = "--max-old-space-size=4096"
+  NETLIFY_NEXT_PLUGIN_SKIP = "false"
 
-# Plugin oficial do Next.js para Netlify
+# Plugin oficial do Next.js para Netlify - versão mais recente
 [[plugins]]
   package = "@netlify/plugin-nextjs"
+  
 
-# Configuração de timeout para funções
+# Configuração otimizada para funções Edge
 [functions]
   node_bundler = "esbuild"
+  external_node_modules = ["@supabase/supabase-js", "bcryptjs"]
+  # Timeout para funções serverless
+  timeout = 30
 
-# Headers para API routes
-[[headers]]
-  for = "/api/*"
-  [headers.values]
-    Content-Type = "application/json"
-    Access-Control-Allow-Origin = "*"
-    Access-Control-Allow-Methods = "GET, POST, PUT, DELETE, OPTIONS"
-    Access-Control-Allow-Headers = "Content-Type, Authorization"
-    Cache-Control = "no-store, no-cache, must-revalidate"
-
-# Headers básicos de segurança
+# Headers de segurança para todas as páginas
 [[headers]]
   for = "/*"
   [headers.values]
@@ -34,11 +32,85 @@
     X-Content-Type-Options = "nosniff"
     X-XSS-Protection = "1; mode=block"
     Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+    Strict-Transport-Security = "max-age=31536000; includeSubDomains"
 
-# Headers para imagens
+# Headers para API routes
+[[headers]]
+  for = "/api/*"
+  [headers.values]
+    Content-Type = "application/json; charset=utf-8"
+    Access-Control-Allow-Origin = "*"
+    Access-Control-Allow-Methods = "GET, POST, PUT, DELETE, OPTIONS"
+    Access-Control-Allow-Headers = "Content-Type, Authorization, X-Requested-With"
+    Cache-Control = "no-store, no-cache, must-revalidate, private"
+
+# Headers para assets estáticos - cache longo
+[[headers]]
+  for = "/_next/static/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Headers para imagens - cache longo
 [[headers]]
   for = "/images/*"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
+
+# Headers para favicon e manifest
+[[headers]]
+  for = "/favicon.*"
+  [headers.values]
+    Cache-Control = "public, max-age=86400"
+
+# Headers específicos para CSS
+[[headers]]
+  for = "/_next/static/css/*"
+  [headers.values]
+    Content-Type = "text/css; charset=utf-8"
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Headers específicos para JS
+[[headers]]
+  for = "/_next/static/chunks/*"
+  [headers.values]
+    Content-Type = "application/javascript; charset=utf-8" 
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Headers para todos os assets _next
+[[headers]]
+  for = "/_next/static/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Redirects específicos para páginas (não assets)
+[[redirects]]
+  from = "/pt/:path*"
+  to = "/pt/:path*"
+  status = 200
+  
+[[redirects]]
+  from = "/en/:path*" 
+  to = "/en/:path*"
+  status = 200
+
+# Redirect root para PT
+[[redirects]]
+  from = "/"
+  to = "/pt"
+  status = 302
+
+# SPA fallback apenas para páginas de idioma (não assets)
+[[redirects]]
+  from = "/pt/*"
+  to = "/pt/index.html"
+  status = 200
+  force = false
+  
+[[redirects]]
+  from = "/en/*"
+  to = "/en/index.html" 
+  status = 200
+  force = false
 
  

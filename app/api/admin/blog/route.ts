@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@/lib/supabase'
-import { cookies } from 'next/headers'
+// import { cookies } from 'next/headers' // Não necessário mais
 import { Database } from '@/types/database.types'
 import { createClient } from '@supabase/supabase-js'
 
@@ -47,7 +47,7 @@ async function checkAdminAuth(request: NextRequest) {
     } else {
       // Fallback to cookie-based authentication
       console.log('🔍 API Blog: Tentando autenticação via cookies...')
-      const supabase = createServerClient(cookies())
+      const supabase = await createServerClient()
       const { data: sessionData, error } = await supabase.auth.getSession()
       
       if (error || !sessionData.session) {
@@ -87,7 +87,7 @@ export async function GET(request: NextRequest) {
     console.log('✅ API Blog GET: Usuário autorizado, listando posts usando função SECURITY DEFINER')
 
     // Use função SECURITY DEFINER para bypassar RLS
-    const supabase = createServerClient(cookies())
+    const supabase = await createServerClient()
     const { searchParams } = new URL(request.url)
     
     // Check if this is a count request
@@ -174,7 +174,7 @@ export async function POST(request: NextRequest) {
 
     console.log('✅ API Blog POST: Usuário autorizado, criando post usando função SECURITY DEFINER')
 
-    const supabase = createServerClient(cookies())
+    const supabase = await createServerClient()
     const body = await request.json()
     const { title, content, excerpt, featured_image, published, slug } = body
 

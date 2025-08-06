@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, use } from 'react'
 import Link from 'next/link'
 import { useSupabase } from '@/components/providers/SupabaseProvider'
 import { useAdminApi } from '@/lib/hooks/useAdminApi'
@@ -10,10 +10,13 @@ import { useAdmin } from '@/hooks/useAdmin'
 type BlogPost = Database['public']['Tables']['blog_posts']['Row']
 
 interface BlogManagementPageProps {
-  params: { locale: string }
+  params: Promise<{ locale: string }>
 }
 
 export default function BlogManagementPage({ params }: BlogManagementPageProps) {
+  // Desempacotar params usando React.use()
+  const resolvedParams = use(params)
+
   const { supabase } = useSupabase()
   const { adminFetch } = useAdminApi()
   const [blogPosts, setBlogPosts] = useState<BlogPost[]>([])
@@ -22,14 +25,10 @@ export default function BlogManagementPage({ params }: BlogManagementPageProps) 
   const { isAdmin, loading: adminLoading } = useAdmin()
   const [locale, setLocale] = useState<string>('pt')
 
-  // Resolver params async
+  // Definir locale diretamente dos params
   useEffect(() => {
-    const resolveParams = async () => {
-      const resolvedParams = await params
-      setLocale(resolvedParams.locale || 'pt')
-    }
-    resolveParams()
-  }, [params])
+    setLocale(resolvedParams.locale || 'pt')
+  }, [resolvedParams.locale])
   
   // Fetch blog posts usando API admin para evitar problemas com RLS
   const fetchBlogPosts = async () => {

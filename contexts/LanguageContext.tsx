@@ -34,21 +34,33 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
 
   // Initialize language on mount
   useEffect(() => {
-    setIsMounted(true)
-    
-    // Detect language from URL first, then localStorage
-    const urlLanguage = detectLanguageFromUrl(pathname)
-    const storedLanguage = getStoredLanguage()
-    
-    // PRIORIZE URL language always - if URL has /pt/ use 'pt', if /en/ use 'en'
-    const initialLanguage = urlLanguage || storedLanguage
-    
-    console.log('🏠 Context URL:', pathname, '→ Language:', urlLanguage, '→ Final:', initialLanguage)
-    
-    setLanguage(initialLanguage)
-    
-    // Store the determined language
-    storeLanguage(initialLanguage)
+    try {
+      setIsMounted(true)
+      
+      // Ensure we're on the client side
+      if (typeof window === 'undefined') {
+        setLanguage('pt')
+        return
+      }
+      
+      // Detect language from URL first, then localStorage
+      const urlLanguage = detectLanguageFromUrl(pathname)
+      const storedLanguage = getStoredLanguage()
+      
+      // PRIORIZE URL language always - if URL has /pt/ use 'pt', if /en/ use 'en'
+      const initialLanguage = urlLanguage || storedLanguage
+      
+      console.log('🏠 Context URL:', pathname, '→ Language:', urlLanguage, '→ Final:', initialLanguage)
+      
+      setLanguage(initialLanguage)
+      
+      // Store the determined language
+      storeLanguage(initialLanguage)
+    } catch (error) {
+      console.error('Error initializing LanguageProvider:', error)
+      setLanguage('pt')
+      setIsMounted(true)
+    }
   }, [pathname])
 
   // Switch language function
@@ -132,29 +144,5 @@ export function useLanguage(): LanguageContextType {
   return context
 }
 
-// Simple hook for just translations (alternative to full context)
-export function useTranslations() {
-  const context = useContext(LanguageContext)
-  
-  if (context === undefined) {
-    // Fallback to Portuguese if context is not available
-    return {
-      t: (key: string) => {
-        const keys = key.split('.')
-        let value: any = translations.pt
-        
-        for (const k of keys) {
-          value = value?.[k]
-        }
-        
-        return value || key
-      },
-      language: 'pt' as Language
-    }
-  }
-  
-  return {
-    t: context.t,
-    language: context.language
-  }
-}
+// Alternative translations hook - removed to avoid conflicts
+// Use the dedicated useTranslations from hooks/useTranslations.ts instead

@@ -8,7 +8,7 @@ import { supabase } from '@/lib/supabase'
 import { toast } from 'react-hot-toast'
 import { trackDatabaseError, trackApiError } from '@/lib/error-tracking'
 import { menuCache } from '@/lib/cache-manager'
-import { useTranslations } from '@/contexts/LanguageContext'
+import { useTranslations } from '@/hooks/useTranslations'
 
 interface MenuItem {
   id: string

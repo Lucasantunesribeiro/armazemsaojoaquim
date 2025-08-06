@@ -1,6 +1,5 @@
 import { createClient as createSupabaseClient } from '@supabase/supabase-js'
 import { createBrowserClient, createServerClient as createSSRServerClient } from '@supabase/ssr'
-import { cookies } from 'next/headers'
 import { NextRequest, NextResponse } from 'next/server'
 import { Database } from '../types/database.types'
 
@@ -117,8 +116,54 @@ function createMockClient() {
   }
 }
 
-// Cliente para o browser (client-side)
+// Cache para cliente Supabase (singleton pattern)
+let cachedBrowserClient: any = null
+
+// Cliente para o browser (client-side) - OTIMIZADO
 export function createClient() {
+  if (!isSupabaseConfigured()) {
+    console.warn('⚠️ Supabase não configurado, usando cliente mock')
+    return createMockClient() as any
+  }
+
+  // Retorna client cacheado se já existe
+  if (cachedBrowserClient) {
+    return cachedBrowserClient
+  }
+
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+
+  cachedBrowserClient = createBrowserClient<Database>(supabaseUrl, supabaseAnonKey, {
+    auth: {
+      persistSession: true,
+      autoRefreshToken: true,
+      detectSessionInUrl: true,
+      flowType: 'pkce',
+      storageKey: 'armazem-sao-joaquim-auth',
+      debug: false // Sempre false em produção para performance
+    },
+    realtime: {
+      params: {
+        eventsPerSecond: 5 // Reduzido para performance
+      }
+    },
+    global: {
+      headers: {
+        'X-Client-Info': 'armazem-sao-joaquim',
+        'Cache-Control': 'max-age=60' // Cache headers para performance
+      }
+    },
+    db: {
+      schema: 'public'
+    }
+  })
+
+  return cachedBrowserClient
+}
+
+// Cliente para server components - NEXT.JS 15 COMPATIBLE
+export async function createServerClient() {
   if (!isSupabaseConfigured()) {
     console.warn('⚠️ Supabase não configurado, usando cliente mock')
     return createMockClient() as any
@@ -126,31 +171,45 @@ export function createClient() {
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  
+  // NEXT.JS 15: cookies() agora é async - importar dinamicamente para evitar erro de client component
+  const { cookies } = await import('next/headers')
+  const cookieStore = await cookies()
 
-  return createBrowserClient<Database>(supabaseUrl, supabaseAnonKey, {
-    auth: {
-      persistSession: true,
-      autoRefreshToken: true,
-      detectSessionInUrl: true,
-      flowType: 'pkce',
-      storageKey: 'armazem-sao-joaquim-auth',
-      debug: process.env.NODE_ENV === 'development'
+  return createSSRServerClient<Database>(supabaseUrl, supabaseAnonKey, {
+    cookies: {
+      getAll() {
+        return cookieStore.getAll()
+      },
+      setAll(cookiesToSet: Array<{ name: string; value: string; options?: any }>) {
+        try {
+          cookiesToSet.forEach(({ name, value, options }) =>
+            cookieStore.set(name, value, options)
+          )
+        } catch {
+          // The `setAll` method was called from a Server Component.
+          // This can be ignored if you have middleware refreshing
+          // user sessions.
+        }
+      },
     },
-    realtime: {
-      params: {
-        eventsPerSecond: 10
-      }
+    auth: {
+      persistSession: false,
+      autoRefreshToken: false,
+      detectSessionInUrl: false,
+      flowType: 'pkce',
+      debug: process.env.NODE_ENV === 'development'
     },
     global: {
       headers: {
-        'X-Client-Info': 'armazem-sao-joaquim',
+        'X-Client-Info': 'armazem-sao-joaquim-server',
       }
     }
   })
 }
 
-// Cliente para server components
-export function createServerClient(cookieStore: ReturnType<typeof cookies>) {
+// Legacy function for backward compatibility - will be deprecated
+export function createServerClientLegacy(cookieStore: Awaited<ReturnType<typeof cookies>>) {
   if (!isSupabaseConfigured()) {
     console.warn('⚠️ Supabase não configurado, usando cliente mock')
     return createMockClient() as any
@@ -283,6 +342,110 @@ export const forceLogout = async () => {
     console.error('Erro no logout forçado:', error)
     return { success: false, error: error.message }
   }
+}
+
+// Query Cache para performance - TTL de 1 minuto
+const queryCache = new Map<string, { data: any; timestamp: number }>()
+const CACHE_TTL = 60 * 1000 // 1 minuto
+
+// Função para criar chave de cache
+function createCacheKey(table: string, query: string, params?: any): string {
+  return `${table}-${query}-${JSON.stringify(params || {})}`
+}
+
+// Função para limpar cache expirado
+function cleanExpiredCache() {
+  const now = Date.now()
+  for (const [key, value] of queryCache.entries()) {
+    if (now - value.timestamp > CACHE_TTL) {
+      queryCache.delete(key)
+    }
+  }
+}
+
+// Wrapper para queries com cache
+export const cachedQuery = async <T>(
+  cacheKey: string,
+  queryFn: () => Promise<{ data: T | null; error: any }>
+): Promise<{ data: T | null; error: any }> => {
+  // Limpeza periódica do cache
+  if (Math.random() < 0.1) cleanExpiredCache()
+
+  // Verificar cache
+  const cached = queryCache.get(cacheKey)
+  if (cached && (Date.now() - cached.timestamp) < CACHE_TTL) {
+    return { data: cached.data, error: null }
+  }
+
+  // Executar query
+  const result = await queryFn()
+  
+  // Cache apenas resultados de sucesso
+  if (!result.error && result.data) {
+    queryCache.set(cacheKey, {
+      data: result.data,
+      timestamp: Date.now()
+    })
+  }
+
+  return result
+}
+
+// Função para invalidar cache específico
+export const invalidateCache = (pattern?: string) => {
+  if (pattern) {
+    for (const key of queryCache.keys()) {
+      if (key.includes(pattern)) {
+        queryCache.delete(key)
+      }
+    }
+  } else {
+    queryCache.clear()
+  }
+}
+
+// Helpers para queries comuns com cache
+export const getCachedUsers = () => {
+  const client = createClient()
+  return cachedQuery(
+    createCacheKey('users', 'list'),
+    () => client.from('users').select('*')
+  )
+}
+
+export const getCachedDashboardStats = () => {
+  const client = createClient()
+  return cachedQuery(
+    createCacheKey('dashboard', 'stats'),
+    async () => {
+      // Query otimizada para dashboard
+      const [users, reservas, blog, menu] = await Promise.all([
+        client.from('users').select('id', { count: 'exact', head: true }),
+        client.from('reservas').select('id', { count: 'exact', head: true }),
+        client.from('blog_posts').select('id', { count: 'exact', head: true }),
+        client.from('menu_items').select('id', { count: 'exact', head: true })
+      ])
+
+      if (users.error || reservas.error || blog.error || menu.error) {
+        return { 
+          data: null, 
+          error: users.error || reservas.error || blog.error || menu.error 
+        }
+      }
+
+      return {
+        data: {
+          totalUsers: users.count || 0,
+          totalReservas: reservas.count || 0,
+          totalBlogPosts: blog.count || 0,
+          totalMenuItems: menu.count || 0,
+          reservasHoje: 0, // TODO: implementar query específica
+          reservasPendentes: 0 // TODO: implementar query específica
+        },
+        error: null
+      }
+    }
+  )
 }
 
 // Compatibilidade com código existente

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, use } from 'react'
 import { useRouter } from 'next/navigation'
 import { useSupabase } from '@/components/providers/SupabaseProvider'
 import { Database } from '@/types/database.types'
@@ -9,10 +9,13 @@ import ImageUpload from '@/components/admin/ImageUpload'
 type BlogPostInsert = Database['public']['Tables']['blog_posts']['Insert']
 
 interface NewBlogPostPageProps {
-  params: { locale: string }
+  params: Promise<{ locale: string }>
 }
 
 export default function NewBlogPostPage({ params }: NewBlogPostPageProps) {
+  // Desempacotar params usando React.use()
+  const resolvedParams = use(params)
+
   const { supabase, user } = useSupabase()
   const router = useRouter()
   const [loading, setLoading] = useState(false)
@@ -28,14 +31,10 @@ export default function NewBlogPostPage({ params }: NewBlogPostPageProps) {
     published_at: null
   })
 
-  // Resolver params async
+  // Definir locale diretamente dos params
   useEffect(() => {
-    const resolveParams = async () => {
-      const resolvedParams = await params
-      setLocale(resolvedParams.locale || 'pt')
-    }
-    resolveParams()
-  }, [params])
+    setLocale(resolvedParams.locale || 'pt')
+  }, [resolvedParams.locale])
 
   const generateSlug = (title: string) => {
     return title

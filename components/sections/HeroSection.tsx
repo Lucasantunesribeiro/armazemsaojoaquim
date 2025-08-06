@@ -3,10 +3,163 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react'
 import Image from 'next/image'
 import { ChevronLeft, ChevronRight, MapPin, Clock, Phone } from 'lucide-react'
-import { useTranslations } from '@/contexts/LanguageContext'
+import { useTranslations } from '@/hooks/useTranslations'
 
 export default function HeroSection() {
-  const { t } = useTranslations()
+  const { t, isReady } = useTranslations()
+
+  // ALL HOOKS MUST BE CALLED BEFORE ANY CONDITIONAL RETURNS
+  const [currentSlide, setCurrentSlide] = useState(0)
+  const [isAutoPlaying, setIsAutoPlaying] = useState(true)
+  const [imageErrors, setImageErrors] = useState<Record<number, boolean>>({})
+  const [isLoading, setIsLoading] = useState(true)
+  const [touchStart, setTouchStart] = useState<number | null>(null)
+  const [touchEnd, setTouchEnd] = useState<number | null>(null)
+  const [isHovered, setIsHovered] = useState(false)
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false)
+  
+  const intervalRef = useRef<NodeJS.Timeout>()
+  const sectionRef = useRef<HTMLElement>(null)
+  const isInView = useRef(false)
+
+  // Callbacks - MUST BE BEFORE CONDITIONAL RETURNS
+  const handleImageError = useCallback((index: number) => {
+    setImageErrors(prev => ({ ...prev, [index]: true }))
+  }, [])
+
+  const handleImageLoad = useCallback(() => {
+    setIsLoading(false)
+  }, [])
+
+  const nextSlide = useCallback(() => {
+    setCurrentSlide((prev) => (prev + 1) % 3) // Fixed number for heroImages.length
+    setIsAutoPlaying(false)
+    setTimeout(() => setIsAutoPlaying(true), 10000) // Resume after 10s
+  }, [])
+
+  const prevSlide = useCallback(() => {
+    setCurrentSlide((prev) => (prev - 1 + 3) % 3) // Fixed number for heroImages.length
+    setIsAutoPlaying(false)
+    setTimeout(() => setIsAutoPlaying(true), 10000) // Resume after 10s
+  }, [])
+
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    setTouchEnd(null)
+    setTouchStart(e.targetTouches[0].clientX)
+  }, [])
+
+  const handleTouchMove = useCallback((e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX)
+  }, [])
+
+  const handleTouchEnd = useCallback(() => {
+    if (!touchStart || !touchEnd) return
+    
+    const distance = touchStart - touchEnd
+    const isLeftSwipe = distance > 50
+    const isRightSwipe = distance < -50
+
+    if (isLeftSwipe) {
+      nextSlide()
+    } else if (isRightSwipe) {
+      prevSlide()
+    }
+  }, [touchStart, touchEnd, nextSlide, prevSlide])
+
+  // ALL USEEFFECTS - MUST BE BEFORE CONDITIONAL RETURNS
+  // Check for reduced motion preference
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
+    setPrefersReducedMotion(mediaQuery.matches)
+    
+    const handleChange = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches)
+    mediaQuery.addEventListener('change', handleChange)
+    return () => mediaQuery.removeEventListener('change', handleChange)
+  }, [])
+
+  // Intersection Observer for performance
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        isInView.current = entry.isIntersecting
+        if (!entry.isIntersecting && isAutoPlaying) {
+          setIsAutoPlaying(false)
+        }
+      },
+      { threshold: 0.5 }
+    )
+
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current)
+    }
+
+    return () => observer.disconnect()
+  }, [isAutoPlaying])
+
+  // Keyboard navigation
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowLeft') {
+        prevSlide()
+      } else if (e.key === 'ArrowRight') {
+        nextSlide()
+      } else if (e.key === ' ') {
+        e.preventDefault()
+        setIsAutoPlaying(prev => !prev)
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [nextSlide, prevSlide])
+
+  // Auto-play carousel with performance optimization - MOVED BEFORE CONDITIONAL RETURNS
+  useEffect(() => {
+    if (!isAutoPlaying || !isInView.current || isHovered || prefersReducedMotion) return
+
+    intervalRef.current = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % 3) // Fixed number to avoid circular dependency
+    }, 5000)
+
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current)
+      }
+    }
+  }, [isAutoPlaying, isHovered, prefersReducedMotion])
+
+  // Preload next image - MOVED BEFORE CONDITIONAL RETURNS
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    
+    const nextIndex = (currentSlide + 1) % 3 // Fixed number to avoid circular dependency
+    const heroImages = [
+      '/images/armazem-fachada-historica.webp',
+      '/images/armazem-interior-aconchegante.webp',
+      '/images/santa-teresa-vista-panoramica.webp'
+    ]
+    const nextImage = new window.Image()
+    nextImage.src = heroImages[nextIndex]
+  }, [currentSlide])
+
+  // Wait for translations to be ready
+  if (!isReady) {
+    return (
+      <section className="relative h-screen min-h-[600px] max-h-[1000px] overflow-hidden bg-slate-900">
+        <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/40 to-black/70" />
+        <div className="relative z-10 h-full flex items-center justify-center">
+          <div className="text-center text-white">
+            <div className="w-12 h-12 border-2 border-amber-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+            <p className="text-sm font-medium">Carregando...</p>
+          </div>
+        </div>
+      </section>
+    )
+  }
 
   const heroImages = [
     {
@@ -40,130 +193,6 @@ export default function HeroSection() {
     { icon: Clock, text: 'Ter-Dom: 12h-22h', label: t('cafe.hours.title'), href: '#hours' },
     { icon: Phone, text: '(21) 98565-8443', label: t('footer.phone'), href: 'tel:+5521985658443' }
   ]
-  const [currentSlide, setCurrentSlide] = useState(0)
-  const [isAutoPlaying, setIsAutoPlaying] = useState(true)
-  const [imageErrors, setImageErrors] = useState<Record<number, boolean>>({})
-  const [isLoading, setIsLoading] = useState(true)
-  const [touchStart, setTouchStart] = useState<number | null>(null)
-  const [touchEnd, setTouchEnd] = useState<number | null>(null)
-  const [isHovered, setIsHovered] = useState(false)
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false)
-  
-  const intervalRef = useRef<NodeJS.Timeout>()
-  const sectionRef = useRef<HTMLElement>(null)
-  const isInView = useRef(false)
-
-  // Check for reduced motion preference
-  useEffect(() => {
-    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
-    setPrefersReducedMotion(mediaQuery.matches)
-    
-    const handleChange = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches)
-    mediaQuery.addEventListener('change', handleChange)
-    return () => mediaQuery.removeEventListener('change', handleChange)
-  }, [])
-
-  // Intersection Observer for performance
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        isInView.current = entry.isIntersecting
-        if (!entry.isIntersecting && isAutoPlaying) {
-          setIsAutoPlaying(false)
-        }
-      },
-      { threshold: 0.5 }
-    )
-
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current)
-    }
-
-    return () => observer.disconnect()
-  }, [isAutoPlaying])
-
-  // Auto-play carousel with performance optimization
-  useEffect(() => {
-    if (!isAutoPlaying || !isInView.current || isHovered || prefersReducedMotion) return
-
-    intervalRef.current = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % heroImages.length)
-    }, 5000)
-
-    return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current)
-      }
-    }
-  }, [isAutoPlaying, isHovered, prefersReducedMotion])
-
-  // Preload next image
-  useEffect(() => {
-    const nextIndex = (currentSlide + 1) % heroImages.length
-    const nextImage = new window.Image()
-    nextImage.src = heroImages[nextIndex].src
-  }, [currentSlide])
-
-  const handleImageError = useCallback((index: number) => {
-    setImageErrors(prev => ({ ...prev, [index]: true }))
-  }, [])
-
-  const handleImageLoad = useCallback(() => {
-    setIsLoading(false)
-  }, [])
-
-  const nextSlide = useCallback(() => {
-    setCurrentSlide((prev) => (prev + 1) % heroImages.length)
-    setIsAutoPlaying(false)
-    setTimeout(() => setIsAutoPlaying(true), 10000) // Resume after 10s
-  }, [])
-
-  const prevSlide = useCallback(() => {
-    setCurrentSlide((prev) => (prev - 1 + heroImages.length) % heroImages.length)
-    setIsAutoPlaying(false)
-    setTimeout(() => setIsAutoPlaying(true), 10000) // Resume after 10s
-  }, [])
-
-  // Touch handlers for mobile swipe
-  const handleTouchStart = useCallback((e: React.TouchEvent) => {
-    setTouchEnd(null)
-    setTouchStart(e.targetTouches[0].clientX)
-  }, [])
-
-  const handleTouchMove = useCallback((e: React.TouchEvent) => {
-    setTouchEnd(e.targetTouches[0].clientX)
-  }, [])
-
-  const handleTouchEnd = useCallback(() => {
-    if (!touchStart || !touchEnd) return
-    
-    const distance = touchStart - touchEnd
-    const isLeftSwipe = distance > 50
-    const isRightSwipe = distance < -50
-
-    if (isLeftSwipe) {
-      nextSlide()
-    } else if (isRightSwipe) {
-      prevSlide()
-    }
-  }, [touchStart, touchEnd, nextSlide, prevSlide])
-
-  // Keyboard navigation
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'ArrowLeft') {
-        prevSlide()
-      } else if (e.key === 'ArrowRight') {
-        nextSlide()
-      } else if (e.key === ' ') {
-        e.preventDefault()
-        setIsAutoPlaying(prev => !prev)
-      }
-    }
-
-    document.addEventListener('keydown', handleKeyDown)
-    return () => document.removeEventListener('keydown', handleKeyDown)
-  }, [nextSlide, prevSlide])
 
   const currentImage = heroImages[currentSlide]
 

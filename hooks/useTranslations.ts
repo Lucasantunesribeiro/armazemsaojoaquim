@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { usePathname } from 'next/navigation'
 import { 
   Language, 
@@ -22,36 +22,76 @@ export function useTranslations(): UseTranslationsReturn {
   const [isReady, setIsReady] = useState(false)
   const pathname = usePathname()
 
-  useEffect(() => {
-    // Detect language from URL first, then localStorage
-    const urlLanguage = detectLanguageFromUrl(pathname)
-    const storedLanguage = getStoredLanguage()
-    
-    // PRIORIZE URL language always - if URL has /pt/ use 'pt', if /en/ use 'en'
-    const currentLanguage = urlLanguage || storedLanguage
-    
-    console.log('🌍 URL Detected:', pathname, '→ Language:', urlLanguage, '→ Final:', currentLanguage)
-    
-    setLanguage(currentLanguage)
-    setIsReady(true)
+  // Optimize language detection with memoization
+  const detectedLanguage = useMemo(() => {
+    try {
+      return detectLanguageFromUrl(pathname)
+    } catch (error) {
+      console.error('Error detecting language from URL:', error)
+      return 'pt'
+    }
   }, [pathname])
 
-  // Translation function
-  const t = (key: string): string => {
-    const keys = key.split('.')
-    let value: any = translations[language]
+  useEffect(() => {
+    // FAST INITIALIZATION - no async operations in useEffect
+    let currentLanguage: Language = 'pt'
     
-    for (const k of keys) {
-      value = value?.[k]
+    try {
+      // Priority: URL language > localStorage > default
+      if (detectedLanguage) {
+        currentLanguage = detectedLanguage
+      } else if (typeof window !== 'undefined') {
+        const storedLanguage = getStoredLanguage()
+        currentLanguage = storedLanguage
+      }
+      
+      setLanguage(currentLanguage)
+      setIsReady(true)
+      
+    } catch (error) {
+      console.error('Error in useTranslations setup:', error)
+      // Fallback: always ensure hook is ready with Portuguese
+      setLanguage('pt')
+      setIsReady(true)
     }
-    
-    return value || key
-  }
+  }, [detectedLanguage])
+
+  // Memoized translation function for performance
+  const t = useMemo(() => {
+    return (key: string): string => {
+      try {
+        // Fast validation
+        if (!key || typeof key !== 'string') {
+          return key || ''
+        }
+
+        const keys = key.split('.')
+        let value: any = translations[language] || translations['pt'] // Fallback to Portuguese
+        
+        // Optimized nested key access
+        for (const k of keys) {
+          if (value && typeof value === 'object' && k in value) {
+            value = value[k]
+          } else {
+            // Key doesn't exist, return original key for debugging
+            return key
+          }
+        }
+        
+        // Return string value or fallback to key
+        return typeof value === 'string' ? value : key
+        
+      } catch (error) {
+        console.error('Translation error for key:', key, error)
+        return key
+      }
+    }
+  }, [language])
 
   return {
     t,
     language,
-    translations: translations[language],
+    translations: translations[language] || translations['pt'],
     isReady
   }
 }

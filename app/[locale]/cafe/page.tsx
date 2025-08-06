@@ -10,8 +10,8 @@ import { Separator } from '@/components/ui/separator'
 import { Input } from '@/components/ui/Input'
 import { Label } from '@/components/ui/Label'
 import { Textarea } from '@/components/ui/textarea'
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
-import { useTranslations } from '@/contexts/LanguageContext'
+// Dialog removido - usando modal customizado simples
+import { useTranslations } from '@/hooks/useTranslations'
 
 interface Product {
   id: string
@@ -444,100 +444,114 @@ export default function CafePage() {
       {/* Carrinho Flutuante */}
       {cart.length > 0 && (
         <div className="fixed bottom-6 right-6 z-50">
-          <Dialog open={isOrderModalOpen} onOpenChange={setIsOrderModalOpen}>
-            <DialogTrigger asChild>
-              <Button size="lg" className="bg-amber-600 hover:bg-amber-700 shadow-2xl">
-                <ShoppingCart className="w-5 h-5 mr-2" />
-                {getTotalItems()} {getTotalItems() === 1 ? t('cafe.cart.item') : t('cafe.cart.items')} • R$ {getTotalPrice().toFixed(2)}
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-md max-h-[80vh] overflow-y-auto">
-              <DialogHeader>
-                <DialogTitle>{t('cafe.cart.finalizeOrder')}</DialogTitle>
-                <DialogDescription>
-                  {t('cafe.cart.reviewOrder')}
-                </DialogDescription>
-              </DialogHeader>
+          <Button 
+            size="lg" 
+            className="bg-amber-600 hover:bg-amber-700 shadow-2xl"
+            onClick={() => setIsOrderModalOpen(true)}
+          >
+            <ShoppingCart className="w-5 h-5 mr-2" />
+            {getTotalItems()} {getTotalItems() === 1 ? 'item' : 'itens'} • R$ {getTotalPrice().toFixed(2)}
+          </Button>
+          
+          {/* Modal do Carrinho */}
+          {isOrderModalOpen && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center">
+              <div 
+                className="fixed inset-0 bg-black/50 backdrop-blur-sm"
+                onClick={() => setIsOrderModalOpen(false)}
+              />
+              <div className="relative bg-white dark:bg-slate-800 rounded-lg p-6 max-w-md max-h-[80vh] overflow-y-auto shadow-2xl">
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-lg font-semibold">Finalizar Pedido</h3>
+                  <button 
+                    onClick={() => setIsOrderModalOpen(false)}
+                    className="text-slate-500 hover:text-slate-700"
+                  >
+                    ✕
+                  </button>
+                </div>
 
-              <div className="space-y-4">
-                {/* Itens do Carrinho */}
-                <div className="space-y-3">
-                  <h3 className="font-semibold">{t('cafe.cart.yourItems')}:</h3>
-                  {cart.map((item) => (
-                    <div key={item.id} className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800 rounded-lg">
-                      <div className="flex-1">
-                        <div className="font-medium">{item.name}</div>
-                        <div className="text-sm text-slate-600 dark:text-slate-400">
-                          R$ {item.price.toFixed(2)} x {item.quantity}
+                <div className="space-y-4">
+                  {/* Itens do Carrinho */}
+                  <div className="space-y-3">
+                    <h4 className="font-semibold">Seus itens:</h4>
+                    {cart.map((item) => (
+                      <div key={item.id} className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-700 rounded-lg">
+                        <div className="flex-1">
+                          <div className="font-medium">{item.name}</div>
+                          <div className="text-sm text-slate-600 dark:text-slate-400">
+                            R$ {item.price.toFixed(2)} x {item.quantity}
+                          </div>
+                        </div>
+                        <div className="font-bold text-amber-600">
+                          R$ {(item.price * item.quantity).toFixed(2)}
                         </div>
                       </div>
-                      <div className="font-bold text-amber-600">
-                        R$ {(item.price * item.quantity).toFixed(2)}
+                    ))}
+                    <div className="border-t pt-3">
+                      <div className="flex justify-between text-lg font-bold">
+                        <span>Total:</span>
+                        <span className="text-amber-600">R$ {getTotalPrice().toFixed(2)}</span>
                       </div>
                     </div>
-                  ))}
-                  <Separator />
-                  <div className="flex justify-between text-lg font-bold">
-                    <span>{t('cafe.cart.total')}:</span>
-                    <span className="text-amber-600">R$ {getTotalPrice().toFixed(2)}</span>
                   </div>
-                </div>
 
-                {/* Dados do Cliente */}
-                <div className="space-y-4">
-                  <h3 className="font-semibold">{t('cafe.cart.yourData')}:</h3>
-                  <div className="space-y-3">
-                    <div>
-                      <Label htmlFor="name">{t('cafe.cart.form.fullName')} *</Label>
-                      <Input
-                        id="name"
-                        value={customerData.name}
-                        onChange={(e) => setCustomerData(prev => ({ ...prev, name: e.target.value }))}
-                        placeholder={t('cafe.cart.form.fullNamePlaceholder')}
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="phone">{t('cafe.cart.form.phone')}</Label>
-                      <Input
-                        id="phone"
-                        value={customerData.phone}
-                        onChange={(e) => setCustomerData(prev => ({ ...prev, phone: e.target.value }))}
-                        placeholder="(11) 99999-9999"
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="email">{t('cafe.cart.form.email')}</Label>
-                      <Input
-                        id="email"
-                        type="email"
-                        value={customerData.email}
-                        onChange={(e) => setCustomerData(prev => ({ ...prev, email: e.target.value }))}
-                        placeholder={t('cafe.cart.form.emailPlaceholder')}
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="notes">{t('cafe.cart.form.notes')}</Label>
-                      <Textarea
-                        id="notes"
-                        value={customerData.notes}
-                        onChange={(e) => setCustomerData(prev => ({ ...prev, notes: e.target.value }))}
-                        placeholder={t('cafe.cart.form.notesPlaceholder')}
-                        rows={3}
-                      />
+                  {/* Dados do Cliente */}
+                  <div className="space-y-4">
+                    <h4 className="font-semibold">Seus dados:</h4>
+                    <div className="space-y-3">
+                      <div>
+                        <Label htmlFor="name">Nome completo *</Label>
+                        <Input
+                          id="name"
+                          value={customerData.name}
+                          onChange={(e) => setCustomerData(prev => ({ ...prev, name: e.target.value }))}
+                          placeholder="Seu nome completo"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="phone">Telefone</Label>
+                        <Input
+                          id="phone"
+                          value={customerData.phone}
+                          onChange={(e) => setCustomerData(prev => ({ ...prev, phone: e.target.value }))}
+                          placeholder="(11) 99999-9999"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="email">Email</Label>
+                        <Input
+                          id="email"
+                          type="email"
+                          value={customerData.email}
+                          onChange={(e) => setCustomerData(prev => ({ ...prev, email: e.target.value }))}
+                          placeholder="seu@email.com"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="notes">Observações</Label>
+                        <Textarea
+                          id="notes"
+                          value={customerData.notes}
+                          onChange={(e) => setCustomerData(prev => ({ ...prev, notes: e.target.value }))}
+                          placeholder="Alguma observação especial?"
+                          rows={3}
+                        />
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                <Button 
-                  onClick={handleSubmitOrder}
-                  className="w-full bg-amber-600 hover:bg-amber-700"
-                  disabled={!customerData.name}
-                >
-                  {t('cafe.cart.confirmOrder')} • R$ {getTotalPrice().toFixed(2)}
-                </Button>
+                  <Button 
+                    onClick={handleSubmitOrder}
+                    className="w-full bg-amber-600 hover:bg-amber-700"
+                    disabled={!customerData.name}
+                  >
+                    Confirmar Pedido • R$ {getTotalPrice().toFixed(2)}
+                  </Button>
+                </div>
               </div>
-            </DialogContent>
-          </Dialog>
+            </div>
+          )}
         </div>
       )}
     </div>

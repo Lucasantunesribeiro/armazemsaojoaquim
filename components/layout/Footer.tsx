@@ -27,7 +27,7 @@ import LogoSimple from '../atoms/LogoSimple'
 import NewsletterSignup from '../ui/NewsletterSignup'
 import MapButton from '../ui/MapButton'
 import { cn } from '../../lib/utils'
-import { useTranslations } from '@/contexts/LanguageContext'
+import { useTranslations } from '@/hooks/useTranslations'
 
 const Footer = () => {
   const currentYear = new Date().getFullYear()
@@ -170,30 +170,28 @@ const Footer = () => {
                 </div>
                 
                 <p className="text-cinza-claro leading-relaxed font-inter max-w-md text-base">
-                  Desde <strong className="text-amarelo-armazem">1854</strong>, preservamos a tradição gastronômica 
-                  de Santa Teresa. Um patrimônio histórico que oferece experiências culinárias autênticas 
-                  no coração do Rio de Janeiro.
+                  {t('footer.brandDescription')}
                 </p>
 
                 <div className="flex flex-wrap items-center gap-4">
                   <div className="flex items-center space-x-2 text-sm text-cinza-claro">
                     <Heart className="w-4 h-4 text-vermelho-portas" />
-                    <span className="font-inter">170 anos de história</span>
+                    <span className="font-inter">170 {t('footer.yearsOfHistory')}</span>
                   </div>
                   <div className="flex items-center space-x-2 text-sm text-cinza-claro">
                     <Star className="w-4 h-4 text-amarelo-armazem" />
-                    <span className="font-inter">Patrimônio Cultural</span>
+                    <span className="font-inter">{t('footer.culturalHeritage')}</span>
                   </div>
                   <div className="flex items-center space-x-2 text-sm text-cinza-claro">
                     <ChefHat className="w-4 h-4 text-verde-natura" />
-                    <span className="font-inter">Culinária Artesanal</span>
+                    <span className="font-inter">{t('footer.artisanalCuisine')}</span>
                   </div>
                 </div>
 
                 {/* Social Links */}
                 <div className="space-y-4">
                   <h5 className="text-lg font-semibold text-amarelo-armazem font-playfair">
-                    Redes Sociais
+                    {t('footer.socialMedia')}
                   </h5>
                   <div className="flex items-center space-x-4">
                     {socialLinks.map((social) => {
@@ -224,7 +222,7 @@ const Footer = () => {
               {/* Navigation Links */}
               <div className="space-y-6">
                 <h4 className="text-lg font-semibold font-playfair text-amarelo-armazem">
-                  Navegação
+                  {t('footer.navigation')}
                 </h4>
                 <nav className="space-y-3">
                   {navigationLinks.map((link) => {
@@ -249,7 +247,7 @@ const Footer = () => {
                 {/* Utility Links */}
                 <div className="pt-4 space-y-4">
                   <h5 className="text-sm font-semibold text-amarelo-armazem font-inter">
-                    Links Úteis
+                    {t('footer.utilityLinks')}
                   </h5>
                   <div className="space-y-2">
                     {utilityLinks.map((link) => {
@@ -279,7 +277,7 @@ const Footer = () => {
               {/* Contact Info */}
               <div className="space-y-6">
                 <h4 className="text-lg font-semibold font-playfair text-amarelo-armazem">
-                  Contato
+                  {t('footer.contact')}
                 </h4>
                 
                 <div className="space-y-4">
@@ -325,7 +323,7 @@ const Footer = () => {
                 <div className="bg-white/5 backdrop-blur-sm rounded-lg p-4 border border-white/10">
                   <h5 className="text-sm font-semibold text-amarelo-armazem font-inter mb-2 flex items-center">
                     <Phone className="w-4 h-4 mr-2" />
-                    Contato Rápido
+{t('footer.quickContact')}
                   </h5>
                   <a 
                     href="https://wa.me/5521985658443"
@@ -348,7 +346,7 @@ const Footer = () => {
                 <div className="flex items-center space-x-2">
                   <Clock className="w-5 h-5 text-amarelo-armazem" />
                   <h4 className="text-lg font-semibold font-playfair text-amarelo-armazem">
-                    Funcionamento
+                    {t('footer.hours.title')}
                   </h4>
                 </div>
                 

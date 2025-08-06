@@ -18,10 +18,5 @@ module.exports = {
         }]
       } 
     } : {}),
-    ...(process.env.NODE_ENV === 'production' ? {
-      'postcss-custom-properties': {
-        preserve: true,
-      }
-    } : {})
   },
 }

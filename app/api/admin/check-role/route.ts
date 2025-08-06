@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
-import { cookies } from 'next/headers'
+// import { cookies } from 'next/headers' // Não necessário mais
 import { Database } from '@/types/database.types'
 
 export async function GET(request: NextRequest) {
   console.log('🔍 API CheckRole: Iniciando verificação de permissões - ' + new Date().toISOString())
   
   try {
-    const cookieStore = cookies()
+    const cookieStore = await cookies()
     
     // Create Supabase client with same configuration as other admin APIs
     const supabase = createServerClient<Database>(

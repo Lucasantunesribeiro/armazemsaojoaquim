@@ -8,7 +8,7 @@ import Input from '../ui/Input'
 import toast from 'react-hot-toast'
 import { cn } from '../../lib/utils'
 import { useIntersectionObserver } from '../../lib/performance'
-import { useTranslations } from '@/contexts/LanguageContext'
+import { useTranslations } from '@/hooks/useTranslations'
 
 const ContactSection = () => {
   const { t } = useTranslations()

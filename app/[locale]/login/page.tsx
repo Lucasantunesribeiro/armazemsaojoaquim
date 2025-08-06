@@ -2,17 +2,20 @@
 
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import { use } from 'react'
 
 interface LoginPageProps {
-  params: { locale: string }
+  params: Promise<{ locale: string }>
 }
 
 export default function LoginPage({ params }: LoginPageProps) {
   const router = useRouter()
+  
+  // Desempacotar params usando React.use()
+  const resolvedParams = use(params)
 
   useEffect(() => {
-    const redirectToAuth = async () => {
-      const resolvedParams = await params
+    const redirectToAuth = () => {
       const locale = resolvedParams.locale || 'pt'
       
       // Preserve any query parameters from the original URL
@@ -26,7 +29,7 @@ export default function LoginPage({ params }: LoginPageProps) {
     }
 
     redirectToAuth()
-  }, [params, router])
+  }, [resolvedParams.locale, router])
 
   // Show loading state while redirecting
   return (
