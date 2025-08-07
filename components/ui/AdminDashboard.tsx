@@ -17,7 +17,7 @@ import { useAdminApi } from '@/lib/hooks/useAdminApi'
 // import { useEvents } from '@/lib/hooks/useEvents'
 // import { useLoyalty } from '@/lib/hooks/useLoyalty'
 // import { useMenu } from '@/lib/hooks/useMenu'
-import Button from './Button'
+import { Button } from './Button'
 import { Card, CardContent, CardHeader } from './Card'
 import { Badge } from './Badge'
 // import { Dialog, DialogContent, DialogHeader, DialogTitle } from './Dialog'
@@ -359,7 +359,7 @@ const PerformanceCharts = ({ data }: { data: any }) => {
             cx="50%"
             cy="50%"
             labelLine={false}
-            label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+            label={({ name, percent }) => `${name} ${((percent || 0) * 100).toFixed(0)}%`}
             outerRadius={80}
             fill="#8884d8"
             dataKey="value"
@@ -395,21 +395,21 @@ const PerformanceCharts = ({ data }: { data: any }) => {
           <div className="flex gap-2">
             <Button
               size="sm"
-              variant={chartType === 'revenue' ? 'primary' : 'outline'}
+              variant={chartType === 'revenue' ? 'default' : 'outline'}
               onClick={() => setChartType('revenue')}
             >
               Receita
             </Button>
             <Button
               size="sm"
-              variant={chartType === 'orders' ? 'primary' : 'outline'}
+              variant={chartType === 'orders' ? 'default' : 'outline'}
               onClick={() => setChartType('orders')}
             >
               Pedidos
             </Button>
             <Button
               size="sm"
-              variant={chartType === 'customers' ? 'primary' : 'outline'}
+              variant={chartType === 'customers' ? 'default' : 'outline'}
               onClick={() => setChartType('customers')}
             >
               Clientes
@@ -679,11 +679,11 @@ export default function AdminDashboard({ className = '' }: AdminDashboardProps) 
                   <div className="space-y-4">
                     <div className="flex justify-between items-center">
                       <span>Eficiência da Cozinha</span>
-                      <Badge variant="success">{metrics.operational.kitchen_efficiency}%</Badge>
+                      <Badge variant="secondary">{metrics.operational.kitchen_efficiency}%</Badge>
                     </div>
                     <div className="flex justify-between items-center">
                       <span>Uptime do Sistema</span>
-                      <Badge variant="success">{metrics.operational.system_uptime}%</Badge>
+                      <Badge variant="secondary">{metrics.operational.system_uptime}%</Badge>
                     </div>
                     <div className="flex justify-between items-center">
                       <span>Giro de Mesas</span>
@@ -691,7 +691,7 @@ export default function AdminDashboard({ className = '' }: AdminDashboardProps) 
                     </div>
                     <div className="flex justify-between items-center">
                       <span>Alertas de Estoque</span>
-                      <Badge variant="warning">{metrics.operational.stock_alerts}</Badge>
+                      <Badge variant="outline">{metrics.operational.stock_alerts}</Badge>
                     </div>
                   </div>
                 </CardContent>

@@ -3,6 +3,11 @@
 import { forwardRef, useId } from 'react'
 import { cn } from '../../lib/utils'
 
+// Validação de runtime para prevenir erros de factory/call
+if (typeof cn !== 'function') {
+  throw new Error('Input: função cn() não foi importada corretamente do lib/utils')
+}
+
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string
   error?: string

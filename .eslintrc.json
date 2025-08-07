@@ -8,6 +8,9 @@
     "react/no-unescaped-entities": "off",
     "react-hooks/exhaustive-deps": "warn",
     "@next/next/no-page-custom-font": "off",
-    "@next/next/no-img-element": "off"
+    "@next/next/no-img-element": "off",
+    "@next/next/no-html-link-for-pages": "warn",
+    "@next/next/no-assign-module-variable": "warn",
+    "react-hooks/rules-of-hooks": "warn"
   }
 }

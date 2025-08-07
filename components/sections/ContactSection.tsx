@@ -3,7 +3,7 @@
 import React, { useState, useRef, memo, useEffect } from 'react'
 import Image from 'next/image'
 import { MapPin, Phone, Mail, Clock, Send, Instagram, ExternalLink, Heart, Star, Coffee, Calendar } from 'lucide-react'
-import Button from '../ui/Button'
+import { Button } from '../ui/Button'
 import Input from '../ui/Input'
 import toast from 'react-hot-toast'
 import { cn } from '../../lib/utils'

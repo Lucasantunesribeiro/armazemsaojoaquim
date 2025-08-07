@@ -50,4 +50,24 @@
 
 /sw.js
   Content-Type: text/javascript
-  Cache-Control: public, max-age=0, must-revalidate 
+  Cache-Control: public, max-age=0, must-revalidate
+
+# CORREÇÃO CRÍTICA: Headers específicos para imagens da pousada
+/images/pousada/*
+  Content-Type: image/jpeg
+  Cache-Control: public, max-age=86400
+  X-Content-Type-Options: nosniff
+
+# Headers para otimização de imagens estáticas
+/images/*
+  X-Content-Type-Options: nosniff
+  Access-Control-Allow-Origin: *
+  
+# CORS para recursos estáticos
+/*.jpg
+  Access-Control-Allow-Origin: *
+  X-Content-Type-Options: nosniff
+
+/*.jpeg  
+  Access-Control-Allow-Origin: *
+  X-Content-Type-Options: nosniff

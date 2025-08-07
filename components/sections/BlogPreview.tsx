@@ -350,7 +350,7 @@ const BlogPreview = () => {
 							{t('home.blogPreview.cta.description')}
 						</p>
 						<Link prefetch={true} href="/blog" passHref>
-							<Button size="lg" variant="primary">
+							<Button size="lg" variant="default">
 								<Book className="w-5 h-5 mr-2" />
 								{t('home.blogPreview.cta.button')}
 							</Button>

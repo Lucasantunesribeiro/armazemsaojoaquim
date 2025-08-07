@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 // import { cookies } from 'next/headers' // Não necessário mais
 import { Database } from '@/types/database.types'
+import { cookies } from 'next/headers'
 
 export async function GET(request: NextRequest) {
   try {

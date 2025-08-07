@@ -1,173 +1,131 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createServerClient } from '@supabase/ssr'
-// import { cookies } from 'next/headers' // Não necessário mais
-import { Database } from '@/types/database.types'
+import { createServerClient } from '@/lib/supabase'
+
+const ADMIN_EMAIL = 'armazemsaojoaquimoficial@gmail.com'
 
 export async function GET(request: NextRequest) {
-  console.log('🔍 API CheckRole: Iniciando verificação de permissões - ' + new Date().toISOString())
-  
   try {
-    const cookieStore = await cookies()
+    console.log('🔍 ADMIN-CHECK-ROLE: Starting verification...')
     
-    // Create Supabase client with same configuration as other admin APIs
-    const supabase = createServerClient<Database>(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        cookies: {
-          getAll() {
-            return cookieStore.getAll()
-          },
-          setAll(cookiesToSet) {
-            try {
-              cookiesToSet.forEach(({ name, value, options }) => {
-                cookieStore.set(name, value, options)
-              })
-            } catch (error) {
-              console.log('🍪 API CheckRole: Error setting cookies:', error)
-            }
-          },
-        },
-        auth: {
-          persistSession: false,
-          autoRefreshToken: false,
-          detectSessionInUrl: false,
-          flowType: 'pkce',
-          storageKey: 'armazem-sao-joaquim-auth',
-          debug: process.env.NODE_ENV === 'development'
-        },
-      }
-    )
-    
-    // Get session from cookies (same as other admin APIs)
+    // Get session from cookies
+    const supabase = await createServerClient()
     const { data: { session }, error: sessionError } = await supabase.auth.getSession()
     
-    if (sessionError) {
-      console.error('❌ API CheckRole: Erro na sessão:', sessionError)
+    if (sessionError || !session?.user) {
+      console.log('❌ ADMIN-CHECK-ROLE: No active session')
       return NextResponse.json({ 
-        isAdmin: false, 
-        error: 'Session error',
-        details: sessionError.message 
-      })
-    }
-    
-    if (!session || !session.user) {
-      console.log('❌ API CheckRole: Sem sessão ativa')
-      return NextResponse.json({ 
-        isAdmin: false, 
-        error: 'No active session' 
+        isAdmin: false,
+        method: 'no_session',
+        error: 'No active session',
+        debug: { sessionError: sessionError?.message }
       })
     }
 
-    const user = session.user
-    console.log('✅ API CheckRole: Usuário autenticado:', user.email)
-
-    // Primary check: admin email verification
-    const isAdminByEmail = user.email === 'armazemsaojoaquimoficial@gmail.com'
+    const userId = session.user.id
+    const email = session.user.email || ''
     
-    if (isAdminByEmail) {
-      console.log('✅ API CheckRole: Admin confirmado por email direto')
+    console.log('✅ ADMIN-CHECK-ROLE: Session found for:', email)
+
+    // Primary verification: Admin email check
+    if (email === ADMIN_EMAIL) {
+      console.log('✅ ADMIN-CHECK-ROLE: Admin confirmed by email')
+      
+      // Ensure admin profile exists in database
+      try {
+        await supabase.rpc('ensure_admin_profile', {
+          admin_id: userId,
+          admin_email: email,
+          admin_name: 'Administrador Armazém São Joaquim'
+        })
+        console.log('✅ ADMIN-CHECK-ROLE: Admin profile ensured')
+      } catch (profileError) {
+        console.warn('⚠️ ADMIN-CHECK-ROLE: Could not ensure admin profile:', profileError)
+      }
+      
       return NextResponse.json({ 
         isAdmin: true,
+        method: 'email_verification',
+        role: 'admin',
         user: {
-          id: user.id,
-          email: user.email,
+          id: userId,
+          email: email,
+          full_name: 'Administrador Armazém São Joaquim',
           role: 'admin'
-        },
-        source: 'email_verification'
-      })
-    }
-
-    // Secondary check: verify in public.users table for role
-    try {
-      console.log('🔍 API CheckRole: Verificando role na tabela users...')
-      
-      const { data: userData, error: roleError } = await supabase
-        .from('users')
-        .select('id, email, role')
-        .eq('id', user.id)
-        .single()
-
-      if (roleError) {
-        console.error('❌ API CheckRole: Erro ao buscar usuário na tabela users:', roleError)
-        
-        // Fallback: if user not found in public.users but email matches admin, still allow
-        if (user.email === 'armazemsaojoaquimoficial@gmail.com') {
-          console.log('✅ API CheckRole: Admin confirmado por email (fallback)')
-          return NextResponse.json({ 
-            isAdmin: true,
-            user: {
-              id: user.id,
-              email: user.email,
-              role: 'admin'
-            },
-            source: 'email_fallback'
-          })
         }
-        
-        return NextResponse.json({ 
-          isAdmin: false, 
-          error: 'User not found in database',
-          details: roleError.message
-        })
-      }
-
-      console.log('🔍 API CheckRole: Dados do usuário encontrados:', {
-        email: userData.email,
-        role: userData.role
-      })
-      
-      // Check if user has admin role OR is the admin email
-      const isAdminByRole = userData.role === 'admin'
-      const isAdminByEmailMatch = userData.email === 'armazemsaojoaquimoficial@gmail.com'
-      const finalIsAdmin = isAdminByRole || isAdminByEmailMatch
-      
-      console.log('🔍 API CheckRole: Verificação final:', {
-        isAdminByRole,
-        isAdminByEmailMatch,
-        finalIsAdmin
-      })
-
-      return NextResponse.json({ 
-        isAdmin: finalIsAdmin,
-        user: {
-          id: user.id,
-          email: user.email,
-          role: finalIsAdmin ? 'admin' : (userData.role || 'user')
-        },
-        source: 'database_verification'
-      })
-
-    } catch (dbError: any) {
-      console.error('❌ API CheckRole: Erro no banco de dados:', dbError)
-      
-      // Final fallback: if database fails but email is admin, allow access
-      if (user.email === 'armazemsaojoaquimoficial@gmail.com') {
-        console.log('✅ API CheckRole: Admin confirmado por email (fallback de erro)')
-        return NextResponse.json({ 
-          isAdmin: true,
-          user: {
-            id: user.id,
-            email: user.email,
-            role: 'admin'
-          },
-          source: 'error_fallback'
-        })
-      }
-      
-      return NextResponse.json({ 
-        isAdmin: false, 
-        error: 'Database error',
-        details: dbError.message
       })
     }
 
-  } catch (error: any) {
-    console.error('❌ API CheckRole: Erro interno:', error)
+    // Secondary verification: Database role check
+    console.log('🔍 ADMIN-CHECK-ROLE: Checking database role for:', email)
+    
+    const { data: profile, error: profileError } = await supabase
+      .from('profiles')
+      .select('role, email, full_name')
+      .eq('id', userId)
+      .single()
+
+    if (profileError) {
+      console.log('❌ ADMIN-CHECK-ROLE: Profile not found:', profileError.message)
+      
+      // Try by email as fallback
+      const { data: emailProfile, error: emailError } = await supabase
+        .from('profiles')
+        .select('role, email, full_name')
+        .eq('email', email)
+        .single()
+      
+      if (emailError) {
+        console.log('❌ ADMIN-CHECK-ROLE: Email profile not found either')
+        return NextResponse.json({ 
+          isAdmin: false,
+          method: 'profile_not_found',
+          error: 'Profile not found',
+          debug: { 
+            profileError: profileError.message,
+            emailError: emailError.message 
+          }
+        })
+      }
+      
+      // Use email profile
+      const isAdmin = emailProfile.role === 'admin'
+      console.log('✅ ADMIN-CHECK-ROLE: Found by email. Admin:', isAdmin)
+      
+      return NextResponse.json({ 
+        isAdmin,
+        method: 'email_profile_lookup',
+        role: emailProfile.role,
+        user: {
+          id: userId,
+          email: emailProfile.email,
+          full_name: emailProfile.full_name || 'Usuário',
+          role: emailProfile.role
+        }
+      })
+    }
+
+    const isAdmin = profile.role === 'admin'
+    console.log('✅ ADMIN-CHECK-ROLE: Database check complete. Admin:', isAdmin)
+    
     return NextResponse.json({ 
-      isAdmin: false, 
+      isAdmin,
+      method: 'database_lookup',
+      role: profile.role,
+      user: {
+        id: userId,
+        email: profile.email,
+        full_name: profile.full_name || 'Usuário',
+        role: profile.role
+      }
+    })
+    
+  } catch (error: any) {
+    console.error('❌ ADMIN-CHECK-ROLE: Internal server error:', error)
+    return NextResponse.json({ 
+      isAdmin: false,
+      method: 'error',
       error: 'Internal server error',
-      details: error.message
+      debug: { error: error.message }
     }, { status: 500 })
   }
 }

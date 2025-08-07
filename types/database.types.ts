@@ -12,39 +12,81 @@ export type Database = {
       blog_posts: {
         Row: {
           id: string
-          title: string
-          content: string
-          excerpt: string | null
-          featured_image: string | null
+          title_pt: string
+          title_en: string
+          slug_pt: string
+          slug_en: string
+          content_pt: string
+          content_en: string
+          excerpt_pt: string | null
+          excerpt_en: string | null
+          meta_title_pt: string | null
+          meta_title_en: string | null
+          meta_description_pt: string | null
+          meta_description_en: string | null
+          category_pt: string
+          category_en: string
+          tags_pt: string[]
+          tags_en: string[]
+          image_url: string | null
           published: boolean
+          featured: boolean
           author_id: string | null
-          slug: string
+          author_name: string | null
           published_at: string | null
           created_at: string
           updated_at: string
         }
         Insert: {
           id?: string
-          title: string
-          content: string
-          excerpt?: string | null
-          featured_image?: string | null
+          title_pt: string
+          title_en: string
+          slug_pt: string
+          slug_en: string
+          content_pt: string
+          content_en: string
+          excerpt_pt?: string | null
+          excerpt_en?: string | null
+          meta_title_pt?: string | null
+          meta_title_en?: string | null
+          meta_description_pt?: string | null
+          meta_description_en?: string | null
+          category_pt?: string
+          category_en?: string
+          tags_pt?: string[]
+          tags_en?: string[]
+          image_url?: string | null
           published?: boolean
+          featured?: boolean
           author_id?: string | null
-          slug: string
+          author_name?: string | null
           published_at?: string | null
           created_at?: string
           updated_at?: string
         }
         Update: {
           id?: string
-          title?: string
-          content?: string
-          excerpt?: string | null
-          featured_image?: string | null
+          title_pt?: string
+          title_en?: string
+          slug_pt?: string
+          slug_en?: string
+          content_pt?: string
+          content_en?: string
+          excerpt_pt?: string | null
+          excerpt_en?: string | null
+          meta_title_pt?: string | null
+          meta_title_en?: string | null
+          meta_description_pt?: string | null
+          meta_description_en?: string | null
+          category_pt?: string
+          category_en?: string
+          tags_pt?: string[]
+          tags_en?: string[]
+          image_url?: string | null
           published?: boolean
+          featured?: boolean
           author_id?: string | null
-          slug?: string
+          author_name?: string | null
           published_at?: string | null
           created_at?: string
           updated_at?: string
@@ -203,7 +245,9 @@ export type Database = {
           id: string
           email: string | null
           name: string | null
+          full_name: string | null
           phone: string | null
+          role: string
           created_at: string
           updated_at: string
         }
@@ -211,7 +255,9 @@ export type Database = {
           id: string
           email?: string | null
           name?: string | null
+          full_name?: string | null
           phone?: string | null
+          role?: string
           created_at?: string
           updated_at?: string
         }
@@ -219,11 +265,57 @@ export type Database = {
           id?: string
           email?: string | null
           name?: string | null
+          full_name?: string | null
           phone?: string | null
+          role?: string
           created_at?: string
           updated_at?: string
         }
         Relationships: []
+      }
+      admin_activity_logs: {
+        Row: {
+          id: string
+          admin_id: string
+          action: string
+          resource_type: string | null
+          resource_id: string | null
+          details: Json | null
+          ip_address: string | null
+          user_agent: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          admin_id: string
+          action: string
+          resource_type?: string | null
+          resource_id?: string | null
+          details?: Json | null
+          ip_address?: string | null
+          user_agent?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          admin_id?: string
+          action?: string
+          resource_type?: string | null
+          resource_id?: string | null
+          details?: Json | null
+          ip_address?: string | null
+          user_agent?: string | null
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "admin_activity_logs_admin_id_fkey"
+            columns: ["admin_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          }
+        ]
       }
       availability_settings: {
         Row: {
@@ -396,6 +488,54 @@ export type Database = {
         }
         Relationships: []
       }
+      pousada_rooms: {
+        Row: {
+          id: string
+          name: string
+          type: string
+          price_refundable: number
+          price_non_refundable: number
+          description: string | null
+          amenities: string[] | null
+          max_guests: number
+          image_url: string | null
+          available: boolean
+          size_sqm: number | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          name: string
+          type: string
+          price_refundable: number
+          price_non_refundable: number
+          description?: string | null
+          amenities?: string[] | null
+          max_guests?: number
+          image_url?: string | null
+          available?: boolean
+          size_sqm?: number | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          name?: string
+          type?: string
+          price_refundable?: number
+          price_non_refundable?: number
+          description?: string | null
+          amenities?: string[] | null
+          max_guests?: number
+          image_url?: string | null
+          available?: boolean
+          size_sqm?: number | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       reservas_stats: {
@@ -543,3 +683,10 @@ export type ArtOrderUpdate = TablesUpdate<'art_orders'>
 
 export type ArtworkCategory = 'SANTA_TERESA_HISTORICA' | 'RIO_ANTIGO' | 'ARTE_CONTEMPORANEA' | 'RETRATOS_BAIRRO'
 export type ArtOrderStatus = 'PENDING' | 'CONFIRMED' | 'PROCESSING' | 'SHIPPED' | 'DELIVERED' | 'CANCELLED'
+
+// Tipos específicos para pousada
+export type PousadaRoom = Tables<'pousada_rooms'>
+export type PousadaRoomInsert = TablesInsert<'pousada_rooms'>
+export type PousadaRoomUpdate = TablesUpdate<'pousada_rooms'>
+
+export type RoomType = 'STANDARD' | 'DELUXE' | 'SUITE'

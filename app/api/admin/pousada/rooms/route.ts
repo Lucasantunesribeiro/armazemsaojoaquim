@@ -1,146 +1,99 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createServerClient } from '@supabase/ssr'
-// import { cookies } from 'next/headers' // Não necessário mais
+import { createServerClient } from '@/lib/supabase'
+import { withAdminAuth } from '@/lib/admin-auth'
 
 export async function GET(request: NextRequest) {
-  try {
-    const cookieStore = await cookies()
-    
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        cookies: {
-          getAll() {
-            return cookieStore.getAll()
-          },
-          setAll(cookiesToSet) {
-            try {
-              cookiesToSet.forEach(({ name, value, options }) =>
-                cookieStore.set(name, value, options)
-              )
-            } catch {
-              // The `setAll` method was called from a Server Component.
-              // This can be ignored if you have middleware refreshing
-              // user sessions.
-            }
-          },
-        },
+  return withAdminAuth(async (authResult) => {
+    try {
+      console.log('🏠 [POUSADA-ROOMS] Carregando quartos da pousada...')
+      
+      const supabase = await createServerClient()
+
+      const { data: rooms, error } = await supabase
+        .from('pousada_rooms')
+        .select('*')
+        .order('created_at', { ascending: false })
+
+      if (error) {
+        console.error('❌ [POUSADA-ROOMS] Erro ao buscar quartos:', error)
+        return NextResponse.json(
+          { error: 'Erro ao carregar quartos', debug: error.message },
+          { status: 500 }
+        )
       }
-    )
-    
-    // Verificar se é admin
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user || user.user_metadata?.role !== 'admin') {
-      return NextResponse.json(
-        { error: 'Acesso negado' },
-        { status: 403 }
-      )
-    }
 
-    const { data: rooms, error } = await supabase
-      .from('pousada_rooms')
-      .select('*')
-      .order('created_at', { ascending: false })
-
-    if (error) {
-      console.error('Erro ao buscar quartos:', error)
+      console.log(`✅ [POUSADA-ROOMS] ${rooms?.length || 0} quartos carregados`)
+      return NextResponse.json({ 
+        success: true,
+        data: rooms || [],
+        count: rooms?.length || 0
+      })
+      
+    } catch (error) {
+      console.error('💥 [POUSADA-ROOMS] Erro interno:', error)
       return NextResponse.json(
-        { error: 'Erro ao carregar quartos' },
+        { error: 'Erro interno do servidor' },
         { status: 500 }
       )
     }
-
-    return NextResponse.json(rooms || [])
-  } catch (error) {
-    console.error('Erro interno:', error)
-    return NextResponse.json(
-      { error: 'Erro interno do servidor' },
-      { status: 500 }
-    )
-  }
+  }, request)
 }
 
 export async function POST(request: NextRequest) {
-  try {
-    const cookieStore = await cookies()
-    
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        cookies: {
-          getAll() {
-            return cookieStore.getAll()
-          },
-          setAll(cookiesToSet) {
-            try {
-              cookiesToSet.forEach(({ name, value, options }) =>
-                cookieStore.set(name, value, options)
-              )
-            } catch {
-              // The `setAll` method was called from a Server Component.
-              // This can be ignored if you have middleware refreshing
-              // user sessions.
-            }
-          },
-        },
+  return withAdminAuth(async (authResult) => {
+    try {
+      console.log('➕ [POUSADA-ROOMS] Criando novo quarto da pousada...')
+      
+      const supabase = await createServerClient()
+
+      const body = await request.json()
+      const { name, type, price_refundable, price_non_refundable, description, amenities, max_guests, image_url, available } = body
+
+      if (!name || !type || !price_refundable || !price_non_refundable) {
+        console.error('❌ [POUSADA-ROOMS] Dados obrigatórios faltando')
+        return NextResponse.json(
+          { error: 'Dados obrigatórios não fornecidos: name, type, price_refundable, price_non_refundable' },
+          { status: 400 }
+        )
       }
-    )
-    
-    // Verificar se é admin
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user || user.user_metadata?.role !== 'admin') {
-      return NextResponse.json(
-        { error: 'Acesso negado' },
-        { status: 403 }
-      )
-    }
 
-    const body = await request.json()
-    const { name, type, price_refundable, price_non_refundable, description, amenities, max_guests, image_url, available } = body
+      const { data: room, error } = await supabase
+        .from('pousada_rooms')
+        .insert({
+          name,
+          type,
+          price_refundable,
+          price_non_refundable,
+          description,
+          amenities: amenities || [],
+          max_guests: max_guests || 2,
+          image_url,
+          available: available !== false
+        })
+        .select()
+        .single()
 
-    if (!name || !type || !price_refundable || !price_non_refundable) {
-      return NextResponse.json(
-        { error: 'Dados obrigatórios não fornecidos' },
-        { status: 400 }
-      )
-    }
+      if (error) {
+        console.error('❌ [POUSADA-ROOMS] Erro ao criar quarto:', error)
+        return NextResponse.json(
+          { error: 'Erro ao criar quarto', debug: error.message },
+          { status: 500 }
+        )
+      }
 
-    const { data: room, error } = await supabase
-      .from('pousada_rooms')
-      .insert({
-        name,
-        type,
-        price_refundable,
-        price_non_refundable,
-        description,
-        amenities: amenities || [],
-        max_guests: max_guests || 2,
-        image_url,
-        available: available !== false
+      console.log(`✅ [POUSADA-ROOMS] Quarto criado: ${room.name}`)
+      return NextResponse.json({ 
+        success: true, 
+        data: room,
+        message: 'Quarto criado com sucesso!' 
       })
-      .select()
-      .single()
-
-    if (error) {
-      console.error('Erro ao criar quarto:', error)
+      
+    } catch (error) {
+      console.error('💥 [POUSADA-ROOMS] Erro interno:', error)
       return NextResponse.json(
-        { error: 'Erro ao criar quarto' },
+        { error: 'Erro interno do servidor' },
         { status: 500 }
       )
     }
-
-    return NextResponse.json({ 
-      success: true, 
-      room,
-      message: 'Quarto criado com sucesso!' 
-    })
-  } catch (error) {
-    console.error('Erro interno:', error)
-    return NextResponse.json(
-      { error: 'Erro interno do servidor' },
-      { status: 500 }
-    )
-  }
+  }, request)
 }

@@ -1,0 +1,13 @@
+# Netlify _redirects file
+# CORREÇÃO CRÍTICA: Configurações para servir imagens estáticas corretamente
+
+# Servir imagens estáticas diretamente sem otimização Next.js
+/images/* /images/:splat 200
+
+# Fallback para SPA (Single Page Application)
+/*    /index.html   200
+
+# Redirecionamentos específicos para imagens da pousada
+/images/pousada/casarao-historico.jpg /images/pousada/casarao-historico.jpg 200
+/images/pousada/lobie-fachada.jpg /images/pousada/lobie-fachada.jpg 200
+/images/pousada/room-placeholder.jpg /images/pousada/room-placeholder.jpg 200

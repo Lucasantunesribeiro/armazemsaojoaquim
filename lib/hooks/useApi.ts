@@ -3,14 +3,14 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useNotifications } from './useNotifications'
 import { blogApi, menuApi, reservasApi, analyticsApi, utils } from '../api'
-import type { BlogPost, MenuItem, Reserva } from '../api'
+import type { BlogPost, BlogPostMultilingual, MenuItem, Reserva } from '../api'
 
 // ============================
 // BLOG HOOKS
 // ============================
 
 export function useBlogPosts() {
-  const [posts, setPosts] = useState<BlogPost[]>([])
+  const [posts, setPosts] = useState<BlogPostMultilingual[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -35,7 +35,7 @@ export function useBlogPosts() {
 }
 
 export function useBlogPost(slug: string) {
-  const [post, setPost] = useState<BlogPost | null>(null)
+  const [post, setPost] = useState<BlogPostMultilingual | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -62,7 +62,7 @@ export function useBlogPost(slug: string) {
 }
 
 export function useBlogSearch() {
-  const [results, setResults] = useState<BlogPost[]>([])
+  const [results, setResults] = useState<BlogPostMultilingual[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 

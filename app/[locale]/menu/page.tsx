@@ -292,7 +292,29 @@ export default function MenuPage() {
     // Filtrar por categoria
     const allCategoriesText = t('menu.categories.all') || 'Todos'
     if (selectedCategory !== allCategoriesText) {
-      filtered = filtered.filter(item => item.category === selectedCategory)
+      // Mapeamento entre categorias traduzidas e originais
+      const categoryMapping: { [key: string]: string } = {
+        [t('menu.categories.starters') || 'Petiscos']: 'Petiscos',
+        [t('menu.categories.mains') || 'Pratos Principais']: 'Pratos Principais',
+        [t('menu.categories.sandwiches') || 'Sanduíches']: 'Sanduíches',
+        [t('menu.categories.salads') || 'Saladas']: 'Saladas',
+        [t('menu.categories.sides') || 'Guarnições']: 'Guarnições',
+        [t('menu.categories.desserts') || 'Sobremesas']: 'Sobremesas',
+        [t('menu.categories.beverages') || 'Bebidas Sem Álcool']: 'Bebidas Sem Álcool',
+        [t('menu.categories.beers') || 'Cervejas']: 'Cervejas',
+        [t('menu.categories.drinks') || 'Drinks']: 'Drinks',
+        [t('menu.categories.wines') || 'Vinhos']: 'Vinhos',
+        [t('menu.categories.sparklings') || 'Espumantes']: 'Espumantes',
+        [t('menu.categories.spirits') || 'Destilados']: 'Destilados',
+        [t('menu.categories.specials') || 'Especiais da casa']: 'Especiais da casa'
+      }
+      
+      // Obter a categoria original baseada na tradução selecionada
+      const originalCategory = categoryMapping[selectedCategory]
+      
+      if (originalCategory) {
+        filtered = filtered.filter(item => item.category === originalCategory)
+      }
     }
 
     // Filtrar por termo de busca

@@ -1,6 +1,7 @@
 import { createClient as createSupabaseClient } from '@supabase/supabase-js'
 import { createBrowserClient, createServerClient as createSSRServerClient } from '@supabase/ssr'
 import { NextRequest, NextResponse } from 'next/server'
+import { cookies } from 'next/headers'
 import { Database } from '../types/database.types'
 
 // Verificar se as variáveis de ambiente estão configuradas
@@ -139,9 +140,42 @@ export function createClient() {
       persistSession: true,
       autoRefreshToken: true,
       detectSessionInUrl: true,
-      flowType: 'pkce',
+      flowType: 'implicit',
       storageKey: 'armazem-sao-joaquim-auth',
-      debug: false // Sempre false em produção para performance
+      debug: process.env.NODE_ENV === 'development', // Debug em desenvolvimento
+      storage: {
+        getItem: (key) => {
+          try {
+            const value = localStorage.getItem(key)
+            if (process.env.NODE_ENV === 'development') {
+              console.log(`📥 Storage GET ${key}:`, value ? 'encontrado' : 'não encontrado')
+            }
+            return value
+          } catch {
+            return null
+          }
+        },
+        setItem: (key, value) => {
+          try {
+            localStorage.setItem(key, value)
+            if (process.env.NODE_ENV === 'development') {
+              console.log(`📤 Storage SET ${key}:`, value ? 'salvo' : 'vazio')
+            }
+          } catch {
+            // Ignore storage errors
+          }
+        },
+        removeItem: (key) => {
+          try {
+            localStorage.removeItem(key)
+            if (process.env.NODE_ENV === 'development') {
+              console.log(`🗑️ Storage REMOVE ${key}: removido`)
+            }
+          } catch {
+            // Ignore storage errors
+          }
+        }
+      }
     },
     realtime: {
       params: {
@@ -451,3 +485,83 @@ export const getCachedDashboardStats = () => {
 // Compatibilidade com código existente
 export const getSupabaseClient = () => supabase
 export const createMockSupabaseClient = () => createMockClient()
+
+// Função para criar ou atualizar profile de forma segura
+export const upsertProfile = async (user: any) => {
+  try {
+    const supabase = createClient()
+    
+    // Verificar se o profile já existe
+    const { data: existingProfile, error: fetchError } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', user.id)
+      .single()
+    
+    if (fetchError && !fetchError.message.includes('No rows found')) {
+      console.error('❌ Erro ao verificar profile existente:', fetchError)
+      return { error: fetchError }
+    }
+    
+    const profileData = {
+      id: user.id,
+      email: user.email,
+      full_name: user.user_metadata?.full_name || user.email?.split('@')[0] || 'Usuário',
+      avatar_url: user.user_metadata?.avatar_url || null,
+      updated_at: new Date().toISOString()
+    }
+    
+    let result
+    
+    if (existingProfile) {
+      // Atualizar profile existente
+      console.log('🔄 Atualizando profile existente para:', user.id)
+      const { data, error } = await supabase
+        .from('profiles')
+        .update(profileData)
+        .eq('id', user.id)
+        .select()
+        .single()
+      
+      result = { data, error }
+    } else {
+      // Criar novo profile
+      console.log('➕ Criando novo profile para:', user.id)
+      const { data, error } = await supabase
+        .from('profiles')
+        .insert(profileData)
+        .select()
+        .single()
+      
+      result = { data, error }
+    }
+    
+    if (result.error) {
+      console.error('❌ Erro ao upsert profile:', result.error)
+      
+      // Se for erro de duplicação, tentar recuperar o profile existente
+      if (result.error.message?.includes('profiles_pkey') || result.error.message?.includes('duplicate key')) {
+        console.log('🔄 Tentando recuperar profile após erro de duplicação...')
+        
+        const { data: recoveredProfile, error: recoveryError } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', user.id)
+          .single()
+        
+        if (!recoveryError && recoveredProfile) {
+          console.log('✅ Profile recuperado com sucesso')
+          return { data: recoveredProfile, error: null }
+        }
+      }
+      
+      return { error: result.error }
+    }
+    
+    console.log('✅ Profile processado com sucesso')
+    return { data: result.data, error: null }
+  } catch (error) {
+    console.error('💥 Erro inesperado ao processar profile:', error)
+    return { error }
+  }
+}

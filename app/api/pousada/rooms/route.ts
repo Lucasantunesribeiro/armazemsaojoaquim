@@ -10,12 +10,13 @@ export async function GET(request: NextRequest) {
       {
         id: '1',
         name: 'Suíte Histórica Santa Teresa',
-        type: 'suite',
+        type: 'SUITE',
         description: 'Suíte espaçosa com vista panorâmica para o bairro histórico de Santa Teresa. Decoração inspirada na arquitetura colonial brasileira.',
-        price_per_night: 280.00,
+        price_refundable: 320.00,
+        price_non_refundable: 280.00,
         max_guests: 2,
         amenities: ['Wi-Fi', 'Ar condicionado', 'TV', 'Frigobar', 'Vista panorâmica', 'Varanda'],
-        images: ['/images/rooms/suite-historica-1.jpg', '/images/rooms/suite-historica-2.jpg'],
+        image_url: '/images/pousada/suite-historica.jpg',
         available: true,
         size_sqm: 35,
         bed_type: 'King size',
@@ -27,12 +28,13 @@ export async function GET(request: NextRequest) {
       {
         id: '2',
         name: 'Quarto Colonial',
-        type: 'standard',
+        type: 'STANDARD',
         description: 'Quarto aconchegante com decoração que remete ao período colonial. Ideal para quem busca conforto e história.',
-        price_per_night: 180.00,
+        price_refundable: 210.00,
+        price_non_refundable: 180.00,
         max_guests: 2,
         amenities: ['Wi-Fi', 'Ventilador de teto', 'TV', 'Armário vintage'],
-        images: ['/images/rooms/colonial-1.jpg', '/images/rooms/colonial-2.jpg'],
+        image_url: '/images/pousada/quarto-colonial.jpg',
         available: true,
         size_sqm: 25,
         bed_type: 'Queen size',
@@ -44,12 +46,13 @@ export async function GET(request: NextRequest) {
       {
         id: '3',
         name: 'Quarto do Bondinho',
-        type: 'standard',
+        type: 'STANDARD',
         description: 'Quarto temático com vista direta para a linha do bondinho. Perfeito para admirar o vai e vem do transporte histórico.',
-        price_per_night: 200.00,
+        price_refundable: 240.00,
+        price_non_refundable: 200.00,
         max_guests: 2,
         amenities: ['Wi-Fi', 'Ar condicionado', 'TV', 'Vista para o bondinho'],
-        images: ['/images/rooms/bondinho-1.jpg', '/images/rooms/bondinho-2.jpg'],
+        image_url: '/images/pousada/quarto-bondinho.jpg',
         available: true,
         size_sqm: 28,
         bed_type: 'Queen size',
@@ -61,12 +64,13 @@ export async function GET(request: NextRequest) {
       {
         id: '4',
         name: 'Suíte do Armazém',
-        type: 'suite',
+        type: 'SUITE',
         description: 'Suíte premium que ocupa parte do antigo armazém. Ambiente amplo com pé-direito alto e elementos históricos preservados.',
-        price_per_night: 350.00,
+        price_refundable: 400.00,
+        price_non_refundable: 350.00,
         max_guests: 4,
         amenities: ['Wi-Fi', 'Ar condicionado', 'TV Smart', 'Frigobar', 'Varanda privativa', 'Banheira'],
-        images: ['/images/rooms/suite-armazem-1.jpg', '/images/rooms/suite-armazem-2.jpg'],
+        image_url: '/images/pousada/suite-armazem.jpg',
         available: true,
         size_sqm: 45,
         bed_type: 'King size + sofá-cama',
@@ -78,13 +82,14 @@ export async function GET(request: NextRequest) {
       {
         id: '5',
         name: 'Quarto dos Azulejos',
-        type: 'standard',
+        type: 'DELUXE',
         description: 'Quarto decorado com azulejos portugueses originais encontrados durante a restauração do edifício.',
-        price_per_night: 220.00,
+        price_refundable: 260.00,
+        price_non_refundable: 220.00,
         max_guests: 2,
         amenities: ['Wi-Fi', 'Ventilador de teto', 'TV', 'Azulejos históricos'],
-        images: ['/images/rooms/azulejos-1.jpg', '/images/rooms/azulejos-2.jpg'],
-        available: true,
+        image_url: '/images/pousada/quarto-azulejos.jpg',
+        available: false,
         size_sqm: 30,
         bed_type: 'Queen size',
         bathroom_type: 'Privativo com azulejos portugueses',
@@ -116,7 +121,7 @@ export async function GET(request: NextRequest) {
 
     if (maxPrice) {
       filteredRooms = filteredRooms.filter(room => 
-        room.price_per_night <= parseFloat(maxPrice)
+        room.price_non_refundable <= parseFloat(maxPrice)
       )
     }
 

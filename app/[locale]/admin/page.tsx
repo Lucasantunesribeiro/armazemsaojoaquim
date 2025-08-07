@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import dynamic from 'next/dynamic'
 import { useAdminApi } from '@/lib/hooks/useAdminApi'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card'
 import { 
   Users, 
   Calendar, 
@@ -17,17 +18,28 @@ import {
   AlertCircle,
   Plus,
   ArrowRight,
-  Loader2
+  Loader2,
+  Activity,
+  BarChart3,
+  Settings,
+  PlusCircle,
+  Edit,
+  Eye
 } from 'lucide-react'
 
 // Lazy load heavy components
-const LazyActivitySection = dynamic(() => import('./components/ActivitySection'), {
-  loading: () => <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 animate-pulse h-48" />,
+const LazyActivityChart = dynamic(() => import('./components/ActivityChart'), {
+  loading: () => <Card><CardContent className="p-6 animate-pulse h-64" /></Card>,
   ssr: false
 })
 
 const LazyQuickActions = dynamic(() => import('./components/QuickActions'), {
-  loading: () => <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 animate-pulse h-32" />,
+  loading: () => <Card><CardContent className="p-6 animate-pulse h-32" /></Card>,
+  ssr: false
+})
+
+const LazyRecentActivity = dynamic(() => import('./components/RecentActivity'), {
+  loading: () => <Card><CardContent className="p-6 animate-pulse h-48" /></Card>,
   ssr: false
 })
 
@@ -208,7 +220,7 @@ export default function AdminDashboard({ params }: AdminDashboardProps) {
       {/* Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
         {dashboardCards.map((card) => (
-          <NavigableStatsCard
+          <StatsCard
             key={card.title}
             title={card.title}
             value={card.value}
@@ -225,7 +237,7 @@ export default function AdminDashboard({ params }: AdminDashboardProps) {
       {/* Content Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
         {contentCards.map((card) => (
-          <NavigableStatsCard
+          <StatsCard
             key={card.title}
             title={card.title}
             value={card.value}
@@ -240,14 +252,21 @@ export default function AdminDashboard({ params }: AdminDashboardProps) {
         ))}
       </div>
 
-      {/* Quick Actions - Lazy Loaded */}
-      <Suspense fallback={<div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 animate-pulse h-32" />}>
-        <LazyQuickActions locale={locale} />
-      </Suspense>
+      {/* Activity Chart */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Suspense fallback={<Card><CardContent className="p-6 animate-pulse h-64" /></Card>}>
+          <LazyActivityChart />
+        </Suspense>
+        
+        {/* Quick Actions */}
+        <Suspense fallback={<Card><CardContent className="p-6 animate-pulse h-64" /></Card>}>
+          <LazyQuickActions locale={locale} />
+        </Suspense>
+      </div>
 
-      {/* Recent Activity - Lazy Loaded */}
-      <Suspense fallback={<div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 animate-pulse h-48" />}>
-        <LazyActivitySection />
+      {/* Recent Activity */}
+      <Suspense fallback={<Card><CardContent className="p-6 animate-pulse h-48" /></Card>}>
+        <LazyRecentActivity />
       </Suspense>
     </div>
   )
@@ -255,7 +274,7 @@ export default function AdminDashboard({ params }: AdminDashboardProps) {
 
 // Components
 
-interface NavigableStatsCardProps {
+interface StatsCardProps {
   title: string
   value: number
   icon: React.ReactNode
@@ -267,7 +286,7 @@ interface NavigableStatsCardProps {
   large?: boolean
 }
 
-function NavigableStatsCard({ 
+function StatsCard({ 
   title, 
   value, 
   icon, 
@@ -277,37 +296,31 @@ function NavigableStatsCard({
   isNavigating, 
   onClick, 
   large 
-}: NavigableStatsCardProps) {
+}: StatsCardProps) {
   const colorClasses = {
     blue: {
       icon: 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400',
-      hover: 'hover:bg-blue-50 dark:hover:bg-blue-900/10 hover:border-blue-200 dark:hover:border-blue-700',
-      shadow: 'hover:shadow-blue-100 dark:hover:shadow-blue-900/20'
+      hover: 'hover:border-blue-200 dark:hover:border-blue-700'
     },
     green: {
       icon: 'bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400',
-      hover: 'hover:bg-green-50 dark:hover:bg-green-900/10 hover:border-green-200 dark:hover:border-green-700',
-      shadow: 'hover:shadow-green-100 dark:hover:shadow-green-900/20'
+      hover: 'hover:border-green-200 dark:hover:border-green-700'
     },
     yellow: {
       icon: 'bg-yellow-50 dark:bg-yellow-900/20 text-yellow-600 dark:text-yellow-400',
-      hover: 'hover:bg-yellow-50 dark:hover:bg-yellow-900/10 hover:border-yellow-200 dark:hover:border-yellow-700',
-      shadow: 'hover:shadow-yellow-100 dark:hover:shadow-yellow-900/20'
+      hover: 'hover:border-yellow-200 dark:hover:border-yellow-700'
     },
     red: {
       icon: 'bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400',
-      hover: 'hover:bg-red-50 dark:hover:bg-red-900/10 hover:border-red-200 dark:hover:border-red-700',
-      shadow: 'hover:shadow-red-100 dark:hover:shadow-red-900/20'
+      hover: 'hover:border-red-200 dark:hover:border-red-700'
     },
     purple: {
       icon: 'bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400',
-      hover: 'hover:bg-purple-50 dark:hover:bg-purple-900/10 hover:border-purple-200 dark:hover:border-purple-700',
-      shadow: 'hover:shadow-purple-100 dark:hover:shadow-purple-900/20'
+      hover: 'hover:border-purple-200 dark:hover:border-purple-700'
     },
     orange: {
       icon: 'bg-orange-50 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400',
-      hover: 'hover:bg-orange-50 dark:hover:bg-orange-900/10 hover:border-orange-200 dark:hover:border-orange-700',
-      shadow: 'hover:shadow-orange-100 dark:hover:shadow-orange-900/20'
+      hover: 'hover:border-orange-200 dark:hover:border-orange-700'
     }
   }
 
@@ -321,54 +334,40 @@ function NavigableStatsCard({
   }
 
   return (
-    <div
+    <Card 
+      className={`cursor-pointer transition-all duration-200 ${colorClasses[color].hover} ${isNavigating ? 'opacity-75' : 'hover:shadow-md'}`}
       role="button"
       tabIndex={0}
       aria-label={`Navegar para ${title} - ${description}`}
-      title={`Clique para ver ${title}`}
-      className={`
-        navigable-stats-card bg-white dark:bg-gray-800 rounded-lg shadow border border-transparent p-4 sm:p-6
-        cursor-pointer select-none group
-        ${colorClasses[color].hover}
-        ${isNavigating ? 'navigating-card' : ''}
-      `}
       onClick={onClick}
       onKeyDown={handleKeyDown}
     >
-      <div className="flex items-center">
-        <div className={`p-2 sm:p-3 rounded-lg ${colorClasses[color].icon}`}>
-          {isNavigating ? (
-            <Loader2 className="h-6 w-6 animate-spin card-icon-loading" />
-          ) : (
-            icon
-          )}
-        </div>
-        <div className="ml-3 sm:ml-4 flex-1 min-w-0">
-          <div className="flex items-center justify-between">
-            <p className="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400 truncate">
-              {title}
-            </p>
-            <ArrowRight className="h-4 w-4 text-gray-400 dark:text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity duration-200 ml-2" />
+      <CardContent className="p-6">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-4">
+            <div className={`p-3 rounded-lg ${colorClasses[color].icon}`}>
+              {isNavigating ? (
+                <Loader2 className="h-6 w-6 animate-spin" />
+              ) : (
+                icon
+              )}
+            </div>
+            <div>
+              <p className="text-sm font-medium text-muted-foreground">
+                {title}
+              </p>
+              <p className={`font-bold ${large ? 'text-3xl' : 'text-2xl'}`}>
+                {value}
+              </p>
+              <p className="text-xs text-muted-foreground">
+                {isNavigating ? 'Carregando...' : description}
+              </p>
+            </div>
           </div>
-          <p className={`font-bold text-gray-900 dark:text-white transition-all duration-200 ${
-            large ? 'text-2xl sm:text-3xl' : 'text-xl sm:text-2xl'
-          } ${isNavigating ? 'opacity-75' : ''}`}>
-            {value}
-          </p>
-          <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
-            {isNavigating ? 'Carregando...' : description}
-          </p>
+          <ArrowRight className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
         </div>
-      </div>
-      
-      {/* Indicador visual de navegação */}
-      <div className="navigation-indicator flex items-center justify-end mt-2 transition-opacity duration-200">
-        <span className="text-xs text-gray-500 dark:text-gray-400 mr-1">
-          Clique para navegar
-        </span>
-        <ArrowRight className="h-3 w-3 text-gray-400 dark:text-gray-500" />
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   )
 }
 

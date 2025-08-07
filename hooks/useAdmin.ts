@@ -28,7 +28,7 @@ export function useAdmin() {
         // Fallback: verificar role no banco (pode falhar se RLS estiver mal configurado)
         try {
           const { data, error } = await supabase
-            .from('users')
+            .from('profiles')
             .select('role')
             .eq('id', user.id)
             .single()

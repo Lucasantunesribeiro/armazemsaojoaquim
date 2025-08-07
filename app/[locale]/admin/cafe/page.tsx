@@ -5,12 +5,12 @@ import { Plus, Edit, Trash2, Eye, ShoppingCart, DollarSign, Coffee, IceCream } f
 import { Button } from '@/components/ui/Button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/Dialog'
 import { Input } from '@/components/ui/Input'
 import { Label } from '@/components/ui/Label'
-import { Textarea } from '@/components/ui/textarea'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Switch } from '@/components/ui/switch'
+import { Textarea } from '@/components/ui/Textarea'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/Select'
+import { Switch } from '@/components/ui/Switch'
 
 interface Product {
   id: string
@@ -37,9 +37,9 @@ interface Order {
   created_at: string
 }
 
-const initialProductData = {
+const initialProductData: Omit<Product, 'id' | 'created_at' | 'updated_at'> = {
   name: '',
-  category: 'CAFE' as const,
+  category: 'CAFE',
   price: 0,
   description: '',
   image_url: '',

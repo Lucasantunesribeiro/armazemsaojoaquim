@@ -1,68 +1,46 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createServerClient } from '@supabase/ssr'
-// import { cookies } from 'next/headers' // Não necessário mais
+import { createServerClient } from '@/lib/supabase'
+import { withAdminAuth } from '@/lib/admin-auth'
 
 export async function GET(request: NextRequest) {
-  try {
-    const cookieStore = await cookies()
-    
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        cookies: {
-          getAll() {
-            return cookieStore.getAll()
-          },
-          setAll(cookiesToSet) {
-            try {
-              cookiesToSet.forEach(({ name, value, options }) =>
-                cookieStore.set(name, value, options)
-              )
-            } catch {
-              // The `setAll` method was called from a Server Component.
-              // This can be ignored if you have middleware refreshing
-              // user sessions.
-            }
-          },
-        },
-      }
-    )
-    
-    // Verificar se é admin
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user || user.user_metadata?.role !== 'admin') {
-      return NextResponse.json(
-        { error: 'Acesso negado' },
-        { status: 403 }
-      )
-    }
+  return withAdminAuth(async (authResult) => {
+    try {
+      console.log('📅 [POUSADA-BOOKINGS] Carregando reservas da pousada...')
+      
+      const supabase = await createServerClient()
 
-    const { data: bookings, error } = await supabase
-      .from('pousada_bookings')
-      .select(`
-        *,
-        pousada_rooms (
-          name,
-          type
+      const { data: bookings, error } = await supabase
+        .from('pousada_bookings')
+        .select(`
+          *,
+          pousada_rooms (
+            name,
+            type
+          )
+        `)
+        .order('created_at', { ascending: false })
+
+      if (error) {
+        console.error('❌ [POUSADA-BOOKINGS] Erro ao buscar reservas:', error)
+        return NextResponse.json(
+          { error: 'Erro ao carregar reservas', debug: error.message },
+          { status: 500 }
         )
-      `)
-      .order('created_at', { ascending: false })
+      }
 
-    if (error) {
-      console.error('Erro ao buscar reservas:', error)
+      console.log(`✅ [POUSADA-BOOKINGS] ${bookings?.length || 0} reservas carregadas`)
+      return NextResponse.json({ 
+        success: true,
+        data: bookings || [],
+        count: bookings?.length || 0
+      })
+      
+    } catch (error) {
+      console.error('💥 [POUSADA-BOOKINGS] Erro interno:', error)
       return NextResponse.json(
-        { error: 'Erro ao carregar reservas' },
+        { error: 'Erro interno do servidor' },
         { status: 500 }
       )
     }
-
-    return NextResponse.json(bookings || [])
-  } catch (error) {
-    console.error('Erro interno:', error)
-    return NextResponse.json(
-      { error: 'Erro interno do servidor' },
-      { status: 500 }
-    )
-  }
+  }, request)
 }

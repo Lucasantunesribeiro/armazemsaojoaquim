@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { use } from 'react'
 import { Card, CardContent, CardHeader } from '@/components/ui/Card'
-import Button from '@/components/ui/Button'
+import { Button } from '@/components/ui/Button'
 import { Shield, ArrowLeft } from 'lucide-react'
 
 interface UnauthorizedPageProps {

@@ -35,12 +35,193 @@ export interface Translation {
       description: string
       discoverMenu: string
       makeReservation: string
+      sectionAriaLabel: string
+      slideInfo: string
+      keyboardNavigation: string
+      spacebarControl: string
+      previousSlide: string
+      nextSlide: string
     }
     history: {
       title: string
       description: string
       since: string
       tradition: string
+      alt1: string
+      title1: string
+      description1: string
+      alt2: string
+      title2: string
+      description2: string
+      alt3: string
+      title3: string
+      description3: string
+    }
+    about: {
+      badge: string
+      title: {
+        part1: string
+        part2: string
+      }
+      description: string
+      motto: string
+      story: {
+        paragraph1: string
+        paragraph2: string
+      }
+      stats: {
+        years: string
+        tradition: string
+        dishes: string
+        flavors: string
+        visitors: string
+        experiences: string
+        heritage: string
+        culture: string
+        yearsSuffix: string
+        historyLabel: string
+        clientsLabel: string
+        ratingLabel: string
+        generationsSuffix: string
+        traditionLabel: string
+      }
+      features: {
+        location: {
+          title: string
+          description: string
+          highlight: string
+        }
+        heritage: {
+          title: string
+          description: string
+          highlight: string
+        }
+        tradition: {
+          title: string
+          description: string
+          highlight: string
+        }
+      }
+    }
+    menuPreview: {
+      badge: string
+      title: string
+      titleHighlight: string
+      description: string
+      fullMenu: string
+      specialties: {
+        drinks: string
+        coffees: string
+        wines: string
+        sharing: string
+      }
+      categories: {
+        appetizers: {
+          title: string
+          description: string
+          items: {
+            patatas: {
+              name: string
+              description: string
+            }
+            croqueta: {
+              name: string
+              description: string
+            }
+            ceviche: {
+              name: string
+              description: string
+            }
+          }
+        }
+        mains: {
+          title: string
+          description: string
+          items: {
+            ancho: {
+              name: string
+              description: string
+            }
+            tuna: {
+              name: string
+              description: string
+            }
+            octopus: {
+              name: string
+              description: string
+            }
+          }
+        }
+        feijoada: {
+          title: string
+          description: string
+          items: {
+            individual: {
+              name: string
+              description: string
+            }
+            couple: {
+              name: string
+              description: string
+            }
+            buffet: {
+              name: string
+              description: string
+            }
+          }
+        }
+      }
+      cta: {
+        experience: string
+        title: string
+        titleHighlight: string
+        description: string
+        reserveNow: string
+        viewFullMenu: string
+      }
+      products: {
+        title: string
+        description: string
+        alt: string
+      }
+    }
+    blogPreview: {
+      badge: string
+      title: string
+      titleHighlight: string
+      description: string
+      neighborhood: {
+        title: string
+        description: string
+        images: {
+          panoramic: {
+            title: string
+            description: string
+            alt: string
+          }
+          tram: {
+            title: string
+            description: string
+            alt: string
+          }
+        }
+      }
+      stats: {
+        articles: string
+        photos: string
+      }
+      posts: {
+        featured: string
+        readMore: string
+        read: string
+        readMoreAria: string
+      }
+      cta: {
+        title: string
+        description: string
+        button: string
+      }
+      imageNav: string
     }
     experience: {
       title: string
@@ -70,14 +251,43 @@ export interface Translation {
     title: string
     subtitle: string
     description: string
+    cta: {
+      viewMenu: string
+      directions: string
+    }
+    partnership: {
+      title: string
+      description1: string
+      description2: string
+      description3: string
+      label: string
+      name: string
+    }
     hours: {
       title: string
       weekdays: string
+      weekend: string
+      sunday: string
       weekends: string
       closed: string
     }
     menu: {
       title: string
+      description: string
+      loading: string
+      viewDetails: string
+      learnMore: string
+      unavailable: string
+      filters: {
+        all: string
+      }
+      categories: {
+        coffee: string
+        icecream: string
+        sweets: string
+        savory: string
+        drinks: string
+      }
       beverages: string
       food: string
       desserts: string
@@ -86,6 +296,19 @@ export interface Translation {
     atmosphere: {
       title: string
       description: string
+      workRemote: string
+      study: string
+      meetings: string
+      relax: string
+    }
+    location: {
+      title: string
+      description: string
+      address: {
+        title: string
+      }
+      mapTitle: string
+      mapComingSoon: string
     }
   }
 
@@ -321,8 +544,9 @@ export interface Translation {
         message: string
       }
       actions: {
-        addToCart: string
-        inCart: string
+        viewImage: string
+        viewDetails: string
+        share: string
         close: string
       }
       details: {
@@ -334,6 +558,9 @@ export interface Translation {
 
   // Pousada (Hotel)
   pousada: {
+    title: string
+    subtitle: string
+    description: string
     hero: {
       title: string
       subtitle: string
@@ -370,6 +597,10 @@ export interface Translation {
     rooms: {
       title: string
       subtitle: string
+      standard: string
+      deluxe: string
+      suite: string
+      checkAvailability: string
       filters: {
         all: string
         standard: string
@@ -413,6 +644,10 @@ export interface Translation {
         title: string
         description: string
       }
+      breakfast: string
+      parking: string
+      airConditioning: string
+      balcony: string
     }
     checkin: {
       title: string
@@ -428,6 +663,46 @@ export interface Translation {
         button: string
       }
     }
+    booking: {
+      title: string
+      checkIn: string
+      checkOut: string
+      guests: string
+      book: string
+      modal: {
+        title: string
+        confirmTitle: string
+        successTitle: string
+        roomPreview: string
+      }
+      form: {
+        checkIn: string
+        checkOut: string
+        guests: string
+        guestInfo: string
+        name: string
+        email: string
+        phone: string
+        pricingOptions: string
+        nonRefundable: string
+        nonRefundableDesc: string
+        refundable: string
+        refundableDesc: string
+        specialRequests: string
+        specialRequestsPlaceholder: string
+        summary: string
+        nights: string
+        total: string
+        cancel: string
+        confirm: string
+        processing: string
+      }
+      success: {
+        title: string
+        message: string
+        close: string
+      }
+    }
   }
   
   // Footer
@@ -441,6 +716,10 @@ export interface Translation {
     email: string
     socialMedia: string
     followUs: string
+    brandDescription: string
+    yearsOfHistory: string
+    culturalHeritage: string
+    artisanalCuisine: string
     newsletter: {
       title: string
       description: string
@@ -694,6 +973,14 @@ export const translations: Record<Language, Translation> = {
           paragraph2: 'Localizado no coração boêmio de Santa Teresa, nosso armazém preserva não apenas sabores autênticos, mas também as histórias e tradições que fazem deste bairro um patrimônio cultural único do Rio de Janeiro.'
         },
         stats: {
+          years: '170',
+          tradition: 'Autêntica',
+          dishes: '85+',
+          flavors: 'Únicos',
+          visitors: '2500+',
+          experiences: 'Memoráveis',
+          heritage: 'Colonial',
+          culture: 'Preservada',
           yearsSuffix: ' anos',
           historyLabel: 'de História',
           clientsLabel: 'Clientes Satisfeitos/mês',
@@ -717,18 +1004,7 @@ export const translations: Record<Language, Translation> = {
             description: 'Receitas e técnicas passadas através de gerações de chefs apaixonados.',
             highlight: '5 Gerações'
           },
-          experience: {
-            title: 'Experiência Autêntica',
-            description: 'Combinamos história, gastronomia e hospitalidade em cada detalhe.',
-            highlight: 'Experiência Única'
-          }
-        },
-        cta: {
-          title: 'Venha Fazer Parte da Nossa História',
-          description: 'Reserve sua mesa e experimente sabores que atravessaram 170 anos, em um ambiente onde cada detalhe conta nossa rica história.',
-          button: 'Fazer Reserva'
-        },
-        imageNav: 'Ver imagem {{number}}'
+        }
       },
       menuPreview: {
         badge: 'GASTRONOMIA ESPECIAL',
@@ -893,7 +1169,8 @@ export const translations: Record<Language, Translation> = {
         title: 'Nosso Cardápio',
         description: 'Uma seleção especial de cafés artesanais, doces caseiros e os melhores sorvetes da tradicional Sorvete Itália',
         loading: 'Carregando produtos...',
-        addToCart: 'Adicionar',
+        viewDetails: 'Ver Detalhes',
+        learnMore: 'Saiba Mais',
         unavailable: 'Indisponível',
         filters: {
           all: 'Todos'
@@ -904,13 +1181,18 @@ export const translations: Record<Language, Translation> = {
           sweets: 'Doces',
           savory: 'Salgados',
           drinks: 'Bebidas'
-        }
+        },
+        beverages: 'Bebidas',
+        food: 'Comidas',
+        desserts: 'Sobremesas',
+        viewFullMenu: 'Ver Cardápio Completo'
       },
       hours: {
         title: 'Horário de funcionamento',
         weekdays: 'Segunda a sexta: 8h às 18h',
         weekend: 'Sábado: 8h às 19h',
         sunday: 'Domingo: 9h às 17h',
+        weekends: 'Sábado e Domingo',
         closed: 'Fechado'
       },
       atmosphere: {
@@ -930,56 +1212,7 @@ export const translations: Record<Language, Translation> = {
         mapTitle: 'Mapa Interativo',
         mapComingSoon: 'Em breve'
       },
-      cart: {
-        item: 'item',
-        items: 'itens',
-        finalizeOrder: 'Finalizar Pedido',
-        reviewOrder: 'Revise seu pedido e preencha seus dados',
-        yourItems: 'Seus itens',
-        total: 'Total',
-        yourData: 'Seus dados',
-        confirmOrder: 'Confirmar Pedido',
-        orderSuccess: 'Pedido realizado com sucesso!',
-        orderError: 'Erro ao realizar pedido',
-        form: {
-          fullName: 'Nome completo',
-          fullNamePlaceholder: 'Seu nome completo',
-          phone: 'Telefone',
-          email: 'E-mail',
-          emailPlaceholder: 'seu@email.com',
-          notes: 'Observações',
-          notesPlaceholder: 'Alguma observação sobre seu pedido...'
-        }
-      }
-    },
 
-    pousada: {
-      title: 'Pousada São Joaquim',
-      subtitle: 'Hospedagem charmosa em Santa Teresa',
-      description: 'Quartos confortáveis e aconchegantes no coração de Santa Teresa, com vista para as montanhas e proximidade aos principais pontos turísticos.',
-      rooms: {
-        title: 'Nossos quartos',
-        standard: 'Quarto padrão',
-        deluxe: 'Quarto deluxe',
-        suite: 'Suíte',
-        checkAvailability: 'Verificar disponibilidade'
-      },
-      amenities: {
-        title: 'Comodidades',
-        wifi: 'Wi-Fi gratuito',
-        breakfast: 'Café da manhã incluído',
-        parking: 'Estacionamento',
-        airConditioning: 'Ar condicionado',
-        minibar: 'Frigobar',
-        balcony: 'Varanda com vista'
-      },
-      booking: {
-        title: 'Faça sua reserva',
-        checkIn: 'Check-in',
-        checkOut: 'Check-out',
-        guests: 'Hóspedes',
-        book: 'Reservar'
-      }
     },
 
     menu: {
@@ -1208,8 +1441,9 @@ export const translations: Record<Language, Translation> = {
           message: 'Tente ajustar os filtros ou termos de busca.'
         },
         actions: {
-          addToCart: 'Adicionar ao Carrinho',
-          inCart: 'No Carrinho',
+          viewImage: 'Ver Imagem',
+          viewDetails: 'Ver Detalhes',
+          share: 'Compartilhar',
           close: 'Fechar'
         },
         details: {
@@ -1220,6 +1454,9 @@ export const translations: Record<Language, Translation> = {
     },
 
     pousada: {
+      title: 'Pousada São Joaquim',
+      subtitle: 'Hospedagem charmosa em Santa Teresa',
+      description: 'Quartos confortáveis e aconchegantes no coração de Santa Teresa, com vista para as montanhas e proximidade aos principais pontos turísticos.',
       hero: {
         title: 'Lobie Armazém São Joaquim',
         subtitle: 'Casarão histórico de 1854 • Tombado pela União • Santa Teresa',
@@ -1256,6 +1493,10 @@ export const translations: Record<Language, Translation> = {
       rooms: {
         title: 'Nossas Acomodações',
         subtitle: '7 suítes modernas divididas em 3 categorias, todas com comodidades completas',
+        standard: 'Quarto Standard',
+        deluxe: 'Quarto Deluxe',
+        suite: 'Suíte',
+        checkAvailability: 'Verificar Disponibilidade',
         filters: {
           all: 'Todos os Quartos',
           standard: 'Standard',
@@ -1298,7 +1539,11 @@ export const translations: Record<Language, Translation> = {
         minibar: {
           title: 'Frigobar',
           description: 'Bebidas e snacks disponíveis'
-        }
+        },
+        breakfast: 'Café da manhã incluído',
+        parking: 'Estacionamento',
+        airConditioning: 'Ar condicionado',
+        balcony: 'Varanda com vista'
       },
       checkin: {
         title: 'Informações Importantes',
@@ -1312,6 +1557,46 @@ export const translations: Record<Language, Translation> = {
           title: 'Pronto para sua estadia?',
           description: 'Reserve agora e viva a experiência única de se hospedar em um patrimônio histórico no coração de Santa Teresa.',
           button: 'Fazer Reserva'
+        }
+      },
+      booking: {
+        title: 'Faça sua reserva',
+        checkIn: 'Check-in',
+        checkOut: 'Check-out',
+        guests: 'Hóspedes',
+        book: 'Reservar',
+        modal: {
+          title: 'Reservar Quarto',
+          confirmTitle: 'Confirmar Reserva',
+          successTitle: 'Reserva Confirmada!',
+          roomPreview: 'Quarto'
+        },
+        form: {
+          checkIn: 'Check-in',
+          checkOut: 'Check-out',
+          guests: 'Número de Hóspedes',
+          guestInfo: 'Dados do Hóspede',
+          name: 'Nome Completo',
+          email: 'E-mail',
+          phone: 'Telefone/WhatsApp',
+          pricingOptions: 'Opções de Tarifa',
+          nonRefundable: 'Tarifa Promocional',
+          nonRefundableDesc: 'Não-reembolsável • Desconto de 15%',
+          refundable: 'Tarifa Flexível', 
+          refundableDesc: 'Cancelamento gratuito até 24h antes',
+          specialRequests: 'Solicitações Especiais',
+          specialRequestsPlaceholder: 'Descreva aqui necessidades especiais, preferências de quarto, etc.',
+          summary: 'Resumo da Reserva',
+          nights: 'noites',
+          total: 'Total a Pagar',
+          cancel: 'Cancelar',
+          confirm: 'Confirmar Reserva',
+          processing: 'Processando...'
+        },
+        success: {
+          title: 'Reserva Realizada!',
+          message: 'Sua reserva foi confirmada. Em breve entraremos em contato via WhatsApp para finalizar os detalhes.',
+          close: 'Fechar'
         }
       }
     },
@@ -1580,6 +1865,14 @@ export const translations: Record<Language, Translation> = {
           paragraph2: 'Located in the bohemian heart of Santa Teresa, our warehouse preserves not only authentic flavors, but also the stories and traditions that make this neighborhood a unique cultural heritage of Rio de Janeiro.'
         },
         stats: {
+          years: '170',
+          tradition: 'Authentic',
+          dishes: '85+',
+          flavors: 'Unique',
+          visitors: '2500+',
+          experiences: 'Memorable',
+          heritage: 'Colonial',
+          culture: 'Preserved',
           yearsSuffix: ' years',
           historyLabel: 'of History',
           clientsLabel: 'Satisfied Customers/month',
@@ -1602,19 +1895,8 @@ export const translations: Record<Language, Translation> = {
             title: 'Family Tradition',
             description: 'Recipes and techniques passed down through generations of passionate chefs.',
             highlight: '5 Generations'
-          },
-          experience: {
-            title: 'Authentic Experience',
-            description: 'We combine history, gastronomy and hospitality in every detail.',
-            highlight: 'Unique Experience'
           }
-        },
-        cta: {
-          title: 'Come Be Part of Our History',
-          description: 'Reserve your table and experience flavors that have crossed 170 years, in an environment where every detail tells our rich history.',
-          button: 'Make Reservation'
-        },
-        imageNav: 'View image {{number}}'
+        }
       },
       menuPreview: {
         badge: 'SPECIAL GASTRONOMY',
@@ -1779,7 +2061,8 @@ export const translations: Record<Language, Translation> = {
         title: 'Our Menu',
         description: 'A special selection of artisanal coffees, homemade sweets and the best ice cream from the traditional Sorvete Itália',
         loading: 'Loading products...',
-        addToCart: 'Add to Cart',
+        viewDetails: 'View Details',
+        learnMore: 'Learn More',
         unavailable: 'Unavailable',
         filters: {
           all: 'All'
@@ -1790,13 +2073,18 @@ export const translations: Record<Language, Translation> = {
           sweets: 'Sweets',
           savory: 'Savory',
           drinks: 'Drinks'
-        }
+        },
+        beverages: 'Beverages',
+        food: 'Food',
+        desserts: 'Desserts',
+        viewFullMenu: 'View Full Menu'
       },
       hours: {
         title: 'Opening hours',
         weekdays: 'Monday to Friday: 8am to 6pm',
         weekend: 'Saturday: 8am to 7pm',
         sunday: 'Sunday: 9am to 5pm',
+        weekends: 'Saturday and Sunday',
         closed: 'Closed'
       },
       atmosphere: {
@@ -1816,27 +2104,7 @@ export const translations: Record<Language, Translation> = {
         mapTitle: 'Interactive Map',
         mapComingSoon: 'Coming Soon'
       },
-      cart: {
-        item: 'item',
-        items: 'items',
-        finalizeOrder: 'Finalize Order',
-        reviewOrder: 'Review your order and fill in your details',
-        yourItems: 'Your items',
-        total: 'Total',
-        yourData: 'Your data',
-        confirmOrder: 'Confirm Order',
-        orderSuccess: 'Order placed successfully!',
-        orderError: 'Error placing order',
-        form: {
-          fullName: 'Full name',
-          fullNamePlaceholder: 'Your full name',
-          phone: 'Phone',
-          email: 'Email',
-          emailPlaceholder: 'your@email.com',
-          notes: 'Notes',
-          notesPlaceholder: 'Any notes about your order...'
-        }
-      }
+
     },
 
     pousada: {
@@ -1950,7 +2218,40 @@ export const translations: Record<Language, Translation> = {
         checkIn: 'Check-in',
         checkOut: 'Check-out',
         guests: 'Guests',
-        book: 'Book'
+        book: 'Book',
+        modal: {
+          title: 'Book Room',
+          confirmTitle: 'Confirm Booking',
+          successTitle: 'Booking Confirmed!',
+          roomPreview: 'Room'
+        },
+        form: {
+          checkIn: 'Check-in',
+          checkOut: 'Check-out',
+          guests: 'Number of Guests',
+          guestInfo: 'Guest Information',
+          name: 'Full Name',
+          email: 'Email',
+          phone: 'Phone/WhatsApp',
+          pricingOptions: 'Rate Options',
+          nonRefundable: 'Promotional Rate',
+          nonRefundableDesc: 'Non-refundable • 15% discount',
+          refundable: 'Flexible Rate', 
+          refundableDesc: 'Free cancellation up to 24h before',
+          specialRequests: 'Special Requests',
+          specialRequestsPlaceholder: 'Describe here special needs, room preferences, etc.',
+          summary: 'Booking Summary',
+          nights: 'nights',
+          total: 'Total Amount',
+          cancel: 'Cancel',
+          confirm: 'Confirm Booking',
+          processing: 'Processing...'
+        },
+        success: {
+          title: 'Booking Completed!',
+          message: 'Your booking has been confirmed. We will contact you soon via WhatsApp to finalize the details.',
+          close: 'Close'
+        }
       }
     },
 
@@ -2102,8 +2403,9 @@ export const translations: Record<Language, Translation> = {
           message: 'Try adjusting filters or search terms.'
         },
         actions: {
-          addToCart: 'Add to Cart',
-          inCart: 'In Cart',
+          viewImage: 'View Image',
+          viewDetails: 'View Details',
+          share: 'Share',
           close: 'Close'
         },
         details: {
@@ -2404,18 +2706,27 @@ export function getTranslation(language: Language, key: string): string {
 
 // Helper function to detect language from URL
 export function detectLanguageFromUrl(pathname: string): Language {
-  console.log('🔍 Detecting locale from:', pathname)
+  // Reduzir logs - apenas em desenvolvimento
+  if (process.env.NODE_ENV === 'development') {
+    console.log('🔍 Detecting locale from:', pathname)
+  }
   
   if (pathname.startsWith('/en')) {
-    console.log('  → Detected: EN')
+    if (process.env.NODE_ENV === 'development') {
+      console.log('  → Detected: EN')
+    }
     return 'en'
   }
   if (pathname.startsWith('/pt')) {
-    console.log('  → Detected: PT')
+    if (process.env.NODE_ENV === 'development') {
+      console.log('  → Detected: PT')
+    }
     return 'pt'
   }
   
-  console.log('  → Default: PT')
+  if (process.env.NODE_ENV === 'development') {
+    console.log('  → Default: PT')
+  }
   return 'pt' // Default to Portuguese
 }
 

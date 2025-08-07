@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 // import { cookies } from 'next/headers' // Não necessário mais
 import { Database } from '@/types/database.types'
+import { cookies } from 'next/headers'
 
 // GET - Dashboard statistics with caching
 export async function GET(request: NextRequest) {
@@ -57,90 +58,39 @@ export async function GET(request: NextRequest) {
 
     console.log('✅ API /admin/dashboard: Admin authenticated:', session.user.email)
 
-    // Get dashboard stats using optimized function
+    // Get dashboard stats using direct queries
     console.log('📈 API /admin/dashboard: Fetching dashboard stats...')
-    const { data: dashboardStats, error: statsError } = await supabase.rpc('get_dashboard_stats')
+    
+    const [profilesResult, reservasResult, blogResult, menuResult] = await Promise.all([
+      supabase.from('profiles').select('*', { count: 'exact', head: true }),
+      supabase.from('reservas').select('*', { count: 'exact', head: true }),
+      supabase.from('blog_posts').select('*', { count: 'exact', head: true }),
+      supabase.from('menu_items').select('*', { count: 'exact', head: true })
+    ])
 
-    if (statsError) {
-      console.error('❌ API /admin/dashboard: Error fetching stats:', statsError)
-      
-      // Fallback to direct queries if function fails
-      console.log('🔄 API /admin/dashboard: Falling back to direct queries...')
-      
-      const [usersResult, reservasResult, blogResult, menuResult] = await Promise.all([
-        supabase.from('users').select('*', { count: 'exact', head: true }),
-        supabase.from('reservas').select('*', { count: 'exact', head: true }),
-        supabase.from('blog_posts').select('*', { count: 'exact', head: true }),
-        supabase.from('menu_items').select('*', { count: 'exact', head: true })
-      ])
-
-      const fallbackStats = {
-        total_users: usersResult.count || 0,
-        total_reservas: reservasResult.count || 0,
-        total_blog_posts: blogResult.count || 0,
-        total_menu_items: menuResult.count || 0,
-        active_reservas: 0,
-        published_posts: 0,
-        last_updated: new Date().toISOString()
-      }
-
-      const endTime = Date.now()
-      console.log(`⏱️ API /admin/dashboard: Fallback completed in ${endTime - startTime}ms`)
-
-      return NextResponse.json({
-        success: true,
-        data: fallbackStats,
-        source: 'fallback',
-        performance: {
-          duration_ms: endTime - startTime,
-          cached: false
-        }
-      })
+    const dashboardStats = {
+      total_users: profilesResult.count || 0,
+      total_reservas: reservasResult.count || 0,
+      total_blog_posts: blogResult.count || 0,
+      total_menu_items: menuResult.count || 0,
+      active_reservas: 0,
+      published_posts: 0,
+      last_updated: new Date().toISOString()
     }
 
-    // Process the stats data
-    const stats = Array.isArray(dashboardStats) ? dashboardStats[0] : dashboardStats
-    
-    console.log('📊 API /admin/dashboard: Stats retrieved:', {
-      total_users: stats?.total_users || 0,
-      total_reservas: stats?.total_reservas || 0,
-      total_blog_posts: stats?.total_blog_posts || 0,
-      total_menu_items: stats?.total_menu_items || 0
-    })
-
-    // Get recent activity (last 7 days)
-    const { data: recentReservas, error: recentError } = await supabase
-      .from('reservas')
-      .select('id, data_reserva, status, created_at')
-      .gte('created_at', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString())
-      .order('created_at', { ascending: false })
-      .limit(10)
-
     const endTime = Date.now()
-    const duration = endTime - startTime
-
-    console.log(`⏱️ API /admin/dashboard: Completed in ${duration}ms`)
+    console.log(`⏱️ API /admin/dashboard: Query completed in ${endTime - startTime}ms`)
 
     return NextResponse.json({
       success: true,
-      data: {
-        total_users: Number(stats?.total_users || 0),
-        total_reservas: Number(stats?.total_reservas || 0),
-        total_blog_posts: Number(stats?.total_blog_posts || 0),
-        total_menu_items: Number(stats?.total_menu_items || 0),
-        active_reservas: Number(stats?.active_reservas || 0),
-        published_posts: Number(stats?.published_posts || 0),
-        last_updated: stats?.last_updated || new Date().toISOString(),
-        recent_activity: recentReservas || []
-      },
-      source: 'security_definer',
+      data: dashboardStats,
+      source: 'direct_queries',
       performance: {
-        duration_ms: duration,
-        cached: false,
-        optimized: true
+        duration_ms: endTime - startTime,
+        cached: false
       }
     })
-
+    
   } catch (error: any) {
     const endTime = Date.now()
     console.error('❌ API /admin/dashboard: Unexpected error:', error)
@@ -205,15 +155,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
-    // Refresh cache
-    const { error: refreshError } = await supabase.rpc('refresh_dashboard_cache')
-
-    if (refreshError) {
-      console.error('❌ API /admin/dashboard: Error refreshing cache:', refreshError)
-      return NextResponse.json({ error: 'Failed to refresh cache' }, { status: 500 })
-    }
-
-    console.log('✅ API /admin/dashboard: Cache refreshed successfully')
+    // Cache refresh logic would go here (no RPC available)
+    console.log('✅ API /admin/dashboard: Cache refresh requested')
 
     return NextResponse.json({
       success: true,

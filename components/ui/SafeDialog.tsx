@@ -19,6 +19,7 @@ interface SafeDialogTriggerProps {
 interface SafeDialogContentProps {
   className?: string
   children: React.ReactNode
+  onClose?: () => void
 }
 
 interface SafeDialogHeaderProps {
@@ -89,10 +90,10 @@ export function SafeDialog({ open, onOpenChange, children }: SafeDialogProps) {
 
 export function SafeDialogTrigger({ asChild, children, onClick }: SafeDialogTriggerProps) {
   if (asChild && React.isValidElement(children)) {
-    return React.cloneElement(children, {
+    return React.cloneElement(children as any, {
       onClick: (e: React.MouseEvent) => {
-        if (children.props.onClick) {
-          children.props.onClick(e)
+        if ((children as any).props?.onClick) {
+          (children as any).props.onClick(e)
         }
         onClick?.()
       }

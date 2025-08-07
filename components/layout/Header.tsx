@@ -152,7 +152,7 @@ export default function Header() {
   // Wait for translations to be ready
   if (!isReady) {
     return (
-      <header className="fixed top-0 left-0 right-0 z-50 h-18 sm:h-20 bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl shadow-lg">
+      <header className="fixed top-0 left-0 right-0 z-50 h-18 sm:h-20 bg-white/95 dark:bg-slate-900/95 backdrop-blur-2xl shadow-xl">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full">
           <div className="flex items-center justify-between h-full">
             <div className="flex-shrink-0">
@@ -177,7 +177,7 @@ export default function Header() {
   // Render loading state until hydrated
   if (!isMounted || !isHydrated) {
     return (
-      <header className="fixed top-0 left-0 right-0 z-50 h-18 sm:h-20 bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl shadow-lg">
+      <header className="fixed top-0 left-0 right-0 z-50 h-18 sm:h-20 bg-white/95 dark:bg-slate-900/95 backdrop-blur-2xl shadow-xl">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full">
           <div className="flex items-center justify-between h-full">
             <div className="flex-shrink-0">
@@ -215,7 +215,7 @@ export default function Header() {
         fixed top-0 left-0 right-0 z-50 transition-all duration-700 ease-out
         ${isScrolled 
           ? 'h-14 sm:h-16 bg-white/99 dark:bg-slate-900/99 backdrop-blur-3xl shadow-2xl border-b border-slate-300/80 dark:border-slate-600/80' 
-          : 'h-18 sm:h-20 bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl shadow-lg'
+          : 'h-18 sm:h-20 bg-white/95 dark:bg-slate-900/95 backdrop-blur-2xl shadow-xl'
         }
       `}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full">
@@ -231,7 +231,7 @@ export default function Header() {
             </div>
 
             {/* Desktop Navigation */}
-            <nav className={`hidden lg:flex items-center transition-all duration-300 ${isScrolled ? 'space-x-1' : 'space-x-2'}`}>
+            <nav className={`hidden lg:flex items-center transition-all duration-300 ${isScrolled ? 'ml-12 space-x-1' : 'ml-16 space-x-2'}`}>
               {navLinks.map((link) => {
                 const isActive = isActiveLink(link.href)
                 const requiresAuth = link.requiresAuth && !user
@@ -267,6 +267,24 @@ export default function Header() {
 
             {/* Desktop Actions */}
             <div className="hidden lg:flex items-center space-x-2">
+              {/* Menu PDF Link */}
+              <a
+                href="/images/Cardapio.pdf"
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`
+                  relative px-3 py-2 rounded-xl font-semibold transition-all duration-300 hover:scale-105 flex items-center space-x-2
+                  ${isScrolled 
+                    ? 'text-sm bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg' 
+                    : 'text-[15px] bg-emerald-600 hover:bg-emerald-700 text-white shadow-xl'
+                  }
+                `}
+                aria-label="Abrir cardápio em PDF"
+              >
+                <FileText className="w-4 h-4" />
+                <span>Cardápio</span>
+              </a>
+              
               {/* Social Media Links */}
               <div className="flex items-center space-x-1 mr-2">
                 <a
@@ -478,6 +496,18 @@ export default function Header() {
 
               {/* Mobile Actions */}
               <div className="space-y-4 pt-6 border-t border-slate-200 dark:border-slate-700">
+                {/* Menu PDF Link Mobile */}
+                <a
+                  href="/images/Cardapio.pdf"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={closeMobileMenu}
+                  className="flex items-center px-4 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold transition-all duration-300"
+                >
+                  <FileText className="w-5 h-5 mr-3" />
+                  <span>Acesso ao Cardápio</span>
+                </a>
+                
                 {/* Social Media Links Mobile */}
                 <div className="grid grid-cols-3 gap-4 mb-4">
                   <a

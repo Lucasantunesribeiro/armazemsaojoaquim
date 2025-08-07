@@ -23,7 +23,8 @@ export default function DebugPage() {
         setEnvInfo(envData)
       } catch (error) {
         console.error('Erro ao verificar ambiente:', error)
-        setEnvInfo({ error: error.message })
+        const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido'
+        setEnvInfo({ error: errorMessage })
       } finally {
         setLoading(false)
       }

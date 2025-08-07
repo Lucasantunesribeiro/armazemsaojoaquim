@@ -2,20 +2,18 @@
 
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
-import Link from 'next/link'
-import { Calendar, MapPin, Clock, Wifi, Tv, Coffee, Shield, Car, Star, Users, Bath, Bed, CheckCircle, XCircle } from 'lucide-react'
+import { MapPin, Clock, Wifi, Tv, Coffee, Shield, Car, Star, Users, Bath, Bed, CheckCircle, XCircle } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
-import { Separator } from '@/components/ui/separator'
+
+import LocationButton from '@/components/ui/LocationButton'
 import { useTranslations } from '@/hooks/useTranslations'
 
 interface Room {
   id: string
   name: string
   type: 'STANDARD' | 'DELUXE' | 'SUITE'
-  price_refundable: number
-  price_non_refundable: number
   description: string
   amenities: string[]
   max_guests: number
@@ -29,6 +27,7 @@ export default function PousadaPage() {
   const [loading, setLoading] = useState(true)
   const [selectedRoomType, setSelectedRoomType] = useState<string>('ALL')
 
+
   useEffect(() => {
     fetchRooms()
   }, [])
@@ -37,8 +36,12 @@ export default function PousadaPage() {
     try {
       const response = await fetch('/api/pousada/rooms')
       if (response.ok) {
-        const data = await response.json()
-        setRooms(data)
+        const result = await response.json()
+        if (result.success && result.data) {
+          setRooms(result.data)
+        } else {
+          console.error('Invalid API response format:', result)
+        }
       }
     } catch (error) {
       console.error('Error loading rooms:', error)
@@ -69,6 +72,8 @@ export default function PousadaPage() {
     }
   }
 
+
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-50 via-white to-orange-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
       {/* Hero Section */}
@@ -87,15 +92,16 @@ export default function PousadaPage() {
           <p className="text-lg md:text-xl mb-6 font-light">
             {t('pousada.hero.subtitle')}
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" className="bg-amber-600 hover:bg-amber-700 text-white px-8 py-3">
-              <Calendar className="w-5 h-5 mr-2" />
-              {t('pousada.hero.reserveNow')}
-            </Button>
-            <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-slate-900 px-8 py-3">
-              <MapPin className="w-5 h-5 mr-2" />
+          <div className="flex justify-center">
+            <LocationButton 
+              variant="outline" 
+              size="lg"
+              className="border-white text-white hover:bg-white hover:text-slate-900 px-8 py-3"
+              address="Rua São Joaquim, 138 - Lapa, Rio de Janeiro - RJ"
+              coordinates={{ lat: -22.9068, lng: -43.1729 }}
+            >
               {t('pousada.hero.viewLocation')}
-            </Button>
+            </LocationButton>
           </div>
         </div>
       </section>
@@ -177,9 +183,18 @@ export default function PousadaPage() {
             </div>
             <div className="bg-slate-200 dark:bg-slate-700 rounded-2xl h-80 flex items-center justify-center">
               <div className="text-center text-slate-500 dark:text-slate-400">
-                <MapPin className="w-12 h-12 mx-auto mb-2" />
-                <p>{t('pousada.location.mapPlaceholder.title')}</p>
-                <p className="text-sm">{t('pousada.location.mapPlaceholder.subtitle')}</p>
+                <MapPin className="w-12 h-12 mx-auto mb-4" />
+                <p className="mb-2">{t('pousada.location.mapPlaceholder.title')}</p>
+                <p className="text-sm mb-4">{t('pousada.location.mapPlaceholder.subtitle')}</p>
+                <LocationButton 
+                  variant="default"
+                  size="default"
+                  className="bg-amber-600 hover:bg-amber-700 text-white"
+                  address="Rua São Joaquim, 138 - Lapa, Rio de Janeiro - RJ"
+                  coordinates={{ lat: -22.9068, lng: -43.1729 }}
+                >
+                  {t('pousada.hero.viewLocation')}
+                </LocationButton>
               </div>
             </div>
           </div>
@@ -297,22 +312,7 @@ export default function PousadaPage() {
                       </div>
                     </div>
 
-                    <Separator />
 
-                    <div className="space-y-2">
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm text-slate-600">{t('pousada.rooms.pricing.flexible')}</span>
-                        <span className="font-bold text-lg">R$ {room.price_refundable}</span>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm text-slate-600">{t('pousada.rooms.pricing.nonRefundable')}</span>
-                        <span className="font-bold text-lg text-green-600">R$ {room.price_non_refundable}</span>
-                      </div>
-                    </div>
-
-                    <Button className="w-full bg-amber-600 hover:bg-amber-700" disabled={!room.available}>
-                      {room.available ? t('pousada.rooms.actions.reserve') : t('pousada.rooms.actions.unavailable')}
-                    </Button>
                   </CardContent>
                 </Card>
               ))}
@@ -401,20 +401,11 @@ export default function PousadaPage() {
             </Card>
           </div>
 
-          <div className="bg-gradient-to-r from-amber-100 to-orange-100 dark:from-amber-900/30 dark:to-orange-900/30 rounded-2xl p-8">
-            <h3 className="text-2xl font-bold mb-4 text-slate-800 dark:text-white">
-              {t('pousada.checkin.cta.title')}
-            </h3>
-            <p className="text-lg mb-6 text-slate-600 dark:text-slate-300">
-              {t('pousada.checkin.cta.description')}
-            </p>
-            <Button size="lg" className="bg-amber-600 hover:bg-amber-700 text-white px-12 py-4">
-              <Calendar className="w-5 h-5 mr-2" />
-              {t('pousada.checkin.cta.button')}
-            </Button>
-          </div>
+
         </div>
       </section>
+
+
     </div>
   )
 }

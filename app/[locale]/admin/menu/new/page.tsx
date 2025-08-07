@@ -35,14 +35,10 @@ export default function NewMenuItemPage({ params }: NewMenuItemPageProps) {
     nutritional_info: null
   })
 
-  // Resolver params async
-  useEffect(() => {
   // Definir locale diretamente dos params
   useEffect(() => {
     setLocale(resolvedParams.locale || 'pt')
   }, [resolvedParams.locale])
-    resolveParams()
-  }, [params])
 
   useEffect(() => {
     fetchCategories()

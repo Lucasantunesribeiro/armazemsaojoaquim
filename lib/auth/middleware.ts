@@ -55,7 +55,7 @@ export async function requireAdmin(request?: NextRequest, response?: NextRespons
   // Tentar verificação por role no banco - primeiro por ID da sessão
   try {
     const { data: userData, error: userError } = await supabase
-      .from('users')
+      .from('profiles')
       .select('role')
       .eq('id', session.user.id)
       .single()
@@ -77,7 +77,7 @@ export async function requireAdmin(request?: NextRequest, response?: NextRespons
   // Se falhou por ID, tentar verificação por email no banco
   try {
     const { data: adminUserData, error: adminUserError } = await supabase
-      .from('users')
+      .from('profiles')
       .select('role, id')
       .eq('email', session.user.email)
       .single()
@@ -141,7 +141,7 @@ export async function isAdmin(): Promise<boolean> {
     // Backup: verificar role no banco por ID
     try {
       const { data: user } = await supabase
-        .from('users')
+        .from('profiles')
         .select('role')
         .eq('id', session.user.id)
         .single()
@@ -156,7 +156,7 @@ export async function isAdmin(): Promise<boolean> {
     // Fallback: verificar role no banco por email
     try {
       const { data: adminUser } = await supabase
-        .from('users')
+        .from('profiles')
         .select('role')
         .eq('email', session.user.email)
         .single()

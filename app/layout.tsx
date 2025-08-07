@@ -2,6 +2,8 @@ import type { Metadata, Viewport } from 'next'
 import { Inter, Playfair_Display } from 'next/font/google'
 import './globals.css'
 import { Providers } from '@/components/providers/Providers'
+import OAuthDebugger from '@/components/debug/OAuthDebugger'
+import OAuthAdvancedDebugger from '@/components/debug/OAuthAdvancedDebugger'
 
 // Importar utilitário para suprimir warnings do Grammarly
 import '@/lib/suppress-warnings'
@@ -92,6 +94,8 @@ export default function RootLayout({
       >
         <Providers>
           {children}
+          <OAuthDebugger />
+          <OAuthAdvancedDebugger />
         </Providers>
       </body>
     </html>

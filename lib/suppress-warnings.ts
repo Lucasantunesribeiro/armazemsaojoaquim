@@ -292,6 +292,19 @@ function createConsoleOverride() {
 
   console.error = (...args: any[]) => {
     const message = args.join(' ')
+    
+    // Não suprimir erros de OAuth vazios - podem indicar problemas de configuração
+    if (message.includes('OAuth Error') && message.includes('{}')) {
+      originalError.apply(console, args)
+      return
+    }
+    
+    // Não suprimir erros de autenticação importantes
+    if (message.includes('Auth Error') || message.includes('Authentication failed')) {
+      originalError.apply(console, args)
+      return
+    }
+    
     // Be more selective with error suppression
     if (!shouldSuppressWarning(message) || message.includes('Network') || message.includes('Failed')) {
       originalError.apply(console, args)

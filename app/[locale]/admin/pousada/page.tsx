@@ -5,13 +5,13 @@ import { Plus, Edit, Trash2, Eye, Users, DollarSign } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/Dialog'
 import { Input } from '@/components/ui/Input'
 import { Label } from '@/components/ui/Label'
-import { Textarea } from '@/components/ui/textarea'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Switch } from '@/components/ui/switch'
-import { Separator } from '@/components/ui/separator'
+import { Textarea } from '@/components/ui/Textarea'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/Select'
+import { Switch } from '@/components/ui/Switch'
+import { Separator } from '@/components/ui/Separator'
 
 interface Room {
   id: string
@@ -44,13 +44,13 @@ interface Booking {
   created_at: string
 }
 
-const initialRoomData = {
+const initialRoomData: Omit<Room, 'id' | 'created_at' | 'updated_at'> = {
   name: '',
-  type: 'STANDARD' as const,
+  type: 'STANDARD',
   price_refundable: 0,
   price_non_refundable: 0,
   description: '',
-  amenities: [] as string[],
+  amenities: [],
   max_guests: 2,
   image_url: '',
   available: true
@@ -391,9 +391,15 @@ export default function AdminPousadaPage() {
                     </div>
                     <div className="flex flex-wrap gap-2 mt-2">
                       {roomData.amenities.map((amenity, index) => (
-                        <Badge key={index} variant="secondary" className="cursor-pointer" onClick={() => removeAmenity(amenity)}>
-                          {amenity} ×
-                        </Badge>
+                        <button
+                          key={index}
+                          onClick={() => removeAmenity(amenity)}
+                          className="cursor-pointer"
+                        >
+                          <Badge variant="secondary">
+                            {amenity} ×
+                          </Badge>
+                        </button>
                       ))}
                     </div>
                   </div>

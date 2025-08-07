@@ -1,4 +1,4 @@
-import { supabase } from './supabase'
+import { createServerClient } from './supabase'
 import { Database } from '../types/database.types'
 
 // ============================
@@ -19,74 +19,198 @@ function isValidSingleData<T>(data: any): data is T {
 }
 
 // ============================
-// BLOG OPERATIONS
+// BLOG OPERATIONS - MULTILINGUAL
 // ============================
 
-export const blogApi = {
-  // Buscar todos os posts publicados
-  async getAllPosts(): Promise<BlogPost[]> {
-    try {
-      const { data, error } = await (supabase as any)
-        .from('blog_posts')
-        .select('*')
-        .eq('published', true)
-        .order('created_at', { ascending: false })
+// Multilingual BlogPost interface
+export interface BlogPostMultilingual {
+  id: string
+  title: string
+  slug: string
+  content: string
+  excerpt: string | null
+  image_url: string | null
+  meta_title: string | null
+  meta_description: string | null
+  category: string
+  tags: string[]
+  published: boolean
+  featured: boolean
+  author_name: string | null
+  published_at: string | null
+  created_at: string
+  updated_at: string
+}
 
-      if (error) {
-        console.error('Erro ao buscar posts:', error)
-        return []
+export const blogApi = {
+  // Buscar todos os posts publicados por idioma
+  async getAllPosts(language: string = 'pt'): Promise<BlogPostMultilingual[]> {
+    try {
+      console.log(`[blogApi] getAllPosts called for language: ${language}`)
+      
+      // Use server-side client when running on server, HTTP when on client
+      if (typeof window === 'undefined') {
+        // Server-side: use Supabase client directly
+        const { createSupabaseServerClient } = await import('./supabase-server')
+        const supabase = await createSupabaseServerClient()
+        
+        const { data: posts, error } = await supabase
+          .rpc('get_blog_posts_by_language', { p_language: language })
+        
+        if (error) {
+          console.error('[blogApi] Supabase error:', error)
+          return []
+        }
+        
+        console.log(`[blogApi] Successfully fetched ${posts?.length || 0} posts from Supabase`)
+        return posts || []
+      } else {
+        // Client-side: use HTTP API
+        const baseUrl = window.location.origin
+        const url = `${baseUrl}/api/blog/posts?lang=${encodeURIComponent(language)}&limit=50`
+        
+        const response = await fetch(url, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          cache: 'no-cache'
+        })
+        
+        if (!response.ok) {
+          console.warn(`[blogApi] API not ready (${response.status}) - returning empty array`)
+          return []
+        }
+        
+        const data = await response.json()
+        console.log(`[blogApi] Successfully fetched ${data.posts?.length || 0} posts from API`)
+        
+        return data.posts || []
       }
       
-      return isValidData<BlogPost>(data) ? data : []
     } catch (error) {
-      console.error('Erro ao buscar posts:', error)
+      console.warn('[blogApi] Error fetching posts:', error instanceof Error ? error.message : 'Unknown error')
       return []
     }
   },
 
-  // Buscar post por slug
-  async getPostBySlug(slug: string): Promise<BlogPost | null> {
+  // Buscar post por slug e idioma
+  async getPostBySlug(slug: string, language: string = 'pt'): Promise<BlogPostMultilingual | null> {
     try {
-      const { data, error } = await (supabase as any)
-        .from('blog_posts')
-        .select('*')
-        .eq('slug', slug)
-        .eq('published', true)
-        .single()
-
-      if (error) {
-        console.error('Erro ao buscar post por slug:', error)
-        return null
+      console.log(`[blogApi] getPostBySlug called: ${slug} (${language})`)
+      
+      // Use server-side client when running on server, HTTP when on client
+      if (typeof window === 'undefined') {
+        // Server-side: use Supabase client directly
+        const { createSupabaseServerClient } = await import('./supabase-server')
+        const supabase = await createSupabaseServerClient()
+        
+        const { data: posts, error } = await supabase
+          .rpc('get_blog_post_by_slug', { p_slug: slug, p_language: language })
+        
+        if (error) {
+          console.error('[blogApi] Supabase error:', error)
+          return null
+        }
+        
+        const post = posts?.[0] || null
+        console.log(`[blogApi] Successfully fetched post from Supabase: ${post?.title}`)
+        return post
+      } else {
+        // Client-side: use HTTP API
+        const baseUrl = window.location.origin
+        const url = `${baseUrl}/api/blog/posts/${encodeURIComponent(slug)}?lang=${encodeURIComponent(language)}`
+        
+        const response = await fetch(url, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          cache: 'no-cache'
+        })
+        
+        if (!response.ok) {
+          if (response.status === 404) {
+            return null
+          }
+          console.warn(`[blogApi] API not ready (${response.status}) - returning null`)
+          return null
+        }
+        
+        const data = await response.json()
+        console.log(`[blogApi] Successfully fetched post from API: ${data.post?.title}`)
+        
+        return data.post
       }
       
-      return isValidSingleData<BlogPost>(data) ? data : null
     } catch (error) {
-      console.error('Erro ao buscar post por slug:', error)
+      console.warn('[blogApi] Error fetching post:', error instanceof Error ? error.message : 'Unknown error')
       return null
     }
   },
 
-  // Buscar posts com busca por texto
-  async searchPosts(searchTerm: string): Promise<BlogPost[]> {
+  // Buscar posts em destaque por idioma
+  async getFeaturedPosts(language: string = 'pt'): Promise<BlogPostMultilingual[]> {
     try {
-      const { data, error } = await (supabase as any)
-        .from('blog_posts')
-        .select('*')
-        .eq('published', true)
-        .or(`title.ilike.%${searchTerm}%, excerpt.ilike.%${searchTerm}%`)
-        .order('created_at', { ascending: false })
-
-      if (error) {
-        console.error('Erro ao buscar posts:', error)
-        return []
-      }
+      console.log(`[blogApi] getFeaturedPosts called for language: ${language}`)
       
-      return isValidData<BlogPost>(data) ? data : []
+      const allPosts = await this.getAllPosts(language)
+      const featuredPosts = allPosts.filter(post => post.featured)
+      
+      console.log(`[blogApi] Found ${featuredPosts.length} featured posts`)
+      return featuredPosts
+      
     } catch (error) {
-      console.error('Erro ao buscar posts:', error)
+      console.warn('[blogApi] Error getting featured posts:', error instanceof Error ? error.message : 'Unknown error')
+      return []
+    }
+  },
+
+  // Buscar posts por categoria e idioma
+  async getPostsByCategory(category: string, language: string = 'pt'): Promise<BlogPostMultilingual[]> {
+    try {
+      const allPosts = await this.getAllPosts(language)
+      return allPosts.filter(post => post.category === category)
+    } catch (error) {
+      console.error('[blogApi] Erro ao buscar posts por categoria:', error)
+      return []
+    }
+  },
+
+  // Buscar posts com termo de busca
+  async searchPosts(searchTerm: string, language: string = 'pt'): Promise<BlogPostMultilingual[]> {
+    try {
+      console.log(`[blogApi] Buscando posts com termo: ${searchTerm} (${language})`)
+      
+      const allPosts = await this.getAllPosts(language)
+      return allPosts.filter(post =>
+        post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (post.excerpt && post.excerpt.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        post.content.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        post.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()))
+      )
+    } catch (error) {
+      console.error('[blogApi] Erro ao buscar posts:', error)
       return []
     }
   }
+}
+
+// Legacy functions for backward compatibility
+export async function getAllPosts(language: string = 'pt'): Promise<BlogPostMultilingual[]> {
+  return blogApi.getAllPosts(language)
+}
+
+export async function getPostBySlug(slug: string, language: string = 'pt'): Promise<BlogPostMultilingual | null> {
+  return blogApi.getPostBySlug(slug, language)
+}
+
+export async function getFeaturedPosts(language: string = 'pt'): Promise<BlogPostMultilingual[]> {
+  return blogApi.getFeaturedPosts(language)
+}
+
+export async function getPostsByCategory(category: string, language: string = 'pt'): Promise<BlogPostMultilingual[]> {
+  return blogApi.getPostsByCategory(category, language)
 }
 
 // ============================
@@ -97,7 +221,8 @@ export const menuApi = {
   // Buscar todos os itens disponíveis
   async getAllItems(): Promise<MenuItem[]> {
     try {
-      const { data, error } = await (supabase as any)
+      const supabase = await createServerClient()
+      const { data, error } = await supabase
         .from('menu_items')
         .select('*')
         .eq('available', true)
@@ -119,7 +244,8 @@ export const menuApi = {
   // Buscar itens por categoria
   async getItemsByCategory(category: string): Promise<MenuItem[]> {
     try {
-      const { data, error } = await (supabase as any)
+      const supabase = await createServerClient()
+      const { data, error } = await supabase
         .from('menu_items')
         .select('*')
         .eq('category', category)
@@ -141,7 +267,8 @@ export const menuApi = {
   // Buscar itens com filtro de texto
   async searchItems(searchTerm: string): Promise<MenuItem[]> {
     try {
-      const { data, error } = await (supabase as any)
+      const supabase = await createServerClient()
+      const { data, error } = await supabase
         .from('menu_items')
         .select('*')
         .eq('available', true)
@@ -164,7 +291,8 @@ export const menuApi = {
   // Buscar categorias disponíveis
   async getCategories(): Promise<string[]> {
     try {
-      const { data, error } = await (supabase as any)
+      const supabase = await createServerClient()
+      const { data, error } = await supabase
         .from('menu_items')
         .select('category')
         .eq('available', true)
@@ -193,7 +321,8 @@ export const reservasApi = {
   // Buscar reservas do usuário
   async getUserReservations(userId: string): Promise<Reserva[]> {
     try {
-      const { data, error } = await (supabase as any)
+      const supabase = await createServerClient()
+      const { data, error } = await supabase
         .from('reservas')
         .select('*')
         .eq('user_id', userId)
@@ -214,7 +343,8 @@ export const reservasApi = {
   // Criar nova reserva
   async createReservation(reserva: Database['public']['Tables']['reservas']['Insert']): Promise<Reserva | null> {
     try {
-      const { data, error } = await (supabase as any)
+      const supabase = await createServerClient()
+      const { data, error } = await supabase
         .from('reservas')
         .insert(reserva)
         .select()
@@ -235,7 +365,8 @@ export const reservasApi = {
   // Atualizar reserva
   async updateReservation(id: string, updates: Database['public']['Tables']['reservas']['Update']): Promise<Reserva | null> {
     try {
-      const { data, error } = await (supabase as any)
+      const supabase = await createServerClient()
+      const { data, error } = await supabase
         .from('reservas')
         .update(updates)
         .eq('id', id)
@@ -257,7 +388,8 @@ export const reservasApi = {
   // Deletar reserva
   async deleteReservation(id: string): Promise<void> {
     try {
-      const { error } = await (supabase as any)
+      const supabase = await createServerClient()
+      const { error } = await supabase
         .from('reservas')
         .delete()
         .eq('id', id)
@@ -275,7 +407,8 @@ export const reservasApi = {
   // Verificar disponibilidade
   async checkAvailability(data: string, horario: string): Promise<boolean> {
     try {
-      const { data: reservas, error } = await (supabase as any)
+      const supabase = await createServerClient()
+      const { data: reservas, error } = await supabase
         .from('reservas')
         .select('id')
         .eq('data', data)
@@ -306,7 +439,8 @@ export const analyticsApi = {
   // Estatísticas do menu
   async getMenuStats() {
     try {
-      const { data, error } = await (supabase as any)
+      const supabase = await createServerClient()
+      const { data, error } = await supabase
         .from('menu_items')
         .select('category, id')
         .eq('available', true)
@@ -336,7 +470,8 @@ export const analyticsApi = {
   // Estatísticas de reservas
   async getReservationStats(userId?: string) {
     try {
-      let query = (supabase as any)
+      const supabase = await createServerClient()
+      let query = supabase
         .from('reservas')
         .select('status, data, pessoas')
 

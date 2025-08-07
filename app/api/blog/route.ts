@@ -1,11 +1,70 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+)
+
 export async function GET(request: NextRequest) {
   try {
     console.log('📝 Blog API Público: Iniciando busca de posts...')
 
-    // Mock data dos posts do blog do Armazém São Joaquim
+    const { searchParams } = new URL(request.url)
+    const locale = searchParams.get('locale') || 'pt'
+    const limit = parseInt(searchParams.get('limit') || '10')
+    const offset = parseInt(searchParams.get('offset') || '0')
+
+    // Usar nova função multilingual do Supabase
+    const { data: posts, error } = await supabase
+      .rpc('get_blog_posts_by_language', { p_language: locale })
+      .range(offset, offset + limit - 1)
+
+    if (error) {
+      console.error('💥 Erro ao buscar posts do blog:', error)
+      throw new Error(`Database error: ${error.message}`)
+    }
+
+    // Transformar dados para formato esperado pelo frontend
+    const transformedPosts = posts?.map((post: any) => ({
+      id: post.id,
+      title: post.title,
+      slug: post.slug,
+      excerpt: post.excerpt,
+      content: post.content,
+      image_url: post.image_url,
+      published: post.published,
+      featured: post.featured,
+      author_name: post.author_name || 'Equipe Armazém',
+      published_at: post.published_at || post.created_at,
+      created_at: post.created_at,
+      updated_at: post.updated_at,
+      tags: post.tags || ['Blog', 'Armazém São Joaquim'],
+      category: post.category || 'Geral',
+      language: locale === 'en' ? 'en-US' : 'pt-BR',
+      reading_time: Math.max(1, Math.ceil((post.content?.length || 0) / 1000))
+    })) || []
+
+    console.log(`✅ Blog API Público: ${transformedPosts.length} posts encontrados`)
+
+    return NextResponse.json({
+      success: true,
+      data: transformedPosts,
+      count: transformedPosts.length,
+      total: transformedPosts.length,
+      categories: ['Geral', 'História', 'Gastronomia', 'Bebidas', 'Eventos'],
+      pagination: {
+        limit,
+        offset,
+        hasNext: transformedPosts.length === limit,
+        hasPrev: offset > 0
+      }
+    })
+
+  } catch (error) {
+    console.error('💥 Erro na API pública do blog:', error)
+    
+    // Fallback para mock data em caso de erro do banco
     const mockPosts = [
       {
         id: '1',
@@ -19,9 +78,10 @@ export async function GET(request: NextRequest) {
           
           <p>Hoje, o espaço mantém viva essa tradição histórica, oferecendo uma experiência gastronômica única que honra o passado enquanto abraça o presente.</p>
         `,
-        featured_image: '/images/blog/historia-armazem.jpg',
+        image_url: '/images/blog/historia-armazem.avif',
         published: true,
-        author: 'Equipe Armazém',
+        featured: false,
+        author_name: 'Equipe Armazém',
         published_at: '2024-01-15T10:00:00Z',
         created_at: '2024-01-15T09:00:00Z',
         updated_at: '2024-01-15T10:00:00Z',
@@ -42,9 +102,10 @@ export async function GET(request: NextRequest) {
           
           <p>Servida tradicionalmente aos sábados, nossa feijoada vem acompanhada de arroz, farofa crocante, couve refogada e laranja para complementar perfeitamente a experiência.</p>
         `,
-        featured_image: '/images/blog/segredos-feijoada.jpg',
+        image_url: '/images/blog/segredos-feijoada.avif',
         published: true,
-        author: 'Chef da Casa',
+        featured: true,
+        author_name: 'Chef da Casa',
         published_at: '2024-02-01T14:00:00Z',
         created_at: '2024-02-01T13:00:00Z',
         updated_at: '2024-02-01T14:00:00Z',
@@ -65,9 +126,10 @@ export async function GET(request: NextRequest) {
           
           <p>Experimente nosso "Bondinho Dourado", um coquetel exclusivo que homenageia o famoso transporte histórico de Santa Teresa, ou o "Pôr do Sol Teresa", inspirado nas vistas deslumbrantes do bairro.</p>
         `,
-        featured_image: '/images/blog/drinks.jpg',
+        image_url: '/images/blog/drinks.avif',
         published: true,
-        author: 'Bartender Chefe',
+        featured: false,
+        author_name: 'Bartender Chefe',
         published_at: '2024-02-10T16:00:00Z',
         created_at: '2024-02-10T15:00:00Z',
         updated_at: '2024-02-10T16:00:00Z',
@@ -88,9 +150,10 @@ export async function GET(request: NextRequest) {
           
           <p>Seja um aniversário, casamento, lançamento de produto ou confraternização empresarial, nossa equipe se dedica a criar experiências memoráveis para seus convidados.</p>
         `,
-        featured_image: '/images/blog/eventos.jpg',
+        image_url: '/images/blog/eventos.avif',
         published: true,
-        author: 'Coordenação de Eventos',
+        featured: true,
+        author_name: 'Coordenação de Eventos',
         published_at: '2024-02-20T12:00:00Z',
         created_at: '2024-02-20T11:00:00Z',
         updated_at: '2024-02-20T12:00:00Z',
@@ -138,7 +201,7 @@ export async function GET(request: NextRequest) {
     // Aplicar limit e offset
     const paginatedPosts = filteredPosts.slice(offset, offset + limit)
 
-    console.log(`✅ Blog API Público: ${paginatedPosts.length} posts encontrados (mock data)`)
+    console.log(`🔄 Blog API Público: ${paginatedPosts.length} posts encontrados (fallback mock data)`)
 
     return NextResponse.json({
       success: true,
@@ -153,11 +216,5 @@ export async function GET(request: NextRequest) {
         hasPrev: offset > 0
       }
     })
-  } catch (error) {
-    console.error('💥 Erro na API pública do blog:', error)
-    return NextResponse.json(
-      { error: 'Erro interno do servidor', details: error instanceof Error ? error.message : 'Unknown error' },
-      { status: 500 }
-    )
   }
 }

@@ -50,7 +50,10 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
       // PRIORIZE URL language always - if URL has /pt/ use 'pt', if /en/ use 'en'
       const initialLanguage = urlLanguage || storedLanguage
       
-      console.log('🏠 Context URL:', pathname, '→ Language:', urlLanguage, '→ Final:', initialLanguage)
+      // Reduzir logs - apenas em desenvolvimento
+      if (process.env.NODE_ENV === 'development') {
+        console.log('🏠 Context URL:', pathname, '→ Language:', urlLanguage, '→ Final:', initialLanguage)
+      }
       
       setLanguage(initialLanguage)
       

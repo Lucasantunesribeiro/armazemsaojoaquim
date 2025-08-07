@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { Award, MapPin, Clock, Users, Heart, Star, Camera, Calendar } from 'lucide-react'
 import Link from 'next/link'
-import Button from '../ui/Button'
+import { Button } from '../ui/Button'
 import ImageWithFallback from '../ImageWithFallback'
 import { useTranslations } from '@/hooks/useTranslations'
 

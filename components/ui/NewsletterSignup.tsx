@@ -4,7 +4,7 @@ import React, { useState } from 'react'
 import { Send, Mail, CheckCircle } from 'lucide-react'
 import { cn } from '../../lib/utils'
 import toast from 'react-hot-toast'
-import Button from './Button'
+// import { Button } from './Button'
 
 interface NewsletterSignupProps {
   className?: string
@@ -193,7 +193,7 @@ const NewsletterSignup: React.FC<NewsletterSignupProps> = ({
           required
         />
         
-        <Button
+        <button
           type="submit"
           disabled={loading}
           className={buttonVariants[variant]}
@@ -202,7 +202,7 @@ const NewsletterSignup: React.FC<NewsletterSignupProps> = ({
             variant === 'default' ? "w-5 h-5 mr-2" : "w-4 h-4 mr-2"
           )} />
           {loading ? 'Inscrevendo...' : buttonText}
-        </Button>
+        </button>
       </form>
 
       {variant === 'default' && (

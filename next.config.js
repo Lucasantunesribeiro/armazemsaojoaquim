@@ -1,78 +1,89 @@
 /** @type {import('next').NextConfig} */
+const withBundleAnalyzer = require('@next/bundle-analyzer')({
+  enabled: process.env.ANALYZE === 'true',
+})
+
 const nextConfig = {
-  // Build configurations - Temporariamente ignore errors para testar build
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
-  typescript: {
-    ignoreBuildErrors: true,
-  },
-  
-  // Output configuration for Netlify
-  output: 'standalone',
-  trailingSlash: false,
-  
-  // Runtime configurations
-  poweredByHeader: false,
+  // Configurações básicas
   reactStrictMode: true,
   
-  // Configurações de imagem otimizadas
+  // Configurações de imagem - Otimizadas para Netlify
   images: {
+    unoptimized: true,
     formats: ['image/webp', 'image/avif'],
-    deviceSizes: [640, 750, 828, 1080, 1200, 1920],
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
-    minimumCacheTTL: 31536000, // 1 year
-    dangerouslyAllowSVG: true,
-    contentSecurityPolicy: "default-src 'self'; script-src 'none'; img-src 'self' data: blob:; sandbox;",
-    unoptimized: false,
-    loader: 'default',
-    // Configurações para Supabase Storage e outros domínios
+    minimumCacheTTL: 60,
+    
     remotePatterns: [
-      // Para desenvolvimento local
       {
         protocol: 'http',
         hostname: 'localhost',
         port: '3000',
         pathname: '/**',
       },
-      // Para produção (Netlify)
       {
         protocol: 'https',
         hostname: '*.netlify.app',
         pathname: '/**',
       },
-      // Para Supabase Storage
       {
         protocol: 'https',
         hostname: '*.supabase.co',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'enolssforaepnrpfrima.supabase.co',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'via.placeholder.com',
+        pathname: '/**',
+      },
     ],
   },
 
-  // Configurações para pacotes externos do servidor - NEXT.JS 15 FIX
-  serverExternalPackages: ['bcryptjs'],
-
-  // NEXT.JS 15 - Experimental features otimizadas
+  // Configurações experimentais para performance
   experimental: {
-    // Package import optimization para melhor tree shaking
+    optimizeCss: true,
+    middlewarePrefetch: 'strict',
     optimizePackageImports: [
       '@radix-ui/react-icons', 
       'lucide-react',
-      'react-dom',
-      '@supabase/supabase-js'
+      '@radix-ui/react-dialog',
+      '@radix-ui/react-select',
+      '@radix-ui/react-separator',
+      '@radix-ui/react-switch',
+      'react-hook-form',
+      '@hookform/resolvers'
     ],
-    // CSS otimizations
-    optimizeCss: true,
-    serverMinification: true,
-    // Performance features
-    gzipSize: true,
-    // NEXT.JS 15: Better middleware handling
-    middlewarePrefetch: 'strict',
+    // Enable modern bundling optimizations
+    esmExternals: true,
   },
 
-  // Configurações de webpack simplificadas para evitar factory call errors
-  webpack: (config, { isServer }) => {
+  // Configurações de compiler para performance
+  compiler: {
+    removeConsole: process.env.NODE_ENV === 'production',
+  },
+
+  // Configurações de webpack para otimização
+  webpack: (config, { isServer, dev }) => {
+    // Otimizações de produção
+    if (!dev) {
+      config.optimization = {
+        ...config.optimization,
+        sideEffects: false,
+        usedExports: true,
+      }
+    }
+
     // Configurações básicas para o cliente
     if (!isServer) {
       config.resolve.fallback = {
@@ -82,92 +93,16 @@ const nextConfig = {
         tls: false,
         crypto: false,
       }
+
+      // Otimizações de bundle size
+      config.resolve.alias = {
+        ...config.resolve.alias,
+        '@': '.',
+      }
     }
 
     return config
   },
-
-  // Configurações de headers otimizados
-  async headers() {
-    return [
-      // Security headers para todas as páginas
-      {
-        source: '/(.*)',
-        headers: [
-          {
-            key: 'X-Frame-Options',
-            value: 'DENY',
-          },
-          {
-            key: 'X-Content-Type-Options',
-            value: 'nosniff',
-          },
-          {
-            key: 'X-XSS-Protection',
-            value: '1; mode=block',
-          },
-          {
-            key: 'Referrer-Policy',
-            value: 'strict-origin-when-cross-origin',
-          },
-          {
-            key: 'Permissions-Policy',
-            value: 'camera=(), microphone=(), geolocation=()',
-          },
-        ],
-      },
-      // Cache headers para assets estáticos
-      {
-        source: '/(_next/static|images|favicon)/(.*)',
-        headers: [
-          {
-            key: 'Cache-Control',
-            value: 'public, max-age=31536000, immutable',
-          },
-        ],
-      },
-      // API routes headers
-      {
-        source: '/api/(.*)',
-        headers: [
-          {
-            key: 'Cache-Control',
-            value: 'no-store, no-cache, must-revalidate',
-          },
-        ],
-      },
-    ]
-  },
-
-  // Configurações de redirects otimizados
-  async redirects() {
-    return [
-      {
-        source: '/',
-        destination: '/pt',
-        permanent: false,
-      },
-      // SEO redirects para páginas antigas
-      {
-        source: '/admin/(.*)',
-        has: [
-          {
-            type: 'cookie',
-            key: 'role',
-            value: '(?!admin).*',
-          },
-        ],
-        destination: '/unauthorized',
-        permanent: false,
-      },
-    ]
-  },
-
-  // Performance budget warnings
-  onDemandEntries: {
-    maxInactiveAge: 25 * 1000,
-    pagesBufferLength: 2,
-  },
 }
 
-module.exports = nextConfig
+module.exports = withBundleAnalyzer(nextConfig)

@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '../../../lib/supabase'
+import { cookies } from 'next/headers'
 // import { cookies } from 'next/headers' // Não necessário mais
 
 export async function GET(request: NextRequest) {
   try {
     const cookieStore = await cookies()
-    const supabase = createServerClient(cookieStore)
+    const supabase = createServerClient()
     
     const tables = [
       'cafe_products',
@@ -18,7 +19,8 @@ export async function GET(request: NextRequest) {
     
     for (const table of tables) {
       try {
-        const { data, error, count } = await supabase
+        const supabaseClient = await supabase
+        const { data, error, count } = await supabaseClient
           .from(table)
           .select('*', { count: 'exact', head: true })
         

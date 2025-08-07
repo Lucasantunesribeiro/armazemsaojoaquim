@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { Search, Filter, Heart, ShoppingCart, Eye, Star, MapPin, Calendar, Palette, User } from 'lucide-react'
+import { useState, useEffect, useCallback } from 'react'
+import { Search, Heart, Eye, Star, MapPin, Calendar, Palette, User, Share2 } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Card } from '@/components/ui/Card'
@@ -26,31 +26,60 @@ interface Artwork {
   updated_at: string
 }
 
-const getCategoriesList = (t: any) => [
-  { value: 'all', label: t('gallery.categories.all'), icon: Palette },
-  { value: 'SANTA_TERESA_HISTORICA', label: t('gallery.categories.historical'), icon: MapPin },
-  { value: 'RIO_ANTIGO', label: t('gallery.categories.oldRio'), icon: Calendar },
-  { value: 'ARTE_CONTEMPORANEA', label: t('gallery.categories.contemporary'), icon: Palette },
-  { value: 'RETRATOS_BAIRRO', label: t('gallery.categories.neighborhood'), icon: User }
-]
+interface GaleriaPageProps {
+  params: Promise<{ locale: string }>
+}
 
-export default function GaleriaPage() {
-  const { t } = useTranslations()
+export default function GaleriaPage({ params }: GaleriaPageProps) {
+  // TODOS OS HOOKS DEVEM VIR PRIMEIRO - NUNCA MOVER PARA DENTRO DE CONDICIONAIS
+  const [locale, setLocale] = useState<string>('pt')
   const [artworks, setArtworks] = useState<Artwork[]>([])  
-  const categories = getCategoriesList(t)
   const [loading, setLoading] = useState(true)
   const [selectedCategory, setSelectedCategory] = useState('all')
   const [searchTerm, setSearchTerm] = useState('')
   const [favorites, setFavorites] = useState<string[]>([])
-  const [cart, setCart] = useState<string[]>([])
   const [selectedArtwork, setSelectedArtwork] = useState<Artwork | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
 
+  const { t, isReady } = useTranslations()
+  
   useEffect(() => {
-    fetchArtworks()
-  }, [selectedCategory])
+    params.then(({ locale: paramLocale }) => {
+      setLocale(paramLocale)
+    })
+  }, [params])
 
-  const fetchArtworks = async () => {
+  const getCategories = () => [
+    { 
+      value: 'all', 
+      label: t('gallery.categories.all') || 'Todas as Categorias', 
+      icon: Palette 
+    },
+    { 
+      value: 'SANTA_TERESA_HISTORICA', 
+      label: t('gallery.categories.historical') || 'Santa Teresa Histórica', 
+      icon: MapPin 
+    },
+    { 
+      value: 'RIO_ANTIGO', 
+      label: t('gallery.categories.oldRio') || 'Rio Antigo', 
+      icon: Calendar 
+    },
+    { 
+      value: 'ARTE_CONTEMPORANEA', 
+      label: t('gallery.categories.contemporary') || 'Arte Contemporânea', 
+      icon: Palette 
+    },
+    { 
+      value: 'RETRATOS_BAIRRO', 
+      label: t('gallery.categories.neighborhood') || 'Retratos do Bairro', 
+      icon: User 
+    }
+  ]
+
+  const fetchArtworks = useCallback(async () => {
+    if (!isReady) return // Proteção adicional
+    
     try {
       setLoading(true)
       const params = new URLSearchParams()
@@ -69,6 +98,21 @@ export default function GaleriaPage() {
     } finally {
       setLoading(false)
     }
+  }, [selectedCategory, isReady])
+
+  useEffect(() => {
+    if (isReady) {
+      fetchArtworks()
+    }
+  }, [fetchArtworks])
+
+  // Early return APÓS todos os hooks
+  if (!isReady) {
+    return (
+      <div className="min-h-screen pt-32">
+        <Loading />
+      </div>
+    )
   }
 
   const filteredArtworks = artworks.filter(artwork =>
@@ -85,12 +129,18 @@ export default function GaleriaPage() {
     )
   }
 
-  const toggleCart = (artworkId: string) => {
-    setCart(prev => 
-      prev.includes(artworkId) 
-        ? prev.filter(id => id !== artworkId)
-        : [...prev, artworkId]
-    )
+  const shareArtwork = (artwork: Artwork) => {
+    if (navigator.share) {
+      navigator.share({
+        title: artwork.title,
+        text: `${locale === 'en' ? 'Check out this artwork:' : 'Confira esta obra de arte:'} ${artwork.title} ${t('gallery.artwork.by') || 'por'} ${artwork.artist}`,
+        url: window.location.href
+      })
+    } else {
+      // Fallback para navegadores que não suportam Web Share API
+      navigator.clipboard.writeText(`${artwork.title} ${t('gallery.artwork.by') || 'por'} ${artwork.artist} - ${window.location.href}`)
+      alert(locale === 'en' ? 'Link copied to clipboard!' : 'Link copiado para a área de transferência!')
+    }
   }
 
   const openModal = (artwork: Artwork) => {
@@ -111,13 +161,14 @@ export default function GaleriaPage() {
   }
 
   const getCategoryLabel = (category: string) => {
+    const categories = getCategories()
     const cat = categories.find(c => c.value === category)
     return cat?.label || category
   }
 
   if (loading) {
     return (
-      <div className="min-h-screen pt-20">
+      <div className="min-h-screen pt-32">
         <Loading />
       </div>
     )
@@ -125,19 +176,19 @@ export default function GaleriaPage() {
 
   return (
     <>
-      <div className="min-h-screen pt-20 bg-gradient-to-br from-amber-50 via-white to-orange-50 dark:from-slate-900 dark:via-slate-800 dark:to-amber-900/20">
+      <div className="min-h-screen pt-32 bg-gradient-to-br from-amber-50 via-white to-orange-50 dark:from-slate-900 dark:via-slate-800 dark:to-amber-900/20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* Hero Section */}
           <div className="text-center mb-12">
             <h1 className="text-4xl md:text-6xl font-bold text-slate-900 dark:text-white mb-4 font-serif">
-              {t('gallery.title')}
+              {t('gallery.title') || 'Galeria de Arte'}
             </h1>
             <p className="text-xl text-slate-600 dark:text-slate-300 mb-6 max-w-3xl mx-auto">
-              {t('gallery.subtitle')}
+              {t('gallery.subtitle') || 'Memórias de Santa Teresa em cada pincelada'}
             </p>
             <div className="flex items-center justify-center space-x-2 text-amber-700 dark:text-amber-300">
               <MapPin className="w-5 h-5" />
-              <span className="font-semibold">{t('gallery.quote')}</span>
+              <span className="font-semibold">{t('gallery.quote') || '"En esta casa tenemos memoria"'}</span>
             </div>
           </div>
 
@@ -149,7 +200,7 @@ export default function GaleriaPage() {
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-5 h-5" />
                 <Input
                   type="text"
-                  placeholder={t('gallery.search.placeholder')}
+                  placeholder={t('gallery.search.placeholder') || 'Buscar por título, artista ou descrição...'}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-10 pr-4 py-3 w-full"
@@ -158,8 +209,8 @@ export default function GaleriaPage() {
 
               {/* Categorias */}
               <div className="flex flex-wrap gap-2">
-                {categories.map((category) => {
-                  const Icon = category.icon
+                {getCategories().map((category) => {
+                  const IconComponent = category.icon
                   return (
                     <Button
                       key={category.value}
@@ -167,7 +218,7 @@ export default function GaleriaPage() {
                       onClick={() => setSelectedCategory(category.value)}
                       className="flex items-center space-x-2"
                     >
-                      <Icon className="w-4 h-4" />
+                      <IconComponent className="w-4 h-4" />
                       <span className="hidden sm:inline">{category.label}</span>
                     </Button>
                   )
@@ -211,13 +262,10 @@ export default function GaleriaPage() {
                     <Button
                       size="sm"
                       variant="outline"
-                      onClick={() => toggleCart(artwork.id)}
-                      className={`border-0 ${cart.includes(artwork.id) 
-                        ? 'bg-amber-500 hover:bg-amber-600 text-white' 
-                        : 'bg-white/90 hover:bg-white text-slate-900'
-                      }`}
+                      onClick={() => shareArtwork(artwork)}
+                      className="bg-white/90 hover:bg-white text-slate-900 border-0"
                     >
-                      <ShoppingCart className="w-4 h-4" />
+                      <Share2 className="w-4 h-4" />
                     </Button>
                   </div>
 
@@ -225,7 +273,7 @@ export default function GaleriaPage() {
                   {artwork.featured && (
                     <div className="absolute top-3 left-3 bg-amber-500 text-white px-2 py-1 rounded-full text-xs font-bold flex items-center space-x-1">
                       <Star className="w-3 h-3" />
-                      <span>{t('gallery.artwork.featured')}</span>
+                      <span>{t('gallery.artwork.featured') || 'Destaque'}</span>
                     </div>
                   )}
 
@@ -240,7 +288,7 @@ export default function GaleriaPage() {
                     {artwork.title}
                   </h3>
                   <p className="text-slate-600 dark:text-slate-400 text-sm mb-2">
-                    {t('gallery.artwork.by')} {artwork.artist}
+                    {t('gallery.artwork.by') || 'por'} {artwork.artist}
                   </p>
                   <p className="text-slate-700 dark:text-slate-300 text-sm mb-3 line-clamp-2">
                     {artwork.description}
@@ -263,8 +311,8 @@ export default function GaleriaPage() {
             <div className="text-center py-12">
               <div className="text-slate-400 dark:text-slate-500 mb-4">
                 <Palette className="w-16 h-16 mx-auto mb-4" />
-                <h3 className="text-xl font-semibold mb-2">{t('gallery.artwork.noResults.title')}</h3>
-                <p>{t('gallery.artwork.noResults.message')}</p>
+                <h3 className="text-xl font-semibold mb-2">{t('gallery.artwork.noResults.title') || 'Nenhum quadro encontrado'}</h3>
+                <p>{t('gallery.artwork.noResults.message') || 'Tente ajustar os filtros ou termos de busca.'}</p>
               </div>
             </div>
           )}
@@ -286,7 +334,7 @@ export default function GaleriaPage() {
                 {selectedArtwork.featured && (
                   <div className="absolute top-3 right-3 bg-amber-500 text-white px-3 py-1 rounded-full text-sm font-bold flex items-center space-x-1">
                     <Star className="w-4 h-4" />
-                    <span>{t('gallery.artwork.featured')}</span>
+                    <span>{t('gallery.artwork.featured') || 'Destaque'}</span>
                   </div>
                 )}
               </div>
@@ -298,7 +346,7 @@ export default function GaleriaPage() {
                     {selectedArtwork.title}
                   </h2>
                   <p className="text-lg text-slate-600 dark:text-slate-400 mb-4">
-                    {t('gallery.artwork.by')} {selectedArtwork.artist}
+                    {t('gallery.artwork.by') || 'por'} {selectedArtwork.artist}
                   </p>
                   <div className="text-3xl font-bold text-amber-600 dark:text-amber-400 mb-4">
                     {formatPrice(selectedArtwork.price)}
@@ -324,13 +372,13 @@ export default function GaleriaPage() {
 
                 <div className="space-y-4">
                   <div>
-                    <h4 className="font-semibold text-slate-900 dark:text-white mb-2">{t('gallery.artwork.details.description')}</h4>
+                    <h4 className="font-semibold text-slate-900 dark:text-white mb-2">{t('gallery.artwork.details.description') || 'Descrição'}</h4>
                     <p className="text-slate-700 dark:text-slate-300">{selectedArtwork.description}</p>
                   </div>
                   
                   {selectedArtwork.historical_context && (
                     <div>
-                      <h4 className="font-semibold text-slate-900 dark:text-white mb-2">{t('gallery.artwork.details.historicalContext')}</h4>
+                      <h4 className="font-semibold text-slate-900 dark:text-white mb-2">{t('gallery.artwork.details.historicalContext') || 'Contexto Histórico'}</h4>
                       <p className="text-slate-700 dark:text-slate-300">{selectedArtwork.historical_context}</p>
                     </div>
                   )}
@@ -338,15 +386,11 @@ export default function GaleriaPage() {
 
                 <div className="flex space-x-3 pt-4">
                   <Button
-                    onClick={() => toggleCart(selectedArtwork.id)}
-                    className={`flex-1 flex items-center justify-center space-x-2 ${
-                      cart.includes(selectedArtwork.id)
-                        ? 'bg-amber-500 hover:bg-amber-600'
-                        : 'bg-amber-600 hover:bg-amber-700'
-                    }`}
+                    onClick={() => shareArtwork(selectedArtwork)}
+                    className="flex-1 flex items-center justify-center space-x-2 bg-amber-600 hover:bg-amber-700"
                   >
-                    <ShoppingCart className="w-4 h-4" />
-                    <span>{cart.includes(selectedArtwork.id) ? t('gallery.artwork.actions.inCart') : t('gallery.artwork.actions.addToCart')}</span>
+                    <Share2 className="w-4 h-4" />
+                    <span>{t('gallery.artwork.actions.share') || 'Compartilhar'}</span>
                   </Button>
                   <Button
                     variant="outline"
@@ -362,7 +406,7 @@ export default function GaleriaPage() {
                   onClick={closeModal}
                   className="w-full mt-4"
                 >
-                  {t('gallery.artwork.actions.close')}
+                  {t('gallery.artwork.actions.close') || 'Fechar'}
                 </Button>
               </div>
             </div>

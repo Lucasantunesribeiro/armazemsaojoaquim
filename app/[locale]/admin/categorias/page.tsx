@@ -40,7 +40,8 @@ export default function AdminCategorias() {
       const data = await adminFetch('/api/admin/categorias')
       setCategories(data)
     } catch (error) {
-      setError(error.message || 'Erro ao carregar categorias')
+      const errorMessage = error instanceof Error ? error.message : 'Erro ao carregar categorias'
+      setError(errorMessage)
     } finally {
       setLoading(false)
     }
@@ -68,7 +69,8 @@ export default function AdminCategorias() {
       setFormData({ name: '', description: '', display_order: 1 })
       loadCategories()
     } catch (error) {
-      setError(error.message || 'Erro ao salvar categoria')
+      const errorMessage = error instanceof Error ? error.message : 'Erro ao salvar categoria'
+      setError(errorMessage)
     }
   }
 
@@ -89,7 +91,8 @@ export default function AdminCategorias() {
       await adminFetch(`/api/admin/categorias/${id}`, { method: 'DELETE' })
       loadCategories()
     } catch (error) {
-      setError(error.message || 'Erro ao excluir categoria')
+      const errorMessage = error instanceof Error ? error.message : 'Erro ao excluir categoria'
+      setError(errorMessage)
     }
   }
 
