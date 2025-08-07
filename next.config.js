@@ -107,6 +107,10 @@ const nextConfig = {
       }
     }
 
+    // Melhorar resolução de módulos
+    config.resolve.modules = ['node_modules', '.']
+    config.resolve.extensions = ['.js', '.jsx', '.ts', '.tsx']
+
     return config
   },
 }
