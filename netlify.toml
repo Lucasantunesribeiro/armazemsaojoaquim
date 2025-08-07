@@ -21,8 +21,6 @@
 [functions]
   node_bundler = "esbuild"
   external_node_modules = ["@supabase/supabase-js", "bcryptjs"]
-  # Timeout para funções serverless
-  timeout = 30
 
 # Headers de segurança para todas as páginas
 [[headers]]
