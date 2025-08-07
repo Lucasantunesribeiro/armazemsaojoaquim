@@ -1,7 +1,15 @@
 /** @type {import('next').NextConfig} */
-const withBundleAnalyzer = require('@next/bundle-analyzer')({
-  enabled: process.env.ANALYZE === 'true',
-})
+
+// Configuração condicional do bundle analyzer
+let withBundleAnalyzer = (config) => config
+
+try {
+  withBundleAnalyzer = require('@next/bundle-analyzer')({
+    enabled: process.env.ANALYZE === 'true',
+  })
+} catch (error) {
+  console.log('Bundle analyzer não disponível, usando configuração padrão')
+}
 
 const nextConfig = {
   // Configurações básicas
@@ -64,8 +72,6 @@ const nextConfig = {
       'react-hook-form',
       '@hookform/resolvers'
     ],
-    // Enable modern bundling optimizations
-    esmExternals: true,
   },
 
   // Configurações de compiler para performance

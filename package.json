@@ -70,6 +70,7 @@
   "dependencies": {
     "@emailjs/browser": "^4.4.1",
     "@hookform/resolvers": "3.3.2",
+    "@next/bundle-analyzer": "^15.4.5",
     "@radix-ui/react-dialog": "^1.1.14",
     "@radix-ui/react-label": "^2.1.7",
     "@radix-ui/react-select": "^2.2.5",
@@ -111,7 +112,6 @@
     "zod": "3.22.4"
   },
   "devDependencies": {
-    "@next/bundle-analyzer": "^15.4.5",
     "@playwright/test": "^1.53.0",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^14.3.1",
