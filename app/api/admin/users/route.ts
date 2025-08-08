@@ -85,9 +85,9 @@ export async function GET(request: NextRequest) {
 
           stats = {
             total: count || 0,
-            admins: statsData.filter(u => u.role === 'admin').length,
-            users: statsData.filter(u => u.role === 'user' || !u.role).length,
-            recent: statsData.filter(u => new Date(u.created_at) > weekAgo).length
+            admins: statsData.filter((u: any) => u.role === 'admin').length,
+            users: statsData.filter((u: any) => u.role === 'user' || !u.role).length,
+            recent: statsData.filter((u: any) => new Date(u.created_at) > weekAgo).length
           }
         } else {
           console.warn('⚠️ [ADMIN-USERS] Erro nas estatísticas:', statsError)

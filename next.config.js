@@ -99,17 +99,22 @@ const nextConfig = {
         tls: false,
         crypto: false,
       }
-
-      // Otimizações de bundle size
-      config.resolve.alias = {
-        ...config.resolve.alias,
-        '@': '.',
-      }
     }
 
     // Melhorar resolução de módulos
     config.resolve.modules = ['node_modules', '.']
     config.resolve.extensions = ['.js', '.jsx', '.ts', '.tsx']
+    
+    // Configuração específica para resolver alias @/
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      '@': '.',
+      '@/components': './components',
+      '@/lib': './lib',
+      '@/types': './types',
+      '@/hooks': './hooks',
+      '@/app': './app'
+    }
 
     return config
   },

@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
         { name: 'pousada_rooms', query: () => supabase.from('pousada_rooms').select('id, name').limit(1) }
       ]
       
-      const results = {}
+      const results: Record<string, any> = {}
       
       for (const test of tests) {
         try {
@@ -41,7 +41,7 @@ export async function GET(request: NextRequest) {
           console.error(`💥 Erro crítico na tabela ${test.name}:`, error)
           results[test.name] = {
             accessible: false,
-            error: error.message,
+            error: error instanceof Error ? error.message : 'Unknown error',
             count: 0,
             sample: null
           }

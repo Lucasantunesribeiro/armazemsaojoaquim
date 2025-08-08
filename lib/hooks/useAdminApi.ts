@@ -292,7 +292,7 @@ export function useAdminApi() {
         setState(prev => ({
           ...prev,
           isAuthenticated: false,
-          error: error.message
+          error: error instanceof Error ? error.message : 'Erro de autenticação'
         }))
         
         // Redirecionar para login se estiver no browser

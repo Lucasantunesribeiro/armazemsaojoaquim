@@ -1,10 +1,7 @@
-import { Resend } from 'resend';
 import { ENV } from './config';
+import { resend } from './resend';
 import { ReservationConfirmation } from '../components/email-templates/ReservationConfirmation';
 import { AdminNotification } from '../components/email-templates/AdminNotification';
-
-// Inicializar Resend
-const resend = new Resend(ENV.RESEND_API_KEY);
 
 export interface ReservationData {
   id: string;
@@ -66,7 +63,7 @@ export class EmailService {
 
       if (error) {
         console.error('❌ Erro ao enviar email de confirmação:', error);
-        return { success: false, error: error.message };
+        return { success: false, error: 'Erro ao enviar email' };
       }
 
       console.log('✅ Email de confirmação enviado com sucesso:', data?.id);
@@ -170,12 +167,12 @@ export class EmailService {
         console.error('❌ Erro ao enviar notificação para admin:', error);
         
         // Se falhar e estivermos em sandbox, tentar com email do desenvolvedor
-        if (error.message?.includes('validation_error') && !this.isSandboxMode()) {
+        if (error && typeof error === 'object' && 'message' in error && typeof (error as any).message === 'string' && (error as any).message.includes('validation_error') && !this.isSandboxMode()) {
           console.log('🔄 Tentando enviar para email do desenvolvedor devido a erro de validação...');
           return this.sendAdminNotificationFallback(reservationData);
         }
         
-        return { success: false, error: error.message };
+        return { success: false, error: 'Erro ao enviar notificação' };
       }
 
       console.log('✅ Notificação para admin enviada com sucesso:', data?.id);
@@ -265,7 +262,7 @@ export class EmailService {
 
       if (error) {
         console.error('❌ Erro no fallback:', error);
-        return { success: false, error: error.message };
+        return { success: false, error: 'Erro no fallback' };
       }
 
       console.log('✅ Email de fallback enviado com sucesso:', data?.id);
@@ -319,7 +316,7 @@ export class EmailService {
 
       if (error) {
         console.error('❌ Erro ao enviar email simples:', error);
-        return { success: false, error: error.message };
+        return { success: false, error: 'Erro ao enviar email simples' };
       }
 
       console.log('✅ Email simples enviado com sucesso:', data?.id);
@@ -375,7 +372,7 @@ export class EmailService {
 
       if (error) {
         console.error('❌ Erro no teste:', error);
-        return { success: false, error: error.message };
+        return { success: false, error: 'Erro no teste de configuração' };
       }
 
       console.log('✅ Teste enviado com sucesso:', data?.id);

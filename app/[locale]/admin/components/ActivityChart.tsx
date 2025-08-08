@@ -231,21 +231,8 @@ export default function ActivityChart() {
               />
               <Bar 
                 dataKey="usuarios" 
-                fill="hsl(var(--primary))" 
-                name="Usuários"
-                radius={[2, 2, 0, 0]}
-              />
-              <Bar 
-                dataKey="reservas" 
-                fill="hsl(var(--secondary))" 
-                name="Reservas"
-                radius={[2, 2, 0, 0]}
-              />
-              <Bar 
-                dataKey="posts" 
-                fill="hsl(var(--accent))" 
-                name="Posts"
-                radius={[2, 2, 0, 0]}
+                fill="hsl(var(--primary))"
+                radius={[4, 4, 0, 0]}
               />
             </BarChart>
           </ResponsiveContainer>

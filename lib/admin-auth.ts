@@ -115,9 +115,9 @@ export async function verifyAdminAuth(request?: NextRequest): Promise<AdminAuthR
  * Wrapper para APIs admin que retorna automaticamente erro 401/403 se necessário
  */
 export async function withAdminAuth<T = any>(
-  handler: (authResult: AdminAuthResult) => Promise<NextResponse<T>>,
+  handler: (authResult: AdminAuthResult) => Promise<NextResponse<any>>,
   request?: NextRequest
-): Promise<NextResponse<T | { error: string; debug?: any }>> {
+): Promise<NextResponse<any>> {
   // Se o middleware já processou a requisição, apenas executar o handler
   // O middleware já verificou a autenticação e permissões
   if (request) {
