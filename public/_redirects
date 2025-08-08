@@ -1,13 +1,42 @@
-# Netlify _redirects file
-# CORREÇÃO CRÍTICA: Configurações para servir imagens estáticas corretamente
+# Armazém São Joaquim - Optimized Redirects for Next.js 15
+# Priority order matters - more specific rules first
 
-# Servir imagens estáticas diretamente sem otimização Next.js
+# API routes - highest priority, preserve all
+/api/* /api/:splat 200
+
+# Static images - serve directly without Next.js optimization
 /images/* /images/:splat 200
 
-# Fallback para SPA (Single Page Application)
-/*    /index.html   200
+# Admin auth protection
+/admin/* /pt/admin/:splat 302
 
-# Redirecionamentos específicos para imagens da pousada
+# Locale-specific pages
+/pt/admin/* /pt/admin/:splat 200
+/en/admin/* /en/admin/:splat 200
+/pt/blog/* /pt/blog/:splat 200
+/en/blog/* /en/blog/:splat 200
+
+# Root redirects
+/ /pt 302
+/admin /pt/admin 302
+/menu /pt/menu 302
+/galeria /pt/galeria 302
+/pousada /pt/pousada 302
+/blog /pt/blog 302
+/cafe /pt/cafe 302
+
+# Dynamic route compatibility
+/pt/admin/menu/editar/:id /pt/admin/menu/:id 301
+/pt/admin/categorias/editar/:id /pt/admin/categorias/:id 301
+
+# Specific pousada images (for critical loading)
 /images/pousada/casarao-historico.jpg /images/pousada/casarao-historico.jpg 200
 /images/pousada/lobie-fachada.jpg /images/pousada/lobie-fachada.jpg 200
 /images/pousada/room-placeholder.jpg /images/pousada/room-placeholder.jpg 200
+
+# Locale fallbacks
+/pt/* /pt/:splat 200
+/en/* /en/:splat 200
+
+# Final fallback for SPA
+/* /index.html 200

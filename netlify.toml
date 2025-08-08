@@ -4,13 +4,16 @@
   functions = "netlify/functions"
 
 [build.environment]
-  NODE_VERSION = "20"
+  NODE_VERSION = "22"
   NPM_FLAGS = "--legacy-peer-deps"
   NODE_ENV = "production"
   NEXT_TELEMETRY_DISABLED = "1"
   # Performance optimizations
   NODE_OPTIONS = "--max-old-space-size=4096"
   NETLIFY_NEXT_PLUGIN_SKIP = "false"
+  # Next.js 15 optimizations
+  NEXT_PRIVATE_STANDALONE = "true"
+  NEXT_PRIVATE_DISABLE_ESLINT = "false"
 
 # Plugin oficial do Next.js para Netlify - versão mais recente
 [[plugins]]
