@@ -17,13 +17,7 @@ import {
   CheckCircle,
   X
 } from 'lucide-react'
-import { Button } from '@/components/ui/Button'
-import { Input } from '@/components/ui/Input'
-import { Card } from '@/components/ui/Card'
-import { Label } from '@/components/ui/Label'
-import { Textarea } from '@/components/ui/Textarea'
-import { Switch } from '@/components/ui/Switch'
-import { Badge } from '@/components/ui/Badge'
+import { Button, Input, Card, CardHeader, CardContent, CardTitle, CardDescription, Label, Textarea, Switch, Badge } from '@/components/ui'
 import { toast } from 'sonner'
 import { RichTextEditor } from './RichTextEditor'
 
