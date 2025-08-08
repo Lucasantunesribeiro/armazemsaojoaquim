@@ -1,7 +1,13 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Card, CardContent, CardHeader, CardTitle, Button, Input, Label, Textarea, Switch, Separator } from '@/components/ui'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
+import { Button } from '@/components/ui/Button'
+import { Input } from '@/components/ui/Input'
+import { Label } from '@/components/ui/Label'
+import { Textarea } from '@/components/ui/Textarea'
+import { Switch } from '@/components/ui/Switch'
+import { Separator } from '@/components/ui/Separator'
 import { toast } from 'sonner'
 import { 
   Settings, 
