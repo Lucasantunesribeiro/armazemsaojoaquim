@@ -81,6 +81,18 @@ const nextConfig = {
 
   // Configurações de webpack para otimização
   webpack: (config, { isServer, dev }) => {
+    // Recharts + victory-vendor/d3-shape compatibility fix
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      'victory-vendor/d3-shape': 'd3-shape',
+      '@': '.',
+      '@/components': './components',
+      '@/lib': './lib',
+      '@/types': './types',
+      '@/hooks': './hooks',
+      '@/app': './app'
+    }
+
     // Otimizações de produção
     if (!dev) {
       config.optimization = {
@@ -105,16 +117,13 @@ const nextConfig = {
     config.resolve.modules = ['node_modules', '.']
     config.resolve.extensions = ['.js', '.jsx', '.ts', '.tsx']
     
-    // Configuração específica para resolver alias @/
-    config.resolve.alias = {
-      ...config.resolve.alias,
-      '@': '.',
-      '@/components': './components',
-      '@/lib': './lib',
-      '@/types': './types',
-      '@/hooks': './hooks',
-      '@/app': './app'
-    }
+    // Suppress specific Recharts warnings
+    config.ignoreWarnings = [
+      /Failed to parse source map/,
+      /Critical dependency: the request of a dependency is an expression/,
+      /Module not found: Can't resolve 'victory-vendor\/d3-shape'/,
+      /Attempted import error:.*is not exported from 'victory-vendor\/d3-shape'/
+    ]
 
     return config
   },
