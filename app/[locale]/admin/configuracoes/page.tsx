@@ -19,7 +19,11 @@ import {
   CheckCircle,
   Info
 } from 'lucide-react'
-import { Button, Input, Card, Textarea, Switch } from '@/components/ui'
+import { Button } from '@/components/ui/Button'
+import { Input } from '@/components/ui/Input'
+import { Card } from '@/components/ui/Card'
+import { Textarea } from '@/components/ui/Textarea'
+import { Switch } from '@/components/ui/Switch'
 
 interface ConfiguracoesPageProps {
   params: Promise<{ locale: string }>

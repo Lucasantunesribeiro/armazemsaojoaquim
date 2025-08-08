@@ -2,7 +2,10 @@
 
 import { useState, useEffect } from 'react'
 import { Eye, Clock, Coffee, IceCream, Cake, Utensils, GlassWater } from 'lucide-react'
-import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle, Badge, Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui'
+import { Button } from '@/components/ui/Button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card'
+import { Badge } from '@/components/ui/Badge'
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/Dialog'
 
 interface Product {
   id: string
