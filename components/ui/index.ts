@@ -5,7 +5,7 @@ export { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogFooter, Dialo
 export { Select, SelectGroup, SelectValue, SelectTrigger, SelectContent, SelectLabel, SelectItem, SelectSeparator, SelectScrollUpButton, SelectScrollDownButton } from './Select'
 export { Button } from './Button'
 export { Input } from './Input'
-export { Card } from './Card'
+export { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent } from './Card'
 export { Label } from './Label'
 export { Badge } from './Badge'
 export { Alert } from './Alert'
