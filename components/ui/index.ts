@@ -6,5 +6,27 @@ export { Label } from './Label'
 export { Badge } from './Badge'
 export { Textarea } from './Textarea'
 export { Switch } from './Switch'
-export { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from './Dialog'
-export { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './Select'
+export { 
+  Dialog, 
+  DialogContent, 
+  DialogTrigger, 
+  DialogHeader,
+  DialogFooter,
+  DialogTitle,
+  DialogDescription,
+  DialogClose,
+  DialogOverlay,
+  DialogPortal
+} from './Dialog'
+export { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue,
+  SelectGroup,
+  SelectLabel,
+  SelectSeparator,
+  SelectScrollUpButton,
+  SelectScrollDownButton
+} from './Select'
