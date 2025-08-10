@@ -19,6 +19,7 @@ import { Card } from '@/components/ui/Card'
 import { PousadaRoom } from '@/types/database.types'
 import RoomForm from './components/RoomForm'
 import RoomCard from './components/RoomCard'
+import { useAdmin } from '@/hooks/useAdmin'
 
 interface PousadasPageProps {
   params: Promise<{ locale: string }>
@@ -27,6 +28,9 @@ interface PousadasPageProps {
 export default function PousadasPage({ params }: PousadasPageProps) {
   const resolvedParams = use(params)
   const locale = resolvedParams.locale || 'pt'
+  
+  // Hook de autenticação admin
+  const { isAdmin, hasProfile, loading: adminLoading } = useAdmin()
   
   const [rooms, setRooms] = useState<PousadaRoom[]>([])
   const [loading, setLoading] = useState(true)
@@ -39,9 +43,12 @@ export default function PousadasPage({ params }: PousadasPageProps) {
   const [formLoading, setFormLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
+  // Carregar quartos apenas quando o admin estiver autenticado
   useEffect(() => {
-    loadRooms()
-  }, [])
+    if (!adminLoading && isAdmin && hasProfile) {
+      loadRooms()
+    }
+  }, [adminLoading, isAdmin, hasProfile])
 
   const loadRooms = async () => {
     try {
@@ -69,12 +76,12 @@ export default function PousadasPage({ params }: PousadasPageProps) {
     }
   }
 
-  // Reload rooms when filters change
+  // Reload rooms when filters change (apenas se admin autenticado)
   useEffect(() => {
-    if (!loading) {
+    if (!adminLoading && isAdmin && hasProfile && !loading) {
       loadRooms()
     }
-  }, [filterType, filterAvailability, searchTerm])
+  }, [filterType, filterAvailability, searchTerm, adminLoading, isAdmin, hasProfile])
 
   const filteredRooms = rooms.filter(room => {
     const matchesSearch = room.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -214,12 +221,29 @@ export default function PousadasPage({ params }: PousadasPageProps) {
     setError(null)
   }
 
-  if (loading) {
+  // Mostrar loading se admin ainda está carregando ou se dados estão carregando
+  if (adminLoading || loading) {
     return (
       <div className="flex items-center justify-center py-12">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-400">Carregando quartos...</p>
+          <p className="text-gray-600 dark:text-gray-400">
+            {adminLoading ? 'Verificando permissões...' : 'Carregando quartos...'}
+          </p>
+        </div>
+      </div>
+    )
+  }
+
+  // Verificar se usuário tem permissão admin
+  if (!isAdmin || !hasProfile) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="text-center">
+          <div className="text-red-600 dark:text-red-400 mb-4">
+            <AlertCircle className="h-12 w-12 mx-auto mb-2" />
+          </div>
+          <p className="text-gray-600 dark:text-gray-400">Acesso negado. Apenas administradores podem acessar esta página.</p>
         </div>
       </div>
     )

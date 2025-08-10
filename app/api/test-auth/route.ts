@@ -1,10 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@/lib/supabase'
-import { verifyAdmin, getCurrentUser, loginWithFallback, logAuthEvent } from '@/lib/auth'
+import { verifyAdminStatus as verifyAdmin } from '@/lib/auth/admin-verification'
+import { validateAndRefreshSession as getCurrentUser } from '@/lib/auth/enhanced-login'
+import { loginWithFallback } from '@/lib/auth/enhanced-login'
+import { logAuthEvent } from '@/lib/auth/logging'
 
 export async function GET(request: NextRequest) {
   try {
-    logAuthEvent('TEST_AUTH_START', { ip: request.headers.get('x-forwarded-for') || 'unknown' })
+    logAuthEvent({ 
+      action: 'admin_check',
+      method: 'test_auth',
+      ip_address: request.headers.get('x-forwarded-for') || 'unknown',
+      success: true,
+      timestamp: new Date().toISOString()
+    })
     
     const supabase = await createServerClient()
     
@@ -12,7 +21,13 @@ export async function GET(request: NextRequest) {
 
     // 1. Verificar sessão
     const { data: { session }, error: sessionError } = await supabase.auth.getSession()
-    logAuthEvent('SESSION_CHECK', { hasSession: !!session, error: sessionError?.message })
+    logAuthEvent({ 
+      action: 'admin_check',
+      method: 'session_check',
+      success: !!session,
+      error: sessionError?.message,
+      timestamp: new Date().toISOString()
+    })
     
     results.session = {
       hasSession: !!session,
@@ -29,7 +44,13 @@ export async function GET(request: NextRequest) {
         .eq('id', session.user.id)
         .single()
 
-      logAuthEvent('PROFILE_CHECK', { found: !!profileData, error: profileError?.message })
+      logAuthEvent({ 
+        action: 'admin_check',
+        method: 'profile_check',
+        success: !!profileData,
+        error: profileError?.message,
+        timestamp: new Date().toISOString()
+      })
 
       results.userInDatabase = {
         found: !!profileData,
@@ -45,7 +66,13 @@ export async function GET(request: NextRequest) {
         .eq('email', 'armazemsaojoaquimoficial@gmail.com')
         .single()
 
-      logAuthEvent('ADMIN_CHECK', { found: !!adminData, error: adminError?.message })
+      logAuthEvent({ 
+        action: 'admin_check',
+        method: 'admin_check',
+        success: !!adminData,
+        error: adminError?.message,
+        timestamp: new Date().toISOString()
+      })
 
       results.adminUser = {
         found: !!adminData,
@@ -58,11 +85,11 @@ export async function GET(request: NextRequest) {
       try {
         const adminResult = await verifyAdmin(session)
         results.unifiedAuthSystem = {
-          isAdmin: adminResult.success,
-          user: adminResult.user,
+          isAdmin: adminResult.isAdmin,
+          user: adminResult.profile,
           error: adminResult.error,
           method: adminResult.method,
-          status: adminResult.success ? 'SUCCESS' : 'FAIL'
+          status: adminResult.isAdmin ? 'SUCCESS' : 'FAIL'
         }
 
         // 5. Testar getCurrentUser

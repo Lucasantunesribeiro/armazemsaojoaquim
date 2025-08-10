@@ -49,6 +49,7 @@
     ".next",
     "out",
     "scripts",
+    "__tests__",
     "build.log",
     "dev.log",
     "server.log"

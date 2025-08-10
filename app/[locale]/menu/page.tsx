@@ -66,7 +66,7 @@ export default function MenuPage() {
   const fetchMenuItems = async () => {
     try {
       // Verificar cache primeiro
-      const cachedItems = menuCache.get()
+      const cachedItems = menuCache.get<MenuItem[]>('menu-items')
       if (cachedItems) {
         setMenuItems(cachedItems)
         setLoading(false)
@@ -89,7 +89,7 @@ export default function MenuPage() {
         // Usar dados de fallback se a consulta falhar
         const fallbackItems = getFallbackMenuItems()
         setMenuItems(fallbackItems)
-        menuCache.set(fallbackItems) // Cache dos dados de fallback
+        menuCache.set('menu-items', fallbackItems) // Cache dos dados de fallback
         toast.error(t('menu.errors.loadError') || 'Erro ao carregar menu. Exibindo versão local.')
         return
       }
@@ -125,13 +125,13 @@ export default function MenuPage() {
         })
         
         setMenuItems(sortedItems)
-        menuCache.set(sortedItems) // Cache dos dados do banco
+        menuCache.set('menu-items', sortedItems) // Cache dos dados do banco
         toast.success(t('menu.success.loaded') || 'Menu carregado com sucesso')
       } else {
         // Se não há dados no banco, usar dados de fallback
         const fallbackItems = getFallbackMenuItems()
         setMenuItems(fallbackItems)
-        menuCache.set(fallbackItems) // Cache dos dados de fallback
+        menuCache.set('menu-items', fallbackItems) // Cache dos dados de fallback
         toast.success(t('menu.success.example') || 'Exibindo cardápio de exemplo')
       }
     } catch (error) {
@@ -144,7 +144,7 @@ export default function MenuPage() {
       // Usar dados de fallback em caso de erro
       const fallbackItems = getFallbackMenuItems()
       setMenuItems(fallbackItems)
-      menuCache.set(fallbackItems) // Cache dos dados de fallback
+      menuCache.set('menu-items', fallbackItems) // Cache dos dados de fallback
       toast.error(t('menu.errors.loadError') || 'Erro ao carregar menu. Exibindo versão local.')
     } finally {
       setLoading(false)

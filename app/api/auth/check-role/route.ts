@@ -1,127 +1,96 @@
-import { NextResponse } from 'next/server'
-import { createServerClient } from '@/lib/supabase'
+import { NextRequest, NextResponse } from 'next/server'
+import { createClient } from '@/lib/supabase/server'
+import { 
+  verifyAdminStatus, 
+  ensureAdminProfile
+} from '@/lib/auth/admin-verification'
+import { logAuthEvent } from '@/lib/auth/logging'
+import { recoverFromAuthError } from '@/lib/auth/error-recovery'
+import { AuthErrorType } from '@/lib/auth/types'
+import { validateAndRefreshSession } from '@/lib/auth/enhanced-login'
 
-const ADMIN_EMAIL = 'armazemsaojoaquimoficial@gmail.com'
-
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const startTime = Date.now()
+  
   try {
-    console.log('🔍 AUTH-CHECK-ROLE: Starting verification...')
+    // Fast session validation with timeout
+    const sessionPromise = validateAndRefreshSession(request)
+    const timeoutPromise = new Promise((_, reject) => 
+      setTimeout(() => reject(new Error('Session validation timeout')), 1500)
+    )
     
-    const supabase = await createServerClient()
+    const sessionResult = await Promise.race([sessionPromise, timeoutPromise]) as any
     
-    // Get active session
-    const { data: { session }, error: sessionError } = await supabase.auth.getSession()
-    
-    if (sessionError || !session?.user) {
-      console.log('❌ AUTH-CHECK-ROLE: No active session:', sessionError?.message)
-      return NextResponse.json({ 
-        isAdmin: false, 
-        error: 'No active session',
-        debug: { sessionError: sessionError?.message }
-      })
+    if (!sessionResult.valid || !sessionResult.user) {
+      // Skip logging for faster response
+      return NextResponse.json({
+        isAdmin: false,
+        authenticated: false,
+        error: sessionResult.error || 'Invalid session',
+        method: 'session_validation',
+        responseTime: Date.now() - startTime
+      }, { status: 401 })
     }
 
-    const userId = session.user.id
-    const email = session.user.email || ''
+    // Fast admin verification with timeout
+    const adminPromise = verifyAdminStatus(sessionResult.user)
+    const adminTimeoutPromise = new Promise((_, reject) => 
+      setTimeout(() => reject(new Error('Admin verification timeout')), 1000)
+    )
     
-    console.log('✅ AUTH-CHECK-ROLE: Active session found for:', email)
-
-    // Primary verification: Admin email check
-    if (email === ADMIN_EMAIL) {
-      console.log('✅ AUTH-CHECK-ROLE: Admin access by email verification')
-      
-      // Ensure admin profile exists
-      try {
-        await supabase.rpc('ensure_admin_profile', {
-          admin_id: userId,
-          admin_email: email,
-          admin_name: 'Administrador Armazém São Joaquim'
-        })
-        console.log('✅ AUTH-CHECK-ROLE: Admin profile ensured')
-      } catch (profileError) {
-        console.warn('⚠️ AUTH-CHECK-ROLE: Could not ensure admin profile:', profileError)
-      }
-      
-      return NextResponse.json({ 
-        isAdmin: true,
-        user: {
-          id: userId,
-          email: email,
-          full_name: 'Administrador Armazém São Joaquim',
-          role: 'admin'
-        },
-        source: 'email',
-        method: 'direct_email_check'
-      })
+    const adminResult = await Promise.race([adminPromise, adminTimeoutPromise]) as any
+    
+    // Skip profile ensuring for faster response - only do basic check
+    let profile = null
+    if (adminResult.isAdmin && adminResult.profile) {
+      profile = adminResult.profile
+    }
+    
+    // Skip detailed logging for faster response
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`✅ Fast admin check: ${adminResult.isAdmin} (${Date.now() - startTime}ms)`)
     }
 
-    // Secondary verification: Check profile in database
-    const { data: profile, error: profileError } = await supabase
-      .from('profiles')
-      .select('role, email, full_name')
-      .eq('id', userId)
-      .single()
-
-    if (profileError) {
-      console.log('❌ AUTH-CHECK-ROLE: Profile error:', profileError.message)
-      
-      // Try by email as fallback
-      const { data: emailProfile, error: emailError } = await supabase
-        .from('profiles')
-        .select('role, email, full_name')
-        .eq('email', email)
-        .single()
-      
-      if (emailError) {
-        console.log('❌ AUTH-CHECK-ROLE: Email profile not found either')
-        return NextResponse.json({ 
-          isAdmin: false, 
-          error: 'Profile not found',
-          debug: { 
-            profileError: profileError.message,
-            emailError: emailError.message 
-          }
-        })
-      }
-      
-      // Use email profile
-      const isAdmin = emailProfile.role === 'admin'
-      console.log('✅ AUTH-CHECK-ROLE: Found by email. Admin:', isAdmin)
-      
-      return NextResponse.json({ 
-        isAdmin,
-        user: {
-          id: userId,
-          email: emailProfile.email,
-          full_name: emailProfile.full_name || email,
-          role: emailProfile.role
-        },
-        source: 'email_profile',
-        method: 'email_profile_lookup'
-      })
-    }
-
-    const isAdmin = profile.role === 'admin'
-    console.log(`✅ AUTH-CHECK-ROLE: Profile found. Role: ${profile.role}, Admin: ${isAdmin}`)
-    
-    return NextResponse.json({ 
-      isAdmin,
+    // Return minimal response for speed
+    const response = {
+      isAdmin: adminResult.isAdmin,
+      authenticated: sessionResult.valid,
+      method: adminResult.method,
+      sessionValid: sessionResult.valid,
       user: {
-        id: userId,
-        email: profile.email || email,
-        full_name: profile.full_name || email,
-        role: profile.role
+        id: sessionResult.user.id,
+        email: sessionResult.user.email
       },
-      source: 'profile',
-      method: 'profile_lookup'
-    })
+      profile,
+      responseTime: Date.now() - startTime,
+      error: adminResult.error
+    }
+
+    return NextResponse.json(response)
+
+  } catch (error) {
+    console.error('Auth check-role API error:', error)
     
-  } catch (error: any) {
-    console.error('❌ AUTH-CHECK-ROLE: Internal server error:', error)
-    return NextResponse.json({ 
-      isAdmin: false, 
-      error: 'Internal server error',
-      debug: { error: error.message }
+    // Fast fallback response
+    return NextResponse.json({
+      isAdmin: false,
+      authenticated: false,
+      error: 'Request timeout or server error',
+      method: 'error',
+      responseTime: Date.now() - startTime,
+      debug: process.env.NODE_ENV === 'development' ? String(error) : undefined
     }, { status: 500 })
   }
+}
+
+// Handle OPTIONS for CORS
+export async function OPTIONS(request: NextRequest) {
+  return new NextResponse(null, {
+    status: 200,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    },
+  })
 }

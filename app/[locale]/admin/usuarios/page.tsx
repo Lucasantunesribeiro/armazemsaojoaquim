@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { use } from 'react'
 import { 
   Search, 
@@ -22,132 +22,112 @@ import {
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Card } from '@/components/ui/Card'
+import { useAdminApi } from '@/lib/hooks/useAdminApi'
+import { useAdminData } from '@/hooks/useAdminData'
+import { 
+  UserData, 
+  UserDataTransformer, 
+  transformApiResponse,
+  formatDate,
+  getRoleBadgeColor
+} from '@/lib/data-transformers'
+import { useComponentLifecycle, useRenderCounter } from '@/hooks/useComponentLifecycle'
+import { CacheDebugger } from '@/components/admin/CacheDebugger'
 
 interface UsersPageProps {
   params: Promise<{ locale: string }>
 }
 
-interface User {
-  id: string
-  email: string
-  full_name: string
-  phone: string
-  role: 'user' | 'admin'
-  status: 'active' | 'inactive' | 'suspended'
-  avatar_url: string
-  last_login: string
-  created_at: string
-  updated_at: string
-  location: string
-  total_reservations: number
-}
+// Using UserData from data-transformers instead of local interface
 
 export default function UsersPage({ params }: UsersPageProps) {
   const resolvedParams = use(params)
   const locale = resolvedParams.locale || 'pt'
   
-  const [users, setUsers] = useState<User[]>([])
-  const [loading, setLoading] = useState(true)
+  // Debug component lifecycle
+  useComponentLifecycle('UsersPage')
+  useRenderCounter('UsersPage', 3)
+  
+  const { makeRequest, isAuthorized, isLoading: adminLoading } = useAdminApi()
   const [searchTerm, setSearchTerm] = useState('')
   const [filterRole, setFilterRole] = useState('all')
   const [filterStatus, setFilterStatus] = useState('all')
   const [showFilters, setShowFilters] = useState(false)
 
-  useEffect(() => {
-    loadUsers()
-  }, [])
-
-  const loadUsers = async () => {
-    try {
-      setLoading(true)
-      // TODO: Implement API call to load users
-      // const response = await fetch('/api/admin/users')
-      // const data = await response.json()
-      // setUsers(data)
-      
-      // Mock data for now
-      setUsers([
-        {
-          id: '1',
-          email: 'maria.silva@email.com',
-          full_name: 'Maria Silva',
-          phone: '(11) 99999-9999',
-          role: 'user',
-          status: 'active',
-          avatar_url: '',
-          last_login: '2024-01-20T10:30:00Z',
-          created_at: '2023-06-15T14:20:00Z',
-          updated_at: '2024-01-20T10:30:00Z',
-          location: 'São Paulo, SP',
-          total_reservations: 5
-        },
-        {
-          id: '2',
-          email: 'joao.santos@email.com',
-          full_name: 'João Santos',
-          phone: '(11) 88888-8888',
-          role: 'user',
-          status: 'active',
-          avatar_url: '',
-          last_login: '2024-01-19T16:45:00Z',
-          created_at: '2023-08-22T09:10:00Z',
-          updated_at: '2024-01-19T16:45:00Z',
-          location: 'Rio de Janeiro, RJ',
-          total_reservations: 3
-        },
-        {
-          id: '3',
-          email: 'ana.costa@email.com',
-          full_name: 'Ana Costa',
-          phone: '(11) 77777-7777',
-          role: 'user',
-          status: 'inactive',
-          avatar_url: '',
-          last_login: '2023-12-10T08:20:00Z',
-          created_at: '2023-04-10T11:30:00Z',
-          updated_at: '2023-12-10T08:20:00Z',
-          location: 'Belo Horizonte, MG',
-          total_reservations: 1
-        },
-        {
-          id: '4',
-          email: 'armazemsaojoaquimoficial@gmail.com',
-          full_name: 'Administrador Armazém São Joaquim',
-          phone: '(11) 66666-6666',
-          role: 'admin',
-          status: 'active',
-          avatar_url: '',
-          last_login: '2024-01-22T14:15:00Z',
-          created_at: '2023-01-01T00:00:00Z',
-          updated_at: '2024-01-22T14:15:00Z',
-          location: 'São Paulo, SP',
-          total_reservations: 0
+  // Memoize endpoint to prevent unnecessary re-fetches
+  const endpoint = useMemo(() => '/users', [])
+  
+  // Use enhanced data loading hook
+  const { data: users, loading, error, isEmpty, retry, refresh } = useAdminData<UserData>(
+    endpoint,
+    {
+      transform: (response) => {
+        console.log('[UsersPage] Raw API response:', response)
+        
+        // Handle the users API response format
+        if (response && typeof response === 'object') {
+          let usersArray: any[] = []
+          
+          // Handle different response formats
+          if (response.success && response.data) {
+            // Check if data has users array (new API format)
+            if (response.data.users && Array.isArray(response.data.users)) {
+              usersArray = response.data.users
+            } else if (Array.isArray(response.data)) {
+              usersArray = response.data
+            } else {
+              usersArray = [response.data]
+            }
+          } else if (Array.isArray(response)) {
+            usersArray = response
+          } else if (response.users && Array.isArray(response.users)) {
+            usersArray = response.users
+          } else {
+            console.warn('[UsersPage] Unexpected response format:', response)
+            return []
+          }
+          
+          console.log('[UsersPage] Users array length:', usersArray.length)
+          
+          // Use the transformer to ensure consistent data format
+          const result = transformApiResponse(usersArray, new UserDataTransformer())
+          console.log('[UsersPage] Transformed users:', result.length)
+          return result
         }
-      ])
-    } catch (error) {
-      console.error('Erro ao carregar usuários:', error)
-    } finally {
-      setLoading(false)
+        
+        console.warn('[UsersPage] Unexpected response format')
+        return []
+      },
+      dependencies: [], // Remove dependencies to prevent cascading re-fetches
+      errorConfig: {
+        maxRetries: 2,
+        retryDelay: 1000,
+        showFallback: false
+      }
     }
-  }
+  )
 
-  const filteredUsers = users.filter(user => {
-    const matchesSearch = user.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         user.phone.includes(searchTerm)
-    const matchesRole = filterRole === 'all' || user.role === filterRole
-    const matchesStatus = filterStatus === 'all' || user.status === filterStatus
-    return matchesSearch && matchesRole && matchesStatus
-  })
+  // Memoize filtered users to prevent excessive re-calculations
+  const filteredUsers = useMemo(() => {
+    return users.filter(user => {
+      const matchesSearch = user.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           (user.phone || '').includes(searchTerm)
+      const matchesRole = filterRole === 'all' || user.role === filterRole
+      // Since UserData doesn't have status, we'll treat all as active
+      const matchesStatus = filterStatus === 'all' || filterStatus === 'active'
+      return matchesSearch && matchesRole && matchesStatus
+    })
+  }, [users, searchTerm, filterRole, filterStatus])
 
   const handleDeleteUser = async (userId: string) => {
     if (confirm('Tem certeza que deseja excluir este usuário?')) {
       try {
-        // TODO: Implement API call to delete user
-        // await fetch(`/api/admin/users/${userId}`, { method: 'DELETE' })
-        setUsers(users.filter(user => user.id !== userId))
+        await makeRequest(`/users/${userId}`, { method: 'DELETE' })
+        refresh() // Refresh data after deletion
       } catch (error) {
         console.error('Erro ao excluir usuário:', error)
+        alert('Erro ao excluir usuário. Tente novamente.')
       }
     }
   }
@@ -155,24 +135,21 @@ export default function UsersPage({ params }: UsersPageProps) {
   const handleToggleUserStatus = async (userId: string) => {
     try {
       // TODO: Implement API call to toggle user status
-      setUsers(users.map(user => 
-        user.id === userId 
-          ? { ...user, status: user.status === 'active' ? 'inactive' : 'active' as 'active' | 'inactive' }
-          : user
-      ))
+      console.log('Toggle status for user:', userId)
+      // For now just log since UserData doesn't have status field
     } catch (error) {
       console.error('Erro ao alterar status do usuário:', error)
     }
   }
 
-  const getStatusBadge = (status: string) => {
+  const getStatusBadge = (status: string = 'active') => {
     const statusConfig = {
       active: { label: 'Ativo', class: 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300' },
       inactive: { label: 'Inativo', class: 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300' },
       suspended: { label: 'Suspenso', class: 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300' }
     }
     
-    const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.inactive
+    const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.active
     
     return (
       <span className={`px-2 py-1 rounded-full text-xs font-medium ${config.class}`}>
@@ -182,36 +159,37 @@ export default function UsersPage({ params }: UsersPageProps) {
   }
 
   const getRoleBadge = (role: string) => {
-    const roleConfig = {
-      admin: { label: 'Admin', class: 'bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-300' },
-      user: { label: 'Usuário', class: 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-300' }
-    }
-    
-    const config = roleConfig[role as keyof typeof roleConfig] || roleConfig.user
-    
     return (
-      <span className={`px-2 py-1 rounded-full text-xs font-medium ${config.class}`}>
-        {config.label}
+      <span className={`px-2 py-1 rounded-full text-xs font-medium ${getRoleBadgeColor(role)}`}>
+        {role === 'admin' ? 'Admin' : 'Usuário'}
       </span>
     )
   }
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('pt-BR', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    })
-  }
-
-  if (loading) {
+  if (adminLoading || loading) {
     return (
       <div className="flex items-center justify-center py-12">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-400">Carregando usuários...</p>
+          <p className="text-gray-600 dark:text-gray-400">
+            {adminLoading ? 'Verificando permissões...' : 'Carregando usuários...'}
+          </p>
+        </div>
+      </div>
+    )
+  }
+
+  if (!isAuthorized) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="text-center">
+          <Shield className="h-12 w-12 text-red-400 mx-auto mb-4" />
+          <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+            Acesso Negado
+          </h3>
+          <p className="text-gray-600 dark:text-gray-400">
+            Você não tem permissão para acessar esta página.
+          </p>
         </div>
       </div>
     )
@@ -219,6 +197,7 @@ export default function UsersPage({ params }: UsersPageProps) {
 
   return (
     <div className="space-y-6">
+      <CacheDebugger />
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
@@ -334,7 +313,7 @@ export default function UsersPage({ params }: UsersPageProps) {
                 Usuários Ativos
               </p>
               <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                {users.filter(user => user.status === 'active').length}
+                {users.length}
               </p>
             </div>
           </div>
@@ -363,10 +342,10 @@ export default function UsersPage({ params }: UsersPageProps) {
             </div>
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                Total de Reservas
+                Total de Logins
               </p>
               <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                {users.reduce((sum, user) => sum + user.total_reservations, 0)}
+                {users.reduce((sum, user) => sum + user.sign_in_count, 0)}
               </p>
             </div>
           </div>
@@ -403,7 +382,7 @@ export default function UsersPage({ params }: UsersPageProps) {
                       {user.full_name}
                     </h3>
                     {getRoleBadge(user.role)}
-                    {getStatusBadge(user.status)}
+                    {getStatusBadge('active')}
                   </div>
                   
                   {/* Actions Menu */}
@@ -453,16 +432,11 @@ export default function UsersPage({ params }: UsersPageProps) {
                     </div>
                   )}
                   
-                  {user.location && (
-                    <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                      <MapPin className="h-4 w-4" />
-                      {user.location}
-                    </div>
-                  )}
+
                   
                   <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
                     <Calendar className="h-4 w-4" />
-                    {user.total_reservations} reservas
+                    {user.sign_in_count} logins
                   </div>
                 </div>
 
@@ -470,7 +444,7 @@ export default function UsersPage({ params }: UsersPageProps) {
                 <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
                   <div className="flex items-center gap-1">
                     <Clock className="h-4 w-4" />
-                    Último login: {formatDate(user.last_login)}
+                    Último login: {formatDate(user.last_sign_in)}
                   </div>
                   
                   <div className="flex items-center gap-1">
@@ -486,23 +460,10 @@ export default function UsersPage({ params }: UsersPageProps) {
                       size="sm"
                       variant="outline"
                       onClick={() => handleToggleUserStatus(user.id)}
-                      className={`flex items-center gap-2 ${
-                        user.status === 'active' 
-                          ? 'text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20'
-                          : 'text-green-600 hover:text-green-700 hover:bg-green-50 dark:hover:bg-green-900/20'
-                      }`}
+                      className="flex items-center gap-2 text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
                     >
-                      {user.status === 'active' ? (
-                        <>
-                          <UserX className="h-4 w-4" />
-                          Desativar
-                        </>
-                      ) : (
-                        <>
-                          <UserCheck className="h-4 w-4" />
-                          Ativar
-                        </>
-                      )}
+                      <UserX className="h-4 w-4" />
+                      Desativar
                     </Button>
                   </div>
                 )}

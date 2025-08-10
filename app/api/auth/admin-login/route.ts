@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { loginWithFallback, logAuthEvent, isAdminCredentials } from '@/lib/auth'
+import { loginWithFallback } from '@/lib/auth/enhanced-login'
+import { logAuthEvent } from '@/lib/auth/logging'
+import { isAdminCredentials } from '@/lib/auth/admin-verification'
 import { createServerClient } from '@/lib/supabase'
 
 export async function POST(request: NextRequest) {
@@ -7,18 +9,35 @@ export async function POST(request: NextRequest) {
     const { email, password } = await request.json()
 
     if (!email || !password) {
-      logAuthEvent('ADMIN_LOGIN_MISSING_CREDENTIALS')
+      await logAuthEvent({
+        email: email || '',
+        action: 'login',
+        method: 'admin_login_api',
+        success: false,
+        error: 'Missing credentials'
+      })
       return NextResponse.json({
         success: false,
         error: 'Email e password são obrigatórios'
       }, { status: 400 })
     }
 
-    logAuthEvent('ADMIN_LOGIN_ATTEMPT', { email })
+    await logAuthEvent({
+      email,
+      action: 'login',
+      method: 'admin_login_api',
+      success: false
+    })
 
     // Verificar se são credenciais admin
     if (!isAdminCredentials(email, password)) {
-      logAuthEvent('ADMIN_LOGIN_INVALID_CREDENTIALS', { email })
+      await logAuthEvent({
+        email,
+        action: 'login',
+        method: 'admin_login_api',
+        success: false,
+        error: 'Invalid admin credentials'
+      })
       return NextResponse.json({
         success: false,
         error: 'Credenciais inválidas para admin'
@@ -26,31 +45,33 @@ export async function POST(request: NextRequest) {
     }
 
     // Tentar login com fallback
-    const result = await loginWithFallback(email, password)
+    const result = await loginWithFallback({ email, password })
     
-    logAuthEvent('ADMIN_LOGIN_RESULT', {
+    await logAuthEvent({
+      email,
+      action: 'login',
+      method: 'admin_login_api',
       success: result.success,
-      method: result.method,
-      userId: result.user?.id
+      user_id: result.user?.id,
+      error: result.success ? undefined : (result.error || 'Login failed')
     })
 
     if (result.success) {
       // Se login bem-sucedido e tem sessão Supabase, configurar cookies
-      if (result.session && result.method === 'supabase_auth') {
+      if (result.session) {
         try {
           const supabase = await createServerClient()
           await supabase.auth.setSession(result.session)
-          logAuthEvent('ADMIN_LOGIN_COOKIES_SET')
+          // Session cookies set successfully
         } catch (error) {
-          logAuthEvent('ADMIN_LOGIN_COOKIES_ERROR', { error: error instanceof Error ? error.message : 'Unknown' })
+          console.error('Error setting session cookies:', error)
         }
       }
 
       return NextResponse.json({
         success: true,
         user: result.user,
-        method: result.method,
-        message: getSuccessMessage(result.method)
+        message: 'Login realizado com sucesso!'
       })
     }
 
@@ -60,7 +81,7 @@ export async function POST(request: NextRequest) {
     }, { status: 401 })
 
   } catch (error: any) {
-    logAuthEvent('ADMIN_LOGIN_INTERNAL_ERROR', { error: error.message })
+    console.error('Admin login internal error:', error)
     return NextResponse.json({
       success: false,
       error: 'Erro interno do servidor',

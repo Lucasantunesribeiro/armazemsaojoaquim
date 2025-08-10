@@ -13,6 +13,14 @@ const customJestConfig = {
   // Test environment
   testEnvironment: 'jsdom',
   
+  // ES modules support
+  extensionsToTreatAsEsm: ['.ts', '.tsx'],
+  globals: {
+    'ts-jest': {
+      useESM: true
+    }
+  },
+  
   // Module name mapping for path aliases
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/$1',
@@ -59,7 +67,7 @@ const customJestConfig = {
   },
   
   transformIgnorePatterns: [
-    '/node_modules/',
+    '/node_modules/(?!(isows|@supabase|@babel|@jest))',
     '^.+\\.module\\.(css|sass|scss)$',
   ],
   

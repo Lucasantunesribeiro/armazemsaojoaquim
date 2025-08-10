@@ -1,373 +1,349 @@
-import { NextResponse } from 'next/server'
-import { ZodError } from 'zod'
-import { auditLogger } from './audit-logger'
+// Comprehensive error handling utilities for admin panel
 
-// Tipos de erro personalizados
-export class AppError extends Error {
-  public readonly statusCode: number
-  public readonly isOperational: boolean
-  public readonly code?: string
-
-  constructor(
-    message: string,
-    statusCode: number = 500,
-    isOperational: boolean = true,
-    code?: string
-  ) {
-    super(message)
-    this.statusCode = statusCode
-    this.isOperational = isOperational
-    this.code = code
-
-    Error.captureStackTrace(this, this.constructor)
-  }
+export enum ErrorType {
+  NETWORK = 'NETWORK',
+  AUTHENTICATION = 'AUTHENTICATION',
+  AUTHORIZATION = 'AUTHORIZATION',
+  VALIDATION = 'VALIDATION',
+  SERVER = 'SERVER',
+  CLIENT = 'CLIENT',
+  TIMEOUT = 'TIMEOUT',
+  UNKNOWN = 'UNKNOWN'
 }
 
-export class ValidationError extends AppError {
-  public readonly validationErrors: string[]
-
-  constructor(message: string, validationErrors: string[] = []) {
-    super(message, 400, true, 'VALIDATION_ERROR')
-    this.validationErrors = validationErrors
-  }
+export interface AppError {
+  type: ErrorType
+  message: string
+  code?: string
+  details?: any
+  timestamp: number
+  endpoint?: string
+  retryable: boolean
 }
 
-export class AuthenticationError extends AppError {
-  constructor(message: string = 'Não autorizado') {
-    super(message, 401, true, 'AUTHENTICATION_ERROR')
-  }
-}
-
-export class AuthorizationError extends AppError {
-  constructor(message: string = 'Acesso negado') {
-    super(message, 403, true, 'AUTHORIZATION_ERROR')
-  }
-}
-
-export class NotFoundError extends AppError {
-  constructor(message: string = 'Recurso não encontrado') {
-    super(message, 404, true, 'NOT_FOUND_ERROR')
-  }
-}
-
-export class ConflictError extends AppError {
-  constructor(message: string = 'Conflito de dados') {
-    super(message, 409, true, 'CONFLICT_ERROR')
-  }
-}
-
-export class DatabaseError extends AppError {
-  constructor(message: string = 'Erro no banco de dados') {
-    super(message, 500, true, 'DATABASE_ERROR')
-  }
-}
-
-export class ExternalServiceError extends AppError {
-  constructor(message: string = 'Erro em serviço externo') {
-    super(message, 502, true, 'EXTERNAL_SERVICE_ERROR')
-  }
-}
-
-// Interface para resposta de erro padronizada
-interface ErrorResponse {
-  success: false
-  error: {
-    message: string
-    code?: string
-    statusCode: number
-    validationErrors?: string[]
-    requestId?: string
-    timestamp: string
-  }
-}
-
-// Classe principal para tratamento de erros
 export class ErrorHandler {
-  private static instance: ErrorHandler
+  private static errorLog: AppError[] = []
+  private static maxLogSize = 100
 
-  private constructor() {}
-
-  static getInstance(): ErrorHandler {
-    if (!ErrorHandler.instance) {
-      ErrorHandler.instance = new ErrorHandler()
+  static createError(
+    type: ErrorType,
+    message: string,
+    options: {
+      code?: string
+      details?: any
+      endpoint?: string
+      retryable?: boolean
+    } = {}
+  ): AppError {
+    const error: AppError = {
+      type,
+      message,
+      code: options.code,
+      details: options.details,
+      timestamp: Date.now(),
+      endpoint: options.endpoint,
+      retryable: options.retryable ?? this.isRetryableError(type)
     }
-    return ErrorHandler.instance
+
+    this.logError(error)
+    return error
   }
 
-  // Método principal para tratar erros em APIs
-  async handleError(error: unknown, request?: any): Promise<NextResponse<ErrorResponse>> {
-    const requestId = this.generateRequestId()
-    
-    // Log do erro
-    console.error(`[ERROR ${requestId}]`, error)
+  static fromHttpError(
+    error: any,
+    endpoint?: string
+  ): AppError {
+    if (error.response) {
+      const status = error.response.status
+      const data = error.response.data
 
-    // Determinar o tipo de erro e criar resposta apropriada
-    let errorResponse: ErrorResponse
+      switch (status) {
+        case 401:
+          return this.createError(
+            ErrorType.AUTHENTICATION,
+            'Sessão expirada. Faça login novamente.',
+            { code: 'AUTH_EXPIRED', endpoint, retryable: false }
+          )
 
-    if (error instanceof AppError) {
-      errorResponse = this.handleAppError(error, requestId)
-    } else if (error instanceof ZodError) {
-      errorResponse = this.handleZodError(error, requestId)
-    } else if (error instanceof Error) {
-      errorResponse = this.handleGenericError(error, requestId)
-    } else {
-      errorResponse = this.handleUnknownError(requestId)
-    }
+        case 403:
+          return this.createError(
+            ErrorType.AUTHORIZATION,
+            'Você não tem permissão para acessar este recurso.',
+            { code: 'ACCESS_DENIED', endpoint, retryable: false }
+          )
 
-    // Log de auditoria para erros críticos
-    if (errorResponse.error.statusCode >= 500) {
-      try {
-        await auditLogger.logSystemAction('error', {
-          error_type: errorResponse.error.code || 'UNKNOWN_ERROR',
-          error_message: errorResponse.error.message,
-          request_id: requestId,
-          stack: error instanceof Error ? error.stack : undefined
-        }, request)
-      } catch (auditError) {
-        console.error('Erro ao registrar log de auditoria:', auditError)
+        case 404:
+          return this.createError(
+            ErrorType.CLIENT,
+            'Recurso não encontrado.',
+            { code: 'NOT_FOUND', endpoint, retryable: false }
+          )
+
+        case 422:
+          return this.createError(
+            ErrorType.VALIDATION,
+            data?.message || 'Dados inválidos fornecidos.',
+            { code: 'VALIDATION_ERROR', details: data?.errors, endpoint, retryable: false }
+          )
+
+        case 429:
+          return this.createError(
+            ErrorType.CLIENT,
+            'Muitas tentativas. Tente novamente em alguns minutos.',
+            { code: 'RATE_LIMITED', endpoint, retryable: true }
+          )
+
+        case 500:
+        case 502:
+        case 503:
+        case 504:
+          return this.createError(
+            ErrorType.SERVER,
+            'Erro interno do servidor. Tente novamente mais tarde.',
+            { code: `HTTP_${status}`, endpoint, retryable: true }
+          )
+
+        default:
+          return this.createError(
+            ErrorType.SERVER,
+            data?.message || `Erro HTTP ${status}`,
+            { code: `HTTP_${status}`, endpoint, retryable: status >= 500 }
+          )
       }
     }
 
-    return NextResponse.json(errorResponse, {
-      status: errorResponse.error.statusCode
-    })
-  }
-
-  private handleAppError(error: AppError, requestId: string): ErrorResponse {
-    const response: ErrorResponse = {
-      success: false,
-      error: {
-        message: error.message,
-        code: error.code,
-        statusCode: error.statusCode,
-        requestId,
-        timestamp: new Date().toISOString()
-      }
-    }
-
-    if (error instanceof ValidationError) {
-      response.error.validationErrors = error.validationErrors
-    }
-
-    return response
-  }
-
-  private handleZodError(error: ZodError, requestId: string): ErrorResponse {
-    const validationErrors = error.errors.map(err => {
-      const path = err.path.length > 0 ? `${err.path.join('.')}: ` : ''
-      return `${path}${err.message}`
-    })
-
-    return {
-      success: false,
-      error: {
-        message: 'Dados de entrada inválidos',
-        code: 'VALIDATION_ERROR',
-        statusCode: 400,
-        validationErrors,
-        requestId,
-        timestamp: new Date().toISOString()
-      }
-    }
-  }
-
-  private handleGenericError(error: Error, requestId: string): ErrorResponse {
-    // Mapear erros comuns do Supabase
-    if (error.message.includes('duplicate key value')) {
-      return {
-        success: false,
-        error: {
-          message: 'Registro duplicado',
-          code: 'DUPLICATE_ENTRY',
-          statusCode: 409,
-          requestId,
-          timestamp: new Date().toISOString()
-        }
-      }
-    }
-
-    if (error.message.includes('foreign key constraint')) {
-      return {
-        success: false,
-        error: {
-          message: 'Violação de integridade referencial',
-          code: 'FOREIGN_KEY_VIOLATION',
-          statusCode: 400,
-          requestId,
-          timestamp: new Date().toISOString()
-        }
-      }
-    }
-
-    if (error.message.includes('permission denied') || error.message.includes('RLS')) {
-      return {
-        success: false,
-        error: {
-          message: 'Acesso negado',
-          code: 'PERMISSION_DENIED',
-          statusCode: 403,
-          requestId,
-          timestamp: new Date().toISOString()
-        }
-      }
-    }
-
-    if (error.message.includes('connection') || error.message.includes('timeout')) {
-      return {
-        success: false,
-        error: {
-          message: 'Erro de conexão com o banco de dados',
-          code: 'CONNECTION_ERROR',
-          statusCode: 503,
-          requestId,
-          timestamp: new Date().toISOString()
-        }
-      }
-    }
-
-    // Erro genérico
-    return {
-      success: false,
-      error: {
-        message: process.env.NODE_ENV === 'development' 
-          ? error.message 
-          : 'Erro interno do servidor',
-        code: 'INTERNAL_ERROR',
-        statusCode: 500,
-        requestId,
-        timestamp: new Date().toISOString()
-      }
-    }
-  }
-
-  private handleUnknownError(requestId: string): ErrorResponse {
-    return {
-      success: false,
-      error: {
-        message: 'Erro desconhecido',
-        code: 'UNKNOWN_ERROR',
-        statusCode: 500,
-        requestId,
-        timestamp: new Date().toISOString()
-      }
-    }
-  }
-
-  private generateRequestId(): string {
-    return `req_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`
-  }
-
-  // Método para tratar erros síncronos
-  handleSyncError(error: unknown): never {
-    if (error instanceof AppError) {
-      throw error
-    }
-
-    if (error instanceof Error) {
-      throw new AppError(
-        process.env.NODE_ENV === 'development' 
-          ? error.message 
-          : 'Erro interno',
-        500,
-        false
+    if (error.code === 'NETWORK_ERROR' || error.name === 'NetworkError') {
+      return this.createError(
+        ErrorType.NETWORK,
+        'Erro de conexão. Verifique sua internet e tente novamente.',
+        { code: 'NETWORK_ERROR', endpoint, retryable: true }
       )
     }
 
-    throw new AppError('Erro desconhecido', 500, false)
+    if (error.name === 'TimeoutError' || error.code === 'TIMEOUT') {
+      return this.createError(
+        ErrorType.TIMEOUT,
+        'Tempo limite excedido. Tente novamente.',
+        { code: 'TIMEOUT', endpoint, retryable: true }
+      )
+    }
+
+    return this.createError(
+      ErrorType.UNKNOWN,
+      error.message || 'Erro desconhecido. Tente novamente.',
+      { code: 'UNKNOWN', details: error, endpoint, retryable: true }
+    )
+  }
+
+  private static isRetryableError(type: ErrorType): boolean {
+    return [
+      ErrorType.NETWORK,
+      ErrorType.SERVER,
+      ErrorType.TIMEOUT
+    ].includes(type)
+  }
+
+  private static logError(error: AppError): void {
+    // Add to error log
+    this.errorLog.unshift(error)
+    
+    // Keep log size manageable
+    if (this.errorLog.length > this.maxLogSize) {
+      this.errorLog = this.errorLog.slice(0, this.maxLogSize)
+    }
+
+    // Log to console in development
+    if (process.env.NODE_ENV === 'development') {
+      console.error('🚨 [ErrorHandler]', error)
+    }
+
+    // In production, you might want to send to error tracking service
+    if (process.env.NODE_ENV === 'production' && error.type === ErrorType.SERVER) {
+      // Example: Send to error tracking service
+      // errorTrackingService.captureError(error)
+    }
+  }
+
+  static getErrorLog(): AppError[] {
+    return [...this.errorLog]
+  }
+
+  static clearErrorLog(): void {
+    this.errorLog = []
+  }
+
+  static getErrorStats() {
+    const stats = {
+      total: this.errorLog.length,
+      byType: {} as Record<ErrorType, number>,
+      recent: this.errorLog.filter(e => Date.now() - e.timestamp < 60000).length // Last minute
+    }
+
+    this.errorLog.forEach(error => {
+      stats.byType[error.type] = (stats.byType[error.type] || 0) + 1
+    })
+
+    return stats
   }
 }
 
-// Wrapper para APIs com tratamento de erro automático
+// Retry utility with exponential backoff
+export class RetryManager {
+  static async withRetry<T>(
+    operation: () => Promise<T>,
+    options: {
+      maxRetries?: number
+      baseDelay?: number
+      maxDelay?: number
+      backoffFactor?: number
+      shouldRetry?: (error: any) => boolean
+    } = {}
+  ): Promise<T> {
+    const {
+      maxRetries = 3,
+      baseDelay = 1000,
+      maxDelay = 10000,
+      backoffFactor = 2,
+      shouldRetry = (error) => {
+        const appError = ErrorHandler.fromHttpError(error)
+        return appError.retryable
+      }
+    } = options
+
+    let lastError: any
+    
+    for (let attempt = 0; attempt <= maxRetries; attempt++) {
+      try {
+        return await operation()
+      } catch (error) {
+        lastError = error
+        
+        // Don't retry on last attempt or if error is not retryable
+        if (attempt === maxRetries || !shouldRetry(error)) {
+          throw error
+        }
+
+        // Calculate delay with exponential backoff
+        const delay = Math.min(
+          baseDelay * Math.pow(backoffFactor, attempt),
+          maxDelay
+        )
+
+        console.log(`🔄 [RetryManager] Attempt ${attempt + 1}/${maxRetries + 1} failed, retrying in ${delay}ms...`)
+        
+        await new Promise(resolve => setTimeout(resolve, delay))
+      }
+    }
+
+    throw lastError
+  }
+}
+
+// Circuit breaker pattern for failing services
+export class CircuitBreaker {
+  private failures = 0
+  private lastFailureTime = 0
+  private state: 'CLOSED' | 'OPEN' | 'HALF_OPEN' = 'CLOSED'
+
+  constructor(
+    private threshold: number = 5,
+    private timeout: number = 60000 // 1 minute
+  ) {}
+
+  async execute<T>(operation: () => Promise<T>): Promise<T> {
+    if (this.state === 'OPEN') {
+      if (Date.now() - this.lastFailureTime > this.timeout) {
+        this.state = 'HALF_OPEN'
+      } else {
+        throw ErrorHandler.createError(
+          ErrorType.SERVER,
+          'Serviço temporariamente indisponível. Tente novamente mais tarde.',
+          { code: 'CIRCUIT_BREAKER_OPEN', retryable: true }
+        )
+      }
+    }
+
+    try {
+      const result = await operation()
+      this.onSuccess()
+      return result
+    } catch (error) {
+      this.onFailure()
+      throw error
+    }
+  }
+
+  private onSuccess(): void {
+    this.failures = 0
+    this.state = 'CLOSED'
+  }
+
+  private onFailure(): void {
+    this.failures++
+    this.lastFailureTime = Date.now()
+
+    if (this.failures >= this.threshold) {
+      this.state = 'OPEN'
+    }
+  }
+
+  getState() {
+    return {
+      state: this.state,
+      failures: this.failures,
+      lastFailureTime: this.lastFailureTime
+    }
+  }
+}
+
+// Global error boundary for React components
+export function handleComponentError(error: Error, errorInfo: any) {
+  const appError = ErrorHandler.createError(
+    ErrorType.CLIENT,
+    `Erro no componente: ${error.message}`,
+    {
+      code: 'COMPONENT_ERROR',
+      details: { error: error.stack, errorInfo },
+      retryable: false
+    }
+  )
+
+  console.error('🚨 [Component Error]', appError)
+  
+  // In production, send to error tracking
+  if (process.env.NODE_ENV === 'production') {
+    // errorTrackingService.captureError(appError)
+  }
+}
+
+// Higher-order function for API route error handling
 export function withErrorHandler<T extends any[], R>(
   handler: (...args: T) => Promise<R>
 ) {
-  return async (...args: T): Promise<R | NextResponse<ErrorResponse>> => {
+  return async (...args: T): Promise<R> => {
     try {
       return await handler(...args)
     } catch (error) {
-      const errorHandler = ErrorHandler.getInstance()
-      
-      // Tentar extrair request do primeiro argumento se for NextRequest
-      const request = args[0] && typeof args[0] === 'object' && 'headers' in args[0] 
-        ? args[0] as any 
-        : undefined
-      
-      return errorHandler.handleError(error, request)
+      const appError = ErrorHandler.fromHttpError(error)
+      console.error('🚨 [API Error]', appError)
+      throw error
     }
   }
 }
 
-// Instância singleton
-export const errorHandler = ErrorHandler.getInstance()
-
-// Funções utilitárias para lançar erros específicos
-export function throwValidationError(message: string, validationErrors: string[] = []) {
-  throw new ValidationError(message, validationErrors)
+// Utility functions for throwing specific errors
+export function throwAuthenticationError(message?: string): never {
+  throw ErrorHandler.createError(
+    ErrorType.AUTHENTICATION,
+    message || 'Authentication required',
+    { code: 'AUTH_REQUIRED', retryable: false }
+  )
 }
 
-export function throwAuthenticationError(message?: string) {
-  throw new AuthenticationError(message)
-}
-
-export function throwAuthorizationError(message?: string) {
-  throw new AuthorizationError(message)
-}
-
-export function throwNotFoundError(message?: string) {
-  throw new NotFoundError(message)
-}
-
-export function throwConflictError(message?: string) {
-  throw new ConflictError(message)
-}
-
-export function throwDatabaseError(message?: string) {
-  throw new DatabaseError(message)
-}
-
-export function throwExternalServiceError(message?: string) {
-  throw new ExternalServiceError(message)
-}
-
-// Middleware para capturar erros não tratados
-export function setupErrorHandling() {
-  process.on('unhandledRejection', (reason, promise) => {
-    console.error('Unhandled Rejection at:', promise, 'reason:', reason)
-    // Não encerrar o processo em produção para evitar downtime
-    if (process.env.NODE_ENV === 'development') {
-      process.exit(1)
-    }
-  })
-
-  process.on('uncaughtException', (error) => {
-    console.error('Uncaught Exception:', error)
-    // Registrar no audit log
-    auditLogger.logSystemAction('uncaught_exception', {
-      error_message: error.message,
-      error_stack: error.stack
-    }).catch(console.error)
-    
-    process.exit(1)
-  })
-}
-
-// Hook para React (client-side)
-export function useErrorHandler() {
-  const handleError = (error: unknown, fallbackMessage?: string) => {
-    console.error('Client error:', error)
-    
-    if (error instanceof Error) {
-      return {
-        message: fallbackMessage || error.message,
-        isError: true
-      }
-    }
-    
-    return {
-      message: fallbackMessage || 'Ocorreu um erro inesperado',
-      isError: true
-    }
-  }
-
-  return { handleError }
+export function throwAuthorizationError(message?: string): never {
+  throw ErrorHandler.createError(
+    ErrorType.AUTHORIZATION,
+    message || 'Access denied',
+    { code: 'ACCESS_DENIED', retryable: false }
+  )
 }

@@ -1,0 +1,36 @@
+{
+  "timestamp": "2025-08-09T12:40:33.020Z",
+  "summary": {
+    "total": 5,
+    "passed": 0,
+    "failed": 5,
+    "pending": 0
+  },
+  "results": {
+    "diagnostic": {
+      "status": "failed",
+      "output": "",
+      "error": "Cannot access 'process' before initialization"
+    },
+    "fix": {
+      "status": "failed",
+      "output": "",
+      "error": "Cannot access 'process' before initialization"
+    },
+    "unit": {
+      "status": "failed",
+      "output": "",
+      "error": "Cannot access 'process' before initialization"
+    },
+    "integration": {
+      "status": "failed",
+      "output": "",
+      "error": "Cannot access 'process' before initialization"
+    },
+    "e2e": {
+      "status": "failed",
+      "output": "",
+      "error": "Cannot access 'process' before initialization"
+    }
+  }
+}

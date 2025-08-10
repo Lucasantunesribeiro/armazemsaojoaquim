@@ -3,7 +3,6 @@ import { Inter } from 'next/font/google'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
 import BottomNavigation from '@/components/ui/BottomNavigation'
-import { Toaster } from '@/components/ui/Toaster'
 import { Providers } from '@/components/providers/Providers'
 import '../globals.css'
 import { Suspense } from 'react'
@@ -28,15 +27,16 @@ export default async function LocaleLayout({
   const { locale } = await params
   return (
     <>
-      <Header />
-      <main className="min-h-screen main-content-mobile">
-        <Suspense fallback={<Loading />}>
-          {children}
-        </Suspense>
-      </main>
-      <Footer />
-      <BottomNavigation />
-      <Toaster />
+      <Providers>
+        <Header />
+        <main className="min-h-screen main-content-mobile">
+          <Suspense fallback={<Loading />}>
+            {children}
+          </Suspense>
+        </main>
+        <Footer />
+        <BottomNavigation />
+      </Providers>
     </>
   )
 }

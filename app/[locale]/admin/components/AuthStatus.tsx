@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/Button'
 import { RefreshCw, Shield, AlertTriangle, CheckCircle } from 'lucide-react'
 
 export default function AuthStatus() {
-  const { isAuthenticated, isLoading, error, refreshSession } = useAdminApi()
+  const { isAuthorized: isAuthenticated, isLoading } = useAdminApi()
 
   if (isLoading) {
     return (
@@ -27,15 +27,15 @@ export default function AuthStatus() {
         <AlertTitle className="text-red-800">Erro de autenticação</AlertTitle>
         <AlertDescription className="text-red-700">
           <div className="space-y-2">
-            <p>{error || 'Sua sessão expirou ou não foi encontrada.'}</p>
+            <p>Sua sessão expirou ou não foi encontrada.</p>
             <Button
-              onClick={refreshSession}
+              onClick={() => window.location.reload()}
               variant="outline"
               size="sm"
               className="flex items-center gap-2 border-red-300 hover:bg-red-100"
             >
               <RefreshCw className="h-4 w-4" />
-              Tentar renovar sessão
+              Recarregar página
             </Button>
           </div>
         </AlertDescription>

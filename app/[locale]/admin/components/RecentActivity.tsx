@@ -26,7 +26,7 @@ interface ActivityItem {
 }
 
 export default function RecentActivity() {
-  const { adminFetch, isAuthenticated, isLoading: authLoading, error: authError, refreshSession } = useAdminApi()
+  const { adminFetch, isAuthorized: isAuthenticated, isLoading: authLoading } = useAdminApi()
   const [activities, setActivities] = useState<ActivityItem[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -61,19 +61,15 @@ export default function RecentActivity() {
       const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido'
       setError(errorMessage)
       
-      // Se for erro de autenticação e ainda não tentou renovar, tentar renovar
+      // Se for erro de autenticação e ainda não tentou novamente, tentar uma vez mais
       if ((errorMessage.includes('session') || errorMessage.includes('auth')) && retryCount === 0) {
-        console.log('🔄 Tentando renovar sessão...')
-        const refreshed = await refreshSession()
-        
-        if (refreshed) {
-          setRetryCount(1)
-          // Tentar novamente após renovar
-          setTimeout(() => {
-            loadRecentActivity()
-          }, 1000)
-          return
-        }
+        console.log('🔄 Tentando novamente...')
+        setRetryCount(1)
+        // Tentar novamente após delay
+        setTimeout(() => {
+          loadRecentActivity()
+        }, 1000)
+        return
       }
       
       // Usar dados de fallback após falha
@@ -204,7 +200,7 @@ export default function RecentActivity() {
   }
 
   // Mostrar erro de autenticação
-  if (authError && !isAuthenticated) {
+  if (!isAuthenticated && !authLoading) {
     return (
       <Card>
         <CardHeader>
@@ -213,7 +209,7 @@ export default function RecentActivity() {
             Atividade Recente
           </CardTitle>
           <CardDescription className="text-destructive">
-            {authError}
+            Acesso não autorizado. Faça login como administrador.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -221,13 +217,13 @@ export default function RecentActivity() {
             <div className="text-center space-y-4">
               <p className="text-muted-foreground">Erro de autenticação</p>
               <Button
-                onClick={refreshSession}
+                onClick={() => window.location.reload()}
                 variant="outline"
                 size="sm"
                 className="flex items-center gap-2"
               >
                 <RefreshCw className="h-4 w-4" />
-                Tentar novamente
+                Recarregar Página
               </Button>
             </div>
           </div>

@@ -2107,6 +2107,134 @@ select:focus {
   animation: progress-fill linear forwards;
 }
 
+/* Theme-aware toast CSS variables defaults (fallback) */
+:root {
+  --toast-bg: var(--toast-info-bg, #eff6ff);
+  --toast-border: var(--toast-info-border, #2563eb);
+  --toast-text: var(--toast-info-text, #1d4ed8);
+}
+
+[data-theme="dark"], .dark {
+  --toast-bg: var(--toast-info-bg, #1e3a8a);
+  --toast-border: var(--toast-info-border, #3b82f6);
+  --toast-text: var(--toast-info-text, #60a5fa);
+}
+
+/* LocationButton CSS Custom Properties for Theme Consistency */
+:root {
+  /* Primary Location Button Colors - Light Theme */
+  --location-button-primary-bg: #d97706; /* amber-600 */
+  --location-button-primary-hover: #b45309; /* amber-700 */
+  --location-button-primary-text: #ffffff;
+  --location-button-primary-ring: #f59e0b; /* amber-500 */
+  
+  /* Outline Variant Colors - Light Theme */
+  --location-button-outline-border: #d97706; /* amber-600 */
+  --location-button-outline-text: #b45309; /* amber-700 */
+  --location-button-outline-bg: #ffffff;
+  --location-button-outline-hover: #fef3c7; /* amber-50 */
+  
+  /* Secondary Variant Colors - Light Theme */
+  --location-button-secondary-bg: #fef3c7; /* amber-100 */
+  --location-button-secondary-text: #92400e; /* amber-800 */
+  --location-button-secondary-hover: #fde68a; /* amber-200 */
+  
+  /* Ghost Variant Colors - Light Theme */
+  --location-button-ghost-text: #b45309; /* amber-700 */
+  --location-button-ghost-hover-bg: #fef3c7; /* amber-100 */
+  --location-button-ghost-hover-text: #92400e; /* amber-800 */
+  
+  /* Google Maps Button Colors - Light Theme */
+  --google-maps-button-bg: #2563eb; /* blue-600 */
+  --google-maps-button-hover: #1d4ed8; /* blue-700 */
+  --google-maps-button-text: #ffffff;
+  --google-maps-button-ring: #3b82f6; /* blue-500 */
+  
+  /* Waze Button Colors - Light Theme */
+  --waze-button-bg: #06b6d4; /* cyan-500 */
+  --waze-button-hover: #0891b2; /* cyan-600 */
+  --waze-button-text: #ffffff;
+  --waze-button-ring: #06b6d4; /* cyan-500 */
+  
+  /* Apple Maps Button Colors - Light Theme */
+  --apple-maps-button-bg: #374151; /* gray-700 */
+  --apple-maps-button-hover: #1f2937; /* gray-800 */
+  --apple-maps-button-text: #ffffff;
+  --apple-maps-button-ring: #6b7280; /* gray-500 */
+  
+  /* Shadow and Effects - Light Theme */
+  --location-button-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --location-button-shadow-hover: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  
+  /* Transitions */
+  --location-button-transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Dark Theme Overrides for LocationButton */
+[data-theme="dark"], .dark {
+  /* Primary Button Dark Theme */
+  --location-button-primary-bg: #d97706; /* Keep amber for visibility */
+  --location-button-primary-hover: #f59e0b; /* Lighter on hover in dark */
+  --location-button-primary-text: #000000; /* Black text for better contrast */
+  
+  /* Outline Variant Dark Theme */
+  --location-button-outline-border: #f59e0b; /* amber-500 */
+  --location-button-outline-text: #fbbf24; /* amber-400 */
+  --location-button-outline-bg: #111827; /* gray-900 */
+  --location-button-outline-hover: #451a03; /* amber-950 */
+  
+  /* Secondary Variant Dark Theme */
+  --location-button-secondary-bg: #451a03; /* amber-900 */
+  --location-button-secondary-text: #fef3c7; /* amber-100 */
+  --location-button-secondary-hover: #92400e; /* amber-800 */
+  
+  /* Ghost Variant Dark Theme */
+  --location-button-ghost-text: #fbbf24; /* amber-400 */
+  --location-button-ghost-hover-bg: #451a03; /* amber-950 */
+  --location-button-ghost-hover-text: #fde68a; /* amber-300 */
+  
+  /* Google Maps Button Dark Theme */
+  --google-maps-button-bg: #1d4ed8; /* blue-700 */
+  --google-maps-button-hover: #2563eb; /* blue-600 */
+  
+  /* Waze Button Dark Theme */
+  --waze-button-bg: #0891b2; /* cyan-600 */
+  --waze-button-hover: #06b6d4; /* cyan-500 */
+  
+  /* Apple Maps Button Dark Theme */
+  --apple-maps-button-bg: #4b5563; /* gray-600 */
+  --apple-maps-button-hover: #6b7280; /* gray-500 */
+  
+  /* Shadow and Effects Dark Theme */
+  --location-button-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.3), 0 4px 6px -4px rgb(0 0 0 / 0.3);
+  --location-button-shadow-hover: 0 20px 25px -5px rgb(0 0 0 / 0.4), 0 8px 10px -6px rgb(0 0 0 / 0.4);
+}
+
+/* High Contrast Mode Support for LocationButton */
+@media (prefers-contrast: high) {
+  :root {
+    --location-button-primary-bg: #000000;
+    --location-button-primary-text: #ffffff;
+    --location-button-outline-border: #000000;
+    --location-button-outline-text: #000000;
+    --location-button-shadow: 0 0 0 2px #000000;
+  }
+  
+  .dark {
+    --location-button-primary-bg: #ffffff;
+    --location-button-primary-text: #000000;
+    --location-button-outline-border: #ffffff;
+    --location-button-outline-text: #ffffff;
+  }
+}
+
+/* Reduced Motion Support for LocationButton */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --location-button-transition: none;
+  }
+}
+
 /* Toast responsive adjustments */
 @media (max-width: 640px) {
   .toast-container {

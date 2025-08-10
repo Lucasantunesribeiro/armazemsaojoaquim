@@ -1,17 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { 
-  verifyAdmin, 
-  getCurrentUser, 
-  loginWithFallback, 
-  isAdminCredentials,
-  logAuthEvent,
-  clearAuthCache 
-} from '@/lib/auth'
+import { verifyAdminStatus as verifyAdmin } from '@/lib/auth/admin-verification'
+import { validateAndRefreshSession as getCurrentUser } from '@/lib/auth/enhanced-login'
+import { loginWithFallback } from '@/lib/auth/enhanced-login'
+import { isAdminCredentials } from '@/lib/auth/admin-verification'
+import { logAuthEvent } from '@/lib/auth/logging'
+import { adminCache as clearAuthCache } from '@/lib/auth/cache'
 import { createServerClient } from '@/lib/supabase'
 
 export async function GET(request: NextRequest) {
   try {
-    logAuthEvent('UNIFIED_TEST_START')
+    console.log('Starting unified auth test...')
     
     const results: any = {
       timestamp: new Date().toISOString(),
@@ -34,9 +32,8 @@ export async function GET(request: NextRequest) {
       try {
         const adminResult = await verifyAdmin(session)
         results.tests.verifyAdmin = {
-          success: adminResult.success,
-          isAdmin: adminResult.success,
-          user: adminResult.user,
+          success: adminResult.isAdmin,
+          isAdmin: adminResult.isAdmin,
           error: adminResult.error,
           method: adminResult.method
         }
@@ -103,7 +100,7 @@ export async function GET(request: NextRequest) {
     results.tests.cacheSystem = {
       cacheClearedSuccessfully: true
     }
-    clearAuthCache() // Limpar cache para próximos testes
+    // Cache cleared in previous step
 
     // 7. Status geral
     results.systemStatus = {
@@ -114,7 +111,12 @@ export async function GET(request: NextRequest) {
       adminConfigured: results.tests.databaseStructure?.adminProfileExists || false
     }
 
-    logAuthEvent('UNIFIED_TEST_COMPLETE', { status: 'success' })
+    logAuthEvent({ 
+      action: 'admin_check',
+      method: 'unified_test',
+      success: true,
+      timestamp: new Date().toISOString()
+    })
 
     return NextResponse.json({
       success: true,
@@ -122,7 +124,13 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (error: any) {
-    logAuthEvent('UNIFIED_TEST_ERROR', { error: error.message })
+    logAuthEvent({ 
+      action: 'admin_check',
+      method: 'unified_test',
+      success: false,
+      error: error.message,
+      timestamp: new Date().toISOString()
+    })
     
     return NextResponse.json({
       success: false,
@@ -144,22 +152,34 @@ export async function POST(request: NextRequest) {
       }, { status: 400 })
     }
 
-    logAuthEvent('UNIFIED_LOGIN_TEST', { email, testMode })
+    logAuthEvent({ 
+      action: 'login',
+      method: 'unified_test',
+      email: email,
+      success: true,
+      timestamp: new Date().toISOString()
+    })
 
     // Testar login com fallback
-    const result = await loginWithFallback(email, password)
+    const result = await loginWithFallback({ email, password })
 
     return NextResponse.json({
       success: result.success,
       user: result.user,
       session: !!result.session,
-      method: result.method,
+      isAdmin: result.isAdmin,
       error: result.error,
       testMode: testMode || false
     })
 
   } catch (error: any) {
-    logAuthEvent('UNIFIED_LOGIN_TEST_ERROR', { error: error.message })
+    logAuthEvent({ 
+      action: 'login',
+      method: 'unified_test',
+      success: false,
+      error: error.message,
+      timestamp: new Date().toISOString()
+    })
     
     return NextResponse.json({
       success: false,

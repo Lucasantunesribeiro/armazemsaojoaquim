@@ -1,0 +1,166 @@
+/* LocationButton Component Styles */
+
+/* Focus Visible Styles for Better Accessibility */
+.location-button:focus-visible {
+  outline: 2px solid var(--location-button-primary-ring);
+  outline-offset: 2px;
+}
+
+/* Ensure text is never transparent */
+.location-button-text {
+  opacity: 1 !important;
+  color: inherit !important;
+}
+
+/* Loading state accessibility */
+.location-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.location-button:disabled .location-button-text {
+  opacity: 0.8 !important;
+}
+
+/* Map Service Button Specific Styles */
+.map-service-button {
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(8px);
+}
+
+/* Google Maps Button Enhancements */
+.map-service-button.google-maps {
+  background: linear-gradient(135deg, #4285f4 0%, #34a853 50%, #ea4335 100%);
+  background-size: 200% 200%;
+  animation: google-gradient 3s ease infinite;
+}
+
+.map-service-button.google-maps:hover {
+  background-position: right center;
+  box-shadow: 0 8px 25px rgba(66, 133, 244, 0.3);
+}
+
+@keyframes google-gradient {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Waze Button Enhancements */
+.map-service-button.waze {
+  background: linear-gradient(135deg, #00d4ff 0%, #00b8d4 100%);
+  position: relative;
+}
+
+.map-service-button.waze::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transition: left 0.5s;
+}
+
+.map-service-button.waze:hover::before {
+  left: 100%;
+}
+
+.map-service-button.waze:hover {
+  box-shadow: 0 8px 25px rgba(0, 212, 255, 0.3);
+}
+
+/* Apple Maps Button Enhancements */
+.map-service-button.apple-maps {
+  background: linear-gradient(135deg, #1c1c1e 0%, #48484a 100%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.map-service-button.apple-maps:hover {
+  background: linear-gradient(135deg, #2c2c2e 0%, #58585a 100%);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
+/* Failed Service Button */
+.map-service-button.failed {
+  background: linear-gradient(135deg, #6b7280 0%, #9ca3af 100%);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Preferred Service Indicator */
+.map-service-button.preferred {
+  position: relative;
+}
+
+.map-service-button.preferred::after {
+  content: '';
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 8px;
+  height: 8px;
+  background: #fbbf24;
+  border-radius: 50%;
+  border: 2px solid white;
+  animation: pulse-star 2s infinite;
+}
+
+@keyframes pulse-star {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.2); opacity: 0.8; }
+}
+
+/* Shimmer Effect for Loading States */
+.map-service-button.loading {
+  position: relative;
+  overflow: hidden;
+}
+
+.map-service-button.loading::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% { left: -100%; }
+  100% { left: 100%; }
+}
+
+/* Mobile Responsive Adjustments */
+@media (max-width: 1024px) {
+  .map-service-button {
+    padding: 0.75rem 1rem;
+    font-size: 0.875rem;
+  }
+}
+
+/* Touch Device Optimizations */
+@media (hover: none) and (pointer: coarse) {
+  .map-service-button {
+    min-height: 44px; /* iOS touch target minimum */
+    min-width: 44px;
+  }
+  
+  .map-service-button:hover {
+    transform: none; /* Disable hover transforms on touch devices */
+  }
+}
+
+/* Print Styles */
+@media print {
+  .map-service-button {
+    background: white !important;
+    color: black !important;
+    border: 1px solid black !important;
+    box-shadow: none !important;
+  }
+}

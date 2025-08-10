@@ -94,6 +94,7 @@ export function BlogPostForm({ initialData = null }: BlogPostFormProps) {
       router.refresh()
     } catch (error) {
       console.error('Erro ao salvar post:', error)
+      // TODO: Substituir por toast quando disponível no contexto
       alert('Erro ao salvar post. Tente novamente.')
     } finally {
       setIsLoading(false)

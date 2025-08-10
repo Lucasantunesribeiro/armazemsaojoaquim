@@ -103,94 +103,62 @@ function cleanExpiredCache(): void {
   }
 }
 
-// Robust admin authentication middleware
+// Simplified admin authentication middleware
 async function verifyAdminAccess(
   supabase: any,
   session: any,
   userId: string,
   email: string
 ): Promise<{ isAdmin: boolean; reason: string }> {
-  // Primary verification: Check admin email
-  if (email === ADMIN_EMAIL) {
-    console.log('✅ MIDDLEWARE: Admin verified by email:', email)
-    return { isAdmin: true, reason: 'admin_email' }
-  }
-
-  // Check cache first
-  const cached = getAdminFromCache(userId, email)
-  if (cached !== null) {
-    if (cached.expired) {
-      console.log('⏰ MIDDLEWARE: Session expired for:', email)
-      return { isAdmin: false, reason: 'session_expired' }
-    }
-    console.log('📋 MIDDLEWARE: Admin status from cache:', cached.isAdmin)
-    return { isAdmin: cached.isAdmin, reason: 'cache' }
-  }
-
-  // Database verification
   try {
-    console.log('🔍 MIDDLEWARE: Checking database for user:', email)
+    // Primary check: Admin email
+    if (email === ADMIN_EMAIL) {
+      console.log('✅ MIDDLEWARE: Admin verified by email')
+      setAdminCache(userId, email, true, session.created_at ? new Date(session.created_at).getTime() : Date.now())
+      return { isAdmin: true, reason: 'admin_email' }
+    }
     
-    // First try by user ID
-    let { data: profile, error } = await supabase
-      .from('profiles')
-      .select('role, email')
-      .eq('id', userId)
-      .single()
-
-    // If not found by ID, try by email
-    if (error && email) {
-      console.log('🔄 MIDDLEWARE: Trying by email fallback')
-      const result = await supabase
+    // Check cache first for performance
+    const cached = getAdminFromCache(userId, email)
+    if (cached !== null && !cached.expired) {
+      console.log('📋 MIDDLEWARE: Using cached admin result')
+      return { isAdmin: cached.isAdmin, reason: 'cache' }
+    }
+    
+    // Database verification as fallback
+    try {
+      const { data: profile, error } = await supabase
         .from('profiles')
-        .select('role, email')
-        .eq('email', email)
+        .select('role')
+        .eq('id', userId)
         .single()
       
-      profile = result.data
-      error = result.error
-    }
-
-    if (error) {
-      console.log('❌ MIDDLEWARE: Database error:', error.message)
-      
-      // For admin email, create profile if it doesn't exist
-      if (email === ADMIN_EMAIL) {
-        console.log('🔧 MIDDLEWARE: Creating admin profile for:', email)
-        try {
-          await supabase.rpc('ensure_admin_profile', {
-            admin_id: userId,
-            admin_email: email,
-            admin_name: 'Administrador Armazém São Joaquim'
-          })
-          
-          setAdminCache(userId, email, true, session.created_at ? new Date(session.created_at).getTime() : Date.now())
-          return { isAdmin: true, reason: 'admin_profile_created' }
-        } catch (createError) {
-          console.error('❌ MIDDLEWARE: Failed to create admin profile:', createError)
-        }
+      if (!error && profile) {
+        const isAdmin = profile.role === 'admin'
+        setAdminCache(userId, email, isAdmin, session.created_at ? new Date(session.created_at).getTime() : Date.now())
+        console.log(`✅ MIDDLEWARE: Database verification - isAdmin: ${isAdmin}`)
+        return { isAdmin, reason: 'database' }
       }
-      
-      setAdminCache(userId, email, false)
-      return { isAdmin: false, reason: 'database_error' }
+    } catch (dbError) {
+      console.warn('⚠️ MIDDLEWARE: Database check failed:', dbError)
     }
-
-    const isAdmin = profile.role === 'admin'
-    console.log('✅ MIDDLEWARE: Database check complete. Admin:', isAdmin)
     
-    setAdminCache(userId, email, isAdmin, session.created_at ? new Date(session.created_at).getTime() : Date.now())
-    return { isAdmin, reason: 'database' }
-
-  } catch (dbError: any) {
-    console.error('❌ MIDDLEWARE: Database query failed:', dbError)
+    // Not admin
+    console.log('❌ MIDDLEWARE: User is not admin')
+    setAdminCache(userId, email, false, session.created_at ? new Date(session.created_at).getTime() : Date.now())
+    return { isAdmin: false, reason: 'not_admin' }
     
-    // Fallback for admin email
+  } catch (error: any) {
+    console.error('❌ MIDDLEWARE: Admin verification error:', error)
+    
+    // Fallback to email check for critical errors
     if (email === ADMIN_EMAIL) {
-      console.log('⚠️ MIDDLEWARE: Database failed but admin email - allowing access')
+      console.log('⚠️ MIDDLEWARE: Error occurred but admin email - allowing access')
+      setAdminCache(userId, email, true, session.created_at ? new Date(session.created_at).getTime() : Date.now())
       return { isAdmin: true, reason: 'admin_email_fallback' }
     }
     
-    return { isAdmin: false, reason: 'database_failure' }
+    return { isAdmin: false, reason: 'verification_error' }
   }
 }
 
@@ -247,8 +215,40 @@ export async function middleware(request: NextRequest) {
     // Get session with error handling for Edge Runtime
     let session = null
     try {
+      // First try to get session from cookies
       const { data: { session: userSession }, error } = await supabase.auth.getSession()
       session = userSession
+      
+      // If no session from cookies, try Authorization header
+      if (!session && request.headers.get('authorization')) {
+        const authHeader = request.headers.get('authorization')
+        if (authHeader?.startsWith('Bearer ')) {
+          const token = authHeader.split(' ')[1]
+          console.log('🔑 MIDDLEWARE: Trying Authorization header...')
+          
+          try {
+            // Create a new client with the token
+            const { createClient } = await import('@supabase/supabase-js')
+            const tokenClient = createClient(
+              process.env.NEXT_PUBLIC_SUPABASE_URL!,
+              process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+            )
+            
+            const { data: { user }, error: tokenError } = await tokenClient.auth.getUser(token)
+            
+            if (!tokenError && user) {
+              console.log('✅ MIDDLEWARE: Session found via Authorization header')
+              session = {
+                user,
+                access_token: token,
+                expires_at: Math.floor(Date.now() / 1000) + 3600 // 1 hour from now
+              }
+            }
+          } catch (tokenError) {
+            console.warn('⚠️ MIDDLEWARE: Authorization header error:', tokenError)
+          }
+        }
+      }
       
       // Refresh user data if session exists (Next.js 15 compatibility)
       if (session && !error) {

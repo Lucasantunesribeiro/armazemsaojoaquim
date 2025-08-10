@@ -10,6 +10,9 @@ import { Input } from '@/components/ui/Input'
 import { Card, CardContent, CardHeader } from '@/components/ui/Card'
 import { Mail, User, Eye, EyeOff, Shield, CheckCircle } from 'lucide-react'
 import { createClient } from '@/lib/supabase'
+import { ToastProvider } from '@/contexts/ToastContext'
+import ToastContainer from '@/components/ui/ToastContainer'
+import { useAuthToasts } from '@/hooks/useAuthToasts'
 
 const loginSchema = z.object({
   email: z.string().email('E-mail inválido'),
@@ -52,17 +55,19 @@ export default function AuthPage({ params }: AuthPageProps) {
   const router = useRouter()
   const supabase = createClient()
 
-  // Funções locais para notificações
-  const showToast = (type: 'success' | 'error' | 'warning' | 'info', message: string, title?: string) => {
-    console.log(`${type.toUpperCase()}:`, title, message)
-    // Usar alert como fallback simples
-    alert(`${title || type.toUpperCase()}: ${message}`)
-  }
-
-  const showAuthError = (type: string, message?: string) => {
-    console.error('Auth Error:', type, message)
-    alert(`Erro: ${message || type}`)
-  }
+  // Hooks para notificações toast
+  const {
+    showAuthSuccess,
+    showAuthError,
+    showAuthWarning,
+    showRegistrationSuccess,
+    showLoginSuccess,
+    showPasswordResetSuccess,
+    showEmailResendSuccess,
+    showRateLimitWarning,
+    showOAuthSuccess,
+    showToast
+  } = useAuthToasts()
 
   const showProgress = (stage: string, message: string, progress?: number) => {
     console.log(`Progress: ${stage} - ${message} (${progress}%)`)
@@ -219,12 +224,13 @@ export default function AuthPage({ params }: AuthPageProps) {
               
               if (!retryResult.error) {
                 console.log('✅ Login bem-sucedido após correção!')
-                showToast('success', 'Login realizado com sucesso!', '🎉 Bem-vindo!')
                 
                 // Continuar com o fluxo normal
                 if (retryResult.data.user) {
                   const adminEmails = ['armazemsaojoaquimoficial@gmail.com']
                   const isUserAdmin = adminEmails.includes(retryResult.data.user.email || '')
+                  
+                  showLoginSuccess(isUserAdmin)
                   
                   if (isUserAdmin) {
                     window.location.href = `/${locale}/admin`
@@ -271,7 +277,12 @@ export default function AuthPage({ params }: AuthPageProps) {
 
       if (authData.user) {
         console.log('✅ Login realizado com sucesso!')
-        showToast('success', 'Login realizado com sucesso!', '🎉 Bem-vindo!')
+        
+        // Verificar se o usuário é admin baseado no email
+        const adminEmails = ['armazemsaojoaquimoficial@gmail.com']
+        const isUserAdmin = adminEmails.includes(authData.user.email || '')
+        
+        showLoginSuccess(isUserAdmin)
         
         // Limpar dados de registro recente
         localStorage.removeItem('recent_registration_email')
@@ -279,10 +290,6 @@ export default function AuthPage({ params }: AuthPageProps) {
         // Aguardar um pouco para garantir que a sessão seja propagada para o servidor
         console.log('⏳ Aguardando propagação da sessão...')
         await new Promise(resolve => setTimeout(resolve, 1500))
-        
-        // Verificar se o usuário é admin baseado no email
-        const adminEmails = ['armazemsaojoaquimoficial@gmail.com']
-        const isUserAdmin = adminEmails.includes(authData.user.email || '')
         
         if (isUserAdmin) {
           console.log('🔐 Usuário admin detectado, redirecionando para /admin')
@@ -391,9 +398,9 @@ export default function AuthPage({ params }: AuthPageProps) {
                 console.log('✅ Bypass bem-sucedido via Admin API')
                 
                 if (bypassResult.requiresManualActivation) {
-                  showToast('success', '🎯 Conta criada com sucesso!\n\nDevido ao rate limit, entre em contato conosco para ativar sua conta.')
+                  showAuthWarning('Devido ao rate limit, entre em contato conosco para ativar sua conta.', '🎯 Conta criada!')
                 } else {
-                  showToast('success', '🎯 Conta criada via sistema alternativo!\n\nVerifique seu email para confirmar.')
+                  showRegistrationSuccess(true)
                   
                   // Salvar email para facilitar detecção no login
                   localStorage.setItem('recent_registration_email', data.email)
@@ -413,7 +420,7 @@ export default function AuthPage({ params }: AuthPageProps) {
             }
 
             // Se bypass falhou, mostrar mensagem original
-            showToast('error', `📧 Limite de emails atingido!\n\n• Aguarde 1-2 horas antes de tentar novamente\n• Use um email diferente se urgente\n• Este é um limite do Supabase para prevenir spam`)
+            showAuthError('email-rate-limit', 'Aguarde 1-2 horas antes de tentar novamente ou use um email diferente.')
             
             // Salvar timestamp do rate limit
             localStorage.setItem('supabase_rate_limit_timestamp', Date.now().toString())
@@ -421,18 +428,18 @@ export default function AuthPage({ params }: AuthPageProps) {
             
             return
           } else {
-            showToast('error', '⏰ Muitas tentativas de cadastro. Aguarde alguns minutos e tente novamente.')
+            showAuthError('too-many-requests')
             return
           }
         }
 
         // Outros erros
         if (error.message?.includes('User already registered')) {
-          showToast('error', '📧 Este email já está cadastrado!\n\nTente fazer login ou use a opção "Esqueci minha senha".')
+          showAuthError('user-exists', 'Tente fazer login ou use a opção "Esqueci minha senha".')
           return
         }
 
-        showToast('error', `Erro no cadastro: ${error.message}`)
+        showAuthError('server-error', error.message)
         return
       }
 
@@ -441,7 +448,7 @@ export default function AuthPage({ params }: AuthPageProps) {
         
         // Verificar se precisa de confirmação
         if (!authData.session) {
-          showToast('success', '🎉 Conta criada com sucesso!\n\nVerifique seu email para confirmar sua conta.')
+          showRegistrationSuccess(true)
           
           // Salvar email para facilitar detecção no login
           localStorage.setItem('recent_registration_email', data.email)
@@ -453,15 +460,14 @@ export default function AuthPage({ params }: AuthPageProps) {
           }, 3000)
         } else {
           // Login automático se não precisar de confirmação
-          showToast('success', '🎉 Conta criada e login realizado com sucesso!')
+          const adminEmails = ['armazemsaojoaquimoficial@gmail.com']
+          const isUserAdmin = adminEmails.includes(authData.user.email || '')
+          
+          showRegistrationSuccess(false)
           
           // Aguardar um pouco para garantir que a sessão seja propagada para o servidor
           console.log('⏳ Aguardando propagação da sessão após registro...')
           await new Promise(resolve => setTimeout(resolve, 1500))
-          
-          // Verificar se o usuário é admin baseado no email
-          const adminEmails = ['armazemsaojoaquimoficial@gmail.com']
-          const isUserAdmin = adminEmails.includes(authData.user.email || '')
           
           if (isUserAdmin) {
             console.log('🔐 Usuário admin detectado, redirecionando para /admin')
@@ -501,11 +507,12 @@ export default function AuthPage({ params }: AuthPageProps) {
       }
 
       console.log('✅ Google OAuth iniciado com sucesso')
+      showOAuthSuccess()
       // O redirecionamento acontece automaticamente
       
     } catch (error: any) {
       console.error('❌ Erro inesperado no Google OAuth:', error)
-      showToast('error', 'Erro inesperado no login com Google. Tente novamente.')
+      showAuthError('server-error', 'Erro inesperado no login com Google. Tente novamente.')
     } finally {
       setLoading(false)
     }
@@ -533,15 +540,15 @@ export default function AuthPage({ params }: AuthPageProps) {
         console.error('❌ Erro ao reenviar confirmação:', error)
         
         if (error.message?.includes('rate limit')) {
-          showToast('error', '⏰ Limite de reenvio atingido. Aguarde alguns minutos e tente novamente.')
+          showAuthError('rate-limit', 'Limite de reenvio atingido. Aguarde alguns minutos.')
         } else {
-          showToast('error', `Erro ao reenviar email: ${error.message}`)
+          showAuthError('server-error', `Erro ao reenviar email: ${error.message}`)
         }
         return
       }
 
       console.log('✅ Email de confirmação reenviado!')
-      showToast('success', '📧 Email de confirmação reenviado!\n\nVerifique sua caixa de entrada.')
+      showEmailResendSuccess()
       
       setShowResendConfirmation(false)
       localStorage.removeItem('recent_registration_email')
@@ -562,15 +569,15 @@ export default function AuthPage({ params }: AuthPageProps) {
       })
 
       if (error) {
-        showToast('error', `Erro ao enviar email de recuperação: ${error.message}`)
+        showAuthError('server-error', `Erro ao enviar email de recuperação: ${error.message}`)
       } else {
-        showToast('success', 'Email de recuperação enviado! Verifique sua caixa de entrada.')
+        showPasswordResetSuccess()
         setShowForgotPassword(false)
         forgotPasswordForm.reset()
       }
     } catch (error: any) {
       console.error('Erro ao enviar email de recuperação:', error)
-      showToast('error', 'Erro inesperado')
+      showAuthError('network-error')
     } finally {
       setLoading(false)
     }

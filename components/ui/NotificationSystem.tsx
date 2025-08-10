@@ -1,7 +1,7 @@
 'use client'
 
 import React from 'react'
-import { ToastContainer } from './Toast'
+import { ToastContainer } from './ToastContainer'
 import ProgressModal from './ProgressModal'
 
 /**

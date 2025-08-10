@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
+import { AdminErrorBoundary } from '@/components/admin/ErrorBoundary'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
@@ -25,18 +26,24 @@ import {
   Filter,
   Edit3,
   Trash2,
-  UserPlus
+  UserPlus,
+  RefreshCw,
+  AlertCircle
 } from 'lucide-react'
-
-interface User {
-  id: string
-  email: string
-  name?: string
-  role?: string
-  created_at: string
-  updated_at?: string
-  last_sign_in_at?: string
-}
+import { useAdminData } from '@/hooks/useAdminData'
+import { useAdminApi } from '@/lib/hooks/useAdminApi'
+import { 
+  UserData, 
+  UserDataTransformer, 
+  transformApiResponse,
+  formatDateTime,
+  getRoleBadgeColor
+} from '@/lib/data-transformers'
+import { LoadingState } from '@/components/admin/LoadingState'
+import { ErrorState } from '@/components/admin/ErrorState'
+import { EmptyState } from '@/components/admin/EmptyState'
+import { DataExporter } from '@/lib/data-export'
+import { Download } from 'lucide-react'
 
 interface UserStats {
   total: number
@@ -52,69 +59,76 @@ interface Pagination {
   pages: number
 }
 
-export default function UsersManagementPage() {
-  const [users, setUsers] = useState<User[]>([])
-  const [stats, setStats] = useState<UserStats>({ total: 0, admins: 0, users: 0, recent: 0 })
-  const [pagination, setPagination] = useState<Pagination>({ page: 1, limit: 20, total: 0, pages: 0 })
-  const [loading, setLoading] = useState(true)
+function UsersManagementPageContent() {
+  const { makeRequest } = useAdminApi()
   const [searchTerm, setSearchTerm] = useState('')
   const [roleFilter, setRoleFilter] = useState('all')
-  const [selectedUser, setSelectedUser] = useState<User | null>(null)
+  const [selectedUser, setSelectedUser] = useState<UserData | null>(null)
   const [editDialogOpen, setEditDialogOpen] = useState(false)
+  const [pagination, setPagination] = useState<Pagination>({ page: 1, limit: 20, total: 0, pages: 0 })
+  const [stats, setStats] = useState<UserStats>({ total: 0, admins: 0, users: 0, recent: 0 })
 
-  useEffect(() => {
-    fetchUsers()
-  }, [pagination.page, searchTerm, roleFilter])
+  // Build endpoint with filters
+  const endpoint = useMemo(() => {
+    const params = new URLSearchParams({
+      page: pagination.page.toString(),
+      limit: pagination.limit.toString(),
+    })
 
-  const fetchUsers = async () => {
-    try {
-      setLoading(true)
-      const params = new URLSearchParams({
-        page: pagination.page.toString(),
-        limit: pagination.limit.toString(),
-      })
+    if (searchTerm) params.append('search', searchTerm)
+    if (roleFilter !== 'all') params.append('role', roleFilter)
 
-      if (searchTerm) params.append('search', searchTerm)
-      if (roleFilter !== 'all') params.append('role', roleFilter)
+    return `/users?${params.toString()}`
+  }, [pagination.page, pagination.limit, searchTerm, roleFilter])
 
-      const response = await fetch(`/api/admin/users?${params}`)
-      
-      if (!response.ok) {
-        throw new Error('Erro ao carregar usuários')
+  // Use enhanced data loading hook
+  const { data: users, loading, error, isEmpty, retry, refresh } = useAdminData<UserData>(
+    endpoint,
+    {
+      transform: (response) => {
+        console.log('🔄 [UsersPage] Raw API response:', response)
+        
+        // Extract stats and pagination from response
+        if (response.success && response.data) {
+          console.log('✅ [UsersPage] Processing successful response with data')
+          console.log('📊 [UsersPage] Stats:', response.data.stats)
+          console.log('👥 [UsersPage] Users array length:', response.data.users?.length || 0)
+          
+          setStats(response.data.stats || { total: 0, admins: 0, users: 0, recent: 0 })
+          setPagination(prev => ({
+            ...prev,
+            total: response.data.pagination?.total || 0,
+            pages: response.data.pagination?.pages || 0
+          }))
+          
+          const transformedUsers = transformApiResponse(response.data.users, new UserDataTransformer())
+          console.log('✅ [UsersPage] Transformed users:', transformedUsers.length)
+          return transformedUsers
+        }
+        
+        console.warn('⚠️ [UsersPage] Unexpected response format, trying fallback')
+        const fallbackUsers = transformApiResponse(response, new UserDataTransformer())
+        console.log('⚠️ [UsersPage] Fallback users:', fallbackUsers.length)
+        return fallbackUsers
+      },
+      dependencies: [searchTerm, roleFilter, pagination.page],
+      errorConfig: {
+        maxRetries: 2,
+        retryDelay: 1000,
+        showFallback: false
       }
-
-      const data = await response.json()
-      setUsers(data.users)
-      setStats(data.stats)
-      setPagination(prev => ({
-        ...prev,
-        total: data.pagination.total,
-        pages: data.pagination.pages
-      }))
-    } catch (error) {
-      console.error('Erro ao carregar usuários:', error)
-      toast.error('Erro ao carregar usuários')
-    } finally {
-      setLoading(false)
     }
-  }
+  )
 
-  const updateUser = async (userId: string, updates: Partial<User>) => {
+  const updateUser = async (userId: string, updates: Partial<UserData>) => {
     try {
-      const response = await fetch('/api/admin/users', {
+      await makeRequest('/users', {
         method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify({ userId, updates })
       })
 
-      if (!response.ok) {
-        throw new Error('Erro ao atualizar usuário')
-      }
-
       toast.success('Usuário atualizado com sucesso')
-      fetchUsers()
+      refresh()
       setEditDialogOpen(false)
     } catch (error) {
       console.error('Erro ao atualizar usuário:', error)
@@ -126,41 +140,47 @@ export default function UsersManagementPage() {
     if (!confirm('Tem certeza que deseja deletar este usuário?')) return
 
     try {
-      const response = await fetch(`/api/admin/users?userId=${userId}`, {
+      await makeRequest(`/users?userId=${userId}`, {
         method: 'DELETE'
       })
 
-      if (!response.ok) {
-        const error = await response.json()
-        throw new Error(error.error || 'Erro ao deletar usuário')
-      }
-
       toast.success('Usuário deletado com sucesso')
-      fetchUsers()
+      refresh()
     } catch (error) {
       console.error('Erro ao deletar usuário:', error)
       toast.error(error instanceof Error ? error.message : 'Erro ao deletar usuário')
     }
   }
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('pt-BR', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    })
-  }
+  const exportUsers = (format: 'csv' | 'json') => {
+    try {
+      const exportData = users.map(user => ({
+        Email: user.email,
+        Nome: user.full_name,
+        Telefone: user.phone || '',
+        Role: user.role,
+        'Data de Cadastro': formatDateTime(user.created_at),
+        'Último Acesso': user.last_sign_in ? formatDateTime(user.last_sign_in) : 'Nunca',
+        'Número de Acessos': user.sign_in_count
+      }))
 
-  const getRoleBadgeColor = (role?: string) => {
-    switch (role) {
-      case 'admin':
-        return 'bg-red-100 text-red-800'
-      case 'user':
-        return 'bg-blue-100 text-blue-800'
-      default:
-        return 'bg-gray-100 text-gray-800'
+      if (format === 'csv') {
+        DataExporter.exportToCSV(exportData, {
+          format: 'csv',
+          filename: `usuarios_${new Date().toISOString().split('T')[0]}`,
+          includeHeaders: true
+        })
+      } else {
+        DataExporter.exportToJSON(exportData, {
+          format: 'json',
+          filename: `usuarios_${new Date().toISOString().split('T')[0]}`
+        })
+      }
+
+      toast.success(`Dados exportados em formato ${format.toUpperCase()}`)
+    } catch (error) {
+      console.error('Erro ao exportar dados:', error)
+      toast.error('Erro ao exportar dados')
     }
   }
 
@@ -227,7 +247,44 @@ export default function UsersManagementPage() {
       {/* Filters */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">Filtros</CardTitle>
+          <div className="flex justify-between items-center">
+            <CardTitle className="text-lg">Filtros</CardTitle>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={refresh}
+              disabled={loading}
+              className="flex items-center gap-2"
+            >
+              <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+              Atualizar
+            </Button>
+            
+            {!isEmpty && (
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => exportUsers('csv')}
+                  disabled={loading}
+                  className="flex items-center gap-2"
+                >
+                  <Download className="h-4 w-4" />
+                  CSV
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => exportUsers('json')}
+                  disabled={loading}
+                  className="flex items-center gap-2"
+                >
+                  <Download className="h-4 w-4" />
+                  JSON
+                </Button>
+              </div>
+            )}
+          </div>
         </CardHeader>
         <CardContent>
           <div className="flex gap-4">
@@ -266,7 +323,35 @@ export default function UsersManagementPage() {
         </CardHeader>
         <CardContent>
           {loading ? (
-            <div className="text-center py-8">Carregando usuários...</div>
+            <LoadingState message="Carregando usuários..." />
+          ) : error ? (
+            <ErrorState 
+              message={error}
+              onRetry={retry}
+              showRetry={true}
+            />
+          ) : isEmpty ? (
+            <EmptyState
+              icon={Users}
+              title="Nenhum usuário encontrado"
+              description={
+                searchTerm || roleFilter !== 'all'
+                  ? 'Tente ajustar os filtros de busca.'
+                  : 'Não há usuários cadastrados no sistema.'
+              }
+              action={
+                searchTerm || roleFilter !== 'all' ? (
+                  <Button
+                    onClick={() => {
+                      setSearchTerm('')
+                      setRoleFilter('all')
+                    }}
+                  >
+                    Limpar Filtros
+                  </Button>
+                ) : undefined
+              }
+            />
           ) : (
             <>
               <Table>
@@ -284,15 +369,15 @@ export default function UsersManagementPage() {
                   {users.map((user) => (
                     <TableRow key={user.id}>
                       <TableCell className="font-medium">{user.email}</TableCell>
-                      <TableCell>{user.name || 'N/A'}</TableCell>
+                      <TableCell>{user.full_name || 'N/A'}</TableCell>
                       <TableCell>
                         <Badge className={getRoleBadgeColor(user.role)}>
                           {user.role || 'user'}
                         </Badge>
                       </TableCell>
-                      <TableCell>{formatDate(user.created_at)}</TableCell>
+                      <TableCell>{formatDateTime(user.created_at)}</TableCell>
                       <TableCell>
-                        {user.last_sign_in_at ? formatDate(user.last_sign_in_at) : 'Nunca'}
+                        {user.last_sign_in ? formatDateTime(user.last_sign_in) : 'Nunca'}
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-2">
@@ -373,8 +458,8 @@ export default function UsersManagementPage() {
                 </Label>
                 <Input
                   id="name"
-                  value={selectedUser.name || ''}
-                  onChange={(e) => setSelectedUser(prev => prev ? { ...prev, name: e.target.value } : null)}
+                  value={selectedUser.full_name || ''}
+                  onChange={(e) => setSelectedUser(prev => prev ? { ...prev, full_name: e.target.value } : null)}
                   className="col-span-3"
                 />
               </div>
@@ -384,7 +469,7 @@ export default function UsersManagementPage() {
                 </Label>
                 <Select
                   value={selectedUser.role || 'user'}
-                  onValueChange={(value) => setSelectedUser(prev => prev ? { ...prev, role: value } : null)}
+                  onValueChange={(value) => setSelectedUser(prev => prev ? { ...prev, role: value as 'user' | 'admin' } : null)}
                 >
                   <SelectTrigger className="col-span-3">
                     <SelectValue />
@@ -401,7 +486,7 @@ export default function UsersManagementPage() {
                 </Button>
                 <Button
                   onClick={() => updateUser(selectedUser.id, {
-                    name: selectedUser.name,
+                    full_name: selectedUser.full_name,
                     role: selectedUser.role
                   })}
                 >
@@ -413,5 +498,13 @@ export default function UsersManagementPage() {
         </DialogContent>
       </Dialog>
     </div>
+  )
+}
+
+export default function UsersManagementPage() {
+  return (
+    <AdminErrorBoundary>
+      <UsersManagementPageContent />
+    </AdminErrorBoundary>
   )
 }

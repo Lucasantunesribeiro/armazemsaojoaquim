@@ -169,11 +169,14 @@ export default function AdminGaleriaPage() {
       if (data.success) {
         closeModal()
         fetchArtworks()
+        // TODO: Adicionar toast de sucesso quando wrapper estiver disponível
       } else {
+        // TODO: Substituir por toast quando wrapper estiver disponível
         alert(data.error || 'Erro ao salvar quadro')
       }
     } catch (error) {
       console.error('Erro ao salvar:', error)
+      // TODO: Substituir por toast quando wrapper estiver disponível
       alert('Erro ao salvar quadro')
     }
   }

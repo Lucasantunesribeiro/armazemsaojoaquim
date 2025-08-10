@@ -67,7 +67,7 @@ interface AdminDashboardProps {
 
 export default function AdminDashboard({ params }: AdminDashboardProps) {
   const router = useRouter()
-  const { adminFetch } = useAdminApi()
+  const { adminFetch, isAuthorized, isLoading: adminLoading } = useAdminApi()
   const [stats, setStats] = useState<DashboardStats>({
     totalUsers: 0,
     totalReservas: 0,
@@ -90,16 +90,36 @@ export default function AdminDashboard({ params }: AdminDashboardProps) {
   const [navigating, setNavigating] = useState<string | null>(null)
 
   useEffect(() => {
-    loadStats()
-  }, [])
+    // Aguardar o admin estar pronto antes de carregar stats
+    if (!adminLoading && isAuthorized) {
+      loadStats()
+    }
+  }, [adminLoading, isAuthorized])
 
   const loadStats = async () => {
     try {
       setLoading(true)
       setError('')
       
-      const data = await adminFetch('/api/admin/dashboard/stats')
-      setStats(data)
+      const response = await adminFetch('/dashboard/stats')
+      
+      if (response.success && response.data) {
+        setStats(response.data)
+      } else {
+        console.warn('API retornou dados de fallback:', response)
+        setStats(response.data || {
+          totalUsers: 0,
+          totalReservas: 0,
+          reservasHoje: 0,
+          reservasPendentes: 0,
+          totalBlogPosts: 0,
+          totalMenuItems: 0
+        })
+        
+        if (!response.success) {
+          setError(response.error || 'Erro ao carregar estatísticas')
+        }
+      }
     } catch (error) {
       console.error('Erro ao carregar estatísticas:', error)
       setError(error instanceof Error ? error.message : 'Erro desconhecido')
@@ -177,12 +197,27 @@ export default function AdminDashboard({ params }: AdminDashboardProps) {
     }
   ]
 
-  if (loading) {
+  if (loading || adminLoading) {
     return (
       <div className="flex items-center justify-center py-12">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-400">Carregando dashboard...</p>
+          <p className="text-gray-600 dark:text-gray-400">
+            {adminLoading ? 'Verificando permissões...' : 'Carregando dashboard...'}
+          </p>
+        </div>
+      </div>
+    )
+  }
+
+  if (!isAuthorized) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="text-center">
+          <div className="bg-red-50 dark:bg-red-900/50 border border-red-200 dark:border-red-800 rounded-lg p-6">
+            <h2 className="text-xl font-semibold text-red-800 dark:text-red-200 mb-2">Acesso Negado</h2>
+            <p className="text-red-700 dark:text-red-300">Você não tem permissão para acessar esta página.</p>
+          </div>
         </div>
       </div>
     )

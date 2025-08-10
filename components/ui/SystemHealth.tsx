@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { Activity, AlertTriangle, CheckCircle, XCircle, Wifi, Database, Users, Clock, Zap, HardDrive } from 'lucide-react'
 import { useSystemMonitoring } from '../../lib/hooks/useSystemMonitoring'
-import { cacheManager } from '../../lib/cache-manager'
+import { adminDataCache } from '../../lib/cache-manager'
 
 export default function SystemHealth() {
   const [isVisible, setIsVisible] = useState(false)
@@ -55,7 +55,7 @@ export default function SystemHealth() {
 
   const systemStatus = getSystemStatus()
   const recommendations = getRecommendations()
-  const cacheStats = cacheManager.getStats()
+  const cacheStats = adminDataCache.getStats()
 
   // Só mostrar em desenvolvimento ou se houver problemas
   const shouldShow = process.env.NODE_ENV === 'development' || 
@@ -210,23 +210,23 @@ export default function SystemHealth() {
               
               <div className="space-y-1 text-xs">
                 <div className="flex justify-between">
-                  <span className="text-gray-500">Taxa de acerto:</span>
-                  <span className={`font-medium ${cacheStats.hitRate > 70 ? 'text-green-600' : cacheStats.hitRate > 40 ? 'text-yellow-600' : 'text-red-600'}`}>
-                    {cacheStats.hitRate.toFixed(1)}%
+                  <span className="text-gray-500">Entradas:</span>
+                  <span className="font-medium text-blue-600">
+                    {cacheStats.size}/{cacheStats.maxSize}
                   </span>
                 </div>
                 
                 <div className="flex justify-between">
                   <span className="text-gray-500">Itens armazenados:</span>
                   <span className="font-medium">
-                    {cacheStats.totalItems}
+                    {cacheStats.size}
                   </span>
                 </div>
                 
                 <div className="flex justify-between">
-                  <span className="text-gray-500">Uso de memória:</span>
+                  <span className="text-gray-500">Capacidade:</span>
                   <span className="font-medium">
-                    {(cacheStats.memoryUsage / 1024).toFixed(1)}KB
+                    {((cacheStats.size / cacheStats.maxSize) * 100).toFixed(1)}%
                   </span>
                 </div>
               </div>

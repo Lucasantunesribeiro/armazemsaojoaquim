@@ -46,6 +46,157 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
+-- Função RPC para admins obterem quartos da pousada (bypass RLS)
+DROP FUNCTION IF EXISTS get_pousada_rooms_admin();
+CREATE OR REPLACE FUNCTION get_pousada_rooms_admin()
+RETURNS TABLE (
+  id UUID,
+  name TEXT,
+  type TEXT,
+  price_refundable DECIMAL(10,2),
+  price_non_refundable DECIMAL(10,2),
+  description TEXT,
+  amenities TEXT[],
+  max_guests INTEGER,
+  image_url TEXT,
+  available BOOLEAN,
+  created_at TIMESTAMPTZ,
+  updated_at TIMESTAMPTZ
+) AS $$
+BEGIN
+  -- Verificar se o usuário atual é admin
+  IF NOT EXISTS (
+    SELECT 1 FROM profiles 
+    WHERE id = auth.uid() 
+    AND role = 'admin'
+  ) THEN
+    RAISE EXCEPTION 'Acesso negado: apenas administradores podem acessar esta função';
+  END IF;
+
+  RETURN QUERY
+  SELECT 
+    pr.id,
+    pr.name,
+    pr.type,
+    pr.price_refundable,
+    pr.price_non_refundable,
+    pr.description,
+    pr.amenities,
+    pr.max_guests,
+    pr.image_url,
+    pr.available,
+    pr.created_at,
+    pr.updated_at
+  FROM pousada_rooms pr
+  ORDER BY pr.created_at DESC;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Função RPC para admins obterem reservas da pousada (bypass RLS)
+DROP FUNCTION IF EXISTS get_pousada_bookings_admin();
+CREATE OR REPLACE FUNCTION get_pousada_bookings_admin()
+RETURNS TABLE (
+  id UUID,
+  room_id UUID,
+  guest_name TEXT,
+  email TEXT,
+  phone TEXT,
+  check_in DATE,
+  check_out DATE,
+  guests_count INTEGER,
+  total_price DECIMAL(10,2),
+  is_refundable BOOLEAN,
+  status TEXT,
+  special_requests TEXT,
+  created_at TIMESTAMPTZ,
+  updated_at TIMESTAMPTZ,
+  room_name TEXT,
+  room_type TEXT
+) AS $$
+BEGIN
+  -- Verificar se o usuário atual é admin
+  IF NOT EXISTS (
+    SELECT 1 FROM profiles 
+    WHERE id = auth.uid() 
+    AND role = 'admin'
+  ) THEN
+    RAISE EXCEPTION 'Acesso negado: apenas administradores podem acessar esta função';
+  END IF;
+
+  RETURN QUERY
+  SELECT 
+    pb.id,
+    pb.room_id,
+    pb.guest_name,
+    pb.email,
+    pb.phone,
+    pb.check_in,
+    pb.check_out,
+    pb.guests_count,
+    pb.total_price,
+    pb.is_refundable,
+    pb.status,
+    pb.special_requests,
+    pb.created_at,
+    pb.updated_at,
+    pr.name as room_name,
+    pr.type as room_type
+  FROM pousada_bookings pb
+  LEFT JOIN pousada_rooms pr ON pb.room_id = pr.id
+  ORDER BY pb.created_at DESC;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Corrigir políticas RLS para pousada_rooms
+DROP POLICY IF EXISTS "Todos podem ver quartos disponíveis" ON pousada_rooms;
+DROP POLICY IF EXISTS "Apenas admins podem gerenciar quartos" ON pousada_rooms;
+DROP POLICY IF EXISTS "pousada_rooms_unified_policy" ON pousada_rooms;
+DROP POLICY IF EXISTS "pousada_rooms_admin_management" ON pousada_rooms;
+
+-- Criar políticas corrigidas para pousada_rooms
+CREATE POLICY "pousada_rooms_public_read" ON pousada_rooms
+FOR SELECT USING (available = true);
+
+CREATE POLICY "pousada_rooms_admin_all" ON pousada_rooms
+FOR ALL USING (
+  EXISTS (
+    SELECT 1 FROM profiles 
+    WHERE id = auth.uid() 
+    AND role = 'admin'
+  )
+);
+
+-- Corrigir políticas RLS para pousada_bookings
+DROP POLICY IF EXISTS "Usuários podem criar reservas" ON pousada_bookings;
+DROP POLICY IF EXISTS "Usuários podem ver suas próprias reservas" ON pousada_bookings;
+DROP POLICY IF EXISTS "Apenas admins podem atualizar reservas" ON pousada_bookings;
+DROP POLICY IF EXISTS "pousada_bookings_insert_policy" ON pousada_bookings;
+DROP POLICY IF EXISTS "pousada_bookings_unified_select_policy" ON pousada_bookings;
+DROP POLICY IF EXISTS "pousada_bookings_admin_update_policy" ON pousada_bookings;
+
+-- Criar políticas corrigidas para pousada_bookings
+CREATE POLICY "pousada_bookings_insert" ON pousada_bookings
+FOR INSERT WITH CHECK (true);
+
+CREATE POLICY "pousada_bookings_select_own_or_admin" ON pousada_bookings
+FOR SELECT USING (
+  auth.jwt() ->> 'email' = email 
+  OR EXISTS (
+    SELECT 1 FROM profiles 
+    WHERE id = auth.uid() 
+    AND role = 'admin'
+  )
+);
+
+CREATE POLICY "pousada_bookings_admin_update" ON pousada_bookings
+FOR UPDATE USING (
+  EXISTS (
+    SELECT 1 FROM profiles 
+    WHERE id = auth.uid() 
+    AND role = 'admin'
+  )
+);
+
 -- Função RPC para admins obterem lista de usuários
 DROP FUNCTION IF EXISTS admin_get_users(INTEGER, INTEGER, TEXT, TEXT);
 CREATE OR REPLACE FUNCTION admin_get_users(

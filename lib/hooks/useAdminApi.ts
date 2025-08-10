@@ -1,354 +1,199 @@
 'use client'
 
-import { createClient } from '@/lib/supabase'
-import { useCallback, useState, useEffect, useRef } from 'react'
-import { useRouter } from 'next/navigation'
-
-interface AdminApiState {
-  isAuthenticated: boolean
-  isLoading: boolean
-  error: string | null
-}
-
-interface RetryConfig {
-  attempts: number
-  maxAttempts: number
-  backoffMs: number
-}
+import { useCallback } from 'react'
+import { useAdmin } from '@/hooks/useAdmin'
+import { createClient } from '@/utils/supabase/client'
 
 export function useAdminApi() {
-  const supabase = createClient()
-  const router = useRouter()
-  const [state, setState] = useState<AdminApiState>({
-    isAuthenticated: false,
-    isLoading: true,
-    error: null
-  })
-  
-  // Ref para evitar múltiplas verificações simultâneas
-  const authCheckRef = useRef<Promise<void> | null>(null)
-  const retryConfigRef = useRef<RetryConfig>({
-    attempts: 0,
-    maxAttempts: 3,
-    backoffMs: 1000
-  })
+  const { isAdmin, hasProfile, loading: adminLoading } = useAdmin()
 
-  // Função de delay para exponential backoff
-  const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
-
-  // Função de exponential backoff
-  const getBackoffDelay = (attempt: number) => Math.min(1000 * Math.pow(2, attempt), 10000)
-
-  // Verificar autenticação com retry robusto
-  const checkAuthWithRetry = useCallback(async (attempt: number = 0): Promise<void> => {
-    console.log(`🔍 [AUTH-CHECK] Tentativa ${attempt + 1}/${retryConfigRef.current.maxAttempts}`)
+  // Função para aguardar o loading terminar com timeout
+  const waitForAdminStatus = useCallback(async (): Promise<void> => {
+    if (!adminLoading) return
     
-    try {
-      setState(prev => ({ ...prev, isLoading: true, error: null }))
+    return new Promise<void>((resolve, reject) => {
+      const timeout = setTimeout(() => {
+        console.warn('⚠️ [useAdminApi] Admin status timeout, proceeding anyway')
+        resolve() // Resolve instead of reject to allow the request to proceed
+      }, 5000) // Reduced timeout to 5 seconds
       
-      // Tentar obter sessão
-      let { data: { session }, error } = await supabase.auth.getSession()
-      
-      // Se erro na primeira tentativa, tentar refresh
-      if (error || !session) {
-        console.log('⚠️ [AUTH-CHECK] Sessão não encontrada, tentando refresh...')
-        
-        const { data: refreshData, error: refreshError } = await supabase.auth.refreshSession()
-        
-        if (!refreshError && refreshData.session) {
-          console.log('✅ [AUTH-CHECK] Sessão renovada com sucesso')
-          session = refreshData.session
-          error = null
+      const checkLoading = () => {
+        if (!adminLoading) {
+          clearTimeout(timeout)
+          resolve()
         } else {
-          console.log('❌ [AUTH-CHECK] Falha no refresh da sessão')
+          setTimeout(checkLoading, 100)
         }
       }
       
-      if (error) {
-        console.error('❌ [AUTH-CHECK] Erro ao verificar sessão:', error)
-        throw new Error(`Session error: ${error.message}`)
-      }
+      checkLoading()
+    })
+  }, [adminLoading])
 
-      if (!session) {
-        console.log('❌ [AUTH-CHECK] Nenhuma sessão ativa encontrada')
-        throw new Error('No active session')
-      }
-
-      // Verificar se é admin
-      const adminEmails = ['armazemsaojoaquimoficial@gmail.com']
-      const isAdmin = adminEmails.includes(session.user.email || '')
-      
-      if (!isAdmin) {
-        console.log('❌ [AUTH-CHECK] Usuário não é admin:', session.user.email)
-        throw new Error('Access denied - admin only')
-      }
-
-      // Verificar se token não está expirado
-      const now = Math.floor(Date.now() / 1000)
-      const expiresAt = session.expires_at || 0
-      
-      if (expiresAt <= now) {
-        console.log('⚠️ [AUTH-CHECK] Token expirado, forçando refresh...')
-        throw new Error('Token expired')
-      }
-
-      console.log('✅ [AUTH-CHECK] Autenticação admin válida confirmada')
-      retryConfigRef.current.attempts = 0 // Reset retry counter
-      
-      setState({
-        isAuthenticated: true,
-        isLoading: false,
-        error: null
-      })
-
-    } catch (error) {
-      console.error(`❌ [AUTH-CHECK] Erro na tentativa ${attempt + 1}:`, error)
-      
-      // Se ainda há tentativas disponíveis, retry com backoff
-      if (attempt < retryConfigRef.current.maxAttempts - 1) {
-        const backoffDelay = getBackoffDelay(attempt)
-        console.log(`🔄 [AUTH-CHECK] Tentando novamente em ${backoffDelay}ms...`)
-        
-        await delay(backoffDelay)
-        return checkAuthWithRetry(attempt + 1)
-      }
-      
-      // Todas as tentativas falharam
-      console.error('💥 [AUTH-CHECK] Todas as tentativas de autenticação falharam')
-      setState({
-        isAuthenticated: false,
-        isLoading: false,
-        error: error instanceof Error ? error.message : 'Erro de autenticação'
-      })
+  const makeRequest = useCallback(async (
+    endpoint: string, 
+    options: RequestInit = {},
+    retryConfig?: {
+      maxRetries?: number
+      baseDelay?: number
+      timeoutMs?: number
+      onWarning?: (message: string) => void
+      onRetry?: (attempt: number, maxRetries: number, delay: number) => void
     }
-  }, [supabase])
-
-  // Verificar autenticação inicial
-  useEffect(() => {
-    const initAuth = async () => {
-      // Evitar múltiplas verificações simultâneas
-      if (authCheckRef.current) {
-        await authCheckRef.current
-        return
-      }
-      
-      authCheckRef.current = checkAuthWithRetry()
-      await authCheckRef.current
-      authCheckRef.current = null
+  ) => {
+    // Default retry configuration - reduced timeout for faster feedback
+    const config = {
+      maxRetries: 2, // Reduced retries
+      baseDelay: 500, // Faster retry
+      timeoutMs: 8000, // Reduced to 8s for faster feedback
+      onWarning: (msg: string) => console.warn(msg),
+      onRetry: (attempt: number, max: number, delay: number) => 
+        console.log(`🔄 [useAdminApi] Retry ${attempt}/${max} in ${delay}ms`),
+      ...retryConfig
     }
 
-    initAuth()
+    // Aguardar confirmação do status admin
+    await waitForAdminStatus()
 
-    // Monitorar mudanças na autenticação com tratamento robusto
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event: string, session: any) => {
-        console.log(`🔄 [AUTH-STATE] Evento: ${event}, Email: ${session?.user?.email}`)
-        
-        if (event === 'SIGNED_OUT' || event === 'TOKEN_REFRESHED' || !session) {
-          console.log('🔄 [AUTH-STATE] Revalidando autenticação...')
-          // Revalidar ao invés de assumir estado
-          await checkAuthWithRetry()
-        } else if (event === 'SIGNED_IN' && session) {
-          console.log('✅ [AUTH-STATE] Usuário autenticado, verificando admin...')
-          const adminEmails = ['armazemsaojoaquimoficial@gmail.com']
-          const isAdmin = adminEmails.includes(session.user.email || '')
-          
-          setState({
-            isAuthenticated: isAdmin,
-            isLoading: false,
-            error: isAdmin ? null : 'Access denied - admin only'
-          })
-        }
-      }
-    )
-
-    return () => {
-      console.log('🧹 [AUTH-HOOK] Limpando subscription')
-      subscription.unsubscribe()
+    if (!isAdmin || !hasProfile) {
+      throw new Error('Admin access required')
     }
-  }, [supabase, checkAuthWithRetry])
 
-  // AdminFetch com retry robusto e tratamento completo de erros
-  const adminFetch = useCallback(async (url: string, options: RequestInit = {}, retryAttempt: number = 0): Promise<any> => {
-    console.log(`📡 [ADMIN-FETCH] ${url} - Tentativa ${retryAttempt + 1}`)
-    
-    try {
-      // ETAPA 1: Verificar sessão atual
-      let { data: { session }, error: sessionError } = await supabase.auth.getSession()
-      
-      // ETAPA 2: Se sem sessão, tentar refresh automático
-      if (sessionError || !session) {
-        console.log('⚠️ [ADMIN-FETCH] Sessão não encontrada, tentando refresh...')
+    // Retry logic with exponential backoff and jitter
+    for (let attempt = 0; attempt <= config.maxRetries; attempt++) {
+      // Declare timeout IDs for each attempt
+      let timeoutId: NodeJS.Timeout | null = null
+      let warningTimeoutId: NodeJS.Timeout | null = null
+      let secondWarningTimeoutId: NodeJS.Timeout | null = null
+
+      try {
+        const supabase = createClient()
+        const { data: { session } } = await supabase.auth.getSession()
         
-        const { data: refreshData, error: refreshError } = await supabase.auth.refreshSession()
-        
-        if (!refreshError && refreshData.session) {
-          console.log('✅ [ADMIN-FETCH] Sessão renovada automaticamente')
-          session = refreshData.session
-          sessionError = null
-        } else {
-          console.error('❌ [ADMIN-FETCH] Falha no refresh automático')
+        if (!session) {
           throw new Error('No active session')
         }
-      }
-      
-      if (sessionError || !session) {
-        throw new Error(`Session error: ${sessionError?.message || 'No session'}`)
-      }
-
-      // ETAPA 3: Verificar admin
-      const adminEmails = ['armazemsaojoaquimoficial@gmail.com']
-      const isAdmin = adminEmails.includes(session.user.email || '')
-      
-      if (!isAdmin) {
-        console.error('❌ [ADMIN-FETCH] Usuário não é admin:', session.user.email)
-        throw new Error('Access denied - admin only')
-      }
-
-      // ETAPA 4: Verificar se token está válido
-      const now = Math.floor(Date.now() / 1000)
-      const expiresAt = session.expires_at || 0
-      
-      if (expiresAt <= now + 60) { // Renovar se expira em menos de 1 minuto
-        console.log('🔄 [ADMIN-FETCH] Token próximo de expirar, renovando...')
         
-        const { data: refreshData, error: refreshError } = await supabase.auth.refreshSession()
-        if (!refreshError && refreshData.session) {
-          session = refreshData.session
-        }
-      }
-
-      // ETAPA 5: Preparar requisição
-      const headers: Record<string, string> = {
-        ...(options.headers as Record<string, string>),
-      }
-
-      if (!(options.body instanceof FormData)) {
-        headers['Content-Type'] = 'application/json'
-      }
-
-      // IMPORTANTE: Incluir Authorization header para que o server possa validar
-      if (session.access_token) {
-        headers['Authorization'] = `Bearer ${session.access_token}`
-        console.log('🔑 [ADMIN-FETCH] Authorization header incluído')
-      }
-
-      console.log(`📤 [ADMIN-FETCH] Executando requisição: ${url}`)
-      
-      // ETAPA 6: Executar requisição
-      const response = await fetch(url, {
-        ...options,
-        headers,
-        credentials: 'include',
-        cache: 'no-cache' // Evitar cache problemático
-      })
-
-      // ETAPA 7: Processar resposta
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ error: 'Unknown error' }))
-        const errorMessage = errorData.error || `HTTP ${response.status}: ${response.statusText}`
+        // Add timeout and retry logic to API requests
+        const controller = new AbortController()
         
-        console.error(`❌ [ADMIN-FETCH] Erro ${response.status} em ${url}:`, errorMessage)
+        // Progressive timeout warnings with more granular feedback
+        warningTimeoutId = setTimeout(() => {
+          config.onWarning('⏳ [useAdminApi] Request taking longer than expected (5s)...')
+        }, 5000) // 5s warning
         
-        // ETAPA 8: Retry lógico para erros de auth
-        if ((response.status === 401 || response.status === 403) && retryAttempt < 2) {
-          console.log(`🔄 [ADMIN-FETCH] Tentando retry após erro ${response.status}...`)
-          
-          // Forçar refresh da sessão
-          await supabase.auth.refreshSession()
-          
-          // Delay antes de retry
-          await delay(getBackoffDelay(retryAttempt))
-          
-          return adminFetch(url, options, retryAttempt + 1)
-        }
+        secondWarningTimeoutId = setTimeout(() => {
+          config.onWarning('⏳ [useAdminApi] Still processing request (8s)... Please wait')
+        }, 8000) // 8s second warning
         
-        throw new Error(errorMessage)
-      }
+        timeoutId = setTimeout(() => {
+          if (warningTimeoutId) clearTimeout(warningTimeoutId)
+          if (secondWarningTimeoutId) clearTimeout(secondWarningTimeoutId)
+          controller.abort()
+        }, config.timeoutMs)
 
-      const data = await response.json()
-      console.log(`✅ [ADMIN-FETCH] Sucesso: ${url}`)
-      
-      // ETAPA 9: Atualizar estado se necessário
-      if (!state.isAuthenticated) {
-        setState({
-          isAuthenticated: true,
-          isLoading: false,
-          error: null
+        // Handle endpoint URL - remove /api/admin prefix if already present
+        const cleanEndpoint = endpoint.startsWith('/api/admin') 
+          ? endpoint 
+          : `/api/admin${endpoint}`
+
+        console.log(`📡 [useAdminApi] Making request to: ${cleanEndpoint} (attempt ${attempt + 1}/${config.maxRetries + 1})`)
+
+        const response = await fetch(cleanEndpoint, {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${session.access_token}`,
+            ...options.headers,
+          },
+          signal: controller.signal,
+          ...options,
         })
-      }
-      
-      return data
-      
-    } catch (error) {
-      console.error(`💥 [ADMIN-FETCH] Erro final em ${url}:`, error)
-      
-      // Atualizar estado em caso de erro de auth
-      if (error instanceof Error && (
-        error.message.includes('session') || 
-        error.message.includes('auth') ||
-        error.message.includes('Access denied')
-      )) {
-        setState(prev => ({
-          ...prev,
-          isAuthenticated: false,
-          error: error instanceof Error ? error.message : 'Erro de autenticação'
-        }))
         
-        // Redirecionar para login se estiver no browser
-        if (typeof window !== 'undefined') {
-          const currentPath = window.location.pathname
-          const locale = currentPath.split('/')[1] || 'pt'
-          const message = encodeURIComponent(`Erro de autenticação: ${error.message}`)
-          router.push(`/${locale}/auth?message=${message}&redirect=${encodeURIComponent(currentPath)}`)
+        // Clear all timeouts on successful response
+        if (timeoutId) clearTimeout(timeoutId)
+        if (warningTimeoutId) clearTimeout(warningTimeoutId)
+        if (secondWarningTimeoutId) clearTimeout(secondWarningTimeoutId)
+
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}))
+          const errorMessage = errorData.error || `HTTP ${response.status}: ${response.statusText}`
+          console.error('❌ [useAdminApi] Request failed:', errorMessage)
+          
+          // Don't retry on client errors (4xx), only server errors (5xx) and timeouts
+          if (response.status >= 400 && response.status < 500) {
+            throw new Error(errorMessage)
+          }
+          
+          // For server errors, throw to trigger retry
+          throw new Error(`Server error: ${errorMessage}`)
         }
+
+        const data = await response.json()
+        console.log('✅ [useAdminApi] Request successful')
+        return data
+        
+      } catch (error) {
+        // Clear timeouts on error
+        if (timeoutId) clearTimeout(timeoutId)
+        if (warningTimeoutId) clearTimeout(warningTimeoutId)
+        if (secondWarningTimeoutId) clearTimeout(secondWarningTimeoutId)
+        
+        // Check if this is the last attempt
+        const isLastAttempt = attempt === config.maxRetries
+        
+        if (error instanceof Error && error.name === 'AbortError') {
+          console.error('⏰ [useAdminApi] Request timeout')
+          
+          if (isLastAttempt) {
+            throw new Error('Request timeout - check your network connection')
+          }
+          
+          // Continue to retry logic for timeout errors
+        } else if (error instanceof Error && error.message.includes('Admin access required')) {
+          // Don't retry auth errors
+          throw error
+        } else if (error instanceof Error && error.message.includes('No active session')) {
+          // Don't retry session errors
+          throw error
+        } else if (error instanceof Error && !error.message.includes('Server error')) {
+          // Don't retry client errors
+          if (isLastAttempt) {
+            console.error('💥 [useAdminApi] Error:', error)
+            throw error
+          }
+        }
+        
+        // If this is the last attempt, throw the error
+        if (isLastAttempt) {
+          console.error('💥 [useAdminApi] Max retries reached. Final error:', error)
+          throw error
+        }
+        
+        // Calculate delay with exponential backoff and jitter
+        const jitter = Math.random() * 0.3 + 0.85 // 85-115% of base delay
+        const delay = Math.min(
+          config.baseDelay * Math.pow(2, attempt) * jitter,
+          10000 // Max 10 seconds between retries
+        )
+        
+        config.onRetry(attempt + 1, config.maxRetries, Math.round(delay))
+        
+        // Wait before retrying
+        await new Promise(resolve => setTimeout(resolve, delay))
       }
-      
-      throw error
     }
-  }, [supabase, state.isAuthenticated, router, delay, getBackoffDelay])
+    
+    // This should never be reached, but TypeScript requires it
+    throw new Error('Unexpected error in retry logic')
+  }, [isAdmin, hasProfile, waitForAdminStatus])
 
-  // Função para forçar renovação de sessão
-  const refreshSession = useCallback(async () => {
-    try {
-      setState(prev => ({ ...prev, isLoading: true, error: null }))
-      
-      const { data: { session }, error } = await supabase.auth.getSession()
-      
-      if (error || !session) {
-        throw new Error('Não foi possível renovar a sessão')
-      }
+  // Alias for backward compatibility
+  const adminFetch = makeRequest
 
-      const adminEmails = ['armazemsaojoaquimoficial@gmail.com']
-      const isAdmin = adminEmails.includes(session.user.email || '')
-      
-      if (!isAdmin) {
-        throw new Error('Acesso negado')
-      }
-
-      setState({
-        isAuthenticated: true,
-        isLoading: false,
-        error: null
-      })
-
-      return true
-    } catch (error) {
-      console.error('❌ Erro ao renovar sessão:', error)
-      setState({
-        isAuthenticated: false,
-        isLoading: false,
-        error: error instanceof Error ? error.message : 'Erro desconhecido'
-      })
-      return false
-    }
-  }, [supabase])
-
-  return { 
-    adminFetch, 
-    refreshSession,
-    isAuthenticated: state.isAuthenticated,
-    isLoading: state.isLoading,
-    error: state.error
+  return {
+    makeRequest,
+    adminFetch,
+    isAuthorized: isAdmin && hasProfile && !adminLoading,
+    isLoading: adminLoading
   }
-} 
+}

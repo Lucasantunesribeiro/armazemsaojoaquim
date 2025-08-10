@@ -23,11 +23,13 @@ export default function ImageUpload({
 
   const handleFileSelect = async (file: File) => {
     if (!file.type.startsWith('image/')) {
+      // TODO: Substituir por toast quando wrapper estiver disponível
       alert('Por favor, selecione apenas arquivos de imagem.')
       return
     }
 
     if (file.size > 5 * 1024 * 1024) { // 5MB limit
+      // TODO: Substituir por toast quando wrapper estiver disponível
       alert('O arquivo deve ter no máximo 5MB.')
       return
     }
@@ -70,6 +72,7 @@ export default function ImageUpload({
       
     } catch (error) {
       console.error('Erro ao fazer upload:', error)
+      // TODO: Substituir por toast quando wrapper estiver disponível
       alert('Erro ao fazer upload da imagem. Tente novamente.')
     } finally {
       setUploading(false)

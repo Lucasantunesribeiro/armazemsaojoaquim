@@ -1,218 +1,389 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
-import { useNotifications, type Notification } from '@/components/providers/NotificationProvider'
-import { X, CheckCircle, AlertCircle, AlertTriangle, Info, ExternalLink } from 'lucide-react'
-import Link from 'next/link'
+import React from 'react'
+import { useTheme, themeVariables } from '@/contexts/ThemeContext'
+import { X, CheckCircle, AlertCircle, AlertTriangle, Info } from 'lucide-react'
+import { cn } from '@/lib/utils'
+import { cva, type VariantProps } from 'class-variance-authority'
 
-interface ToastProps {
-  notification: Notification
+// Toast variants with proper contrast and accessibility
+const toastVariants = cva(
+  "relative flex w-full items-center justify-between space-x-4 overflow-hidden rounded-lg border p-4 pr-8 shadow-lg transition-all duration-300 ease-in-out",
+  {
+    variants: {
+      type: {
+        success: "border-green-200 bg-green-50 text-green-900 dark:border-green-800 dark:bg-green-950 dark:text-green-50",
+        error: "border-red-200 bg-red-50 text-red-900 dark:border-red-800 dark:bg-red-950 dark:text-red-50",
+        warning: "border-yellow-200 bg-yellow-50 text-yellow-900 dark:border-yellow-800 dark:bg-yellow-950 dark:text-yellow-50",
+        info: "border-blue-200 bg-blue-50 text-blue-900 dark:border-blue-800 dark:bg-blue-950 dark:text-blue-50"
+      }
+    },
+    defaultVariants: {
+      type: "info"
+    }
+  }
+)
+
+export interface Toast {
+  id: string
+  type: 'success' | 'error' | 'warning' | 'info'
+  title?: string
+  message: string
+  duration?: number
+  action?: {
+    label: string
+    onClick: () => void
+  }
+  secondaryAction?: {
+    label: string
+    onClick: () => void
+  }
+  dismissible?: boolean
+  persistent?: boolean
+  progress?: {
+    current: number
+    total: number
+    label?: string
+  }
+  expandable?: {
+    summary: string
+    details: string
+  }
+  copyable?: {
+    text: string
+    label?: string
+  }
 }
 
-const Toast: React.FC<ToastProps> = ({ notification }) => {
-  const { removeNotification } = useNotifications()
-  const [isVisible, setIsVisible] = useState(false)
-  const [isExiting, setIsExiting] = useState(false)
+interface ToastComponentProps extends VariantProps<typeof toastVariants> {
+  toast: Toast
+  onDismiss?: (id: string) => void
+  isPaused?: boolean
+}
 
-  useEffect(() => {
-    // Animate in
-    const timer = setTimeout(() => setIsVisible(true), 50)
+const ToastIcons = {
+  success: CheckCircle,
+  error: AlertCircle,
+  warning: AlertTriangle,
+  info: Info
+}
+
+const ToastIconColors = {
+  success: "text-green-600 dark:text-green-400",
+  error: "text-red-600 dark:text-red-400", 
+  warning: "text-yellow-600 dark:text-yellow-400",
+  info: "text-blue-600 dark:text-blue-400"
+}
+
+export function ToastComponent({ toast, onDismiss, isPaused: externalIsPaused }: ToastComponentProps) {
+  const Icon = ToastIcons[toast.type]
+  const { resolvedTheme } = useTheme()
+  const [internalIsPaused, setInternalIsPaused] = React.useState(false)
+  const isPaused = externalIsPaused || internalIsPaused
+  const [swipeOffset, setSwipeOffset] = React.useState(0)
+  const [isDragging, setIsDragging] = React.useState(false)
+  const [isAnnounced, setIsAnnounced] = React.useState(false)
+  const [isExpanded, setIsExpanded] = React.useState(false)
+  const [copySuccess, setCopySuccess] = React.useState(false)
+  const toastRef = React.useRef<HTMLDivElement>(null)
+  
+  const handleDismiss = () => {
+    if (onDismiss) {
+      onDismiss(toast.id)
+    }
+  }
+
+  const handleKeyDown = (event: React.KeyboardEvent) => {
+    if (event.key === 'Escape' && toast.dismissible !== false) {
+      handleDismiss()
+    }
+    
+    // Space or Enter to dismiss (when focused)
+    if ((event.key === ' ' || event.key === 'Enter') && toast.dismissible !== false) {
+      event.preventDefault()
+      handleDismiss()
+    }
+  }
+
+  // Announce toast to screen readers after a short delay
+  React.useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsAnnounced(true)
+    }, 100)
+    
     return () => clearTimeout(timer)
   }, [])
 
-  const handleClose = () => {
-    setIsExiting(true)
-    setTimeout(() => {
-      removeNotification(notification.id)
-    }, 300)
-  }
-
-  const handleAction = () => {
-    if (notification.action?.onClick) {
-      notification.action.onClick()
-    }
-    if (!notification.persistent) {
-      handleClose()
+  // Handle copy functionality
+  const handleCopy = async () => {
+    if (!toast.copyable) return
+    
+    try {
+      await navigator.clipboard.writeText(toast.copyable.text)
+      setCopySuccess(true)
+      setTimeout(() => setCopySuccess(false), 2000)
+    } catch (error) {
+      console.error('Failed to copy:', error)
     }
   }
 
-  // Auto-remove after duration
-  useEffect(() => {
-    if (!notification.persistent && notification.duration) {
-      const timer = setTimeout(handleClose, notification.duration)
-      return () => clearTimeout(timer)
-    }
-  }, [notification.duration, notification.persistent])
+  const handleMouseEnter = () => {
+    setInternalIsPaused(true)
+  }
 
-  // Toast styles by type
-  const getTypeStyles = () => {
-    switch (notification.type) {
-      case 'success':
-        return {
-          gradient: 'bg-gradient-to-r from-green-500 to-emerald-600',
-          iconBg: 'bg-green-100 dark:bg-green-900/30',
-          iconColor: 'text-green-600 dark:text-green-400',
-          icon: CheckCircle,
-          progress: 'bg-green-300'
-        }
-      case 'error':
-        return {
-          gradient: 'bg-gradient-to-r from-red-500 to-rose-600',
-          iconBg: 'bg-red-100 dark:bg-red-900/30',
-          iconColor: 'text-red-600 dark:text-red-400',
-          icon: AlertCircle,
-          progress: 'bg-red-300'
-        }
-      case 'warning':
-        return {
-          gradient: 'bg-gradient-to-r from-amber-500 to-orange-600',
-          iconBg: 'bg-amber-100 dark:bg-amber-900/30',
-          iconColor: 'text-amber-600 dark:text-amber-400',
-          icon: AlertTriangle,
-          progress: 'bg-amber-300'
-        }
-      case 'info':
-      default:
-        return {
-          gradient: 'bg-gradient-to-r from-blue-500 to-indigo-600',
-          iconBg: 'bg-blue-100 dark:bg-blue-900/30',
-          iconColor: 'text-blue-600 dark:text-blue-400',
-          icon: Info,
-          progress: 'bg-blue-300'
-        }
+  const handleMouseLeave = () => {
+    setInternalIsPaused(false)
+  }
+
+  // Touch gesture handlers with improved logic
+  const [touchStartX, setTouchStartX] = React.useState(0)
+  
+  const handleTouchStart = (event: React.TouchEvent) => {
+    if (toast.dismissible === false) return
+    setIsDragging(true)
+    setInternalIsPaused(true)
+    setTouchStartX(event.touches[0].clientX)
+  }
+
+  const handleTouchMove = (event: React.TouchEvent) => {
+    if (!isDragging || toast.dismissible === false) return
+    
+    const touch = event.touches[0]
+    const currentX = touch.clientX
+    const offset = currentX - touchStartX
+    
+    // Only allow horizontal swipe
+    setSwipeOffset(offset)
+  }
+
+  const handleTouchEnd = () => {
+    if (!isDragging || toast.dismissible === false) return
+    
+    setIsDragging(false)
+    setInternalIsPaused(false)
+    
+    // If swiped more than 100px, dismiss
+    if (Math.abs(swipeOffset) > 100) {
+      handleDismiss()
+    } else {
+      setSwipeOffset(0)
     }
   }
 
-  const typeStyles = getTypeStyles()
-  const IconComponent = typeStyles.icon
-
-  // Position classes
-  const getPositionClasses = () => {
-    switch (notification.position) {
-      case 'top-center':
-        return 'top-4 left-1/2 transform -translate-x-1/2'
-      case 'top-left':
-        return 'top-4 left-4'
-      case 'bottom-right':
-        return 'bottom-4 right-4'
-      case 'top-right':
-      default:
-        return 'top-4 right-4'
+  const cssVarsByType: Record<NonNullable<Toast['type']>, React.CSSProperties> = {
+    success: {
+      ['--toast-bg' as any]: themeVariables[resolvedTheme]['--toast-success-bg'],
+      ['--toast-border' as any]: themeVariables[resolvedTheme]['--toast-success-border'],
+      ['--toast-text' as any]: themeVariables[resolvedTheme]['--toast-success-text']
+    },
+    error: {
+      ['--toast-bg' as any]: themeVariables[resolvedTheme]['--toast-error-bg'],
+      ['--toast-border' as any]: themeVariables[resolvedTheme]['--toast-error-border'],
+      ['--toast-text' as any]: themeVariables[resolvedTheme]['--toast-error-text']
+    },
+    warning: {
+      ['--toast-bg' as any]: themeVariables[resolvedTheme]['--toast-warning-bg'],
+      ['--toast-border' as any]: themeVariables[resolvedTheme]['--toast-warning-border'],
+      ['--toast-text' as any]: themeVariables[resolvedTheme]['--toast-warning-text']
+    },
+    info: {
+      ['--toast-bg' as any]: themeVariables[resolvedTheme]['--toast-info-bg'],
+      ['--toast-border' as any]: themeVariables[resolvedTheme]['--toast-info-border'],
+      ['--toast-text' as any]: themeVariables[resolvedTheme]['--toast-info-text']
     }
   }
 
   return (
-    <div 
-      className={`
-        fixed z-50 max-w-sm w-full pointer-events-auto
-        ${getPositionClasses()}
-        transition-all duration-300 ease-out
-        ${isVisible && !isExiting ? 'opacity-100 transform translate-x-0 scale-100' : 'opacity-0 transform translate-x-full scale-95'}
-        ${isExiting ? 'opacity-0 transform translate-x-full scale-95' : ''}
-      `}
+    <div
+      ref={toastRef}
+      className={cn(
+        toastVariants({ type: toast.type }), 
+        "toast-container toast-swipeable",
+        isDragging && "cursor-grabbing",
+        `toast-${toast.type}`
+      )}
+      role={toast.type === 'error' ? 'alert' : 'status'}
+      aria-live={toast.type === 'error' ? 'assertive' : 'polite'}
+      aria-atomic="true"
+      aria-label={`${toast.type} notification: ${toast.title || toast.message}`}
+      tabIndex={toast.dismissible !== false ? 0 : -1}
+      onKeyDown={handleKeyDown}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+      style={{
+        transform: `translateX(${swipeOffset}px)`,
+        opacity: Math.max(0.3, 1 - Math.abs(swipeOffset) / 300),
+        backgroundColor: `var(--toast-bg)`,
+        borderColor: `var(--toast-border)`,
+        color: `var(--toast-text)`,
+        ...cssVarsByType[toast.type]
+      }}
     >
-      {/* Toast Container */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-2xl border border-gray-200 dark:border-gray-700 overflow-hidden">
-        {/* Gradient Top Bar */}
-        <div className={`h-1 ${typeStyles.gradient}`} />
-        
-        {/* Main Content */}
-        <div className="p-4">
-          <div className="flex items-start space-x-3">
-            {/* Icon */}
-            <div className={`flex-shrink-0 p-1.5 rounded-full ${typeStyles.iconBg}`}>
-              {notification.icon ? (
-                <div className={`h-5 w-5 ${typeStyles.iconColor} flex items-center justify-center`}>
-                  {notification.icon}
-                </div>
-              ) : (
-                <IconComponent className={`h-5 w-5 ${typeStyles.iconColor}`} />
-              )}
-            </div>
-
-            {/* Content */}
-            <div className="flex-1 min-w-0">
-              <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-1 pr-8">
-                {notification.title}
-              </h4>
-              <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
-                {notification.message}
-              </p>
-
-              {/* Action Button */}
-              {notification.action && (
-                <div className="mt-3">
-                  {notification.action.href ? (
-                    <Link prefetch={true}
-                      href={notification.action.href}
-                      className="inline-flex items-center text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors"
-                      onClick={handleAction}
-                    >
-                      {notification.action.label}
-                      <ExternalLink className="h-3 w-3 ml-1" />
-                    </Link>
-                  ) : (
-                    <button
-                      onClick={handleAction}
-                      className="inline-flex items-center text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors"
-                    >
-                      {notification.action.label}
-                    </button>
-                  )}
-                </div>
-              )}
-            </div>
-
-            {/* Close Button */}
-            <button
-              onClick={handleClose}
-              className="flex-shrink-0 p-1.5 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors group"
-              aria-label="Fechar notificação"
-            >
-              <X className="h-4 w-4 text-gray-400 dark:text-gray-500 group-hover:text-gray-600 dark:group-hover:text-gray-300" />
-            </button>
-          </div>
+      {/* Icon and Content */}
+      <div className="flex items-start space-x-3">
+        <div className="flex-shrink-0 mt-0.5">
+          <Icon 
+            className={cn("w-5 h-5", ToastIconColors[toast.type])} 
+            aria-hidden="true" 
+          />
         </div>
+        
+        <div className="flex-1 min-w-0">
+          {toast.title && (
+            <h4 className="toast-title text-sm font-semibold mb-1 leading-tight">
+              {toast.title}
+            </h4>
+          )}
+          <p className="toast-message text-sm leading-relaxed opacity-90">
+            {toast.message}
+          </p>
+          
+          {/* Progress Bar */}
+          {toast.progress && (
+            <div className="mt-2">
+              <div className="flex justify-between text-xs mb-1">
+                <span>{toast.progress.label || 'Progress'}</span>
+                <span>{toast.progress.current}/{toast.progress.total}</span>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-2 dark:bg-gray-700">
+                <div 
+                  className={cn(
+                    "h-2 rounded-full transition-all duration-300",
+                    toast.type === 'success' && "bg-green-500",
+                    toast.type === 'error' && "bg-red-500",
+                    toast.type === 'warning' && "bg-yellow-500",
+                    toast.type === 'info' && "bg-blue-500"
+                  )}
+                  style={{ width: `${(toast.progress.current / toast.progress.total) * 100}%` }}
+                />
+              </div>
+            </div>
+          )}
 
-        {/* Progress Bar */}
-        {!notification.persistent && notification.duration && (
-          <div className="h-1 bg-gray-200 dark:bg-gray-700">
-            <div 
-              className={`h-full ${typeStyles.progress} animate-toast-progress`}
-              style={{ 
-                animationDuration: `${notification.duration}ms`,
-                animationTimingFunction: 'linear',
-                animationFillMode: 'forwards'
-              }}
-            />
-          </div>
-        )}
+          {/* Expandable Content */}
+          {toast.expandable && (
+            <div className="mt-2">
+              <button
+                onClick={() => setIsExpanded(!isExpanded)}
+                className="text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 rounded"
+                aria-expanded={isExpanded}
+              >
+                {isExpanded ? '▼' : '▶'} {toast.expandable.summary}
+              </button>
+              {isExpanded && (
+                <div className="mt-2 p-2 bg-gray-50 dark:bg-gray-800 rounded text-sm">
+                  {toast.expandable.details}
+                </div>
+              )}
+            </div>
+          )}
 
-        {/* Timestamp */}
-        <div className="px-4 pb-3">
-          <span className="text-xs text-gray-400 dark:text-gray-500">
-            {new Date(notification.timestamp).toLocaleTimeString('pt-BR', {
-              hour: '2-digit',
-              minute: '2-digit'
-            })}
-          </span>
+          {/* Copy Button */}
+          {toast.copyable && (
+            <button
+              onClick={handleCopy}
+              className={cn(
+                "mt-2 text-sm font-medium px-2 py-1 rounded border transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2",
+                copySuccess 
+                  ? "bg-green-100 text-green-800 border-green-300 dark:bg-green-900 dark:text-green-200 dark:border-green-700"
+                  : "bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600",
+                toast.type === 'success' && "focus:ring-green-500",
+                toast.type === 'error' && "focus:ring-red-500",
+                toast.type === 'warning' && "focus:ring-yellow-500",
+                toast.type === 'info' && "focus:ring-blue-500"
+              )}
+            >
+              {copySuccess ? '✓ Copiado!' : (toast.copyable.label || 'Copiar')}
+            </button>
+          )}
+
+          {/* Action Buttons */}
+          {(toast.action || toast.secondaryAction) && (
+            <div className="mt-3 flex gap-2">
+              {toast.action && (
+                <button
+                  onClick={toast.action.onClick}
+                  className={cn(
+                    "px-3 py-1 text-sm font-medium rounded border transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2",
+                    toast.type === 'success' && "bg-green-600 text-white border-green-600 hover:bg-green-700 focus:ring-green-500",
+                    toast.type === 'error' && "bg-red-600 text-white border-red-600 hover:bg-red-700 focus:ring-red-500",
+                    toast.type === 'warning' && "bg-yellow-600 text-white border-yellow-600 hover:bg-yellow-700 focus:ring-yellow-500",
+                    toast.type === 'info' && "bg-blue-600 text-white border-blue-600 hover:bg-blue-700 focus:ring-blue-500"
+                  )}
+                >
+                  {toast.action.label}
+                </button>
+              )}
+              
+              {toast.secondaryAction && (
+                <button
+                  onClick={toast.secondaryAction.onClick}
+                  className={cn(
+                    "px-3 py-1 text-sm font-medium rounded border transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2",
+                    "bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600",
+                    toast.type === 'success' && "focus:ring-green-500",
+                    toast.type === 'error' && "focus:ring-red-500",
+                    toast.type === 'warning' && "focus:ring-yellow-500",
+                    toast.type === 'info' && "focus:ring-blue-500"
+                  )}
+                >
+                  {toast.secondaryAction.label}
+                </button>
+              )}
+            </div>
+          )}
         </div>
       </div>
+
+      {/* Dismiss Button */}
+      {toast.dismissible !== false && (
+        <button
+          onClick={handleDismiss}
+          className={cn(
+            "absolute top-2 right-2 p-1 rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2",
+            "min-w-[44px] min-h-[44px] flex items-center justify-center", // Touch target size
+            toast.type === 'success' && "text-green-500 hover:text-green-700 focus:ring-green-500 dark:text-green-400 dark:hover:text-green-300",
+            toast.type === 'error' && "text-red-500 hover:text-red-700 focus:ring-red-500 dark:text-red-400 dark:hover:text-red-300",
+            toast.type === 'warning' && "text-yellow-500 hover:text-yellow-700 focus:ring-yellow-500 dark:text-yellow-400 dark:hover:text-yellow-300",
+            toast.type === 'info' && "text-blue-500 hover:text-blue-700 focus:ring-blue-500 dark:text-blue-400 dark:hover:text-blue-300"
+          )}
+          aria-label={`Fechar notificação ${toast.type}: ${toast.title || toast.message}`}
+          title="Pressione Escape ou clique para fechar"
+        >
+          <X className="w-4 h-4" />
+        </button>
+      )}
+
+      {/* Screen reader announcement */}
+      {isAnnounced && (
+        <div className="sr-only" aria-live={toast.type === 'error' ? 'assertive' : 'polite'}>
+          {toast.type} notification: {toast.title ? `${toast.title}. ${toast.message}` : toast.message}
+        </div>
+      )}
+
+      {/* Progress Bar for Auto-Dismiss */}
+      {toast.duration && toast.duration > 0 && (
+        <div className="absolute bottom-0 left-0 right-0 h-1 bg-black/10 dark:bg-white/10 overflow-hidden">
+          <div
+            className={cn(
+              "h-full toast-progress-bar",
+              toast.type === 'success' && "bg-green-500",
+              toast.type === 'error' && "bg-red-500",
+              toast.type === 'warning' && "bg-yellow-500",
+              toast.type === 'info' && "bg-blue-500"
+            )}
+            style={{
+              animationDuration: `${toast.duration}ms`,
+              animationPlayState: isPaused ? 'paused' : 'running'
+            }}
+          />
+        </div>
+      )}
     </div>
   )
 }
 
-// Toast Container Component
-export const ToastContainer: React.FC = () => {
-  const { notifications } = useNotifications()
-
-  return (
-    <>
-      {notifications.map((notification) => (
-        <Toast key={notification.id} notification={notification} />
-      ))}
-    </>
-  )
-}
-
-export default Toast 
+export default ToastComponent
