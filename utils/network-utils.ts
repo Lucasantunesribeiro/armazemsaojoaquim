@@ -25,7 +25,7 @@ export async function fetchWithRetry(
   options: RetryOptions = {}
 ): Promise<Response> {
   const config = { ...DEFAULT_RETRY_OPTIONS, ...options }
-  let lastError: Error
+  let lastError: Error = new Error('Unknown error')
 
   for (let attempt = 1; attempt <= config.maxRetries; attempt++) {
     try {

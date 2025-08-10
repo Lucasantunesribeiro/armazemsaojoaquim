@@ -55,11 +55,6 @@ export async function GET(request: NextRequest) {
         // Simple count - just use the current results length for now
         const count = users?.length || 0
 
-        if (dataError) {
-          console.error('❌ [ADMIN-USERS] Erro nos dados:', dataError)
-          throw new Error(`Data error: ${dataError.message}`)
-        }
-
         // Basic stats from current data
         console.log('[ADMIN-USERS] Calculating basic stats...')
         
