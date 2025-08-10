@@ -4,6 +4,7 @@ export { Input } from './Input'
 export { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent } from './Card'
 export { Label } from './Label'
 export { Badge } from './Badge'
+export { Separator } from './Separator'
 export { Textarea } from './Textarea'
 export { Switch } from './Switch'
 export { 
