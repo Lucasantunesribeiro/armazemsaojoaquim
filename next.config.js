@@ -74,6 +74,12 @@ const nextConfig = {
     ],
   },
 
+  // Configure serverless functions for better Edge Runtime compatibility
+  serverExternalPackages: ['@supabase/supabase-js'],
+
+  // Configure output for Netlify deployment
+  output: 'standalone',
+
   // Configurações de compiler para performance
   compiler: {
     removeConsole: process.env.NODE_ENV === 'production',
@@ -113,17 +119,32 @@ const nextConfig = {
       }
     }
 
+    // Edge Runtime compatibility for Supabase
+    config.resolve.fallback = {
+      ...config.resolve.fallback,
+      process: false,
+    }
+
     // Melhorar resolução de módulos
     config.resolve.modules = ['node_modules', '.']
     config.resolve.extensions = ['.js', '.jsx', '.ts', '.tsx']
     
-    // Suppress specific Recharts warnings
+    // Suppress specific warnings including Supabase Edge Runtime warnings
     config.ignoreWarnings = [
       /Failed to parse source map/,
       /Critical dependency: the request of a dependency is an expression/,
       /Module not found: Can't resolve 'victory-vendor\/d3-shape'/,
-      /Attempted import error:.*is not exported from 'victory-vendor\/d3-shape'/
+      /Attempted import error:.*is not exported from 'victory-vendor\/d3-shape'/,
+      /A Node\.js API is used \(process\.version at line: \d+\) which is not supported in the Edge Runtime/,
+      /process\.version/,
+      /Cannot find module 'critters'/
     ]
+
+    // Ensure critters is available for CSS optimization
+    if (!isServer) {
+      config.externals = config.externals || []
+      config.externals.push('critters')
+    }
 
     return config
   },

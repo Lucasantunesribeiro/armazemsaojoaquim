@@ -4,10 +4,34 @@ import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import { Database } from '../types/database.types'
 
+// Edge Runtime detection
+const isEdgeRuntime = () => {
+  try {
+    return typeof globalThis !== 'undefined' && 
+           ('EdgeRuntime' in globalThis || 
+            globalThis.navigator?.userAgent?.includes('Edge'))
+  } catch {
+    return false
+  }
+}
+
 // Verificar se as variáveis de ambiente estão configuradas
 export const isSupabaseConfigured = () => {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  // Use typeof window to detect client-side vs server-side
+  const isClient = typeof window !== 'undefined'
+  
+  let url: string | undefined
+  let key: string | undefined
+  
+  if (isClient) {
+    // Client-side: access via window object or direct env vars
+    url = process.env.NEXT_PUBLIC_SUPABASE_URL
+    key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  } else {
+    // Server-side: safe to use process.env
+    url = process.env.NEXT_PUBLIC_SUPABASE_URL
+    key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  }
   
   return !!(url && key && url !== 'your_supabase_url' && key !== 'your_supabase_anon_key')
 }
@@ -132,6 +156,7 @@ export function createClient() {
     return cachedBrowserClient
   }
 
+  // Edge Runtime compatible environment variable access
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 
@@ -203,6 +228,7 @@ export async function createServerClient() {
     return createMockClient() as any
   }
 
+  // Server-side environment variables (safe in server context)
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   
