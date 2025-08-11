@@ -7,6 +7,8 @@ import { Providers } from '@/components/providers/Providers'
 import '../globals.css'
 import { Suspense } from 'react'
 import Loading from '@/components/ui/Loading'
+import { ErrorBoundaryGlobal } from '@/components/ErrorBoundaryGlobal'
+import { HydrationProvider } from '@/components/HydrationProvider'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -27,16 +29,30 @@ export default async function LocaleLayout({
   const { locale } = await params
   return (
     <>
-      <Providers>
-        <Header />
-        <main className="min-h-screen main-content-mobile">
-          <Suspense fallback={<Loading />}>
-            {children}
-          </Suspense>
-        </main>
-        <Footer />
-        <BottomNavigation />
-      </Providers>
+      <ErrorBoundaryGlobal
+        onError={(error, errorInfo) => {
+          // Log do erro para monitoramento
+          console.error('🚨 Erro capturado no layout:', error)
+          
+          // Se for erro React #310, log adicional
+          if (error.message.includes('Minified React error #310')) {
+            console.error('🔍 Erro React #310 - possível problema de hooks ou hydration')
+          }
+        }}
+      >
+        <HydrationProvider>
+          <Providers>
+            <Header />
+            <main className="min-h-screen main-content-mobile">
+              <Suspense fallback={<Loading />}>
+                {children}
+              </Suspense>
+            </main>
+            <Footer />
+            <BottomNavigation />
+          </Providers>
+        </HydrationProvider>
+      </ErrorBoundaryGlobal>
     </>
   )
 }

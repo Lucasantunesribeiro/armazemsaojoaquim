@@ -1,6 +1,6 @@
 "use client"
 
-import React, { createContext, useContext, useEffect, useMemo, useState } from 'react'
+import React, { createContext, useContext, useEffect, useMemo, useState, useCallback } from 'react'
 import { useTheme as useNextTheme } from 'next-themes'
 
 export type Theme = 'light' | 'dark' | 'system'
@@ -118,11 +118,11 @@ export function ThemeProvider({ children }: AppThemeProviderProps) {
     if (meta) meta.setAttribute('content', resolvedTheme === 'dark' ? '#111827' : '#ffffff')
   }, [resolvedTheme])
 
-  const toggleTheme = () => {
+  const toggleTheme = useCallback(() => {
     const current = (theme || 'system') as Theme
     if (current === 'system') setTheme(systemTheme === 'dark' ? 'light' : 'dark')
     else setTheme(current === 'dark' ? 'light' : 'dark')
-  }
+  }, [theme, systemTheme, setTheme])
 
   const value = useMemo<ThemeContextValue>(() => ({
     theme: (theme as Theme) || 'system',
@@ -130,7 +130,7 @@ export function ThemeProvider({ children }: AppThemeProviderProps) {
     setTheme: setTheme as (t: Theme) => void,
     toggleTheme,
     systemTheme
-  }), [theme, resolvedTheme, setTheme, systemTheme])
+  }), [theme, resolvedTheme, systemTheme, toggleTheme])
 
   return (
     <ThemeContext.Provider value={value}>
