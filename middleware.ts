@@ -1,15 +1,10 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
-// Supported locales
-export const locales = ['pt', 'en'] as const
-export const defaultLocale = 'pt' as const
-export type Locale = typeof locales[number]
-
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
   
-  // Skip static files and API routes
+  // Skip all processing for static files and API routes
   if (
     pathname.startsWith('/_next/') ||
     pathname.startsWith('/api/') ||
@@ -22,23 +17,14 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next()
   }
 
-  // Simple locale handling
-  const pathnameIsMissingLocale = locales.every(
-    (locale) => !pathname.startsWith(`/${locale}/`) && pathname !== `/${locale}`
-  )
-
-  // Redirect if there is no locale
-  if (pathnameIsMissingLocale) {
-    if (pathname === '/') {
-      return NextResponse.redirect(new URL(`/${defaultLocale}`, request.url))
-    }
-    return NextResponse.redirect(new URL(`/${defaultLocale}${pathname}`, request.url))
+  // Simple locale redirect only
+  if (pathname === '/') {
+    return NextResponse.redirect(new URL('/pt', request.url))
   }
 
-  // Add basic security headers
+  // Basic response with minimal headers
   const response = NextResponse.next()
   response.headers.set('X-Frame-Options', 'DENY')
-  response.headers.set('X-Content-Type-Options', 'nosniff')
   
   return response
 }
