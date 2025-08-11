@@ -221,7 +221,7 @@ export function createClient() {
   return cachedBrowserClient
 }
 
-// Cliente para server components - NEXT.JS 15 COMPATIBLE
+// Cliente para server components - NETLIFY COMPATIBLE
 export async function createServerClient() {
   if (!isSupabaseConfigured()) {
     console.warn('⚠️ Supabase não configurado, usando cliente mock')
@@ -232,9 +232,28 @@ export async function createServerClient() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   
-  // NEXT.JS 15: cookies() agora é async - importar dinamicamente para evitar erro de client component
-  const { cookies } = await import('next/headers')
-  const cookieStore = await cookies()
+  // NETLIFY FIX: Avoid await cookies() to prevent 500 errors
+  let cookieStore: Awaited<ReturnType<typeof cookies>>
+  
+  try {
+    cookieStore = await cookies()
+  } catch (error) {
+    // Fallback for Netlify environment
+    console.warn('⚠️ Cookies não disponível, usando fallback para Netlify')
+    cookieStore = {
+      getAll: () => [],
+      get: () => undefined,
+      set: () => {},
+      delete: () => {},
+      has: () => false,
+      forEach: () => {},
+      entries: () => [][Symbol.iterator](),
+      keys: () => [][Symbol.iterator](),
+      values: () => [][Symbol.iterator](),
+      [Symbol.iterator]: () => [][Symbol.iterator](),
+      size: 0
+    } as any
+  }
 
   return createSSRServerClient<Database>(supabaseUrl, supabaseAnonKey, {
     cookies: {
