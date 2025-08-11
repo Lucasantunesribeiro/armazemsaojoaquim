@@ -5,6 +5,8 @@ import { useEffect } from 'react'
 // Component to load non-critical CSS asynchronously
 export default function AsyncCSS() {
   useEffect(() => {
+    if (typeof window === 'undefined') return
+    
     // Load non-critical CSS after the page has loaded
     const loadAsyncCSS = () => {
       // Create link elements for non-critical stylesheets
@@ -54,6 +56,8 @@ export const preloadCSS = (href: string) => {
 // Component for font optimization
 export const FontOptimizer = () => {
   useEffect(() => {
+    if (typeof window === 'undefined') return
+    
     // Preload critical font weights
     const criticalFonts = [
       'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap',

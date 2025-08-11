@@ -1,15 +1,7 @@
 /** @type {import('next').NextConfig} */
 
-// Configuração condicional do bundle analyzer
+// Disable bundle analyzer for now to avoid potential issues
 let withBundleAnalyzer = (config) => config
-
-try {
-  withBundleAnalyzer = require('@next/bundle-analyzer')({
-    enabled: process.env.ANALYZE === 'true',
-  })
-} catch (error) {
-  console.log('Bundle analyzer não disponível, usando configuração padrão')
-}
 
 const nextConfig = {
   // Configurações básicas
@@ -62,7 +54,8 @@ const nextConfig = {
 
   // Configurações experimentais para performance
   experimental: {
-    optimizeCss: true,
+    // Temporarily disable optimizeCss to fix build issues
+    // optimizeCss: true,
     middlewarePrefetch: 'strict',
     optimizePackageImports: [
       '@radix-ui/react-icons', 
@@ -73,8 +66,7 @@ const nextConfig = {
       '@radix-ui/react-switch',
       'react-hook-form',
       '@hookform/resolvers',
-      'date-fns',
-      'recharts'
+      'date-fns'
     ],
 
   },
@@ -148,6 +140,27 @@ const nextConfig = {
       process: false,
     }
 
+    // Add global polyfills to prevent 'self is not defined' errors
+    const webpack = require('webpack')
+    config.plugins = config.plugins || []
+    config.plugins.push(
+      new webpack.DefinePlugin({
+        'self': 'undefined',
+        'typeof self': JSON.stringify('undefined'),
+        'typeof window': isServer ? JSON.stringify('undefined') : JSON.stringify('object'),
+        'typeof document': isServer ? JSON.stringify('undefined') : JSON.stringify('object'),
+      })
+    )
+
+    // Provide polyfills for server-side rendering
+    if (isServer) {
+      config.plugins.push(
+        new webpack.ProvidePlugin({
+          'self': 'undefined',
+        })
+      )
+    }
+
     // Melhorar resolução de módulos
     config.resolve.modules = ['node_modules', '.']
     config.resolve.extensions = ['.js', '.jsx', '.ts', '.tsx']
@@ -163,11 +176,8 @@ const nextConfig = {
       /Cannot find module 'critters'/
     ]
 
-    // Ensure critters is available for CSS optimization
-    if (!isServer) {
-      config.externals = config.externals || []
-      config.externals.push('critters')
-    }
+    // Remove the critters external configuration as it's causing issues
+    // Critters should be handled by Next.js internally
 
     return config
   },
