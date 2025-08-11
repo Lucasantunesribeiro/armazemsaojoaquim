@@ -2,16 +2,19 @@
   command = "npm run build"
   publish = ".next"
 
-[[plugins]]
-  package = "@netlify/plugin-nextjs"
-
 [build.environment]
   NODE_VERSION = "22"
   NPM_VERSION = "10"
   NEXT_TELEMETRY_DISABLED = "1"
   NODE_ENV = "production"
 
-# Headers para otimização
+[functions]
+  node_bundler = "esbuild"
+  timeout = 15
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+
 [[headers]]
   for = "/*"
   [headers.values]
@@ -20,7 +23,6 @@
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
 
-# Cache para assets estáticos
 [[headers]]
   for = "/images/*"
   [headers.values]
@@ -31,26 +33,7 @@
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
 
-# Headers para fontes
 [[headers]]
   for = "/*.woff2"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
-
-# Função serverless otimizada para Next.js 15
-[functions]
-  node_bundler = "esbuild"
-  # Aumentar timeout para APIs admin complexas
-  timeout = "15"
-  
-# Configurações específicas para Next.js no Netlify
-[build.processing]
-  skip_processing = false
-  
-[build.processing.css]
-  bundle = true
-  minify = true
-  
-[build.processing.js]
-  bundle = true
-  minify = true
