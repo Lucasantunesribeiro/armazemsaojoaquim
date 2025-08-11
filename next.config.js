@@ -60,8 +60,8 @@ const nextConfig = {
 
   // Configurações experimentais para performance e Edge Runtime
   experimental: {
-    // Temporarily disable optimizeCss to fix build issues
-    // optimizeCss: true,
+    // Re-enable CSS optimization now that build is stable
+    optimizeCss: true,
     middlewarePrefetch: 'strict',
     optimizePackageImports: [
       '@radix-ui/react-icons', 
