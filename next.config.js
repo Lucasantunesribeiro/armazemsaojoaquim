@@ -52,7 +52,13 @@ const nextConfig = {
     ],
   },
 
-  // Configurações experimentais para performance
+  // Configure serverless functions for better Edge Runtime compatibility
+  serverExternalPackages: ['@supabase/supabase-js'],
+
+  // Configure output for Netlify deployment
+  output: 'standalone',
+
+  // Configurações experimentais para performance e Edge Runtime
   experimental: {
     // Temporarily disable optimizeCss to fix build issues
     // optimizeCss: true,
@@ -68,14 +74,7 @@ const nextConfig = {
       '@hookform/resolvers',
       'date-fns'
     ],
-
   },
-
-  // Configure serverless functions for better Edge Runtime compatibility
-  serverExternalPackages: ['@supabase/supabase-js'],
-
-  // Configure output for Netlify deployment
-  output: 'standalone',
 
   // Configurações de compiler para performance
   compiler: {
@@ -84,10 +83,9 @@ const nextConfig = {
 
   // Configurações de webpack para otimização
   webpack: (config, { isServer, dev }) => {
-    // Recharts + victory-vendor/d3-shape compatibility fix
+    // Basic alias configuration
     config.resolve.alias = {
       ...config.resolve.alias,
-      'victory-vendor/d3-shape': 'd3-shape',
       '@': '.',
       '@/components': './components',
       '@/lib': './lib',
@@ -96,34 +94,7 @@ const nextConfig = {
       '@/app': './app'
     }
 
-    // Otimizações de produção
-    if (!dev) {
-      config.optimization = {
-        ...config.optimization,
-        sideEffects: false,
-        usedExports: true,
-        splitChunks: {
-          chunks: 'all',
-          cacheGroups: {
-            vendor: {
-              test: /[\\/]node_modules[\\/]/,
-              name: 'vendors',
-              chunks: 'all',
-              priority: 10,
-            },
-            common: {
-              name: 'common',
-              minChunks: 2,
-              chunks: 'all',
-              priority: 5,
-              reuseExistingChunk: true,
-            },
-          },
-        },
-      }
-    }
-
-    // Configurações básicas para o cliente
+    // Basic fallback configuration
     if (!isServer) {
       config.resolve.fallback = {
         ...config.resolve.fallback,
@@ -134,50 +105,16 @@ const nextConfig = {
       }
     }
 
-    // Edge Runtime compatibility for Supabase
-    config.resolve.fallback = {
-      ...config.resolve.fallback,
-      process: false,
-    }
-
-    // Add global polyfills to prevent 'self is not defined' errors
-    const webpack = require('webpack')
-    config.plugins = config.plugins || []
-    config.plugins.push(
-      new webpack.DefinePlugin({
-        'self': 'undefined',
-        'typeof self': JSON.stringify('undefined'),
-        'typeof window': isServer ? JSON.stringify('undefined') : JSON.stringify('object'),
-        'typeof document': isServer ? JSON.stringify('undefined') : JSON.stringify('object'),
-      })
-    )
-
-    // Provide polyfills for server-side rendering
-    if (isServer) {
-      config.plugins.push(
-        new webpack.ProvidePlugin({
-          'self': 'undefined',
-        })
-      )
-    }
-
-    // Melhorar resolução de módulos
-    config.resolve.modules = ['node_modules', '.']
-    config.resolve.extensions = ['.js', '.jsx', '.ts', '.tsx']
-    
-    // Suppress specific warnings including Supabase Edge Runtime warnings
+    // Suppress warnings
     config.ignoreWarnings = [
       /Failed to parse source map/,
       /Critical dependency: the request of a dependency is an expression/,
-      /Module not found: Can't resolve 'victory-vendor\/d3-shape'/,
-      /Attempted import error:.*is not exported from 'victory-vendor\/d3-shape'/,
       /A Node\.js API is used \(process\.version at line: \d+\) which is not supported in the Edge Runtime/,
       /process\.version/,
-      /Cannot find module 'critters'/
+      /self is not defined/,
+      /window is not defined/,
+      /document is not defined/
     ]
-
-    // Remove the critters external configuration as it's causing issues
-    // Critters should be handled by Next.js internally
 
     return config
   },
