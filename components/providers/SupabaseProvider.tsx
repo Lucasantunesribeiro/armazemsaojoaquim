@@ -3,7 +3,7 @@
 import { createClient } from '@/lib/supabase'
 import { Session, User, AuthChangeEvent } from '@supabase/supabase-js'
 import { createContext, useContext, useEffect, useState, useMemo, useRef, useCallback } from 'react'
-import { fetchWithRetry, isOnline } from '@/utils/network-utils'
+// Removed network-utils import to avoid API calls during SSR
 
 interface SupabaseContextType {
   user: User | null
@@ -42,7 +42,7 @@ export default function SupabaseProvider({
     ttl: 30000 // 30 seconds cache
   })
 
-  // Enhanced admin status check with caching and faster timeouts
+  // Simplified admin status check - EMAIL ONLY to avoid API calls during SSR
   const checkAdminStatus = useCallback(async (session: Session) => {
     const userId = session.user.id
     const now = Date.now()
@@ -54,78 +54,19 @@ export default function SupabaseProvider({
       return adminStatusCache.current.isAdmin
     }
     
-    // Immediate fallback for known admin email
+    // ONLY use email-based admin check to avoid API calls during initialization
     const emailAdmin = session.user.email === 'armazemsaojoaquimoficial@gmail.com'
     
-    // If it's the known admin email, cache and return immediately
-    if (emailAdmin) {
-      adminStatusCache.current = {
-        userId,
-        isAdmin: true,
-        timestamp: now,
-        ttl: 300000 // 5 minutes for admin email
-      }
-      console.log('✅ SupabaseProvider: Admin email detected, skipping API call')
-      return true
+    // Cache the email-based result
+    adminStatusCache.current = {
+      userId,
+      isAdmin: emailAdmin,
+      timestamp: now,
+      ttl: 300000 // 5 minutes cache
     }
     
-    // Check network connectivity first
-    if (!isOnline()) {
-      console.warn('⚠️ SupabaseProvider: Network is offline, using email fallback')
-      return emailAdmin
-    }
-    
-    try {
-      console.log('🔍 SupabaseProvider: Checking admin status via API...')
-      
-      // Single attempt with shorter timeout
-      const response = await fetchWithRetry('/api/auth/check-role', {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${session.access_token}`,
-          'Content-Type': 'application/json'
-        }
-      }, {
-        maxRetries: 1, // No retries to avoid long waits
-        retryDelay: 0,
-        timeoutMs: 2000 // Reduced to 2 seconds
-      })
-
-      if (response.ok) {
-        const data = await response.json()
-        console.log('✅ SupabaseProvider: Admin status received:', {
-          isAdmin: data.isAdmin,
-          method: data.method,
-          authenticated: data.authenticated
-        })
-        
-        // Cache the result
-        adminStatusCache.current = {
-          userId,
-          isAdmin: data.isAdmin,
-          timestamp: now,
-          ttl: data.isAdmin ? 300000 : 60000 // 5min for admin, 1min for non-admin
-        }
-        
-        return data.isAdmin
-      } else {
-        console.log('⚠️ SupabaseProvider: API check failed:', response.status)
-        throw new Error(`API returned ${response.status}`)
-      }
-    } catch (error) {
-      console.error('❌ SupabaseProvider: Error checking admin status:', error)
-      
-      // Cache the email fallback result for a short time
-      adminStatusCache.current = {
-        userId,
-        isAdmin: emailAdmin,
-        timestamp: now,
-        ttl: 10000 // 10 seconds for fallback
-      }
-      
-      console.log('🔄 SupabaseProvider: Using email fallback due to API error')
-      return emailAdmin
-    }
+    console.log('✅ SupabaseProvider: Email-based admin check:', emailAdmin)
+    return emailAdmin
   }, [])
 
   useEffect(() => {

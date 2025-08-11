@@ -71,6 +71,7 @@ const nextConfig = {
     // Re-enable CSS optimization now that build is stable
     optimizeCss: true,
     middlewarePrefetch: 'strict',
+    // Otimização crítica para Netlify - reduzir bundle size
     optimizePackageImports: [
       '@radix-ui/react-icons', 
       'lucide-react',
@@ -80,8 +81,13 @@ const nextConfig = {
       '@radix-ui/react-switch',
       'react-hook-form',
       '@hookform/resolvers',
-      'date-fns'
+      'date-fns',
+      'recharts',        // Otimizar charts pesados
+      'react-icons'      // Tree shake react-icons
     ],
+    // Bundle splitting agressivo para Netlify
+    esmExternals: 'loose',
+    serverComponentsExternalPackages: ['@supabase/supabase-js']
   },
 
   // Configurações de compiler para performance

@@ -1,7 +1,6 @@
 import { createClient as createSupabaseClient } from '@supabase/supabase-js'
 import { createBrowserClient, createServerClient as createSSRServerClient } from '@supabase/ssr'
 import { NextRequest, NextResponse } from 'next/server'
-import { cookies } from 'next/headers'
 import { Database } from '../types/database.types'
 
 // Edge Runtime detection
@@ -222,7 +221,7 @@ export function createClient() {
 }
 
 // Cliente para server components - NETLIFY COMPATIBLE
-export async function createServerClient() {
+export function createServerClient() {
   if (!isSupabaseConfigured()) {
     console.warn('⚠️ Supabase não configurado, usando cliente mock')
     return createMockClient() as any
@@ -232,36 +231,23 @@ export async function createServerClient() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   
-  // NETLIFY FIX: Avoid await cookies() to prevent 500 errors
-  let cookieStore: Awaited<ReturnType<typeof cookies>>
-  
-  try {
-    cookieStore = await cookies()
-  } catch (error) {
-    // Fallback for Netlify environment
-    console.warn('⚠️ Cookies não disponível, usando fallback para Netlify')
-    cookieStore = {
-      getAll: () => [],
-      get: () => undefined,
-      set: () => {},
-      delete: () => {},
-      has: () => false,
-      forEach: () => {},
-      entries: () => [][Symbol.iterator](),
-      keys: () => [][Symbol.iterator](),
-      values: () => [][Symbol.iterator](),
-      [Symbol.iterator]: () => [][Symbol.iterator](),
-      size: 0
-    } as any
-  }
-
+  // NETLIFY FIX: Use dynamic import to avoid build issues
   return createSSRServerClient<Database>(supabaseUrl, supabaseAnonKey, {
     cookies: {
       getAll() {
-        return cookieStore.getAll()
+        try {
+          // Dynamic import only when needed
+          const { cookies } = require('next/headers')
+          return cookies().getAll()
+        } catch (error) {
+          console.warn('⚠️ Cookies não disponível em server context')
+          return []
+        }
       },
       setAll(cookiesToSet: Array<{ name: string; value: string; options?: any }>) {
         try {
+          const { cookies } = require('next/headers')
+          const cookieStore = cookies()
           cookiesToSet.forEach(({ name, value, options }) =>
             cookieStore.set(name, value, options)
           )
@@ -287,8 +273,8 @@ export async function createServerClient() {
   })
 }
 
-// Legacy function for backward compatibility - will be deprecated
-export function createServerClientLegacy(cookieStore: Awaited<ReturnType<typeof cookies>>) {
+// Legacy function for backward compatibility - will be deprecated  
+export function createServerClientLegacy(cookieStore: any) {
   if (!isSupabaseConfigured()) {
     console.warn('⚠️ Supabase não configurado, usando cliente mock')
     return createMockClient() as any

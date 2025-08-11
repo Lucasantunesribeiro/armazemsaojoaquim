@@ -23,6 +23,7 @@
     "build:production": "node scripts/build-production.js",
     "optimize:deploy": "node scripts/optimize-deploy.js",
     "deploy:prepare": "npm run optimize:deploy && npm run build",
+    "deploy:netlify": "node scripts/optimize-netlify-deploy.js && npm run build",
     "build:safe": "node scripts/build-production-safe.js",
     "analyze": "ANALYZE=true npm run build",
     "lighthouse": "lighthouse http://localhost:3000 --output=html --output-path=./lighthouse-report.html",

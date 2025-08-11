@@ -37,6 +37,20 @@
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
 
-# Função serverless otimizada
+# Função serverless otimizada para Next.js 15
 [functions]
   node_bundler = "esbuild"
+  # Aumentar timeout para APIs admin complexas
+  timeout = "15"
+  
+# Configurações específicas para Next.js no Netlify
+[build.processing]
+  skip_processing = false
+  
+[build.processing.css]
+  bundle = true
+  minify = true
+  
+[build.processing.js]
+  bundle = true
+  minify = true
