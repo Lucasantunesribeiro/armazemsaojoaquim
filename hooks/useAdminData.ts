@@ -319,7 +319,7 @@ export function useAdminData<T>(
         loadData()
       }
     }, debounceMs),
-    [loadData, autoLoad, debounceMs]
+    [loadData, debounceMs]
   )
 
   // Auto-load data when dependencies change

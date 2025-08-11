@@ -2,122 +2,29 @@
   command = "npm run build"
   publish = ".next"
 
-[build.environment]
-  NODE_VERSION = "20"
-  NPM_FLAGS = "--legacy-peer-deps"
-  NODE_ENV = "production"
-  NEXT_TELEMETRY_DISABLED = "1"
-  # Performance optimizations
-  NODE_OPTIONS = "--max-old-space-size=4096"
-  NETLIFY_NEXT_PLUGIN_SKIP = "false"
-  # Next.js 15 optimizations
-  NEXT_PRIVATE_STANDALONE = "true"
-  NEXT_PRIVATE_DISABLE_ESLINT = "false"
-  # Build optimization - ensure build dependencies are available
-  NPM_CONFIG_PRODUCTION = "false"
-  # Compression optimization
-  NETLIFY_SKIP_EDGE_HANDLERS = "false"
-  # Additional build optimizations
-  NEXT_PRIVATE_SKIP_VALIDATION = "false"
-  NEXT_PRIVATE_DISABLE_WEBPACK_CACHE = "false"
-
-# Plugin oficial do Next.js para Netlify - versão mais recente
 [[plugins]]
   package = "@netlify/plugin-nextjs"
-  
 
-# Configuração otimizada para funções Edge
-[functions]
-  node_bundler = "esbuild"
-  external_node_modules = ["@supabase/supabase-js", "bcryptjs"]
+[build.environment]
+  NODE_VERSION = "20"
+  NPM_VERSION = "10"
+  NEXT_TELEMETRY_DISABLED = "1"
 
-# Headers de segurança para todas as páginas
+# Headers para otimização
 [[headers]]
   for = "/*"
   [headers.values]
     X-Frame-Options = "DENY"
-    X-Content-Type-Options = "nosniff"
     X-XSS-Protection = "1; mode=block"
-    Referrer-Policy = "strict-origin-when-cross-origin"
-    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
-    Strict-Transport-Security = "max-age=31536000; includeSubDomains"
-
-# Headers para API routes
-[[headers]]
-  for = "/api/*"
-  [headers.values]
-    Content-Type = "application/json; charset=utf-8"
-    Access-Control-Allow-Origin = "*"
-    Access-Control-Allow-Methods = "GET, POST, PUT, DELETE, OPTIONS"
-    Access-Control-Allow-Headers = "Content-Type, Authorization, X-Requested-With"
-    Cache-Control = "no-store, no-cache, must-revalidate, private"
-
-# Headers para assets estáticos - cache longo
-[[headers]]
-  for = "/_next/static/*"
-  [headers.values]
-    Cache-Control = "public, max-age=31536000, immutable"
-
-# CORREÇÃO CRÍTICA: Headers específicos para imagens da pousada
-[[headers]]
-  for = "/images/pousada/*"
-  [headers.values]
-    Content-Type = "image/jpeg"
-    Cache-Control = "public, max-age=86400"
     X-Content-Type-Options = "nosniff"
-    Access-Control-Allow-Origin = "*"
+    Referrer-Policy = "strict-origin-when-cross-origin"
 
-# Headers para imagens - cache longo
+# Cache para assets estáticos
 [[headers]]
   for = "/images/*"
   [headers.values]
-    Cache-Control = "public, max-age=86400"
-    X-Content-Type-Options = "nosniff"
-    Access-Control-Allow-Origin = "*"
-
-# Headers específicos para tipos de imagem
-[[headers]]
-  for = "/*.jpg"
-  [headers.values]
-    Content-Type = "image/jpeg"
-    Cache-Control = "public, max-age=86400"
-    Access-Control-Allow-Origin = "*"
-
-[[headers]]
-  for = "/*.jpeg"
-  [headers.values]
-    Content-Type = "image/jpeg" 
-    Cache-Control = "public, max-age=86400"
-    Access-Control-Allow-Origin = "*"
-
-[[headers]]
-  for = "/*.webp"
-  [headers.values]
-    Content-Type = "image/webp"
-    Cache-Control = "public, max-age=86400"
-    Access-Control-Allow-Origin = "*"
-
-# Headers para favicon e manifest
-[[headers]]
-  for = "/favicon.*"
-  [headers.values]
-    Cache-Control = "public, max-age=86400"
-
-# Headers específicos para CSS
-[[headers]]
-  for = "/_next/static/css/*"
-  [headers.values]
-    Content-Type = "text/css; charset=utf-8"
     Cache-Control = "public, max-age=31536000, immutable"
 
-# Headers específicos para JS
-[[headers]]
-  for = "/_next/static/chunks/*"
-  [headers.values]
-    Content-Type = "application/javascript; charset=utf-8" 
-    Cache-Control = "public, max-age=31536000, immutable"
-
-# Headers para todos os assets _next
 [[headers]]
   for = "/_next/static/*"
   [headers.values]
@@ -125,15 +32,41 @@
 
 # Headers para fontes
 [[headers]]
-  for = "/_next/static/media/*"
+  for = "/*.woff2"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
-    Access-Control-Allow-Origin = "*"
 
-# Redirect root para PT
+# Redirects para SPA
 [[redirects]]
-  from = "/"
-  to = "/pt"
-  status = 302
+  from = "/*"
+  to = "/index.html"
+  status = 200
+  conditions = {Role = ["admin"]}
 
- 
+# Error pages
+[[redirects]]
+  from = "/admin/*"
+  to = "/admin/index.html"
+  status = 200
+
+# Função serverless otimizada
+[functions]
+  node_bundler = "esbuild"
+  
+# Build optimizations
+[build.processing]
+  skip_processing = false
+
+[build.processing.css]
+  bundle = true
+  minify = true
+
+[build.processing.js]
+  bundle = true
+  minify = true
+
+[build.processing.html]
+  pretty_urls = true
+
+[build.processing.images]
+  compress = true

@@ -86,7 +86,7 @@ export function useTranslations(): UseTranslationsReturn {
         return key
       }
     }
-  }, [language])
+  }, [language, isReady])
 
   return {
     t,

@@ -29,7 +29,7 @@ const LogoSimple = ({
       {/* Logo Image Container */}
       <div className="relative flex-shrink-0">
         <Image
-          src="/images/logo-optimized.jpg"
+          src="/images/logo.webp"
           alt="Armazém São Joaquim"
           width={logoSize}
           height={logoSize}
@@ -40,6 +40,7 @@ const LogoSimple = ({
           priority={true}
           quality={90}
           sizes="(max-width: 640px) 32px, (max-width: 768px) 36px, (max-width: 1024px) 40px, (max-width: 1280px) 44px, 48px"
+          unoptimized={false}
         />
       </div>
 

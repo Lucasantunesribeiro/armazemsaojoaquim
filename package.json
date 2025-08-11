@@ -21,6 +21,8 @@
     "optimize:performance": "node scripts/optimize-performance.js",
     "build:optimized": "npm run generate-icons && npm run optimize-images && npm run build",
     "build:production": "node scripts/build-production.js",
+    "optimize:deploy": "node scripts/optimize-deploy.js",
+    "deploy:prepare": "npm run optimize:deploy && npm run build",
     "analyze": "ANALYZE=true npm run build",
     "lighthouse": "lighthouse http://localhost:3000 --output=html --output-path=./lighthouse-report.html",
     "perf:check": "npm run optimize:performance && npm run build",
