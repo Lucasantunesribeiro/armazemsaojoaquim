@@ -11,9 +11,9 @@ import {
   Label,
   Textarea,
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
-  Switch,
-  Separator
+  Switch
 } from '@/components/ui'
+import { Separator } from '@/components/ui/Separator'
 
 interface Room {
   id: string
