@@ -56,7 +56,8 @@ const nextConfig = {
   serverExternalPackages: ['@supabase/supabase-js'],
 
   // Configure output for Netlify deployment
-  output: 'standalone',
+  // Remove standalone for better Netlify compatibility
+  // output: 'standalone',
 
   // Configurações experimentais para performance e Edge Runtime
   experimental: {
@@ -80,6 +81,9 @@ const nextConfig = {
   compiler: {
     removeConsole: process.env.NODE_ENV === 'production',
   },
+
+  // Ensure CSS is properly handled
+  assetPrefix: process.env.NODE_ENV === 'production' ? '' : '',
 
   // Configurações de webpack para otimização
   webpack: (config, { isServer, dev }) => {
