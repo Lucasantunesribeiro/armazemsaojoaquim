@@ -102,6 +102,11 @@ export interface Translation {
           highlight: string
         }
       }
+      cta: {
+        title: string
+        description: string
+        button: string
+      }
     }
     menuPreview: {
       badge: string
@@ -1004,6 +1009,11 @@ export const translations: Record<Language, Translation> = {
             description: 'Receitas e técnicas passadas através de gerações de chefs apaixonados.',
             highlight: '5 Gerações'
           },
+        },
+        cta: {
+          title: 'Visite Nossa Galeria',
+          description: 'Descubra a rica história e cultura de Santa Teresa através de nossa coleção de fotografias e obras de arte que retratam a essência do bairro.',
+          button: 'Explorar Galeria'
         }
       },
       menuPreview: {
@@ -1896,6 +1906,11 @@ export const translations: Record<Language, Translation> = {
             description: 'Recipes and techniques passed down through generations of passionate chefs.',
             highlight: '5 Generations'
           }
+        },
+        cta: {
+          title: 'Visit Our Gallery',
+          description: 'Discover the rich history and culture of Santa Teresa through our collection of photographs and artworks that capture the essence of the neighborhood.',
+          button: 'Explore Gallery'
         }
       },
       menuPreview: {
