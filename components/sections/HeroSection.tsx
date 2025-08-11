@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect, useCallback, useRef } from 'react'
+import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react'
 import Image from 'next/image'
 import { ChevronLeft, ChevronRight, MapPin, Clock, Phone } from 'lucide-react'
 import { useTranslations } from '@/hooks/useTranslations'
@@ -161,7 +161,7 @@ export default function HeroSection() {
     )
   }
 
-  const heroImages = [
+  const heroImages = useMemo(() => [
     {
       src: '/images/armazem-fachada-historica.webp',
       fallback: '/images/placeholder.jpg',
@@ -186,13 +186,13 @@ export default function HeroSection() {
       subtitle: t('home.hero.description'),
       cta: t('home.cta.visitUs')
     }
-  ]
+  ], [t])
 
-  const quickInfo = [
+  const quickInfo = useMemo(() => [
     { icon: MapPin, text: 'Santa Teresa, RJ', label: t('nav.contact'), href: '#location' },
     { icon: Clock, text: 'Ter-Dom: 12h-22h', label: t('cafe.hours.title'), href: '#hours' },
     { icon: Phone, text: '(21) 98565-8443', label: t('footer.phone'), href: 'tel:+5521985658443' }
-  ]
+  ], [t])
 
   const currentImage = heroImages[currentSlide]
 
@@ -223,8 +223,8 @@ export default function HeroSection() {
               alt={image.alt}
               fill
               className="object-cover object-center"
-              priority={true}
-              quality={85}
+              priority={index === 0} // Only prioritize first image
+              quality={90}
               sizes="100vw"
               onError={() => handleImageError(index)}
               onLoad={index === 0 ? handleImageLoad : undefined}

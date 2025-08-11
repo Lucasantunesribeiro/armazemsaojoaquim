@@ -8,6 +8,9 @@ import OAuthAdvancedDebugger from '@/components/debug/OAuthAdvancedDebugger'
 // Importar utilitário para suprimir warnings do Grammarly
 import '@/lib/suppress-warnings'
 
+// Initialize performance monitoring
+import '@/lib/performance-monitor'
+
 // Fontes otimizadas com display swap
 const inter = Inter({
   subsets: ['latin'],

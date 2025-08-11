@@ -15,13 +15,15 @@ const nextConfig = {
   // Configurações básicas
   reactStrictMode: true,
   
-  // Configurações de imagem - Otimizadas para Netlify
+  // Configurações de imagem - Otimizadas para performance
   images: {
-    unoptimized: true,
+    unoptimized: false, // Enable Next.js image optimization
     formats: ['image/webp', 'image/avif'],
-    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
-    minimumCacheTTL: 60,
+    minimumCacheTTL: 86400, // 24 hours cache
+    dangerouslyAllowSVG: true,
+    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
     
     remotePatterns: [
       {
@@ -70,8 +72,11 @@ const nextConfig = {
       '@radix-ui/react-separator',
       '@radix-ui/react-switch',
       'react-hook-form',
-      '@hookform/resolvers'
+      '@hookform/resolvers',
+      'date-fns',
+      'recharts'
     ],
+
   },
 
   // Configure serverless functions for better Edge Runtime compatibility
@@ -105,6 +110,24 @@ const nextConfig = {
         ...config.optimization,
         sideEffects: false,
         usedExports: true,
+        splitChunks: {
+          chunks: 'all',
+          cacheGroups: {
+            vendor: {
+              test: /[\\/]node_modules[\\/]/,
+              name: 'vendors',
+              chunks: 'all',
+              priority: 10,
+            },
+            common: {
+              name: 'common',
+              minChunks: 2,
+              chunks: 'all',
+              priority: 5,
+              reuseExistingChunk: true,
+            },
+          },
+        },
       }
     }
 

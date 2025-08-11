@@ -4,6 +4,7 @@ import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
 import BottomNavigation from '@/components/ui/BottomNavigation'
 import { Providers } from '@/components/providers/Providers'
+import CriticalCSS from '@/components/layout/CriticalCSS'
 import '../globals.css'
 import { Suspense } from 'react'
 import Loading from '@/components/ui/Loading'
@@ -27,6 +28,7 @@ export default async function LocaleLayout({
   const { locale } = await params
   return (
     <>
+      <CriticalCSS />
       <Providers>
         <Header />
         <main className="min-h-screen main-content-mobile">

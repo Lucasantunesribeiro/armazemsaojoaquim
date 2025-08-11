@@ -1,12 +1,17 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
+import dynamic from 'next/dynamic'
 import { Search, Heart, Eye, Star, MapPin, Calendar, Palette, User, Share2 } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Card } from '@/components/ui/Card'
-import SafeImage from '@/components/ui/SafeImage'
 import Loading from '@/components/ui/Loading'
+
+// Dynamic import for SafeImage component
+const SafeImage = dynamic(() => import('@/components/ui/SafeImage'), {
+  loading: () => <div className="w-full h-48 bg-gray-200 animate-pulse rounded-lg" />
+})
 import { useTranslations } from '@/hooks/useTranslations'
 
 interface Artwork {

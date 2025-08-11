@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, lazy, Suspense } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import { use } from 'react'
 import { createClient } from '@/lib/supabase'
@@ -20,8 +20,9 @@ import {
   LogOut
 } from 'lucide-react'
 import Link from 'next/link'
-import AdminNotificationCenter from '@/components/ui/AdminNotificationCenter'
-import AdminProfileSetup from '@/components/admin/AdminProfileSetup'
+// Lazy load heavy admin components
+const AdminNotificationCenter = lazy(() => import('@/components/ui/AdminNotificationCenter'))
+const AdminProfileSetup = lazy(() => import('@/components/admin/AdminProfileSetup'))
 import { initializeSessionTimeout, useSessionTimeout, formatRemainingTime } from '@/lib/session-timeout'
 
 interface AdminLayoutProps {
@@ -516,7 +517,9 @@ export default function AdminLayout({
 
             {/* Right side items */}
             <div className="flex items-center space-x-4">
-              <AdminNotificationCenter />
+              <Suspense fallback={<div className="w-8 h-8 animate-pulse bg-gray-200 rounded" />}>
+                <AdminNotificationCenter />
+              </Suspense>
               
               {/* User info - desktop only */}
               <div className="hidden sm:flex items-center space-x-3">

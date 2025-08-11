@@ -1,11 +1,21 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import dynamic from 'next/dynamic'
 import { Eye, Clock, Coffee, IceCream, Cake, Utensils, GlassWater } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/Dialog'
+
+// Dynamic import for Dialog component (used conditionally)
+const Dialog = dynamic(() => import('@/components/ui/Dialog').then(mod => ({ default: mod.Dialog })), {
+  loading: () => <div className="animate-pulse bg-gray-200 rounded-lg h-8 w-24" />
+})
+const DialogContent = dynamic(() => import('@/components/ui/Dialog').then(mod => ({ default: mod.DialogContent })))
+const DialogDescription = dynamic(() => import('@/components/ui/Dialog').then(mod => ({ default: mod.DialogDescription })))
+const DialogHeader = dynamic(() => import('@/components/ui/Dialog').then(mod => ({ default: mod.DialogHeader })))
+const DialogTitle = dynamic(() => import('@/components/ui/Dialog').then(mod => ({ default: mod.DialogTitle })))
+const DialogTrigger = dynamic(() => import('@/components/ui/Dialog').then(mod => ({ default: mod.DialogTrigger })))
 
 interface Product {
   id: string
