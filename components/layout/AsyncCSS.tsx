@@ -8,7 +8,7 @@ export default function AsyncCSS() {
     // Load non-critical CSS after the page has loaded
     const loadAsyncCSS = () => {
       // Create link elements for non-critical stylesheets
-      const stylesheets = [
+      const stylesheets: string[] = [
         // Add any non-critical CSS files here
         // '/css/non-critical.css'
       ]

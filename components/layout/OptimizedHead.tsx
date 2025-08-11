@@ -14,7 +14,11 @@ export default function OptimizedHead() {
         rel="preload"
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
         as="style"
-        onLoad="this.onload=null;this.rel='stylesheet'"
+        onLoad={(e) => {
+          const target = e.target as HTMLLinkElement;
+          target.onload = null;
+          target.rel = 'stylesheet';
+        }}
       />
       <noscript>
         <link
@@ -28,7 +32,11 @@ export default function OptimizedHead() {
         rel="preload"
         href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&display=swap"
         as="style"
-        onLoad="this.onload=null;this.rel='stylesheet'"
+        onLoad={(e) => {
+          const target = e.target as HTMLLinkElement;
+          target.onload = null;
+          target.rel = 'stylesheet';
+        }}
       />
       <noscript>
         <link
