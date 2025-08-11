@@ -34,6 +34,7 @@ export class ErrorBoundaryGlobal extends Component<Props, State> {
     if (error.message.includes('Minified React error #310')) {
       console.error('🔍 Erro React #310 detectado - possível problema com useMemo/useCallback')
       console.error('💡 Stack trace:', errorInfo.componentStack)
+      console.error('🔧 Dica: Verifique hooks com dependências inválidas')
     }
 
     this.setState({
@@ -41,7 +42,7 @@ export class ErrorBoundaryGlobal extends Component<Props, State> {
       errorInfo
     })
 
-    // Callback customizado para logging
+    // Callback customizado para logging (se fornecido)
     this.props.onError?.(error, errorInfo)
   }
 

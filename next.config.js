@@ -6,7 +6,6 @@ let withBundleAnalyzer = (config) => config
 const nextConfig = {
   // Configurações básicas
   reactStrictMode: true,
-  swcMinify: process.env.NODE_ENV === 'production', // Disable minification in dev for better error messages
   
   // Better error handling in development
   ...(process.env.NODE_ENV === 'development' && {

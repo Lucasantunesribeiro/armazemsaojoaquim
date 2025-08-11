@@ -1,3 +1,5 @@
+import React, { useRef, useEffect, useMemo, useCallback, DependencyList } from 'react'
+
 /**
  * Configurações de debug para desenvolvimento
  * Ajuda a identificar problemas como o erro React #310
@@ -23,32 +25,32 @@ export const DEBUG_CONFIG = {
 export const debugLog = {
   error: (message: string, ...args: any[]) => {
     if (DEBUG_CONFIG.VERBOSE_LOGGING) {
-      console.error(`🚨 [DEBUG] ${message}`, ...args)
+      console.error('🚨 [DEBUG] ' + message, ...args)
     }
   },
   
   warn: (message: string, ...args: any[]) => {
     if (DEBUG_CONFIG.VERBOSE_LOGGING) {
-      console.warn(`⚠️ [DEBUG] ${message}`, ...args)
+      console.warn('⚠️ [DEBUG] ' + message, ...args)
     }
   },
   
   info: (message: string, ...args: any[]) => {
     if (DEBUG_CONFIG.VERBOSE_LOGGING) {
-      console.log(`ℹ️ [DEBUG] ${message}`, ...args)
+      console.log('ℹ️ [DEBUG] ' + message, ...args)
     }
   },
   
-  hook: (hookName: string, dependencies: any[], message?: string) => {
+  hook: (hookName: string, dependencies: readonly any[], message?: string) => {
     if (DEBUG_CONFIG.HOOK_DEBUGGING) {
-      console.log(`🪝 [${hookName}] ${message || 'Dependencies:'}, dependencies)
+      console.log('🪝 [' + hookName + '] ' + (message || 'Dependencies:'), dependencies)
     }
   },
   
   performance: (operation: string, duration: number) => {
     if (DEBUG_CONFIG.PERFORMANCE_MONITORING) {
       const color = duration > 100 ? '🔴' : duration > 50 ? '🟡' : '🟢'
-      console.log(`${color} [PERF] ${operation}: ${duration}ms`)
+      console.log(color + ' [PERF] ' + operation + ': ' + duration + 'ms')
     }
   }
 }
@@ -57,15 +59,15 @@ export const debugLog = {
  * Hook de debug para monitorar re-renders
  */
 export function useDebugRender(componentName: string, props?: Record<string, any>) {
-  if (!DEBUG_CONFIG.VERBOSE_LOGGING) return
-  
-  const renderCount = React.useRef(0)
-  const previousProps = React.useRef<Record<string, any>>()
+  const renderCount = useRef(0)
+  const previousProps = useRef<Record<string, any>>()
   
   renderCount.current += 1
   
-  React.useEffect(() => {
-    console.log(`🔄 [${componentName}] Render #${renderCount.current}`)
+  useEffect(() => {
+    if (!DEBUG_CONFIG.VERBOSE_LOGGING) return
+    
+    console.log('🔄 [' + componentName + '] Render #' + renderCount.current)
     
     if (props && previousProps.current) {
       const changedProps = Object.keys(props).filter(
@@ -73,7 +75,7 @@ export function useDebugRender(componentName: string, props?: Record<string, any
       )
       
       if (changedProps.length > 0) {
-        console.log(`   Props changed: ${changedProps.join(', ')}`)
+        console.log('   Props changed: ' + changedProps.join(', '))
       }
     }
     
@@ -86,24 +88,24 @@ export function useDebugRender(componentName: string, props?: Record<string, any
  */
 export function safeUseMemo<T>(
   factory: () => T,
-  deps: React.DependencyList,
+  deps: DependencyList,
   debugName?: string
 ): T {
   if (DEBUG_CONFIG.HOOK_DEBUGGING && debugName) {
     debugLog.hook('useMemo', deps, debugName)
   }
   
-  return React.useMemo(factory, deps)
+  return useMemo(factory, deps)
 }
 
 export function safeUseCallback<T extends (...args: any[]) => any>(
   callback: T,
-  deps: React.DependencyList,
+  deps: DependencyList,
   debugName?: string
 ): T {
   if (DEBUG_CONFIG.HOOK_DEBUGGING && debugName) {
     debugLog.hook('useCallback', deps, debugName)
   }
   
-  return React.useCallback(callback, deps)
+  return useCallback(callback, deps)
 }

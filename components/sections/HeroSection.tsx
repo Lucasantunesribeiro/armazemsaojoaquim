@@ -22,6 +22,40 @@ export default function HeroSection() {
   const sectionRef = useRef<HTMLElement>(null)
   const isInView = useRef(false)
 
+  // Memoize hero images data - MUST BE BEFORE CONDITIONAL RETURNS
+  const heroImages = useMemo(() => [
+    {
+      src: '/images/armazem-fachada-historica.webp',
+      fallback: '/images/placeholder.jpg',
+      alt: 'Fachada histórica do Armazém São Joaquim',
+      title: isReady ? t('home.history.title') : 'História',
+      subtitle: isReady ? t('home.history.description') : 'Nossa tradição',
+      cta: isReady ? t('home.hero.discoverMenu') : 'Descobrir Menu'
+    },
+    {
+      src: '/images/armazem-interior-aconchegante.webp',
+      fallback: '/images/placeholder.jpg',
+      alt: 'Interior aconchegante do restaurante',
+      title: isReady ? t('home.hero.title') : 'Bem-vindos',
+      subtitle: isReady ? t('home.hero.subtitle') : 'Experiência única',
+      cta: isReady ? t('home.hero.makeReservation') : 'Fazer Reserva'
+    },
+    {
+      src: '/images/santa-teresa-vista-panoramica.webp',
+      fallback: '/images/placeholder.jpg',
+      alt: 'Vista panorâmica de Santa Teresa',
+      title: isReady ? t('home.location.title') : 'Localização',
+      subtitle: isReady ? t('home.location.description') : 'Santa Teresa, RJ',
+      cta: isReady ? t('home.hero.visitUs') : 'Nos Visite'
+    }
+  ], [t, isReady])
+
+  const quickInfo = useMemo(() => [
+    { icon: MapPin, text: 'Santa Teresa, RJ', label: isReady ? t('nav.contact') : 'Contato', href: '#location' },
+    { icon: Clock, text: 'Ter-Dom: 12h-22h', label: isReady ? t('cafe.hours.title') : 'Horário', href: '#hours' },
+    { icon: Phone, text: '(21) 98565-8443', label: isReady ? t('footer.phone') : 'Telefone', href: 'tel:+5521985658443' }
+  ], [t, isReady])
+
   // Callbacks - MUST BE BEFORE CONDITIONAL RETURNS
   const handleImageError = useCallback((index: number) => {
     setImageErrors(prev => ({ ...prev, [index]: true }))
@@ -160,39 +194,6 @@ export default function HeroSection() {
       </section>
     )
   }
-
-  const heroImages = useMemo(() => [
-    {
-      src: '/images/armazem-fachada-historica.webp',
-      fallback: '/images/placeholder.jpg',
-      alt: 'Fachada histórica do Armazém São Joaquim',
-      title: t('home.history.title'),
-      subtitle: t('home.history.description'),
-      cta: t('home.hero.discoverMenu')
-    },
-    {
-      src: '/images/armazem-interior-aconchegante.webp',
-      fallback: '/images/placeholder.jpg',
-      alt: 'Interior aconchegante do restaurante',
-      title: t('home.hero.title'),
-      subtitle: t('home.hero.subtitle'),
-      cta: t('home.hero.makeReservation')
-    },
-    {
-      src: '/images/santa-teresa-vista-panoramica.webp',
-      fallback: '/images/placeholder.jpg',
-      alt: 'Vista panorâmica de Santa Teresa',
-      title: t('home.experience.title'),
-      subtitle: t('home.hero.description'),
-      cta: t('home.cta.visitUs')
-    }
-  ], [t])
-
-  const quickInfo = useMemo(() => [
-    { icon: MapPin, text: 'Santa Teresa, RJ', label: t('nav.contact'), href: '#location' },
-    { icon: Clock, text: 'Ter-Dom: 12h-22h', label: t('cafe.hours.title'), href: '#hours' },
-    { icon: Phone, text: '(21) 98565-8443', label: t('footer.phone'), href: 'tel:+5521985658443' }
-  ], [t])
 
   const currentImage = heroImages[currentSlide]
 

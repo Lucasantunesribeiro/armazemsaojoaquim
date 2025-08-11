@@ -29,17 +29,7 @@ export default async function LocaleLayout({
   const { locale } = await params
   return (
     <>
-      <ErrorBoundaryGlobal
-        onError={(error, errorInfo) => {
-          // Log do erro para monitoramento
-          console.error('🚨 Erro capturado no layout:', error)
-          
-          // Se for erro React #310, log adicional
-          if (error.message.includes('Minified React error #310')) {
-            console.error('🔍 Erro React #310 - possível problema de hooks ou hydration')
-          }
-        }}
-      >
+      <ErrorBoundaryGlobal>
         <HydrationProvider>
           <Providers>
             <Header />
