@@ -85,11 +85,6 @@ CEP: 20241-260
 - **Café**: Terça a Domingo, 8h às 18h
 - **Pousada**: Check-in 14h, Check-out 12h
 
-### **Contato**
-- **Telefone**: (21) 99999-9999
-- **WhatsApp**: (21) 99999-9999
-- **Email**: contato@armazemsaojoaquim.com.br
-- **Instagram**: @armazemsaojoaquim
 
 ## 🚗 **Como Chegar**
 
@@ -105,7 +100,6 @@ CEP: 20241-260
 - **Acesso**: Fácil acesso pela R. Alm. Alexandrino
 
 ## 💡 **Dicas para sua Visita**
-
 
 
 ### **Melhores Horários**
@@ -144,10 +138,7 @@ CEP: 20241-260
 - **Website**: [www.armazemsaojoaquim.com.br](https://www.armazemsaojoaquim.com.br)
 - **Instagram**: [@armazemsaojoaquim](https://instagram.com/armazemsaojoaquim)
 - **Facebook**: [Armazém São Joaquim](https://facebook.com/armazemsaojoaquim)
-- **TripAdvisor**: [Avaliações e Fotos](https://tripadvisor.com/armazemsaojoaquim)
 
 ---
 
 **Venha nos visitar e faça parte da nossa história!** 🍽️✨
-
-*O Armazém São Joaquim - Onde a tradição encontra a inovação digital*
