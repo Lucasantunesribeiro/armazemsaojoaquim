@@ -1,176 +1,153 @@
-# Armazém São Joaquim
+# 🏪 Armazém São Joaquim - Experiência Digital
 
-Sistema de reservas e cardápio online para o restaurante Armazém São Joaquim localizado em Santa Teresa, Rio de Janeiro.
+Bem-vindo ao site oficial do **Armazém São Joaquim**, um restaurante tradicional localizado no coração de Santa Teresa, Rio de Janeiro. Nossa plataforma digital oferece uma experiência completa para descobrir nossa culinária, fazer reservas e conhecer nossa história.
 
-## 🏪 Sobre o Restaurante
+## 🌟 O Que Oferecemos
 
-O Armazém São Joaquim é um restaurante tradicional localizado no coração de Santa Teresa, oferecendo culinária brasileira autêntica em um ambiente acolhedor e histórico.
+### 🍽️ **Cardápio Digital Interativo**
+- **Visualização Completa**: Explore nosso menu com fotos profissionais de cada prato
+- **Categorias Organizadas**: Petiscos, pratos principais, sanduíches, saladas, sobremesas e bebidas
+- **Informações Detalhadas**: Preços, descrições, ingredientes e tempo de preparo
+- **Filtros Inteligentes**: Busque por categoria, nome ou disponibilidade
+- **Download em PDF**: Baixe nosso cardápio completo para consulta offline
 
-## ✨ Funcionalidades
 
-### Para Clientes
-- **Visualização do Cardápio**: Cardápio interativo com categorias e imagens dos pratos
-- **Sistema de Reservas**: Reserva de mesas online com validação de disponibilidade
-- **Blog**: Artigos sobre a história do restaurante e pratos especiais
-- **Modo Escuro/Claro**: Interface adaptável às preferências do usuário
-- **Design Responsivo**: Otimizado para desktop, tablet e mobile
 
-### Para Administradores
-- **Painel Administrativo**: Interface completa para gestão do restaurante
-- **Gestão de Cardápio**: CRUD completo para pratos e categorias
-- **Gestão de Reservas**: Visualização e controle das reservas
-- **Gestão de Blog**: Criar e editar artigos do blog
-- **Upload de Imagens**: Sistema integrado para upload de fotos dos pratos
-- **Dashboard**: Estatísticas e métricas do restaurante
+### 🏠 **Pousada e Hospedagem**
+- **Quartos Disponíveis**: Visualize quartos padrão, deluxe e suítes
+- **Fotos dos Ambientes**: Conheça cada espaço antes de reservar
+- **Comodidades Detalhadas**: WiFi, TV, ar condicionado, banheiro privativo
+- **Localização Estratégica**: No coração de Santa Teresa, próximo aos principais pontos turísticos
 
-## 🛠️ Tecnologias Utilizadas
 
-### Frontend
-- **Next.js 14.2.30** - Framework React para produção
-- **React 18** - Biblioteca de interface de usuário
-- **TypeScript** - Tipagem estática para JavaScript
-- **Tailwind CSS** - Framework CSS utilitário
-- **Framer Motion** - Biblioteca de animações (removida na versão final)
+### ☕ **Café e Doces**
+- **Cardápio Especializado**: Cafés artesanais, doces caseiros e salgados frescos
+- **Origem dos Produtos**: Conheça a procedência de nossos ingredientes
+- **Informações Nutricionais**: Alergênicos e ingredientes detalhados
+- **Pedidos Online**: Faça pedidos para retirada ou entrega
+- **História dos Sabores**: Descubra as tradições por trás de cada receita
 
-### Backend
-- **Supabase** - Backend-as-a-Service (BaaS)
-  - Autenticação de usuários
-  - Banco de dados PostgreSQL
-  - Storage para imagens
-  - Row Level Security (RLS)
+### 📖 **Blog e Histórias**
+- **História do Restaurante**: Conheça nossa trajetória desde 1920
+- **Receitas Tradicionais**: Compartilhamos segredos da culinária brasileira
+- **Dicas Culinárias**: Aprenda técnicas e truques dos nossos chefs
+- **Histórias de Santa Teresa**: Descubra o bairro através de nossos olhos
+- **Conteúdo Atualizado**: Novos posts regularmente com histórias e receitas
 
-### Integração e Comunicação
-- **Resend** - Serviço de email transacional
-- **React Hook Form** - Gestão de formulários
-- **Zod** - Validação de schemas
+## 🎨 **Experiência do Usuário**
 
-### Ferramentas de Desenvolvimento
-- **ESLint** - Linter para JavaScript/TypeScript
-- **Jest** - Framework de testes
-- **Playwright** - Testes end-to-end
+### ✨ **Design Responsivo**
+- **Mobile-First**: Otimizado para smartphones e tablets
+- **Desktop Perfeito**: Experiência completa em computadores
+- **Navegação Intuitiva**: Interface clara e fácil de usar
+- **Carregamento Rápido**: Performance otimizada para melhor experiência
 
-## 🚀 Configuração e Instalação
+### 🌓 **Modo Escuro/Claro**
+- **Adaptação Automática**: Detecta preferência do seu dispositivo
+- **Alternância Manual**: Mude entre temas conforme sua preferência
+- **Conforto Visual**: Reduz fadiga visual em diferentes ambientes
 
-### Pré-requisitos
-- Node.js 20.x
-- npm ≥ 10.0.0
+### 🌍 **Suporte Multilíngue**
+- **Português**: Idioma principal com expressões locais
+- **Inglês**: Para turistas internacionais
+- **Tradução Completa**: Todo o conteúdo disponível nos dois idiomas
 
-### 1. Instalação das Dependências
-```bash
-npm install
+## 📱 **Como Usar**
+
+### **1. Navegação Principal**
+- **Página Inicial**: Visão geral e destaques do restaurante
+- **Cardápio**: Menu completo com todas as opções
+- **Pousada**: Informações sobre hospedagem
+- **Café**: Cardápio de cafés e doces
+- **Blog**: Histórias e receitas
+- **Contato**: Localização e informações de contato
+
+
+
+### **2. Explorar o Cardápio**
+1. Navegue pelas categorias
+2. Use os filtros para encontrar pratos específicos
+3. Clique nos pratos para ver detalhes
+4. Visualize fotos e ingredientes
+5. Baixe o PDF para consulta offline
+
+## 📍 **Localização e Contato**
+
+### **Endereço**
+```
+R. Alm. Alexandrino, 470
+Santa Teresa, Rio de Janeiro - RJ
+CEP: 20241-260
 ```
 
-### 2. Configuração das Variáveis de Ambiente
-Copie o arquivo `.env.example` para `.env.local` e configure as seguintes variáveis:
+### **Horários de Funcionamento**
+- **Restaurante**: Terça a Domingo, 12h às 23h
+- **Café**: Terça a Domingo, 8h às 18h
+- **Pousada**: Check-in 14h, Check-out 12h
 
-```bash
-cp .env.example .env.local
-```
+### **Contato**
+- **Telefone**: (21) 99999-9999
+- **WhatsApp**: (21) 99999-9999
+- **Email**: contato@armazemsaojoaquim.com.br
+- **Instagram**: @armazemsaojoaquim
 
-#### Variáveis Obrigatórias:
-- `NEXT_PUBLIC_SUPABASE_URL`: URL do seu projeto Supabase
-- `NEXT_PUBLIC_SUPABASE_ANON_KEY`: Chave pública do Supabase
-- `SUPABASE_SERVICE_ROLE_KEY`: Chave de serviço do Supabase (secreta)
-- `RESEND_API_KEY`: Chave da API do Resend para emails
-- `RESEND_FROM_EMAIL`: Email verificado no Resend
+## 🚗 **Como Chegar**
 
-### 3. Configuração do Banco de Dados
-O projeto utiliza Supabase. Certifique-se de:
-1. Criar um projeto no [Supabase](https://supabase.com)
-2. Configurar as tabelas necessárias (usuários, reservas, cardápio, blog)
-3. Configurar as políticas RLS (Row Level Security)
+### **Transporte Público**
+- **Metrô**: Estação Carioca (Linha 1) - 15 min a pé
+- **Ônibus**: Linhas que passam por Santa Teresa
+- **VLT**: Estação Carioca - 12 min a pé
+- **Bonde de Santa Teresa**: Parada próxima ao restaurante
 
-### 4. Executar o Projeto
+### **Carro**
+- **Estacionamento**: Disponível nas proximidades
+- **GPS**: Use o endereço completo para navegação
+- **Acesso**: Fácil acesso pela R. Alm. Alexandrino
 
-#### Desenvolvimento
-```bash
-npm run dev
-```
+## 💡 **Dicas para sua Visita**
 
-#### Build de Produção
-```bash
-npm run build
-npm run start
-```
 
-#### Outros Comandos Úteis
-```bash
-npm run lint          # Verificar código
-npm run type-check     # Verificar tipos TypeScript  
-npm run test           # Executar testes
-```
 
-## 📁 Estrutura do Projeto
+### **Melhores Horários**
+- **Almoço**: 12h às 14h (mais movimentado)
+- **Jantar**: 19h às 21h (atmosfera mais romântica)
+- **Café da manhã**: 8h às 10h (mais tranquilo)
 
-```
-/
-├── app/                    # App Router do Next.js 13+
-│   ├── admin/             # Páginas administrativas
-│   ├── api/               # API Routes
-│   ├── auth/              # Páginas de autenticação
-│   ├── blog/              # Blog do restaurante
-│   ├── menu/              # Cardápio
-│   └── reservas/          # Sistema de reservas
-├── components/            # Componentes React reutilizáveis
-│   ├── admin/            # Componentes específicos do admin
-│   ├── sections/         # Seções principais do site
-│   └── ui/               # Componentes de interface
-├── lib/                  # Utilitários e configurações
-│   ├── hooks/           # Custom React hooks
-│   └── supabase.ts      # Cliente Supabase
-├── public/               # Arquivos estáticos
-│   └── images/          # Imagens do site
-└── types/               # Definições de tipos TypeScript
-```
+### **O que Experimentar**
+- **Petiscos**: Coxinhas, pastéis e bolinhos
+- **Pratos principais**: Feijoada, moqueca e churrasco
+- **Sobremesas**: Pudim de leite e brigadeiro
+- **Bebidas**: Caipirinhas e cervejas artesanais
 
-## 🔒 Segurança
+## 🌟 **Por que Escolher o Armazém São Joaquim?**
 
-O projeto implementa várias camadas de segurança:
+### **Tradição e Qualidade**
+- **História**: Mais de 100 anos de tradição culinária
+- **Receitas**: Passadas de geração em geração
+- **Ingredientes**: Frescos e de qualidade superior
+- **Chefs**: Experientes e apaixonados pela culinária
 
-- **Autenticação**: Supabase Auth para login seguro
-- **Autorização**: RLS (Row Level Security) no banco de dados
-- **Validação**: Schemas Zod para validação de dados
-- **Sanitização**: Proteção contra XSS e outros ataques
-- **CORS**: Configurado adequadamente para produção
+### **Ambiente Único**
+- **Localização**: No coração histórico de Santa Teresa
+- **Arquitetura**: Construção centenária preservada
+- **Vista**: Panorâmica da cidade do Rio de Janeiro
+- **Atmosfera**: Acolhedora e familiar
 
-## 📱 Deploy
+### **Experiência Completa**
+- **Restaurante**: Culinária brasileira autêntica
+- **Pousada**: Hospedagem confortável e acolhedora
+- **Café**: Momentos especiais com doces e cafés
+- **Eventos**: Casamentos, aniversários e celebrações
 
-### Netlify (Recomendado)
-O projeto está configurado para deploy no Netlify:
+## 🔗 **Conecte-se Conosco**
 
-1. Conecte o repositório ao Netlify
-2. Configure as variáveis de ambiente no painel do Netlify
-3. O deploy será automático a cada push para a branch principal
-
-### Outras Plataformas
-O projeto também é compatível com:
-- **Vercel**
-- **Railway**
-- **Render**
-
-## 🧪 Testes
-
-```bash
-# Testes unitários
-npm run test
-
-# Testes com cobertura
-npm run test:coverage
-
-# Testes end-to-end
-npm run test:e2e
-```
-
-## 📞 Suporte
-
-Para suporte técnico ou dúvidas sobre o sistema, entre em contato através do email: armazemsaojoaquimoficial@gmail.com
-
-## 📄 Licença
-
-Este projeto é proprietário e destinado exclusivamente ao Armazém São Joaquim.
+- **Website**: [www.armazemsaojoaquim.com.br](https://www.armazemsaojoaquim.com.br)
+- **Instagram**: [@armazemsaojoaquim](https://instagram.com/armazemsaojoaquim)
+- **Facebook**: [Armazém São Joaquim](https://facebook.com/armazemsaojoaquim)
+- **TripAdvisor**: [Avaliações e Fotos](https://tripadvisor.com/armazemsaojoaquim)
 
 ---
 
-**Versão**: 1.0.0  
-**Última atualização**: Julho 2025  
-**Desenvolvido com ❤️ para o Armazém São Joaquim**
+**Venha nos visitar e faça parte da nossa história!** 🍽️✨
+
+*O Armazém São Joaquim - Onde a tradição encontra a inovação digital*

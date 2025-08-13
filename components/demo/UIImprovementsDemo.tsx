@@ -122,11 +122,11 @@ function DemoContent() {
                   Pousada Armazém São Joaquim
                 </h4>
                 <p className="text-gray-600 dark:text-gray-300 mb-4">
-                  Rua São Joaquim, 138 - Lapa, Rio de Janeiro - RJ
+                  R. Alm. Alexandrino, 470 - Santa Teresa, Rio de Janeiro - RJ
                 </p>
                 <LocationButton 
-                  address="Rua São Joaquim, 138 - Lapa, Rio de Janeiro - RJ"
-                  coordinates={{ lat: -22.9068, lng: -43.1729 }}
+                  address="R. Alm. Alexandrino, 470 - Santa Teresa, Rio de Janeiro - RJ"
+                  coordinates={{ lat: -22.9150, lng: -43.1886 }}
                   variant="default"
                   size="lg"
                   onClick={handleLocationClick}

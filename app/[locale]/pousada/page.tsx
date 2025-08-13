@@ -97,8 +97,8 @@ export default function PousadaPage() {
               variant="outline" 
               size="lg"
               className="border-white text-white hover:bg-white hover:text-slate-900 px-8 py-3"
-              address="Rua São Joaquim, 138 - Lapa, Rio de Janeiro - RJ"
-              coordinates={{ lat: -22.9068, lng: -43.1729 }}
+              address="R. Alm. Alexandrino, 470 - Santa Teresa, Rio de Janeiro - RJ"
+              coordinates={{ lat: -22.9150, lng: -43.1886 }}
             >
               {t('pousada.hero.viewLocation')}
             </LocationButton>
@@ -181,20 +181,97 @@ export default function PousadaPage() {
                 </div>
               </div>
             </div>
-            <div className="bg-slate-200 dark:bg-slate-700 rounded-2xl h-80 flex items-center justify-center">
-              <div className="text-center text-slate-500 dark:text-slate-400">
-                <MapPin className="w-12 h-12 mx-auto mb-4" />
-                <p className="mb-2">{t('pousada.location.mapPlaceholder.title')}</p>
-                <p className="text-sm mb-4">{t('pousada.location.mapPlaceholder.subtitle')}</p>
-                <LocationButton 
-                  variant="default"
-                  size="default"
-                  className="bg-amber-600 hover:bg-amber-700 text-white"
-                  address="Rua São Joaquim, 138 - Lapa, Rio de Janeiro - RJ"
-                  coordinates={{ lat: -22.9068, lng: -43.1729 }}
-                >
-                  {t('pousada.hero.viewLocation')}
-                </LocationButton>
+            <div className="bg-white dark:bg-slate-800 rounded-2xl overflow-hidden shadow-xl border border-slate-200 dark:border-slate-700">
+              <div className="p-4 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 border-b border-slate-200 dark:border-slate-700">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <MapPin className="w-6 h-6 text-amber-600" />
+                    <div>
+                      <h3 className="text-lg font-bold text-slate-800 dark:text-white">
+                        Mapa Interativo
+                      </h3>
+                      <p className="text-sm text-slate-600 dark:text-slate-400">
+                        Explore nossa localização em Santa Teresa
+                      </p>
+                    </div>
+                  </div>
+                  <LocationButton 
+                    variant="outline"
+                    size="sm"
+                    className="border-amber-600 text-amber-700 hover:bg-amber-50 dark:border-amber-500 dark:text-amber-400 dark:hover:bg-amber-950"
+                    address="R. Alm. Alexandrino, 470 - Santa Teresa, Rio de Janeiro - RJ"
+                    coordinates={{ lat: -22.9150, lng: -43.1886 }}
+                  >
+                    Abrir no Maps
+                  </LocationButton>
+                </div>
+              </div>
+              <div className="relative group">
+                <iframe
+                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3675.3!2d-43.1886!3d-22.9150!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x997e58a85c8b85%3A0x8b8b8b8b8b8b8b8b!2sR.%20Alm.%20Alexandrino%2C%20470%20-%20Santa%20Teresa%2C%20Rio%20de%20Janeiro%20-%20RJ%2C%2020241-260!5e0!3m2!1spt-BR!2sbr!4v1735840000000!5m2!1spt-BR!2sbr"
+                  width="100%"
+                  height="320"
+                  style={{ border: 0 }}
+                  allowFullScreen
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                  title="Localização da Pousada Armazém São Joaquim - Santa Teresa, Rio de Janeiro"
+                  className="w-full transition-all duration-300 group-hover:brightness-110"
+                />
+                
+                {/* Location Badge */}
+                <div className="absolute bottom-4 left-4 bg-white/95 dark:bg-slate-800/95 backdrop-blur-sm rounded-lg px-3 py-2 shadow-lg border border-white/20 transition-all duration-300 group-hover:scale-105">
+                  <div className="flex items-center space-x-2">
+                    <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse shadow-sm"></div>
+                    <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                      Pousada Armazém São Joaquim
+                    </span>
+                  </div>
+                </div>
+
+                {/* Interactive Overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-transparent via-transparent to-black/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+                
+                {/* Fullscreen Button */}
+                <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <button 
+                    className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm rounded-lg p-2 shadow-lg border border-white/20 hover:bg-white dark:hover:bg-slate-700 transition-all duration-200"
+                    onClick={() => {
+                      const mapUrl = "https://www.google.com/maps/search/?api=1&query=-22.9150,-43.1886"
+                      window.open(mapUrl, '_blank', 'noopener,noreferrer')
+                    }}
+                    title="Abrir mapa em tela cheia"
+                  >
+                    <svg className="w-4 h-4 text-slate-700 dark:text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+              
+              {/* Map Info Footer */}
+              <div className="p-4 bg-slate-50 dark:bg-slate-900/50 border-t border-slate-200 dark:border-slate-700">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                  <div className="flex items-center space-x-2 text-slate-600 dark:text-slate-400">
+                    <svg className="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                    <span>Zoom e navegação interativa</span>
+                  </div>
+                  <div className="flex items-center space-x-2 text-slate-600 dark:text-slate-400">
+                    <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                    <span>Localização precisa</span>
+                  </div>
+                  <div className="flex items-center space-x-2 text-slate-600 dark:text-slate-400">
+                    <svg className="w-4 h-4 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+                    </svg>
+                    <span>Rotas e direções</span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>

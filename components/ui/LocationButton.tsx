@@ -125,8 +125,8 @@ interface LocationButtonProps extends VariantProps<typeof locationButtonVariants
 }
 
 export default function LocationButton({
-  address = "Rua São Joaquim, 138 - Lapa, Rio de Janeiro - RJ",
-  coordinates = { lat: -22.9068, lng: -43.1729 },
+  address = "R. Alm. Alexandrino, 470 - Santa Teresa, Rio de Janeiro - RJ",
+  coordinates = { lat: -22.9150, lng: -43.1886 },
   className,
   variant = 'outline',
   size = 'lg',
@@ -221,8 +221,22 @@ export default function LocationButton({
     try {
       const newWindow = window.open(mapUrls.google, '_blank', 'noopener,noreferrer')
       
-      if (!newWindow) {
-        throw new Error('Popup bloqueado')
+      if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
+        // Popup was blocked, try fallback methods
+        console.warn('Popup bloqueado, tentando fallback...')
+        
+        // Try fallback with address search in same tab
+        const fallbackUrl = `https://www.google.com/maps/search/${encodeURIComponent(address)}`
+        
+        // Try to create a temporary link for better user experience
+        const tempLink = document.createElement('a')
+        tempLink.href = fallbackUrl
+        tempLink.target = '_blank'
+        tempLink.rel = 'noopener noreferrer'
+        document.body.appendChild(tempLink)
+        tempLink.click()
+        document.body.removeChild(tempLink)
+        return
       }
       
       // Save preference and mark as successful
@@ -235,18 +249,22 @@ export default function LocationButton({
       
     } catch (error) {
       console.error('Erro ao abrir Google Maps:', error)
-      setFailedServices(prev => new Set(prev).add('google'))
       
-      // Try fallback with address search
+      // Try fallback with address search in same tab
       try {
         const fallbackUrl = `https://www.google.com/maps/search/${encodeURIComponent(address)}`
-        window.open(fallbackUrl, '_blank', 'noopener,noreferrer')
+        
+        // Try to create a temporary link for better user experience
+        const tempLink = document.createElement('a')
+        tempLink.href = fallbackUrl
+        tempLink.target = '_blank'
+        tempLink.rel = 'noopener noreferrer'
+        document.body.appendChild(tempLink)
+        tempLink.click()
+        document.body.removeChild(tempLink)
       } catch (fallbackError) {
-        // If all fails, try alternative service
-        if (!failedServices.has('waze')) {
-          openInWaze()
-          return
-        }
+        console.error('Fallback também falhou:', fallbackError)
+        setFailedServices(prev => new Set(prev).add('google'))
       }
     } finally {
       setTimeout(() => {
@@ -254,7 +272,7 @@ export default function LocationButton({
         setLoadingService(null)
       }, 600)
     }
-  }, [mapUrls.google, address, failedServices])
+  }, [mapUrls.google, address, saveUserPreference, setFailedServices])
 
   const openInAppleMaps = React.useCallback(() => {
     setIsLoading(true)
@@ -262,8 +280,32 @@ export default function LocationButton({
     try {
       const newWindow = window.open(mapUrls.apple, '_blank', 'noopener,noreferrer')
       
-      if (!newWindow) {
-        throw new Error('Popup bloqueado')
+      if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
+        // Popup was blocked, try fallback to Google Maps
+        console.warn('Popup do Apple Maps bloqueado, tentando Google Maps...')
+        
+        if (!failedServices.has('google')) {
+          // Try Google Maps as fallback
+          const fallbackUrl = `https://www.google.com/maps/search/${encodeURIComponent(address)}`
+          const tempLink = document.createElement('a')
+          tempLink.href = fallbackUrl
+          tempLink.target = '_blank'
+          tempLink.rel = 'noopener noreferrer'
+          document.body.appendChild(tempLink)
+          tempLink.click()
+          document.body.removeChild(tempLink)
+          return
+        } else {
+          // If Google also failed, go to same tab
+          const tempLink = document.createElement('a')
+          tempLink.href = mapUrls.apple
+          tempLink.target = '_blank'
+          tempLink.rel = 'noopener noreferrer'
+          document.body.appendChild(tempLink)
+          tempLink.click()
+          document.body.removeChild(tempLink)
+          return
+        }
       }
       
       saveUserPreference('apple')
@@ -279,15 +321,21 @@ export default function LocationButton({
       
       // Fallback to Google Maps
       if (!failedServices.has('google')) {
-        openInGoogleMaps()
-        return
+        const fallbackUrl = `https://www.google.com/maps/search/${encodeURIComponent(address)}`
+        const tempLink = document.createElement('a')
+        tempLink.href = fallbackUrl
+        tempLink.target = '_blank'
+        tempLink.rel = 'noopener noreferrer'
+        document.body.appendChild(tempLink)
+        tempLink.click()
+        document.body.removeChild(tempLink)
       }
     } finally {
       setTimeout(() => {
         setIsLoading(false)
       }, 600)
     }
-  }, [mapUrls.apple, failedServices])
+  }, [mapUrls.apple, failedServices, address, saveUserPreference])
 
   const openInWaze = React.useCallback(() => {
     setLoadingService('waze')
@@ -296,8 +344,32 @@ export default function LocationButton({
     try {
       const newWindow = window.open(mapUrls.waze, '_blank', 'noopener,noreferrer')
       
-      if (!newWindow) {
-        throw new Error('Popup bloqueado')
+      if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
+        // Popup was blocked, try fallback to Google Maps
+        console.warn('Popup do Waze bloqueado, tentando Google Maps...')
+        
+        if (!failedServices.has('google')) {
+          // Try Google Maps as fallback
+          const fallbackUrl = `https://www.google.com/maps/search/${encodeURIComponent(address)}`
+          const tempLink = document.createElement('a')
+          tempLink.href = fallbackUrl
+          tempLink.target = '_blank'
+          tempLink.rel = 'noopener noreferrer'
+          document.body.appendChild(tempLink)
+          tempLink.click()
+          document.body.removeChild(tempLink)
+          return
+        } else {
+          // If Google also failed, go to same tab
+          const tempLink = document.createElement('a')
+          tempLink.href = mapUrls.waze
+          tempLink.target = '_blank'
+          tempLink.rel = 'noopener noreferrer'
+          document.body.appendChild(tempLink)
+          tempLink.click()
+          document.body.removeChild(tempLink)
+          return
+        }
       }
       
       saveUserPreference('waze')
@@ -313,8 +385,14 @@ export default function LocationButton({
       
       // Fallback to Google Maps
       if (!failedServices.has('google')) {
-        openInGoogleMaps()
-        return
+        const fallbackUrl = `https://www.google.com/maps/search/${encodeURIComponent(address)}`
+        const tempLink = document.createElement('a')
+        tempLink.href = fallbackUrl
+        tempLink.target = '_blank'
+        tempLink.rel = 'noopener noreferrer'
+        document.body.appendChild(tempLink)
+        tempLink.click()
+        document.body.removeChild(tempLink)
       }
     } finally {
       setTimeout(() => {
@@ -322,7 +400,7 @@ export default function LocationButton({
         setLoadingService(null)
       }, 600)
     }
-  }, [mapUrls.waze, failedServices])
+  }, [mapUrls.waze, failedServices, address])
 
   const handleClick = React.useCallback(() => {
     // If custom onClick is provided, use it instead
