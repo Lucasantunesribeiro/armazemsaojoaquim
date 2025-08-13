@@ -25,6 +25,10 @@ yarn-debug.log*
 yarn-error.log*
 
 # local env files
+.env
+.env.development
+.env.test
+.env.production
 .env*.local
 .env.local
 .env.development.local
@@ -54,3 +58,9 @@ explicacao.md
 
 #cursor
 .cursor
+
+#kiro
+.kiro
+
+#vscode
+.vscode
