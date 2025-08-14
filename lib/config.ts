@@ -56,9 +56,9 @@ export const config = {
       full: 'Rua Almirante Alexandrino, 470, Santa Teresa, Rio de Janeiro - RJ'
     },
     contact: {
-      phone: '+55 21 98565-8443',
+      phone: '+55 21 94099-1666',
       email: 'armazemsaojoaquimoficial@gmail.com',
-      whatsapp: '+5521985658443'
+      whatsapp: '+552194099166'
     },
     social: {
       instagram: 'https://www.instagram.com/armazemsaojoaquim/',
@@ -175,7 +175,7 @@ export const config = {
   // CONFIGURAÇÕES DE IMAGEM
   // ============================
   images: {
-    placeholder: '/images/placeholder.jpg',
+    placeholder: null,
     logo: '/images/logo.png',
     ogImage: '/og-image.jpg',
     heroImages: [

@@ -191,7 +191,7 @@ export default function SettingsPage() {
                 id="contact_phone"
                 value={settings.general.contact_phone?.value || ''}
                 onChange={(e) => updateSetting('general', 'contact_phone', e.target.value)}
-                placeholder="+55 11 99999-9999"
+                placeholder="+55 21 94099-1666"
               />
               <p className="text-xs text-muted-foreground">
                 {settings.general.contact_phone?.description}

@@ -3,7 +3,7 @@ import Image from 'next/image'
 import { useState, useEffect } from 'react'
 
 interface SimpleImageProps {
-  src: string
+  src: string | null
   alt: string
   width?: number
   height?: number
@@ -30,6 +30,9 @@ const SimpleImage = ({
   // Evitar loops infinitos - máximo 1 tentativa
   const MAX_RETRIES = 1
   
+  // Verificar se src é válido
+  const isValidSrc = src && src.trim() !== ''
+  
   // Reset estado quando URL muda
   useEffect(() => {
     setError(false)
@@ -42,7 +45,8 @@ const SimpleImage = ({
   const finalWidth = useFixedDimensions ? width : undefined
   const finalHeight = useFixedDimensions ? height : undefined
 
-  if (error || retryCount >= MAX_RETRIES) {
+  // Se não há src válido ou houve erro, mostrar placeholder
+  if (!isValidSrc || error || retryCount >= MAX_RETRIES) {
     return (
       <div 
         className={`bg-gray-200 flex items-center justify-center ${fill ? 'absolute inset-0' : ''} ${className}`}
@@ -51,7 +55,7 @@ const SimpleImage = ({
         <div className="text-gray-500 text-center">
           <div className="text-2xl mb-2">🖼️</div>
           <div className="text-sm">Imagem não disponível</div>
-          <div className="text-xs text-red-500 mt-1 break-all">{src.substring(0, 30)}...</div>
+          {src && <div className="text-xs text-red-500 mt-1 break-all">{src.substring(0, 30)}...</div>}
         </div>
       </div>
     )
@@ -69,7 +73,7 @@ const SimpleImage = ({
       )}
       
       <Image
-        src={src}
+        src={src!}
         alt={alt}
         {...(fill ? {
           fill: true,
@@ -83,7 +87,6 @@ const SimpleImage = ({
         loading="eager"
         priority={true}
         onError={() => {
-          console.error(`❌ Erro ao carregar imagem (tentativa ${retryCount + 1}/${MAX_RETRIES}):`, src)
           setRetryCount(prev => prev + 1)
           
           if (retryCount >= MAX_RETRIES - 1) {
@@ -92,7 +95,6 @@ const SimpleImage = ({
           setIsLoading(false)
         }}
         onLoad={() => {
-          console.log('✅ Imagem carregada:', src)
           setIsLoading(false)
           setRetryCount(0) // Reset contador em caso de sucesso
         }}

@@ -19,6 +19,8 @@ interface Room {
   max_guests: number
   image_url: string
   available: boolean
+  price_refundable: number
+  price_non_refundable: number
 }
 
 export default function PousadaPage() {
@@ -333,7 +335,7 @@ export default function PousadaPage() {
                 <Card key={room.id} className="overflow-hidden hover:shadow-2xl transition-shadow duration-300">
                   <div className="relative h-64">
                     <Image
-                      src={room.image_url || '/images/pousada/room-placeholder.jpg'}
+                      src={room.image_url}
                       alt={room.name}
                       fill
                       className="object-cover"
@@ -389,6 +391,39 @@ export default function PousadaPage() {
                       </div>
                     </div>
 
+                    {/* Preços */}
+                    <div className="space-y-3 pt-4 border-t border-slate-200 dark:border-slate-700">
+                      <h4 className="font-semibold text-sm text-slate-800 dark:text-slate-200">Preços por noite</h4>
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm text-slate-600 dark:text-slate-400">Reembolsável</span>
+                          <span className="text-lg font-bold text-green-600">
+                            R$ {room.price_refundable.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm text-slate-600 dark:text-slate-400">Não reembolsável</span>
+                          <span className="text-lg font-bold text-amber-600">
+                            R$ {room.price_non_refundable.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="pt-2">
+                        <Button 
+                          className="w-full bg-amber-600 hover:bg-amber-700 text-white"
+                          disabled={!room.available}
+                          onClick={() => {
+                            if (room.available) {
+                              const message = `Olá! Gostaria de fazer uma reserva para o quarto ${room.name} (${room.type}) da Pousada Armazém São Joaquim.`
+                              const whatsappUrl = `https://wa.me/552194099166?text=${encodeURIComponent(message)}`
+                              window.open(whatsappUrl, '_blank', 'noopener,noreferrer')
+                            }
+                          }}
+                        >
+                          {room.available ? 'Reservar Agora' : 'Indisponível'}
+                        </Button>
+                      </div>
+                    </div>
 
                   </CardContent>
                 </Card>

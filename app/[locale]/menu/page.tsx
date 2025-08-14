@@ -26,18 +26,19 @@ interface MenuItem {
 
 const getCategoriesList = (t: any) => [
   t('menu.categories.all') || 'Todos',
-  t('menu.categories.starters') || 'Petiscos',
-  t('menu.categories.mains') || 'Pratos Principais',
-  t('menu.categories.sandwiches') || 'Sanduíches', 
-  t('menu.categories.salads') || 'Saladas',
-  t('menu.categories.sides') || 'Guarnições',
-  t('menu.categories.desserts') || 'Sobremesas',
-  t('menu.categories.beverages') || 'Bebidas Sem Álcool',
-  t('menu.categories.beers') || 'Cervejas',
-  t('menu.categories.drinks') || 'Drinks',
-  t('menu.categories.wines') || 'Vinhos',
-  t('menu.categories.sparklings') || 'Espumantes',
-  t('menu.categories.spirits') || 'Destilados'
+  t('menu.categories.starters') || 'PETISCOS',
+  t('menu.categories.salads') || 'SALADAS', 
+  t('menu.categories.mains') || 'PRATOS PRINCIPAIS',
+  t('menu.categories.sandwiches') || 'SANDUÍCHES',
+  t('menu.categories.desserts') || 'SOBREMESAS',
+  t('menu.categories.beverages') || 'BEBIDAS SEM ÁLCOOL',
+  t('menu.categories.beers') || 'CERVEJAS',
+  t('menu.categories.drinks') || 'COQUETÉIS',
+  t('menu.categories.caipirinhas') || 'CAIPIRINHAS',
+  t('menu.categories.spirits') || 'DESTILADOS',
+  t('menu.categories.wines') || 'VINHOS',
+  t('menu.categories.sides') || 'GUARNIÇÕES',
+  t('menu.categories.specials') || 'SUGESTÃO DO CHEF'
 ]
 
 export default function MenuPage() {
@@ -155,133 +156,146 @@ export default function MenuPage() {
     return [
       {
         id: 'f16b0add-8704-4620-8ddf-b9b86bbb185e',
-        name: 'Tabule com Frango à Milanesa',
-        description: 'Tabule de grão com pepino, coentro, alface crespa, cenoura, servido com iscas de frango à milanesa',
-        price: 29.00,
-        category: 'Petiscos',
+        name: 'PATATAS BRAVAS',
+        description: 'Batatas douradas com aioli de páprica levemente picante (04 un)',
+        price: 25.00,
+        category: 'PETISCOS',
         available: true,
         featured: false,
-        allergens: ['glúten'],
-        image_url: '/images/placeholder.jpg',
+        allergens: null,
+        image_url: '/images/menu_images/patatas_bravas.webp',
         preparation_time: 15,
-        ingredients: ['Tabule de grão', 'Pepino', 'Coentro', 'Alface crespa', 'Cenoura', 'Frango à milanesa']
+        ingredients: ['Batatas', 'Aioli de páprica']
       },
       {
         id: 'bf73205f-5055-4286-8e06-6b536d7decbb',
-        name: 'Caprese Mineira',
-        description: 'Salada de tomate, queijo minas frescal, pesto de manjericão e torradas finas',
-        price: 39.00,
-        category: 'Petiscos',
+        name: 'CAPRESE MINEIRA',
+        description: 'Salada de tomate, queijo minas frescal, pesto de manjericão e torrada finas',
+        price: 40.00,
+        category: 'SALADAS',
         available: true,
-        featured: true,
+        featured: false,
         allergens: ['laticínios', 'glúten'],
-        image_url: '/images/placeholder.jpg',
+        image_url: '/images/menu_images/caprese_mineira.webp',
         preparation_time: 10,
         ingredients: ['Tomate', 'Queijo minas frescal', 'Pesto de manjericão', 'Torradas']
       },
       {
         id: '441f421e-50cf-4b87-bd3a-fdd67cf22b69',
-        name: 'Tilápia na Brasa',
-        description: 'Tilápia inteira assada na brasa, servida com legumes grelhados.',
-        price: 100.00,
-        category: 'Pratos Principais',
+        name: 'TILÁPIA NA BRASA',
+        description: 'Tilápia inteira assada na brasa e guarnecida de legumes ≅800g (para 2 pessoas)',
+        price: 150.00,
+        category: 'PRATOS PRINCIPAIS',
         available: true,
-        featured: true,
+        featured: false,
         allergens: ['peixe'],
-        image_url: '/images/placeholder.jpg',
+        image_url: '/images/menu_images/tilapia_brasa.webp',
         preparation_time: 30,
         ingredients: ['Tilápia', 'Legumes grelhados']
       },
       {
         id: '5e9b67c2-24a5-4569-8c4c-764d12e26c4f',
-        name: 'Picanha ao Carvão',
-        description: 'Picanha assada na parrilla com molho chimichurri, batatas bravas, farofa e vinagrete.',
+        name: 'PICANHA AO CARVÃO',
+        description: 'Picanha assada na parrilla, com molho chimichurri, batatas bravas, farofa e vinagrete ≅500g (para 2 pessoas)',
         price: 195.00,
-        category: 'Pratos Principais',
+        category: 'PRATOS PRINCIPAIS',
         available: true,
-        featured: true,
-        allergens: ['glúten'],
-        image_url: '/images/placeholder.jpg',
+        featured: false,
+        allergens: null,
+        image_url: '/images/menu_images/picanha_carvao.webp',
         preparation_time: 35,
         ingredients: ['Picanha', 'Molho chimichurri', 'Batatas bravas', 'Farofa', 'Vinagrete']
       },
       {
         id: '8a865961-f1f1-4eb4-91f6-c3103e0a1249',
-        name: 'Hambúrguer da Casa',
-        description: 'Carne selecionada com queijo cheddar, cebola caramelizada, alface, tomate e batata da casa.',
+        name: 'HAMBÚRGUER DA CASA',
+        description: 'Carne selecionada com queijo cheddar, cebola caramelizada, alface, tomate e batata da casa',
         price: 55.00,
-        category: 'Sanduíches',
+        category: 'SANDUÍCHES',
         available: true,
-        featured: true,
+        featured: false,
         allergens: ['glúten', 'laticínios'],
-        image_url: '/images/placeholder.jpg',
+        image_url: '/images/menu_images/hamburguer_casa.webp',
         preparation_time: 20,
         ingredients: ['Carne bovina', 'Queijo cheddar', 'Cebola caramelizada', 'Alface', 'Tomate', 'Batata']
       },
       {
         id: '671960d0-5b4e-4872-b3b0-6e003b3e20a1',
-        name: 'Tarte aux Pommes',
-        description: 'Sobremesa francesa com massa sablée, purê e lâminas de maçã, sorvete de creme e coulis do dia.',
+        name: 'TARTE AUX POMMES',
+        description: 'Deliciosa sobremesa Francesa atemporal de massa sablée recheada com purê fino de maçã, e laminas de maçã, guarnecida de sorvete de creme e coulis do dia',
         price: 25.00,
-        category: 'Sobremesas',
+        category: 'SOBREMESAS',
         available: true,
-        featured: true,
+        featured: false,
         allergens: ['glúten', 'laticínios'],
-        image_url: '/images/placeholder.jpg',
+        image_url: '/images/menu_images/tarte_pommes.webp',
         preparation_time: 15,
         ingredients: ['Massa sablée', 'Maçã', 'Sorvete de creme', 'Coulis']
       },
       {
         id: '12a0ab38-08df-4d7e-83f6-23c1d57a3dc5',
-        name: 'Pink Lemonade',
-        description: 'Limonada da casa adoçada com xarope de hibisco.',
+        name: 'PINK LEMONADE',
+        description: 'Limonada da casa, adoçada com xarope de hibisco',
         price: 14.00,
-        category: 'Bebidas Sem Álcool',
+        category: 'BEBIDAS SEM ÁLCOOL',
         available: true,
-        featured: true,
+        featured: false,
         allergens: null,
-        image_url: '/images/placeholder.jpg',
+        image_url: '/images/menu_images/pink_lemonade.webp',
         preparation_time: 5,
         ingredients: ['Limão', 'Xarope de hibisco', 'Água', 'Açúcar']
       },
       {
         id: 'a22115a0-1c62-4f0f-ae56-4cd5ce3cf263',
-        name: 'Baden Baden Cristal',
+        name: 'BADEN BADEN CRISTAL',
         description: 'Cerveja artesanal - 600ml',
         price: 28.00,
-        category: 'Cervejas',
+        category: 'CERVEJAS',
         available: true,
-        featured: true,
+        featured: false,
         allergens: ['glúten'],
-        image_url: '/images/placeholder.jpg',
+        image_url: '/images/menu_images/baden_baden_cristal.webp',
         preparation_time: null,
         ingredients: ['Malte', 'Lúpulo', 'Água', 'Levedura']
       },
       {
         id: '65e1ff3a-3430-42b4-93bc-60138fd6d3d5',
-        name: 'Morena Tropicana',
-        description: 'Gin, manga, limão taití, amaretto, açúcar e clara de ovo',
+        name: 'MORENA TROPICANA',
+        description: 'Gin, manga, limão taití, amaretto, açúcar, clara de ovo',
         price: 32.00,
-        category: 'Drinks',
+        category: 'COQUETÉIS',
         available: true,
-        featured: true,
+        featured: false,
         allergens: ['ovo'],
-        image_url: '/images/placeholder.jpg',
+        image_url: '/images/menu_images/morena_tropicana.webp',
         preparation_time: 8,
         ingredients: ['Gin', 'Manga', 'Limão taití', 'Amaretto', 'Açúcar', 'Clara de ovo']
       },
       {
-        id: '4ecdc7bb-9474-4d91-9d5e-71f7e7d77d35',
-        name: 'Adobe Emiliana Cabernet Sauvignon',
-        description: 'Reserva Orgânico - Chile - 2022',
-        price: 130.00,
-        category: 'Vinhos',
+        id: 'atum-avocado-special',
+        name: 'ATUM AVOCADO',
+        description: 'Tartare de atum, temperado com teriyaki e mostarda sobre uma pasta de guacamole (avocado)',
+        price: 39.00,
+        category: 'SUGESTÃO DO CHEF',
         available: true,
         featured: true,
-        allergens: null,
-        image_url: '/images/placeholder.jpg',
-        preparation_time: null,
-        ingredients: ['Uva Cabernet Sauvignon']
+        allergens: ['peixe'],
+        image_url: '/images/menu_images/atum_avocado.webp',
+        preparation_time: 12,
+        ingredients: ['Atum', 'Avocado', 'Teriyaki', 'Mostarda']
+      },
+      {
+        id: 'sabor-mediterraneo-special',
+        name: 'SABOR MEDITERRÂNEO',
+        description: 'Frutos do mar (tentáculos de polvo, tilápia grelhada e mini lulinhas), acompanhados de legumes braseados, farofa panko de ervas e molho salsa mango',
+        price: 130.00,
+        category: 'SUGESTÃO DO CHEF',
+        available: true,
+        featured: true,
+        allergens: ['peixe', 'glúten'],
+        image_url: '/images/menu_images/sabor_mediterraneo.webp',
+        preparation_time: 25,
+        ingredients: ['Polvo', 'Tilápia', 'Lulinhas', 'Legumes', 'Farofa panko', 'Molho salsa mango']
       }
     ]
   }
@@ -294,19 +308,19 @@ export default function MenuPage() {
     if (selectedCategory !== allCategoriesText) {
       // Mapeamento entre categorias traduzidas e originais
       const categoryMapping: { [key: string]: string } = {
-        [t('menu.categories.starters') || 'Petiscos']: 'Petiscos',
-        [t('menu.categories.mains') || 'Pratos Principais']: 'Pratos Principais',
-        [t('menu.categories.sandwiches') || 'Sanduíches']: 'Sanduíches',
-        [t('menu.categories.salads') || 'Saladas']: 'Saladas',
-        [t('menu.categories.sides') || 'Guarnições']: 'Guarnições',
-        [t('menu.categories.desserts') || 'Sobremesas']: 'Sobremesas',
-        [t('menu.categories.beverages') || 'Bebidas Sem Álcool']: 'Bebidas Sem Álcool',
-        [t('menu.categories.beers') || 'Cervejas']: 'Cervejas',
-        [t('menu.categories.drinks') || 'Drinks']: 'Drinks',
-        [t('menu.categories.wines') || 'Vinhos']: 'Vinhos',
-        [t('menu.categories.sparklings') || 'Espumantes']: 'Espumantes',
-        [t('menu.categories.spirits') || 'Destilados']: 'Destilados',
-        [t('menu.categories.specials') || 'Especiais da casa']: 'Especiais da casa'
+        [t('menu.categories.starters') || 'PETISCOS']: 'PETISCOS',
+        [t('menu.categories.salads') || 'SALADAS']: 'SALADAS',
+        [t('menu.categories.mains') || 'PRATOS PRINCIPAIS']: 'PRATOS PRINCIPAIS',
+        [t('menu.categories.sandwiches') || 'SANDUÍCHES']: 'SANDUÍCHES',
+        [t('menu.categories.desserts') || 'SOBREMESAS']: 'SOBREMESAS',
+        [t('menu.categories.beverages') || 'BEBIDAS SEM ÁLCOOL']: 'BEBIDAS SEM ÁLCOOL',
+        [t('menu.categories.beers') || 'CERVEJAS']: 'CERVEJAS',
+        [t('menu.categories.drinks') || 'COQUETÉIS']: 'COQUETÉIS',
+        [t('menu.categories.caipirinhas') || 'CAIPIRINHAS']: 'CAIPIRINHAS',
+        [t('menu.categories.spirits') || 'DESTILADOS']: 'DESTILADOS',
+        [t('menu.categories.wines') || 'VINHOS']: 'VINHOS',
+        [t('menu.categories.sides') || 'GUARNIÇÕES']: 'GUARNIÇÕES',
+        [t('menu.categories.specials') || 'SUGESTÃO DO CHEF']: 'SUGESTÃO DO CHEF'
       }
       
       // Obter a categoria original baseada na tradução selecionada
@@ -488,7 +502,7 @@ export default function MenuPage() {
                   {/* Image */}
                   <div className="relative h-48">
                     <SimpleImage
-                      src={item.image_url || ''}
+                      src={item.image_url}
                       alt={item.name}
                       fill
                       loading="eager"

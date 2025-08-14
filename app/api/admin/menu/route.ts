@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
+import { verifyAdminAccess } from '@/lib/admin-auth'
 
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -12,39 +13,12 @@ const supabaseAdmin = createClient(
   }
 )
 
-const supabaseAuth = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-)
-
-async function checkAuth(request: NextRequest) {
-  const authHeader = request.headers.get('Authorization')
-  if (!authHeader?.startsWith('Bearer ')) {
-    return { error: 'Unauthorized', status: 401 }
-  }
-
-  const token = authHeader.substring(7)
-  const { data: { user } } = await supabaseAuth.auth.getUser(token)
-  
-  if (!user) {
-    return { error: 'Invalid token', status: 401 }
-  }
-
-  if (user.email !== 'armazemsaojoaquimoficial@gmail.com') {
-    return { error: 'Admin required', status: 403 }
-  }
-
-  return { user }
-}
-
 // GET - Listar itens do menu
 export async function GET(request: NextRequest) {
   try {
-    console.log('🍽️ API Menu: Carregando lista...')
-    
-    const auth = await checkAuth(request)
-    if (auth.error) {
-      return NextResponse.json({ error: auth.error }, { status: auth.status })
+    const authResult = await verifyAdminAccess(request)
+    if (!authResult.success) {
+      return NextResponse.json({ error: authResult.error }, { status: authResult.status || 401 })
     }
 
     const { data: menuItems, error } = await supabaseAdmin
@@ -71,10 +45,13 @@ export async function POST(request: NextRequest) {
   try {
     console.log('🍽️ API Menu: Criando novo item...')
     
-    const auth = await checkAuth(request)
-    if (auth.error) {
-      return NextResponse.json({ error: auth.error }, { status: auth.status })
+    const authResult = await verifyAdminAccess(request)
+    if (!authResult.success) {
+      console.log('❌ API Menu: Admin access denied:', authResult.error)
+      return NextResponse.json({ error: authResult.error }, { status: authResult.status || 401 })
     }
+    
+    console.log('✅ API Menu: Admin access verified for:', authResult.user?.email)
 
     const body = await request.json()
     console.log('🍽️ API Menu: Dados recebidos:', body)

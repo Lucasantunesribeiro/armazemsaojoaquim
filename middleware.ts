@@ -10,6 +10,45 @@ export type Locale = typeof locales[number]
 // Admin configuration
 const ADMIN_EMAIL = 'armazemsaojoaquimoficial@gmail.com'
 
+// Admin verification function (similar to lib/admin-auth.ts but for middleware)
+async function verifyAdminAccessMiddleware(supabase: any, session: any): Promise<boolean> {
+  try {
+    const user = session?.user
+    if (!user) return false
+
+    // Primary verification: Check by admin email (fastest)
+    const adminEmail = 'armazemsaojoaquimoficial@gmail.com'
+    if (user.email === adminEmail) {
+      console.log('✅ [MIDDLEWARE] Admin verified by email:', user.email)
+      return true
+    }
+
+    // Fallback verification: Check role in profiles table
+    try {
+      const { data: profile, error } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', user.id)
+        .single()
+
+      if (!error && profile?.role === 'admin') {
+        console.log('✅ [MIDDLEWARE] Admin verified by role in database')
+        return true
+      }
+
+      console.log('🔍 [MIDDLEWARE] Profile check result:', { profile, error: error?.message })
+    } catch (dbError) {
+      console.warn('⚠️ [MIDDLEWARE] Database verification failed:', dbError)
+    }
+
+    console.log('❌ [MIDDLEWARE] User is not admin:', user.email)
+    return false
+  } catch (error) {
+    console.error('❌ [MIDDLEWARE] Error in admin verification:', error)
+    return false
+  }
+}
+
 // Get locale from pathname
 function getLocale(pathname: string): Locale | null {
   const segments = pathname.split('/')
@@ -123,8 +162,8 @@ export async function middleware(request: NextRequest) {
         return NextResponse.redirect(redirectUrl)
       }
 
-      const email = session.user.email || ''
-      const isAdmin = email === ADMIN_EMAIL
+      console.log('🔍 [MIDDLEWARE] Checking admin access for:', session.user.email)
+      const isAdmin = await verifyAdminAccessMiddleware(supabase, session)
       
       if (!isAdmin) {
         if (pathname.startsWith('/api/admin/')) {

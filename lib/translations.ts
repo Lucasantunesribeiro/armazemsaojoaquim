@@ -332,17 +332,17 @@ export interface Translation {
     categories: {
       all: string
       starters: string
+      salads: string
       mains: string
       sandwiches: string
-      salads: string
-      sides: string
       desserts: string
       beverages: string
       beers: string
       drinks: string
-      wines: string
-      sparklings: string
+      caipirinhas: string
       spirits: string
+      wines: string
+      sides: string
       specials: string
     }
     noResults: {
@@ -1238,18 +1238,18 @@ export const translations: Record<Language, Translation> = {
       categories: {
         all: 'Todos',
         starters: 'Petiscos',
+        salads: 'Saladas',
         mains: 'Pratos Principais',
         sandwiches: 'Sanduíches',
-        salads: 'Saladas',
-        sides: 'Guarnições',
         desserts: 'Sobremesas',
         beverages: 'Bebidas Sem Álcool',
         beers: 'Cervejas',
-        drinks: 'Drinks',
-        wines: 'Vinhos',
-        sparklings: 'Espumantes',
+        drinks: 'Coquetéis',
+        caipirinhas: 'Caipirinhas',
         spirits: 'Destilados',
-        specials: 'Especiais da casa'
+        wines: 'Vinhos',
+        sides: 'Guarnições',
+        specials: 'Sugestão do Chef'
       },
       noResults: {
         title: 'Nenhum item encontrado',
@@ -1331,8 +1331,8 @@ export const translations: Record<Language, Translation> = {
           zipcode: 'CEP: 20241-262'
         },
         phone: {
-          title: 'Telefone & WhatsApp',
-          number: '+55 21 98565-8443'
+                title: 'Telefone & WhatsApp',
+      number: '+55 21 94099-1666'
         },
         email: {
           title: 'E-mail',
@@ -2283,18 +2283,18 @@ export const translations: Record<Language, Translation> = {
       categories: {
         all: 'All',
         starters: 'Appetizers',
+        salads: 'Salads',
         mains: 'Main Courses',
         sandwiches: 'Sandwiches',
-        salads: 'Salads',
-        sides: 'Sides',
         desserts: 'Desserts',
         beverages: 'Non-Alcoholic Beverages',
         beers: 'Beers',
         drinks: 'Cocktails',
-        wines: 'Wines',
-        sparklings: 'Sparkling Wines',
+        caipirinhas: 'Caipirinhas',
         spirits: 'Spirits',
-        specials: 'House specials'
+        wines: 'Wines',
+        sides: 'Sides',
+        specials: 'House Specials'
       },
       noResults: {
         title: 'No items found',
@@ -2444,8 +2444,8 @@ export const translations: Record<Language, Translation> = {
           zipcode: 'ZIP: 20241-262'
         },
         phone: {
-          title: 'Phone & WhatsApp',
-          number: '+55 21 98565-8443'
+                  title: 'Phone & WhatsApp',
+        number: '+55 21 94099-1666'
         },
         email: {
           title: 'Email',

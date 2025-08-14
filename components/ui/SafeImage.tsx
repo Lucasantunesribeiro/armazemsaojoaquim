@@ -14,7 +14,7 @@ interface SafeImageProps {
   sizes?: string
   quality?: number
   placeholder?: 'blur' | 'empty'
-  fallbackSrc?: string
+  fallbackSrc?: string | null
   showPlaceholderIcon?: boolean
 }
 
@@ -60,7 +60,7 @@ const SafeImage = ({
   sizes,
   quality = 90,
   placeholder = 'empty',
-  fallbackSrc = '/images/placeholder.jpg',
+  fallbackSrc = null,
   showPlaceholderIcon = true
 }: SafeImageProps) => {
   const [currentSrc, setCurrentSrc] = useState<string | null>(null)

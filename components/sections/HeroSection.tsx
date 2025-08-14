@@ -53,7 +53,7 @@ export default function HeroSection() {
   const quickInfo = useMemo(() => [
     { icon: MapPin, text: 'Santa Teresa, RJ', label: isReady ? t('nav.contact') : 'Contato', href: '#location' },
     { icon: Clock, text: 'Ter-Dom: 12h-22h', label: isReady ? t('cafe.hours.title') : 'Horário', href: '#hours' },
-    { icon: Phone, text: '(21) 98565-8443', label: isReady ? t('footer.phone') : 'Telefone', href: 'tel:+5521985658443' }
+            { icon: Phone, text: '(21) 94099-1666', label: isReady ? t('footer.phone') : 'Telefone', href: 'tel:+552194099166' }
   ], [t, isReady])
 
   // Callbacks - MUST BE BEFORE CONDITIONAL RETURNS

@@ -81,7 +81,6 @@ const nextConfig = {
       '@radix-ui/react-switch',
       'react-hook-form',
       '@hookform/resolvers',
-      'date-fns',
       'recharts',        // Otimizar charts pesados
       'react-icons'      // Tree shake react-icons
     ],
@@ -120,6 +119,11 @@ const nextConfig = {
         tls: false,
         crypto: false,
       }
+    }
+
+    // Ensure date-fns is properly resolved
+    if (!config.resolve.alias) {
+      config.resolve.alias = {}
     }
 
     // Suppress warnings

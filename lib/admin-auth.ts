@@ -1,218 +1,185 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { createServerClient } from '@/lib/supabase'
 import { createClient } from '@supabase/supabase-js'
+import { NextRequest } from 'next/server'
 
-// Lista de emails admin autorizada
-const ADMIN_EMAILS = ['armazemsaojoaquimoficial@gmail.com']
+const supabaseAuth = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+)
+
+const supabaseAdmin = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!,
+  {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false
+    }
+  }
+)
 
 export interface AdminAuthResult {
-  isAdmin: boolean
-  user: any | null
-  session: any | null
-  error: string | null
+  success: boolean
+  user?: any
+  error?: string
+  status?: number
 }
 
 /**
- * Middleware centralizado para autenticação admin
- * Verifica sessão, usuário e permissões de admin
- * Suporta tanto cookies (SSR) quanto Authorization header (client-side)
+ * Verifica se o usuário é admin usando a mesma lógica do useAdmin hook
+ * 1. Verifica se o token é válido
+ * 2. Verifica se é o email admin oficial
+ * 3. Como fallback, verifica role na tabela profiles
  */
-export async function verifyAdminAuth(request?: NextRequest): Promise<AdminAuthResult> {
+export async function verifyAdminAccess(request: NextRequest): Promise<AdminAuthResult> {
   try {
-    console.log('🔍 [ADMIN-AUTH] Verificando autenticação admin...')
+    // Verificar Authorization header
+    const authHeader = request.headers.get('Authorization')
     
-    let supabase
-    let session = null
-    let user = null
-    
-    // MÉTODO 1: Tentar via cookies (SSR)
-    try {
-      supabase = await createServerClient()
-      const { data: { session: cookieSession }, error: cookieError } = await supabase.auth.getSession()
-      
-      if (!cookieError && cookieSession) {
-        console.log('✅ [ADMIN-AUTH] Sessão encontrada via cookies')
-        session = cookieSession
-        user = cookieSession.user
+    if (!authHeader?.startsWith('Bearer ')) {
+      return { 
+        success: false, 
+        error: 'Authorization header required', 
+        status: 401 
       }
-    } catch (cookieError) {
-      console.log('⚠️ [ADMIN-AUTH] Falha ao obter sessão via cookies:', cookieError)
     }
+
+    const token = authHeader.substring(7)
     
-    // MÉTODO 2: Se sem sessão, tentar Authorization header (client-side)
-    if (!session && request) {
-      const authHeader = request.headers.get('authorization')
-      if (authHeader && authHeader.startsWith('Bearer ')) {
-        const token = authHeader.split(' ')[1]
-        
-        console.log('🔄 [ADMIN-AUTH] Tentando Authorization header...')
-        
-        // Criar cliente com token
-        const supabaseWithAuth = createClient(
-          process.env.NEXT_PUBLIC_SUPABASE_URL!,
-          process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-        )
-        
-        try {
-          const { data: { user: authUser }, error: authError } = await supabaseWithAuth.auth.getUser(token)
-          
-          if (!authError && authUser) {
-            console.log('✅ [ADMIN-AUTH] Sessão encontrada via Authorization header')
-            session = { user: authUser, access_token: token }
-            user = authUser
-            supabase = supabaseWithAuth
-          }
-        } catch (authHeaderError) {
-          console.log('❌ [ADMIN-AUTH] Erro no Authorization header:', authHeaderError)
+    // Verificar se o token é válido
+    const { data: { user }, error: userError } = await supabaseAuth.auth.getUser(token)
+    
+    if (userError || !user) {
+      return { 
+        success: false, 
+        error: 'Invalid or expired token', 
+        status: 401 
+      }
+    }
+
+    // Primary verification: Check by admin email (fastest)
+    const adminEmail = 'armazemsaojoaquimoficial@gmail.com'
+    if (user.email === adminEmail) {
+      console.log('✅ [AdminAuth] Admin verified by email:', user.email)
+      return { 
+        success: true, 
+        user 
+      }
+    }
+
+    // Secondary verification: Check role in profiles table
+    try {
+      const { data: profile, error: profileError } = await supabaseAdmin
+        .from('profiles')
+        .select('role')
+        .eq('id', user.id)
+        .single()
+
+      if (profileError) {
+        console.warn('⚠️ [AdminAuth] Profile query error:', profileError.message)
+      }
+
+      if (profile?.role === 'admin') {
+        console.log('✅ [AdminAuth] Admin verified by database role:', user.email)
+        return { 
+          success: true, 
+          user 
         }
       }
-    }
-    
-    if (!session || !user) {
-      console.log('❌ [ADMIN-AUTH] Nenhuma sessão ativa encontrada')
-      return {
-        isAdmin: false,
-        user: null,
-        session: null,
-        error: 'No active session'
+
+      // User exists but is not admin
+      console.log('❌ [AdminAuth] User is not admin:', user.email, 'role:', profile?.role)
+      return { 
+        success: false, 
+        error: 'Admin access required', 
+        status: 403 
+      }
+
+    } catch (dbError) {
+      console.error('❌ [AdminAuth] Database verification failed:', dbError)
+      
+      // If database fails but user is admin email, allow access as fallback
+      if (user.email === adminEmail) {
+        console.log('✅ [AdminAuth] Admin verified by email fallback:', user.email)
+        return { 
+          success: true, 
+          user 
+        }
+      }
+      
+      return { 
+        success: false, 
+        error: 'Admin verification failed', 
+        status: 500 
       }
     }
-    
-    // Verificar se é admin
-    const userEmail = user.email || ''
-    const isAdmin = ADMIN_EMAILS.includes(userEmail)
-    
-    if (!isAdmin) {
-      console.log('❌ [ADMIN-AUTH] Usuário não é admin:', userEmail)
-      return {
-        isAdmin: false,
-        user,
-        session,
-        error: `Access denied for: ${userEmail}`
-      }
-    }
-    
-    console.log('✅ [ADMIN-AUTH] Autenticação admin válida:', userEmail)
-    return {
-      isAdmin: true,
-      user,
-      session,
-      error: null
-    }
-    
+
   } catch (error) {
-    console.error('💥 [ADMIN-AUTH] Erro interno:', error)
-    return {
-      isAdmin: false,
-      user: null,
-      session: null,
-      error: `Internal error: ${error instanceof Error ? error.message : 'Unknown'}`
+    console.error('❌ [AdminAuth] Unexpected error:', error)
+    return { 
+      success: false, 
+      error: 'Internal server error', 
+      status: 500 
     }
   }
 }
 
 /**
- * Wrapper para APIs admin que retorna automaticamente erro 401/403 se necessário
+ * Middleware helper para verificar admin em rotas API
  */
-export async function withAdminAuth<T = any>(
-  handler: (authResult: AdminAuthResult) => Promise<NextResponse<any>>,
-  request?: NextRequest
-): Promise<NextResponse<any>> {
-  // Se o middleware já processou a requisição, apenas executar o handler
-  // O middleware já verificou a autenticação e permissões
-  if (request) {
-    const adminSession = request.headers.get('X-Admin-Session')
-    const adminVerified = request.headers.get('X-Admin-Verified')
+export function requireAdmin(handler: (request: NextRequest, adminUser: any, ...args: any[]) => Promise<Response>) {
+  return async (request: NextRequest, ...args: any[]) => {
+    const authResult = await verifyAdminAccess(request)
     
-    if (adminSession === 'true' && adminVerified) {
-      console.log('✅ [ADMIN-AUTH] Middleware já verificou autenticação admin')
-      
-      // Criar um authResult mock baseado no middleware
-      const authResult: AdminAuthResult = {
-        isAdmin: true,
-        user: null, // Será obtido pelo handler se necessário
-        session: null,
-        error: null
-      }
-      
-      try {
-        return await handler(authResult)
-      } catch (error) {
-        console.error('💥 [ADMIN-AUTH] Handler error:', error)
-        return NextResponse.json(
-          {
-            error: 'Internal server error',
-            debug: process.env.NODE_ENV === 'development' ? {
-              message: error instanceof Error ? error.message : 'Unknown error'
-            } : undefined
-          } as T | { error: string; debug?: any },
-          { status: 500 }
-        )
-      }
+    if (!authResult.success) {
+      return new Response(
+        JSON.stringify({ error: authResult.error }),
+        { 
+          status: authResult.status || 500,
+          headers: { 'Content-Type': 'application/json' }
+        }
+      )
     }
+
+    return handler(request, authResult.user, ...args)
   }
-  
-  // Fallback: verificação manual se o middleware não processou
-  console.log('⚠️ [ADMIN-AUTH] Middleware não processou, fazendo verificação manual')
-  const authResult = await verifyAdminAuth(request)
-  
-  if (!authResult.isAdmin) {
-    console.error('🚫 [ADMIN-AUTH] Acesso negado:', authResult.error)
-    
-    const statusCode = authResult.session ? 403 : 401
-    const errorMessage = authResult.session ? 'Access denied - admin only' : 'Authentication required'
-    
-    return NextResponse.json(
-      { 
-        error: errorMessage,
-        debug: process.env.NODE_ENV === 'development' ? {
-          originalError: authResult.error,
-          hasSession: !!authResult.session,
-          hasUser: !!authResult.user,
-          attemptedMethods: {
-            cookies: 'tried',
-            authHeader: request?.headers.get('authorization') ? 'tried' : 'not_available'
-          }
-        } : undefined
-      } as T | { error: string; debug?: any },
-      { status: statusCode }
-    )
-  }
-  
+}
+
+/**
+ * Helper para manter compatibilidade com APIs existentes
+ * Executa uma função handler apenas se o usuário for admin
+ */
+export async function withAdminAuth(
+  handler: (authResult: AdminAuthResult) => Promise<Response>,
+  request: NextRequest
+): Promise<Response> {
   try {
-    return await handler(authResult)
-  } catch (error) {
-    console.error('💥 [ADMIN-AUTH] Handler error:', error)
-    return NextResponse.json(
-      {
-        error: 'Internal server error',
-        debug: process.env.NODE_ENV === 'development' ? {
-          message: error instanceof Error ? error.message : 'Unknown error'
-        } : undefined
-      } as T | { error: string; debug?: any },
-      { status: 500 }
-    )
-  }
-}
-
-/**
- * Função de teste para validar admin auth
- */
-export async function testAdminAuth(): Promise<{
-  success: boolean
-  details: AdminAuthResult & { 
-    timestamp: string
-    environment: string
-  }
-}> {
-  const authResult = await verifyAdminAuth()
-  
-  return {
-    success: authResult.isAdmin,
-    details: {
-      ...authResult,
-      timestamp: new Date().toISOString(),
-      environment: process.env.NODE_ENV || 'unknown'
+    const authResult = await verifyAdminAccess(request)
+    
+    if (!authResult.success) {
+      console.log('❌ [withAdminAuth] Admin access denied:', authResult.error)
+      return new Response(
+        JSON.stringify({ error: authResult.error }),
+        { 
+          status: authResult.status || 401,
+          headers: { 'Content-Type': 'application/json' }
+        }
+      )
     }
+
+    console.log('✅ [withAdminAuth] Admin access verified for:', authResult.user?.email)
+    return await handler(authResult)
+    
+  } catch (error) {
+    console.error('❌ [withAdminAuth] Unexpected error:', error)
+    return new Response(
+      JSON.stringify({ 
+        error: 'Internal server error',
+        debug: error instanceof Error ? error.message : 'Unknown error'
+      }),
+      { 
+        status: 500,
+        headers: { 'Content-Type': 'application/json' }
+      }
+    )
   }
 }

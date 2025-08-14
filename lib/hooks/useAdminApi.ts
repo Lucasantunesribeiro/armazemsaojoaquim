@@ -11,18 +11,18 @@ export function useAdminApi() {
   const waitForAdminStatus = useCallback(async (): Promise<void> => {
     if (!adminLoading) return
     
-    return new Promise<void>((resolve, reject) => {
+    return new Promise<void>((resolve) => {
       const timeout = setTimeout(() => {
-        console.warn('⚠️ [useAdminApi] Admin status timeout, proceeding anyway')
-        resolve() // Resolve instead of reject to allow the request to proceed
-      }, 5000) // Reduced timeout to 5 seconds
+        // Timeout silencioso - apenas prossegue
+        resolve() 
+      }, 3000) // Reduzido para 3 segundos
       
       const checkLoading = () => {
         if (!adminLoading) {
           clearTimeout(timeout)
           resolve()
         } else {
-          setTimeout(checkLoading, 100)
+          setTimeout(checkLoading, 50) // Check mais frequente
         }
       }
       
@@ -41,30 +41,32 @@ export function useAdminApi() {
       onRetry?: (attempt: number, maxRetries: number, delay: number) => void
     }
   ) => {
-    // Default retry configuration - reduced timeout for faster feedback
+    // Default retry configuration - optimized for performance
     const config = {
-      maxRetries: 2, // Reduced retries
-      baseDelay: 500, // Faster retry
-      timeoutMs: 8000, // Reduced to 8s for faster feedback
-      onWarning: (msg: string) => console.warn(msg),
-      onRetry: (attempt: number, max: number, delay: number) => 
-        console.log(`🔄 [useAdminApi] Retry ${attempt}/${max} in ${delay}ms`),
+      maxRetries: 1, // Single retry only
+      baseDelay: 300, // Faster retry
+      timeoutMs: 5000, // Reduced to 5s
+      onWarning: (msg: string) => {}, // Silenciar warnings
+      onRetry: (attempt: number, max: number, delay: number) => {}, // Silenciar logs de retry
       ...retryConfig
     }
 
     // Aguardar confirmação do status admin
     await waitForAdminStatus()
 
+    console.log('🔍 [useAdminApi] Auth check:', { isAdmin, hasProfile, adminLoading })
+    
     if (!isAdmin || !hasProfile) {
+      console.log('❌ [useAdminApi] Admin access denied:', { isAdmin, hasProfile })
       throw new Error('Admin access required')
     }
+    
+    console.log('✅ [useAdminApi] Admin access verified')
 
     // Retry logic with exponential backoff and jitter
     for (let attempt = 0; attempt <= config.maxRetries; attempt++) {
-      // Declare timeout IDs for each attempt
+      // Declare timeout ID for each attempt
       let timeoutId: NodeJS.Timeout | null = null
-      let warningTimeoutId: NodeJS.Timeout | null = null
-      let secondWarningTimeoutId: NodeJS.Timeout | null = null
 
       try {
         const supabase = createClient()
@@ -77,18 +79,9 @@ export function useAdminApi() {
         // Add timeout and retry logic to API requests
         const controller = new AbortController()
         
-        // Progressive timeout warnings with more granular feedback
-        warningTimeoutId = setTimeout(() => {
-          config.onWarning('⏳ [useAdminApi] Request taking longer than expected (5s)...')
-        }, 5000) // 5s warning
-        
-        secondWarningTimeoutId = setTimeout(() => {
-          config.onWarning('⏳ [useAdminApi] Still processing request (8s)... Please wait')
-        }, 8000) // 8s second warning
+        // Timeout warnings removidos para melhor UX
         
         timeoutId = setTimeout(() => {
-          if (warningTimeoutId) clearTimeout(warningTimeoutId)
-          if (secondWarningTimeoutId) clearTimeout(secondWarningTimeoutId)
           controller.abort()
         }, config.timeoutMs)
 
@@ -109,10 +102,8 @@ export function useAdminApi() {
           ...options,
         })
         
-        // Clear all timeouts on successful response
+        // Clear timeout on successful response
         if (timeoutId) clearTimeout(timeoutId)
-        if (warningTimeoutId) clearTimeout(warningTimeoutId)
-        if (secondWarningTimeoutId) clearTimeout(secondWarningTimeoutId)
 
         if (!response.ok) {
           const errorData = await response.json().catch(() => ({}))
@@ -133,10 +124,8 @@ export function useAdminApi() {
         return data
         
       } catch (error) {
-        // Clear timeouts on error
+        // Clear timeout on error
         if (timeoutId) clearTimeout(timeoutId)
-        if (warningTimeoutId) clearTimeout(warningTimeoutId)
-        if (secondWarningTimeoutId) clearTimeout(secondWarningTimeoutId)
         
         // Check if this is the last attempt
         const isLastAttempt = attempt === config.maxRetries

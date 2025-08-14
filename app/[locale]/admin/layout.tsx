@@ -15,6 +15,7 @@ import {
   FileText,
   Users,
   Settings,
+  Utensils,
   ChevronLeft,
   ChevronRight,
   LogOut
@@ -409,6 +410,12 @@ export default function AdminLayout({
       href: `/${locale}/admin`,
       icon: LayoutDashboard,
       current: pathname === `/${locale}/admin`
+    },
+    {
+      name: 'Menu',
+      href: `/${locale}/admin/menu`,
+      icon: Utensils,
+      current: pathname.startsWith(`/${locale}/admin/menu`)
     },
     {
       name: 'Pousadas',

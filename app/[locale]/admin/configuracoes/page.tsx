@@ -108,7 +108,7 @@ export default function ConfiguracoesPage({ params }: ConfiguracoesPageProps) {
         address: 'Rua Principal, 123 - Centro, São Joaquim - SP',
         social_facebook: 'https://facebook.com/armazemsaojoaquim',
         social_instagram: 'https://instagram.com/armazemsaojoaquim',
-        social_whatsapp: '5511999999999',
+        social_whatsapp: '552194099166',
         maintenance_mode: false,
         allow_registrations: true,
         email_notifications: true,

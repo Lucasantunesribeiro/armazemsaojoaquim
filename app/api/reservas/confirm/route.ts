@@ -213,7 +213,7 @@ function generateSuccessPage(reservation: any, alreadyConfirmed: boolean = false
             <div style="margin-top: 30px; padding: 20px; background: #e3f2fd; border-radius: 5px;">
                 <h4 style="color: #1976d2; margin-top: 0;">Importante:</h4>
                 <p style="margin-bottom: 0;">• Chegue com 10 minutos de antecedência</p>
-                <p style="margin-bottom: 0;">• Confirme sua presença por WhatsApp: (11) 9999-9999</p>
+                <p style="margin-bottom: 0;">• Confirme sua presença por WhatsApp: (21) 94099-1666</p>
                 <p style="margin-bottom: 0;">• Em caso de cancelamento, avise com até 2 horas de antecedência</p>
             </div>
         </div>

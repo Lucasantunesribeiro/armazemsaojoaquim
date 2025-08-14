@@ -5,13 +5,13 @@ import Image, { ImageProps } from 'next/image'
 
 interface PousadaImageProps extends Omit<ImageProps, 'src' | 'onError'> {
   src: string
-  fallback?: string
+  fallback?: string | null
   onError?: () => void
 }
 
 export default function PousadaImage({ 
   src, 
-  fallback = '/images/placeholder.jpg',
+  fallback = null,
   onError,
   ...props 
 }: PousadaImageProps) {
@@ -19,10 +19,12 @@ export default function PousadaImage({
   const [currentSrc, setCurrentSrc] = useState(src)
 
   const handleError = () => {
-    if (!hasError && currentSrc !== fallback) {
-      console.warn(`Imagem falhou ao carregar: ${currentSrc}, usando fallback: ${fallback}`)
+    if (!hasError && fallback && currentSrc !== fallback) {
       setHasError(true)
       setCurrentSrc(fallback)
+      onError?.()
+    } else if (!fallback) {
+      setHasError(true)
       onError?.()
     }
   }

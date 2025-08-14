@@ -25,7 +25,7 @@ interface Category {
 }
 
 export default function AdminMenu() {
-  const { adminFetch } = useAdminApi()
+  const { adminFetch, isAuthorized, isLoading: adminApiLoading } = useAdminApi()
   const [menuItems, setMenuItems] = useState<MenuItem[]>([])
   const [categories, setCategories] = useState<Category[]>([])
   const [loading, setLoading] = useState(true)
@@ -33,6 +33,16 @@ export default function AdminMenu() {
   const [showForm, setShowForm] = useState(false)
   const [editingItem, setEditingItem] = useState<MenuItem | null>(null)
   const [filter, setFilter] = useState<string>('all')
+  
+  // Debug logs
+  console.log('🔍 [AdminMenu] Component state:', {
+    isAuthorized,
+    adminApiLoading,
+    loading,
+    error,
+    menuItemsCount: menuItems.length,
+    categoriesCount: categories.length
+  })
 
   // Form data
   const [formData, setFormData] = useState({
@@ -48,19 +58,39 @@ export default function AdminMenu() {
 
   useEffect(() => {
     loadData()
-  }, [])
+  }, [isAuthorized, adminApiLoading])
 
   const loadData = async () => {
     try {
       setLoading(true)
       setError('')
+      
+      console.log('🔄 [AdminMenu] Loading data...')
+      console.log('🔄 [AdminMenu] isAuthorized:', isAuthorized)
+      console.log('🔄 [AdminMenu] adminApiLoading:', adminApiLoading)
+      
+      // Wait for admin verification if still loading
+      if (adminApiLoading) {
+        console.log('⏳ [AdminMenu] Waiting for admin verification...')
+        return
+      }
+      
+      if (!isAuthorized) {
+        console.log('❌ [AdminMenu] Not authorized, skipping data load')
+        setError('Admin access required')
+        return
+      }
+      
       const [itemsData, categoriesData] = await Promise.all([
         adminFetch('/api/admin/menu'),
         adminFetch('/api/admin/categorias')
       ])
+      
+      console.log('✅ [AdminMenu] Data loaded successfully')
       setMenuItems(itemsData)
       setCategories(categoriesData)
     } catch (error) {
+      console.error('❌ [AdminMenu] Error loading data:', error)
       if (error instanceof Error) setError(error.message)
       else setError('Erro ao carregar dados')
     } finally {
@@ -158,6 +188,34 @@ export default function AdminMenu() {
     if (filter === 'featured') return item.featured
     return item.category === filter
   })
+
+  // Show loading while admin verification is in progress
+  if (adminApiLoading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600 dark:text-gray-400">Verificando permissões...</p>
+        </div>
+      </div>
+    )
+  }
+
+  // Show unauthorized message if not admin
+  if (!isAuthorized) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="text-center">
+          <div className="text-red-500 text-6xl mb-4">🚫</div>
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Acesso Negado</h2>
+          <p className="text-gray-600 dark:text-gray-400 mb-4">Você não tem permissão para acessar esta página.</p>
+          <p className="text-sm text-gray-500 dark:text-gray-500">
+            Debug: isAuthorized={String(isAuthorized)}, adminApiLoading={String(adminApiLoading)}
+          </p>
+        </div>
+      </div>
+    )
+  }
 
   if (loading) {
     return (

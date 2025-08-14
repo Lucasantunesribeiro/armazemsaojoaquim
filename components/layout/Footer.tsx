@@ -42,7 +42,7 @@ const Footer = () => {
 
   const utilityLinks = [
     { name: t('footer.downloadMenu'), href: '/api/cardapio-pdf', icon: Download },
-    { name: t('footer.whatsapp'), href: 'https://wa.me/5521985658443', icon: FaWhatsapp, external: true },
+    { name: t('footer.whatsapp'), href: 'https://wa.me/552194099166', icon: FaWhatsapp, external: true },
   ]
 
   const legalLinks: { name: string; href: string }[] = [
@@ -61,9 +61,9 @@ const Footer = () => {
       bgColor: 'hover:bg-pink-500/10'
     },
     {
-      name: 'WhatsApp',
-      href: 'https://wa.me/5521985658443',
-      icon: FaWhatsapp,
+          name: 'WhatsApp',
+    href: 'https://wa.me/552194099166',
+    icon: FaWhatsapp,
       color: 'hover:text-green-400',
       bgColor: 'hover:bg-green-500/10'
     },
@@ -94,7 +94,7 @@ const Footer = () => {
             "name": "Armazém São Joaquim",
             "description": "Restaurante histórico em Santa Teresa, Rio de Janeiro, preservando tradições gastronômicas desde 1854",
             "url": "https://armazemsaojoaquim.com.br",
-            "telephone": "+55-21-98565-8443",
+            "telephone": "+55-21-94099-1666",
             "email": "armazemsaojoaquimoficial@gmail.com",
             "foundingDate": "1854",
             "address": {
@@ -301,10 +301,10 @@ const Footer = () => {
                   <div className="flex items-center space-x-3">
                     <Phone className="w-5 h-5 text-amarelo-armazem flex-shrink-0" />
                     <a 
-                      href="tel:+5521985658443" 
+                      href="tel:+552194099166" 
                       className="text-cinza-claro hover:text-amarelo-armazem transition-colors duration-300 font-inter text-sm"
                     >
-                      (21) 98565-8443
+                      (21) 94099-1666
                     </a>
                   </div>
 
@@ -326,7 +326,7 @@ const Footer = () => {
 {t('footer.quickContact')}
                   </h5>
                   <a 
-                    href="https://wa.me/5521985658443"
+                    href="https://wa.me/552194099166"
                     target="_blank"
                     rel="noopener noreferrer"
                     className={cn(
