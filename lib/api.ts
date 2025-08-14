@@ -1,5 +1,24 @@
-import { createServerClient } from './supabase'
+// Removed problematic import - using direct createClient instead
 import { Database } from '../types/database.types'
+
+// ============================
+// SUPABASE CLIENT HELPER
+// ============================
+
+// Create a safe server client that doesn't use cookies in problematic contexts
+async function createSafeServerClient() {
+  const { createClient } = await import('@supabase/supabase-js')
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false
+      }
+    }
+  )
+}
 
 // ============================
 // TYPE DEFINITIONS
@@ -50,9 +69,8 @@ export const blogApi = {
       
       // Use server-side client when running on server, HTTP when on client
       if (typeof window === 'undefined') {
-        // Server-side: use Supabase client directly
-        const { createSupabaseServerClient } = await import('./supabase-server')
-        const supabase = await createSupabaseServerClient()
+        // Server-side: use safe server client
+        const supabase = await createSafeServerClient()
         
         const { data: posts, error } = await supabase
           .rpc('get_blog_posts_by_language', { p_language: language })
@@ -101,9 +119,8 @@ export const blogApi = {
       
       // Use server-side client when running on server, HTTP when on client
       if (typeof window === 'undefined') {
-        // Server-side: use Supabase client directly
-        const { createSupabaseServerClient } = await import('./supabase-server')
-        const supabase = await createSupabaseServerClient()
+        // Server-side: use safe server client
+        const supabase = await createSafeServerClient()
         
         const { data: posts, error } = await supabase
           .rpc('get_blog_post_by_slug', { p_slug: slug, p_language: language })
@@ -221,7 +238,7 @@ export const menuApi = {
   // Buscar todos os itens disponíveis
   async getAllItems(): Promise<MenuItem[]> {
     try {
-      const supabase = await createServerClient()
+      const supabase = await createSafeServerClient()
       const { data, error } = await supabase
         .from('menu_items')
         .select('*')
@@ -244,7 +261,7 @@ export const menuApi = {
   // Buscar itens por categoria
   async getItemsByCategory(category: string): Promise<MenuItem[]> {
     try {
-      const supabase = await createServerClient()
+      const supabase = await createSafeServerClient()
       const { data, error } = await supabase
         .from('menu_items')
         .select('*')
@@ -267,7 +284,7 @@ export const menuApi = {
   // Buscar itens com filtro de texto
   async searchItems(searchTerm: string): Promise<MenuItem[]> {
     try {
-      const supabase = await createServerClient()
+      const supabase = await createSafeServerClient()
       const { data, error } = await supabase
         .from('menu_items')
         .select('*')
@@ -291,7 +308,7 @@ export const menuApi = {
   // Buscar categorias disponíveis
   async getCategories(): Promise<string[]> {
     try {
-      const supabase = await createServerClient()
+      const supabase = await createSafeServerClient()
       const { data, error } = await supabase
         .from('menu_items')
         .select('category')
@@ -321,7 +338,7 @@ export const reservasApi = {
   // Buscar reservas do usuário
   async getUserReservations(userId: string): Promise<Reserva[]> {
     try {
-      const supabase = await createServerClient()
+      const supabase = await createSafeServerClient()
       const { data, error } = await supabase
         .from('reservas')
         .select('*')
@@ -343,7 +360,7 @@ export const reservasApi = {
   // Criar nova reserva
   async createReservation(reserva: Database['public']['Tables']['reservas']['Insert']): Promise<Reserva | null> {
     try {
-      const supabase = await createServerClient()
+      const supabase = await createSafeServerClient()
       const { data, error } = await supabase
         .from('reservas')
         .insert(reserva)
@@ -365,7 +382,7 @@ export const reservasApi = {
   // Atualizar reserva
   async updateReservation(id: string, updates: Database['public']['Tables']['reservas']['Update']): Promise<Reserva | null> {
     try {
-      const supabase = await createServerClient()
+      const supabase = await createSafeServerClient()
       const { data, error } = await supabase
         .from('reservas')
         .update(updates)
@@ -388,7 +405,7 @@ export const reservasApi = {
   // Deletar reserva
   async deleteReservation(id: string): Promise<void> {
     try {
-      const supabase = await createServerClient()
+      const supabase = await createSafeServerClient()
       const { error } = await supabase
         .from('reservas')
         .delete()
@@ -407,7 +424,7 @@ export const reservasApi = {
   // Verificar disponibilidade
   async checkAvailability(data: string, horario: string): Promise<boolean> {
     try {
-      const supabase = await createServerClient()
+      const supabase = await createSafeServerClient()
       const { data: reservas, error } = await supabase
         .from('reservas')
         .select('id')
@@ -439,7 +456,7 @@ export const analyticsApi = {
   // Estatísticas do menu
   async getMenuStats() {
     try {
-      const supabase = await createServerClient()
+      const supabase = await createSafeServerClient()
       const { data, error } = await supabase
         .from('menu_items')
         .select('category, id')
@@ -470,7 +487,7 @@ export const analyticsApi = {
   // Estatísticas de reservas
   async getReservationStats(userId?: string) {
     try {
-      const supabase = await createServerClient()
+      const supabase = await createSafeServerClient()
       let query = supabase
         .from('reservas')
         .select('status, data, pessoas')

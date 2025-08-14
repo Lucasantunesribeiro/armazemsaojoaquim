@@ -54,14 +54,9 @@ export function useAdminApi() {
     // Aguardar confirmação do status admin
     await waitForAdminStatus()
 
-    console.log('🔍 [useAdminApi] Auth check:', { isAdmin, hasProfile, adminLoading })
-    
     if (!isAdmin || !hasProfile) {
-      console.log('❌ [useAdminApi] Admin access denied:', { isAdmin, hasProfile })
       throw new Error('Admin access required')
     }
-    
-    console.log('✅ [useAdminApi] Admin access verified')
 
     // Retry logic with exponential backoff and jitter
     for (let attempt = 0; attempt <= config.maxRetries; attempt++) {
