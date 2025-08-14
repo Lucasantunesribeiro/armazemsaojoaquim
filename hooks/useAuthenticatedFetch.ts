@@ -23,7 +23,7 @@ export function useAuthenticatedFetch() {
     // Escutar mudanças de autenticação
     const supabase = createClient()
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
+      (event: string, session: any) => {
         setAccessToken(session?.access_token || null)
       }
     )
