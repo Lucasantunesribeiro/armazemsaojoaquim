@@ -1,16 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
-import { withAdminAuth } from '@/lib/admin-auth'
-import { PousadaRoomInsert } from '@/types/database.types'
 
 export async function GET(request: NextRequest) {
-  return withAdminAuth(async (authResult) => {
-    try {
-      // Use service role client to bypass RLS issues
-      const supabase = createClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.SUPABASE_SERVICE_ROLE_KEY!
+  try {
+    // Verificar autenticação admin via headers do middleware
+    const adminSession = request.headers.get('X-Admin-Session')
+    const adminVerified = request.headers.get('X-Admin-Verified')
+    
+    if (!adminSession || adminSession !== 'true' || !adminVerified) {
+      return NextResponse.json(
+        { error: 'Access denied - admin authentication required' },
+        { status: 401 }
       )
+    }
+
+    // Use service role client to bypass RLS issues
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    )
 
     // Buscar parâmetros de query
     const { searchParams } = new URL(request.url)
@@ -44,31 +52,30 @@ export async function GET(request: NextRequest) {
     }
 
     return NextResponse.json(rooms)
-    } catch (error) {
-      console.error('Erro interno:', error)
-      return NextResponse.json({ error: 'Erro interno do servidor' }, { status: 500 })
-    }
-  }, request)
+  } catch (error) {
+    console.error('Erro interno:', error)
+    return NextResponse.json({ error: 'Erro interno do servidor' }, { status: 500 })
+  }
 }
 
 export async function POST(request: NextRequest) {
-  return withAdminAuth(async (authResult) => {
-    try {
-      // Use service role client to bypass RLS issues
-      const supabase = createClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.SUPABASE_SERVICE_ROLE_KEY!
+  try {
+    // Verificar autenticação admin via headers do middleware
+    const adminSession = request.headers.get('X-Admin-Session')
+    const adminVerified = request.headers.get('X-Admin-Verified')
+    
+    if (!adminSession || adminSession !== 'true' || !adminVerified) {
+      return NextResponse.json(
+        { error: 'Access denied - admin authentication required' },
+        { status: 401 }
       )
-      
-      // Get user from auth result or create a mock user for logging
-      let user = authResult.user
-      if (!user) {
-        // Since we're using service role, create a mock user for logging purposes
-        user = {
-          id: 'admin-service-role',
-          email: 'armazemsaojoaquimoficial@gmail.com'
-        }
-      }
+    }
+
+    // Use service role client to bypass RLS issues
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    )
 
     const body = await request.json()
     
@@ -88,7 +95,7 @@ export async function POST(request: NextRequest) {
       }, { status: 400 })
     }
 
-    const roomData: PousadaRoomInsert = {
+    const roomData = {
       name,
       type: type.toUpperCase(),
       price_refundable: parseFloat(price_refundable),
@@ -97,8 +104,7 @@ export async function POST(request: NextRequest) {
       amenities: body.amenities || [],
       max_guests: parseInt(max_guests),
       image_url: body.image_url || null,
-      available: body.available !== false,
-      size_sqm: body.size_sqm ? parseInt(body.size_sqm) : null
+      available: body.available !== false
     }
 
     const { data: room, error } = await supabase
@@ -112,21 +118,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Erro ao criar quarto' }, { status: 500 })
     }
 
-    // Log da atividade admin
-    await supabase
-      .from('admin_activity_logs')
-      .insert({
-        admin_id: user.id,
-        action: 'CREATE_ROOM',
-        resource_type: 'pousada_room',
-        resource_id: room.id,
-        details: { room_name: room.name, room_type: room.type }
-      })
-
     return NextResponse.json(room, { status: 201 })
-    } catch (error) {
-      console.error('Erro interno:', error)
-      return NextResponse.json({ error: 'Erro interno do servidor' }, { status: 500 })
-    }
-  }, request)
+  } catch (error) {
+    console.error('Erro interno:', error)
+    return NextResponse.json({ error: 'Erro interno do servidor' }, { status: 500 })
+  }
 }

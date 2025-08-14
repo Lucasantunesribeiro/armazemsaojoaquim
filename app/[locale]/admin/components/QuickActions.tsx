@@ -30,7 +30,7 @@ export default function QuickActions({ locale }: QuickActionsProps) {
     {
       title: "Novo Post",
       description: "Criar artigo para o blog",
-      href: `/${locale}/admin/blog/novo`,
+      href: `/${locale}/admin/blog/new`,
       icon: <PlusCircle className="h-5 w-5" />,
       color: "blue"
     },

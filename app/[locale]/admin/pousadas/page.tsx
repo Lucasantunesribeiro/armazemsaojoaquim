@@ -20,6 +20,7 @@ import { PousadaRoom } from '@/types/database.types'
 import RoomForm from './components/RoomForm'
 import RoomCard from './components/RoomCard'
 import { useAdmin } from '@/hooks/useAdmin'
+import { useAuthenticatedFetch } from '@/hooks/useAuthenticatedFetch'
 
 interface PousadasPageProps {
   params: Promise<{ locale: string }>
@@ -31,6 +32,7 @@ export default function PousadasPage({ params }: PousadasPageProps) {
   
   // Hook de autenticação admin
   const { isAdmin, hasProfile, loading: adminLoading } = useAdmin()
+  const { authenticatedFetch, hasToken } = useAuthenticatedFetch()
   
   const [rooms, setRooms] = useState<PousadaRoom[]>([])
   const [loading, setLoading] = useState(true)
