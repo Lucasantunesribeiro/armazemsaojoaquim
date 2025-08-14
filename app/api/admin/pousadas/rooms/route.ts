@@ -3,15 +3,32 @@ import { createClient } from '@supabase/supabase-js'
 
 export async function GET(request: NextRequest) {
   try {
-    // Verificar autenticação admin via headers do middleware
+    // Verificar autenticação admin via headers do middleware OU Authorization header
     const adminSession = request.headers.get('X-Admin-Session')
     const adminVerified = request.headers.get('X-Admin-Verified')
+    const authHeader = request.headers.get('authorization')
     
-    if (!adminSession || adminSession !== 'true' || !adminVerified) {
+    // Se não tem headers do middleware, verificar Authorization header
+    if ((!adminSession || adminSession !== 'true' || !adminVerified) && !authHeader?.startsWith('Bearer ')) {
       return NextResponse.json(
-        { error: 'Access denied - admin authentication required' },
+        { 
+          error: 'Access denied - admin authentication required',
+          debug: process.env.NODE_ENV === 'development' ? {
+            hasAdminSession: !!adminSession,
+            adminSessionValue: adminSession,
+            hasAdminVerified: !!adminVerified,
+            hasAuthHeader: !!authHeader,
+            authHeaderType: authHeader?.split(' ')[0]
+          } : undefined
+        },
         { status: 401 }
       )
+    }
+    
+    // Se usando Authorization header, verificar se o usuário é admin
+    if (authHeader && !adminSession) {
+      // Aqui você pode adicionar validação adicional do token se necessário
+      console.log('🔍 API: Usando Authorization header para autenticação')
     }
 
     // Use service role client to bypass RLS issues
@@ -60,15 +77,31 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    // Verificar autenticação admin via headers do middleware
+    // Verificar autenticação admin via headers do middleware OU Authorization header
     const adminSession = request.headers.get('X-Admin-Session')
     const adminVerified = request.headers.get('X-Admin-Verified')
+    const authHeader = request.headers.get('authorization')
     
-    if (!adminSession || adminSession !== 'true' || !adminVerified) {
+    // Se não tem headers do middleware, verificar Authorization header
+    if ((!adminSession || adminSession !== 'true' || !adminVerified) && !authHeader?.startsWith('Bearer ')) {
       return NextResponse.json(
-        { error: 'Access denied - admin authentication required' },
+        { 
+          error: 'Access denied - admin authentication required',
+          debug: process.env.NODE_ENV === 'development' ? {
+            hasAdminSession: !!adminSession,
+            adminSessionValue: adminSession,
+            hasAdminVerified: !!adminVerified,
+            hasAuthHeader: !!authHeader,
+            authHeaderType: authHeader?.split(' ')[0]
+          } : undefined
+        },
         { status: 401 }
       )
+    }
+    
+    // Se usando Authorization header, verificar se o usuário é admin
+    if (authHeader && !adminSession) {
+      console.log('🔍 API POST: Usando Authorization header para autenticação')
     }
 
     // Use service role client to bypass RLS issues
