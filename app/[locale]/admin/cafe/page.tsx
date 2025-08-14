@@ -11,6 +11,7 @@ import { Label } from '@/components/ui/Label'
 import { Textarea } from '@/components/ui/Textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/Select'
 import { Switch } from '@/components/ui/Switch'
+import { useAuthenticatedFetch } from '@/hooks/useAuthenticatedFetch'
 
 interface Product {
   id: string
@@ -47,6 +48,7 @@ const initialProductData: Omit<Product, 'id' | 'created_at' | 'updated_at'> = {
 }
 
 export default function AdminCafePage() {
+  const { authenticatedFetch, hasToken } = useAuthenticatedFetch()
   const [products, setProducts] = useState<Product[]>([])
   const [orders, setOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState(true)

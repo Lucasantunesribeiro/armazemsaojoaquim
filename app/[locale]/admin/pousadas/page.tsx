@@ -45,12 +45,12 @@ export default function PousadasPage({ params }: PousadasPageProps) {
   const [formLoading, setFormLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  // Carregar quartos apenas quando o admin estiver autenticado
+  // Carregar quartos apenas quando o admin estiver autenticado e token estiver disponível
   useEffect(() => {
-    if (!adminLoading && isAdmin && hasProfile) {
+    if (!adminLoading && isAdmin && hasProfile && hasToken) {
       loadRooms()
     }
-  }, [adminLoading, isAdmin, hasProfile])
+  }, [adminLoading, isAdmin, hasProfile, hasToken])
 
   const loadRooms = async () => {
     try {
@@ -62,7 +62,7 @@ export default function PousadasPage({ params }: PousadasPageProps) {
       if (filterAvailability !== 'all') params.append('available', filterAvailability)
       if (searchTerm) params.append('search', searchTerm)
       
-      const response = await fetch(`/api/admin/pousadas/rooms?${params}`)
+      const response = await authenticatedFetch(`/api/admin/pousadas/rooms?${params}`)
       
       if (!response.ok) {
         throw new Error('Erro ao carregar quartos')
@@ -78,12 +78,12 @@ export default function PousadasPage({ params }: PousadasPageProps) {
     }
   }
 
-  // Reload rooms when filters change (apenas se admin autenticado)
+  // Reload rooms when filters change (apenas se admin autenticado e token disponível)
   useEffect(() => {
-    if (!adminLoading && isAdmin && hasProfile && !loading) {
+    if (!adminLoading && isAdmin && hasProfile && hasToken && !loading) {
       loadRooms()
     }
-  }, [filterType, filterAvailability, searchTerm, adminLoading, isAdmin, hasProfile])
+  }, [filterType, filterAvailability, searchTerm, adminLoading, isAdmin, hasProfile, hasToken])
 
   const filteredRooms = rooms.filter(room => {
     const matchesSearch = room.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -100,11 +100,8 @@ export default function PousadasPage({ params }: PousadasPageProps) {
     try {
       setFormLoading(true)
       
-      const response = await fetch('/api/admin/pousadas/rooms', {
+      const response = await authenticatedFetch('/api/admin/pousadas/rooms', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify(roomData),
       })
 
@@ -131,11 +128,8 @@ export default function PousadasPage({ params }: PousadasPageProps) {
     try {
       setFormLoading(true)
       
-      const response = await fetch(`/api/admin/pousadas/rooms/${editingRoom.id}`, {
+      const response = await authenticatedFetch(`/api/admin/pousadas/rooms/${editingRoom.id}`, {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify(roomData),
       })
 
@@ -161,7 +155,7 @@ export default function PousadasPage({ params }: PousadasPageProps) {
 
   const handleDeleteRoom = async (roomId: string) => {
     try {
-      const response = await fetch(`/api/admin/pousadas/rooms/${roomId}`, {
+      const response = await authenticatedFetch(`/api/admin/pousadas/rooms/${roomId}`, {
         method: 'DELETE',
       })
 
@@ -183,11 +177,8 @@ export default function PousadasPage({ params }: PousadasPageProps) {
       const room = rooms.find(r => r.id === roomId)
       if (!room) return
 
-      const response = await fetch(`/api/admin/pousadas/rooms/${roomId}`, {
+      const response = await authenticatedFetch(`/api/admin/pousadas/rooms/${roomId}`, {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify({ available: !room.available }),
       })
 
@@ -223,14 +214,15 @@ export default function PousadasPage({ params }: PousadasPageProps) {
     setError(null)
   }
 
-  // Mostrar loading se admin ainda está carregando ou se dados estão carregando
-  if (adminLoading || loading) {
+  // Mostrar loading se admin ainda está carregando, token não disponível ou se dados estão carregando
+  if (adminLoading || !hasToken || loading) {
     return (
       <div className="flex items-center justify-center py-12">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
           <p className="text-gray-600 dark:text-gray-400">
-            {adminLoading ? 'Verificando permissões...' : 'Carregando quartos...'}
+            {adminLoading ? 'Verificando permissões...' : 
+             !hasToken ? 'Obtendo credenciais...' : 'Carregando quartos...'}
           </p>
         </div>
       </div>
