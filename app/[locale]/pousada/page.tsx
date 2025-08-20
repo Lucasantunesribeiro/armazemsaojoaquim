@@ -415,7 +415,7 @@ export default function PousadaPage() {
                           onClick={() => {
                             if (room.available) {
                               const message = `Olá! Gostaria de fazer uma reserva para o quarto ${room.name} (${room.type}) da Pousada Armazém São Joaquim.`
-                              const whatsappUrl = `https://wa.me/552194099166?text=${encodeURIComponent(message)}`
+                              const whatsappUrl = `https://wa.me/5521985658443?text=${encodeURIComponent(message)}`
                               window.open(whatsappUrl, '_blank', 'noopener,noreferrer')
                             }
                           }}

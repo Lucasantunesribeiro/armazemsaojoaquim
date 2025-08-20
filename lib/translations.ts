@@ -1331,8 +1331,8 @@ export const translations: Record<Language, Translation> = {
           zipcode: 'CEP: 20241-262'
         },
         phone: {
-                title: 'Telefone & WhatsApp',
-      number: '+55 21 94099-1666'
+          title: 'Telefone & WhatsApp',
+          number: '+55 21 98565-8443'
         },
         email: {
           title: 'E-mail',
@@ -1468,7 +1468,7 @@ export const translations: Record<Language, Translation> = {
       subtitle: 'Hospedagem charmosa em Santa Teresa',
       description: 'Quartos confortáveis e aconchegantes no coração de Santa Teresa, com vista para as montanhas e proximidade aos principais pontos turísticos.',
       hero: {
-        title: 'Lobie Armazém São Joaquim',
+        title: 'Pousada São Joaquim',
         subtitle: 'Casarão histórico de 1854 • Tombado pela União • Santa Teresa',
         reserveNow: 'Reservar Agora',
         viewLocation: 'Ver Localização'
@@ -1502,7 +1502,7 @@ export const translations: Record<Language, Translation> = {
       },
       rooms: {
         title: 'Nossas Acomodações',
-        subtitle: '7 suítes modernas divididas em 3 categorias, todas com comodidades completas',
+        subtitle: '8 suítes modernas divididas em 3 categorias, todas com comodidades completas',
         standard: 'Quarto Standard',
         deluxe: 'Quarto Deluxe',
         suite: 'Suíte',
@@ -2127,7 +2127,7 @@ export const translations: Record<Language, Translation> = {
       subtitle: 'Charming accommodation in Santa Teresa',
       description: 'Comfortable and cozy rooms in the heart of Santa Teresa, with mountain views and proximity to major tourist attractions.',
       hero: {
-        title: 'Lobie Armazém São Joaquim',
+        title: 'Pousada São Joaquim',
         subtitle: 'Historic mansion from 1854 • National Heritage • Santa Teresa',
         reserveNow: 'Book Now',
         viewLocation: 'View Location'
@@ -2161,7 +2161,7 @@ export const translations: Record<Language, Translation> = {
       },
       rooms: {
         title: 'Our Accommodations',
-        subtitle: '7 modern suites divided into 3 categories, all with complete amenities',
+        subtitle: '8 modern suites divided into 3 categories, all with complete amenities',
         standard: 'Standard room',
         deluxe: 'Deluxe room',
         suite: 'Suite',
@@ -2444,8 +2444,8 @@ export const translations: Record<Language, Translation> = {
           zipcode: 'ZIP: 20241-262'
         },
         phone: {
-                  title: 'Phone & WhatsApp',
-        number: '+55 21 94099-1666'
+          title: 'Telefone & WhatsApp',
+          number: '+55 21 98565-8443'
         },
         email: {
           title: 'Email',

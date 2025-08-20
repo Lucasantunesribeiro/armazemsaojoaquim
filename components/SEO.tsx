@@ -100,7 +100,7 @@ export default function SEO({
       postalCode: '20241-000',
       country: 'BR'
     },
-            phone: '+55 21 94099-1666',
+            phone: '+55 21 98565-8443',
     email: 'contato@armazemsaojoaquim.com.br',
     openingHours: [
       'Mo-Th 11:00-23:00',
@@ -132,7 +132,7 @@ export default function SEO({
     url: fullUrl,
     image: fullImage,
     logo: `${DEFAULT_SEO.url}/images/armazem-logo.webp`,
-            telephone: '+55 21 94099-1666',
+            telephone: '+55 21 98565-8443',
     email: 'contato@armazemsaojoaquim.com.br',
     address: {
       '@type': 'PostalAddress',
@@ -443,7 +443,7 @@ export default function SEO({
           <meta property="restaurant:contact_info:region" content="Rio de Janeiro" />
           <meta property="restaurant:contact_info:postal_code" content="20241-260" />
           <meta property="restaurant:contact_info:country_name" content="Brasil" />
-          <meta property="restaurant:contact_info:phone_number" content="+552194099166" />
+          <meta property="restaurant:contact_info:phone_number" content="+5521985658443" />
         </>
       )}
       

@@ -100,7 +100,7 @@ const ContactSection = () => {
       title: t('contact.info.phone.title'),
       content: [t('contact.info.phone.number')],
       gradient: 'from-green-500 to-emerald-600',
-              action: () => window.open('tel:+552194099166', '_blank')
+              action: () => window.open('tel:+5521985658443', '_blank')
     },
     {
       icon: Mail,
@@ -421,7 +421,7 @@ const ContactSection = () => {
                     {t('contact.form.quickReservations.description')}
                   </p>
                   <a
-                    href="tel:+552194099166"
+                    href="tel:+5521985658443"
                     className={cn(
                       "inline-flex items-center space-x-2 px-4 py-2 rounded-lg",
                       "bg-green-500 hover:bg-green-600 text-white",

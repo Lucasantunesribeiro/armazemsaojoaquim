@@ -219,7 +219,7 @@ function getDefaultSettings() {
         description: 'Email principal para contato'
       },
       contact_phone: {
-        value: '+55 21 94099-1666',
+        value: '+55 21 98565-8443',
         description: 'Telefone principal para contato'
       },
       address: {

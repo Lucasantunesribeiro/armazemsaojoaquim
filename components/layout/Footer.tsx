@@ -2,6 +2,7 @@
 
 import React from 'react'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { 
   MapPin, 
   Phone, 
@@ -11,7 +12,6 @@ import {
   Youtube,
   Heart,
   Utensils,
-  Calendar,
   Star,
   ChefHat,
   Coffee,
@@ -32,17 +32,23 @@ import { useTranslations } from '@/hooks/useTranslations'
 const Footer = () => {
   const currentYear = new Date().getFullYear()
   const { t } = useTranslations()
+  const pathname = usePathname()
+  const isPousadaPage = Boolean(pathname && pathname.includes('pousada'))
+  
+  // Debug temporário
+  if (typeof window !== 'undefined') {
+    console.log('Footer Debug:', { pathname, isPousadaPage, windowLocation: window.location.pathname })
+  }
 
   const navigationLinks = [
     { name: t('nav.home'), href: '/', icon: Coffee },
     { name: t('nav.restaurant'), href: '/menu', icon: Utensils },
-    { name: t('header.makeReservation'), href: '/reservas', icon: Calendar },
     { name: t('nav.blog'), href: '/blog', icon: FileText },
   ]
 
   const utilityLinks = [
     { name: t('footer.downloadMenu'), href: '/api/cardapio-pdf', icon: Download },
-    { name: t('footer.whatsapp'), href: 'https://wa.me/552194099166', icon: FaWhatsapp, external: true },
+    { name: t('footer.whatsapp'), href: 'https://wa.me/5521985658443', icon: FaWhatsapp, external: true },
   ]
 
   const legalLinks: { name: string; href: string }[] = [
@@ -62,7 +68,7 @@ const Footer = () => {
     },
     {
           name: 'WhatsApp',
-    href: 'https://wa.me/552194099166',
+    href: 'https://wa.me/5521985658443',
     icon: FaWhatsapp,
       color: 'hover:text-green-400',
       bgColor: 'hover:bg-green-500/10'
@@ -94,7 +100,7 @@ const Footer = () => {
             "name": "Armazém São Joaquim",
             "description": "Restaurante histórico em Santa Teresa, Rio de Janeiro, preservando tradições gastronômicas desde 1854",
             "url": "https://armazemsaojoaquim.com.br",
-            "telephone": "+55-21-94099-1666",
+            "telephone": "+55-21-98565-8443",
             "email": "armazemsaojoaquimoficial@gmail.com",
             "foundingDate": "1854",
             "address": {
@@ -301,22 +307,25 @@ const Footer = () => {
                   <div className="flex items-center space-x-3">
                     <Phone className="w-5 h-5 text-amarelo-armazem flex-shrink-0" />
                     <a 
-                      href="tel:+552194099166" 
+                      href="tel:+5521985658443"
                       className="text-cinza-claro hover:text-amarelo-armazem transition-colors duration-300 font-inter text-sm"
                     >
-                      (21) 94099-1666
+                      +55 21 98565-8443
                     </a>
                   </div>
 
-                  <div className="flex items-center space-x-3">
-                    <Mail className="w-5 h-5 text-amarelo-armazem flex-shrink-0" />
-                    <a 
-                      href="mailto:armazemsaojoaquimoficial@gmail.com" 
-                      className="text-cinza-claro hover:text-amarelo-armazem transition-colors duration-300 font-inter text-sm break-all"
-                    >
-                      armazemsaojoaquimoficial@gmail.com
-                    </a>
-                  </div>
+                  {/* E-mail de contato - oculto na página da pousada */}
+                  {!isPousadaPage && (
+                    <div className="flex items-center space-x-3">
+                      <Mail className="w-5 h-5 text-amarelo-armazem flex-shrink-0" />
+                      <a 
+                        href="mailto:armazemsaojoaquimoficial@gmail.com" 
+                        className="text-cinza-claro hover:text-amarelo-armazem transition-colors duration-300 font-inter text-sm break-all"
+                      >
+                        armazemsaojoaquimoficial@gmail.com
+                      </a>
+                    </div>
+                  )}
                 </div>
 
                 {/* Emergency Contact */}
@@ -326,7 +335,7 @@ const Footer = () => {
 {t('footer.quickContact')}
                   </h5>
                   <a 
-                    href="https://wa.me/552194099166"
+                    href="https://wa.me/5521985658443"
                     target="_blank"
                     rel="noopener noreferrer"
                     className={cn(
@@ -369,8 +378,7 @@ const Footer = () => {
                 {/* Special Notice */}
                 <div className="bg-amarelo-armazem/10 backdrop-blur-sm rounded-lg p-4 border border-amarelo-armazem/20">
                   <p className="text-xs text-amarelo-armazem font-inter leading-relaxed">
-                    <strong>Nota:</strong> Recomendamos fazer reserva para garantir sua mesa, 
-                    especialmente nos finais de semana e feriados.
+                    <strong>Nota:</strong> fazemos reserva durante a semana. Finais de semana é por ordem de chegada.
                   </p>
                 </div>
 

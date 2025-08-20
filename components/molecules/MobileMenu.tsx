@@ -3,7 +3,7 @@
 import { memo } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { User, Calendar, LogOut } from 'lucide-react'
+import { User, LogOut } from 'lucide-react'
 import toast from 'react-hot-toast'
 import NavLink from '../atoms/NavLink'
 import type { NavigationItem, NavigationItems } from '../../types/navigation'
@@ -14,7 +14,7 @@ interface MobileMenuProps {
   isActive: (href: string) => boolean
   user: any
   onSignOut: () => void
-  onReservationClick: () => void
+
   onClose: () => void
   className?: string
 }
@@ -25,7 +25,6 @@ const MobileMenu = memo(({
   isActive, 
   user, 
   onSignOut, 
-  onReservationClick, 
   onClose,
   className = '' 
 }: MobileMenuProps) => {
@@ -46,10 +45,7 @@ const MobileMenu = memo(({
     onClose()
   }
 
-  const handleReservationClick = () => {
-    onReservationClick()
-    onClose()
-  }
+
 
   const handleSignOut = () => {
     onSignOut()
@@ -103,42 +99,17 @@ const MobileMenu = memo(({
         </nav>
         {/* Mobile User Actions */}
         <div className="pt-4 space-y-2">
-          {user ? (
-            <>
-              <button
-                onClick={handleReservationClick}
-                className="block w-full bg-amarelo-armazem hover:bg-vermelho-portas text-white font-semibold px-4 py-3 rounded-lg text-center transition-colors duration-200 font-inter focus-ring"
-                aria-label="Fazer nova reserva"
-              >
-                <span className="flex items-center justify-center space-x-2">
-                  <Calendar className="w-5 h-5" />
-                  <span>Nova Reserva</span>
-                </span>
-              </button>
-              <button
-                onClick={handleSignOut}
-                className="block w-full border border-red-500 text-red-500 hover:bg-red-500 hover:text-white font-semibold px-4 py-3 rounded-lg text-center transition-colors duration-200 font-inter focus-ring"
-                aria-label="Fazer logout"
-              >
-                <span className="flex items-center justify-center space-x-2">
-                  <LogOut className="w-5 h-5" />
-                  <span>Sair</span>
-                </span>
-              </button>
-            </>
-          ) : (
-            <>
-              <button
-                onClick={handleReservationClick}
-                className="block w-full bg-amarelo-armazem hover:bg-vermelho-portas text-white font-semibold px-4 py-3 rounded-lg text-center transition-colors duration-200 font-inter focus-ring"
-                aria-label="Fazer reserva"
-              >
-                <span className="flex items-center justify-center space-x-2">
-                  <Calendar className="w-5 h-5" />
-                  <span>Reservar</span>
-                </span>
-              </button>
-            </>
+          {user && (
+            <button
+              onClick={handleSignOut}
+              className="block w-full border border-red-500 text-red-500 hover:bg-red-500 hover:text-white font-semibold px-4 py-3 rounded-lg text-center transition-colors duration-200 font-inter focus-ring"
+              aria-label="Fazer logout"
+            >
+              <span className="flex items-center justify-center space-x-2">
+                <LogOut className="w-5 h-5" />
+                <span>Sair</span>
+              </span>
+            </button>
           )}
         </div>
       </div>

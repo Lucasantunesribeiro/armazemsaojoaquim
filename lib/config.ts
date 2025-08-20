@@ -56,9 +56,14 @@ export const config = {
       full: 'Rua Almirante Alexandrino, 470, Santa Teresa, Rio de Janeiro - RJ'
     },
     contact: {
-      phone: '+55 21 94099-1666',
+      phone: '+5521985658443',
+      whatsapp: '+5521985658443',
       email: 'armazemsaojoaquimoficial@gmail.com',
-      whatsapp: '+552194099166'
+      address: 'Rua Almirante Alexandrino, 470 - Santa Teresa, Rio de Janeiro - RJ',
+      coordinates: {
+        lat: -22.9150,
+        lng: -43.1886
+      }
     },
     social: {
       instagram: 'https://www.instagram.com/armazemsaojoaquim/',
