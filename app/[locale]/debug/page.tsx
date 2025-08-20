@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import Link from 'next/link'
 
 export default function DebugPage() {
   const [envInfo, setEnvInfo] = useState<any>({})
@@ -97,19 +98,19 @@ export default function DebugPage() {
         </div>
 
         <div className="flex space-x-4">
-          <a
+          <Link
             href="/"
             className="inline-block bg-amber-600 hover:bg-amber-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200"
           >
             🏠 Voltar ao Início
-          </a>
+          </Link>
           
-          <a
+          <Link
             href="/pt"
             className="inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200"
           >
             🔄 Testar Rota PT
-          </a>
+          </Link>
         </div>
       </div>
     </div>

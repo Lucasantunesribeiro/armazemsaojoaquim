@@ -4,6 +4,7 @@ import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react'
 import Image from 'next/image'
 import { ChevronLeft, ChevronRight, MapPin, Clock, Phone } from 'lucide-react'
 import { useTranslations } from '@/hooks/useTranslations'
+import Link from 'next/link'
 
 export default function HeroSection() {
   const { t, isReady } = useTranslations()
@@ -301,7 +302,7 @@ export default function HeroSection() {
 
           {/* Call to Action Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center max-w-lg mx-auto">
-            <a
+            <Link
               href="/menu"
               className="group bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-semibold text-sm sm:text-base transition-all duration-300 transform hover:scale-105 active:scale-95 shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 focus:ring-offset-black"
             >
@@ -309,16 +310,16 @@ export default function HeroSection() {
                 <span>{t('home.hero.discoverMenu')}</span>
                 <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </span>
-            </a>
+            </Link>
             
-            <a
+            <Link
               href="/reservas"
               className="group bg-transparent border-2 border-white hover:bg-white hover:text-gray-900 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-semibold text-sm sm:text-base transition-all duration-300 transform hover:scale-105 active:scale-95 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-black"
             >
               <span className="flex items-center justify-center space-x-2">
                 <span>{currentImage.cta}</span>
               </span>
-            </a>
+            </Link>
           </div>
         </div>
       </div>

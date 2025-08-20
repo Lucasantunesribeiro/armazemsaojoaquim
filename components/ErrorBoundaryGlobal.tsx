@@ -1,6 +1,7 @@
 'use client'
 
 import React, { Component, ReactNode } from 'react'
+import Link from 'next/link'
 
 interface Props {
   children: ReactNode
@@ -78,28 +79,21 @@ export class ErrorBoundaryGlobal extends Component<Props, State> {
                 </details>
               )}
               
-              <div className="space-y-3">
-                <button
-                  onClick={() => this.setState({ hasError: false, error: undefined, errorInfo: undefined })}
-                  className="w-full px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg transition-colors"
-                >
-                  Tentar Novamente
-                </button>
-                
-                <button
-                  onClick={() => window.location.reload()}
-                  className="w-full px-4 py-2 bg-gray-200 hover:bg-gray-300 dark:bg-gray-600 dark:hover:bg-gray-500 text-gray-800 dark:text-white rounded-lg transition-colors"
-                >
-                  Recarregar Página
-                </button>
-                
-                <a
-                  href="/"
-                  className="block w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-center transition-colors"
-                >
-                  Voltar ao Início
-                </a>
-              </div>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                  <Link
+                    href="/"
+                    className="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-amber-600 hover:bg-amber-700 transition-colors duration-200"
+                  >
+                    🏠 Voltar ao Início
+                  </Link>
+                  
+                  <Link
+                    href="/pt"
+                    className="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-amber-700 bg-amber-100 hover:bg-amber-200 transition-colors duration-200"
+                  >
+                    🔄 Tentar Novamente
+                  </Link>
+                </div>
             </div>
           </div>
         </div>

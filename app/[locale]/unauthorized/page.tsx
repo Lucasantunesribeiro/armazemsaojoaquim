@@ -6,6 +6,7 @@ import { use } from 'react'
 import { Card, CardContent, CardHeader } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Shield, ArrowLeft } from 'lucide-react'
+import Link from 'next/link'
 
 interface UnauthorizedPageProps {
   params: Promise<{ locale: string }>

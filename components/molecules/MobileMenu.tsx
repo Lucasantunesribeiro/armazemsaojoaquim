@@ -86,13 +86,13 @@ const MobileMenu = memo(({
             {/* Botão destacado de login */}
             {!user && (
               <div className="pt-4">
-                <a
+                <Link
                   href="/auth"
-                  className="flex items-center justify-center space-x-3 w-full border-2 border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 hover:border-amber-500 dark:hover:border-amber-400 hover:text-amber-600 dark:hover:text-amber-400 px-6 py-4 rounded-2xl font-bold transition-all duration-300 font-inter bg-white dark:bg-slate-800 hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]"
+                  className="flex items-center space-x-3 px-4 py-3 text-slate-700 dark:text-slate-300 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/20 rounded-lg transition-all duration-200"
                 >
                   <User className="w-5 h-5" />
-                  <span className="text-base">Entrar na conta</span>
-                </a>
+                  <span>Entrar</span>
+                </Link>
               </div>
             )}
           </div>

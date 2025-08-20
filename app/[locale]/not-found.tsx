@@ -16,26 +16,26 @@ export default function LocaleNotFound() {
           </p>
         </div>
 
-        <div className="space-y-4">
+        <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Link
             href="/"
-            className="block w-full bg-amber-600 hover:bg-amber-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200"
+            className="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-amber-600 hover:bg-amber-700 transition-colors duration-200"
           >
-            Voltar ao início
+            🏠 Voltar ao Início
           </Link>
           
           <Link
             href="/menu"
-            className="block w-full bg-gray-600 hover:bg-gray-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200"
+            className="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-amber-700 bg-amber-100 hover:bg-amber-200 transition-colors duration-200"
           >
-            Ver cardápio
+            🍽️ Ver Menu
           </Link>
           
           <Link
             href="/pousada"
-            className="block w-full bg-gray-600 hover:bg-gray-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200"
+            className="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-amber-700 bg-amber-100 hover:bg-amber-200 transition-colors duration-200"
           >
-            Conhecer a pousada
+            🏨 Conhecer Pousada
           </Link>
         </div>
 

@@ -1,3 +1,5 @@
+import Link from 'next/link'
+
 export default function TestPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-blue-100">
@@ -10,13 +12,20 @@ export default function TestPage() {
           Se você está vendo esta página, a rota [locale] está funcionando corretamente.
         </p>
         
-        <div className="space-y-4">
-          <a
+        <div className="flex space-x-4">
+          <Link
             href="/"
-            className="inline-block bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200"
+            className="inline-block bg-amber-600 hover:bg-amber-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200"
           >
-            Voltar ao início
-          </a>
+            🏠 Voltar ao Início
+          </Link>
+          
+          <Link
+            href="/pt"
+            className="inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200"
+          >
+            🔄 Testar Rota PT
+          </Link>
         </div>
       </div>
     </div>

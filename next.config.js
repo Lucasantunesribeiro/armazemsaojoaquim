@@ -83,10 +83,7 @@ const nextConfig = {
       '@hookform/resolvers',
       'recharts',        // Otimizar charts pesados
       'react-icons'      // Tree shake react-icons
-    ],
-    // Bundle splitting agressivo para Netlify
-    esmExternals: 'loose',
-    serverComponentsExternalPackages: ['@supabase/supabase-js']
+    ]
   },
 
   // Configurações de compiler para performance

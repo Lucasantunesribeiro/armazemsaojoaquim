@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import { useAdminApi } from '@/lib/hooks/useAdminApi'
 import { Plus, Edit, Trash2, Star, Eye, EyeOff } from 'lucide-react'
 import Image from 'next/image'
@@ -52,7 +52,7 @@ export default function AdminMenu() {
     loadData()
   }, [isAuthorized, adminApiLoading])
 
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     try {
       setLoading(true)
       setError('')
@@ -80,9 +80,13 @@ export default function AdminMenu() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [isAuthorized, adminApiLoading, adminFetch])
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  useEffect(() => {
+    loadData()
+  }, [loadData])
+
+  const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault()
     try {
       const submitData = {
@@ -111,9 +115,9 @@ export default function AdminMenu() {
       if (error instanceof Error) setError(error.message)
       else setError('Erro ao salvar item')
     }
-  }
+  }, [formData, editingItem, adminFetch, loadData])
 
-  const resetForm = () => {
+  const resetForm = useCallback(() => {
     setFormData({
       name: '',
       description: '',
@@ -124,9 +128,9 @@ export default function AdminMenu() {
       allergens: '',
       image_url: ''
     })
-  }
+  }, [])
 
-  const handleEdit = (item: MenuItem) => {
+  const handleEdit = useCallback((item: MenuItem) => {
     setEditingItem(item)
     setFormData({
       name: item.name,
@@ -139,9 +143,9 @@ export default function AdminMenu() {
       image_url: item.image_url || ''
     })
     setShowForm(true)
-  }
+  }, [])
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = useCallback(async (id: string) => {
     if (!confirm('Tem certeza que deseja excluir este item?')) return
     
     try {
@@ -151,9 +155,9 @@ export default function AdminMenu() {
       if (error instanceof Error) setError(error.message)
       else setError('Erro ao excluir item')
     }
-  }
+  }, [adminFetch, loadData])
 
-  const toggleAvailable = async (id: string, available: boolean) => {
+  const toggleAvailable = useCallback(async (id: string, available: boolean) => {
     try {
       await adminFetch(`/api/admin/menu/${id}`, {
         method: 'PUT',
@@ -164,14 +168,16 @@ export default function AdminMenu() {
       if (error instanceof Error) setError(error.message)
       else setError('Erro ao atualizar disponibilidade')
     }
-  }
+  }, [adminFetch, loadData])
 
-  const filteredItems = menuItems.filter(item => {
-    if (filter === 'all') return true
-    if (filter === 'available') return item.available
-    if (filter === 'featured') return item.featured
-    return item.category === filter
-  })
+  const filteredItems = useMemo(() => {
+    return menuItems.filter(item => {
+      if (filter === 'all') return true
+      if (filter === 'available') return item.available
+      if (filter === 'featured') return item.featured
+      return item.category === filter
+    })
+  }, [menuItems, filter])
 
   // Show loading while admin verification is in progress
   if (adminApiLoading) {
