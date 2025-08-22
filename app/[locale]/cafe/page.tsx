@@ -420,9 +420,10 @@ export default function CafePage() {
             <div>
               <h3 className="font-semibold mb-2">Horário de Funcionamento</h3>
               <p className="text-sm text-slate-600">
-                Segunda a Sexta: 8h às 18h<br />
-                Sábado: 9h às 17h<br />
-                Domingo: 10h às 16h
+                Segunda a Quinta: 12h às 00h<br />
+                Sexta: 12h às 00h<br />
+                Sábado: 11h30 às 00h<br />
+                Domingo: 11h30 às 22h
               </p>
             </div>
             <div>

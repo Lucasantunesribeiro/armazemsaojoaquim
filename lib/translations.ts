@@ -738,8 +738,12 @@ export interface Translation {
     hours: {
       title: string
       monday: string
-      tuesdayFriday: string
-      weekends: string
+      tuesday: string
+      wednesday: string
+      thursday: string
+      friday: string
+      saturday: string
+      sunday: string
       closed: string
     }
     specialNote: {
@@ -1332,7 +1336,7 @@ export const translations: Record<Language, Translation> = {
         },
         phone: {
           title: 'Telefone & WhatsApp',
-          number: '+55 21 98565-8443'
+          number: '+55 21 99409-9166'
         },
         email: {
           title: 'E-mail',
@@ -1638,8 +1642,12 @@ export const translations: Record<Language, Translation> = {
       hours: {
         title: 'Funcionamento',
         monday: 'Segunda-feira',
-        tuesdayFriday: 'Terça a Sexta',
-        weekends: 'Sábado e Domingo',
+        tuesday: 'Terça-feira',
+        wednesday: 'Quarta-feira',
+        thursday: 'Quinta-feira',
+        friday: 'Sexta-feira',
+        saturday: 'Sábado',
+        sunday: 'Domingo',
         closed: 'Fechado'
       },
       specialNote: {
@@ -2445,7 +2453,7 @@ export const translations: Record<Language, Translation> = {
         },
         phone: {
           title: 'Telefone & WhatsApp',
-          number: '+55 21 98565-8443'
+          number: '+55 21 99409-9166'
         },
         email: {
           title: 'Email',
@@ -2535,8 +2543,12 @@ export const translations: Record<Language, Translation> = {
       hours: {
         title: 'Opening Hours',
         monday: 'Monday',
-        tuesdayFriday: 'Tuesday to Friday',
-        weekends: 'Saturday and Sunday',
+        tuesday: 'Tuesday',
+        wednesday: 'Wednesday',
+        thursday: 'Thursday',
+        friday: 'Friday',
+        saturday: 'Saturday',
+        sunday: 'Sunday',
         closed: 'Closed'
       },
       specialNote: {

@@ -60,7 +60,7 @@ export default function AuthHeader({
               </Link>
               
               <Link prefetch={true} 
-                href="tel:+5521985658443" 
+                href="tel:+5521994099166" 
                 className="inline-flex items-center text-amber-700 hover:text-amber-800 transition-colors"
               >
                 <Phone className="w-4 h-4 mr-2" />

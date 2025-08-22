@@ -303,7 +303,7 @@ export default function Header() {
                   <FaInstagram className="w-4 h-4" />
                 </a>
                 <a
-                  href="https://wa.me/5521985658443"
+                  href="https://wa.me/5521994099166"
                   target="_blank"
                   rel="noopener noreferrer"
                   className={`
@@ -313,7 +313,7 @@ export default function Header() {
                       : 'text-slate-700 hover:text-green-600 dark:text-slate-300 dark:hover:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/20'
                     }
                   `}
-                  aria-label="WhatsApp (21) 98565-8443"
+                  aria-label="WhatsApp (21) 99409-9166"
                 >
                   <FaWhatsapp className="w-4 h-4" />
                 </a>
@@ -578,7 +578,7 @@ export default function Header() {
                     <FaInstagram className="w-5 h-5" />
                   </a>
                   <a
-                    href="https://wa.me/5521985658443"
+                    href="https://wa.me/5521994099166"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center justify-center p-3 rounded-xl bg-green-50 hover:bg-green-100 dark:bg-green-900/20 dark:hover:bg-green-900/40 text-green-600 dark:text-green-400 transition-all duration-300"

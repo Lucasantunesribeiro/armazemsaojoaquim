@@ -339,7 +339,7 @@ export const ReservationConfirmation: React.FC<Readonly<ReservationConfirmationP
           flexWrap: 'wrap'
         }}>
           <div style={{ fontSize: '14px', color: 'rgba(255,255,255,0.8)' }}>
-            📞 (21) 98565-8443
+            📞 (21) 99409-9166
           </div>
           <div style={{ fontSize: '14px', color: 'rgba(255,255,255,0.8)' }}>
             📧 armazemsaojoaquimoficial@gmail.com

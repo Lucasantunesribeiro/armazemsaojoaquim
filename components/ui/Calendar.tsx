@@ -108,7 +108,7 @@ export default function Calendar({
 
   const getDateAvailability = (dateString: string) => {
     const unavailableTimesForDate = unavailableTimes[dateString] || []
-    const totalSlots = 12 // Exemplo: 12:00 às 23:00 (12 horários)
+    const totalSlots = 12 // Exemplo: 12:00 às 00:00 (12 horários)
     const availableSlots = totalSlots - unavailableTimesForDate.length
     
     if (availableSlots === 0) return 'unavailable'
@@ -274,7 +274,7 @@ export default function Calendar({
           </div>
           <div className="flex items-center">
             <span className="w-3 h-3 bg-gray-300 rounded-full mr-2"></span>
-            <span>Fechado (Domingos)</span>
+            <span>Fechado (Datas indisponíveis)</span>
           </div>
         </div>
       </div>

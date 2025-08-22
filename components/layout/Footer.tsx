@@ -48,7 +48,7 @@ const Footer = () => {
 
   const utilityLinks = [
     { name: t('footer.downloadMenu'), href: '/api/cardapio-pdf', icon: Download },
-    { name: t('footer.whatsapp'), href: 'https://wa.me/5521985658443', icon: FaWhatsapp, external: true },
+    { name: t('footer.whatsapp'), href: 'https://wa.me/5521994099166', icon: FaWhatsapp, external: true },
   ]
 
   const legalLinks: { name: string; href: string }[] = [
@@ -68,7 +68,7 @@ const Footer = () => {
     },
     {
           name: 'WhatsApp',
-    href: 'https://wa.me/5521985658443',
+    href: 'https://wa.me/5521994099166',
     icon: FaWhatsapp,
       color: 'hover:text-green-400',
       bgColor: 'hover:bg-green-500/10'
@@ -83,9 +83,13 @@ const Footer = () => {
   ]
 
   const scheduleData = [
-    { day: t('footer.hours.monday'), hours: t('footer.hours.closed'), closed: true },
-    { day: t('footer.hours.tuesdayFriday'), hours: '12h - 22h', closed: false },
-    { day: t('footer.hours.weekends'), hours: '12h - 23h', closed: false },
+    { day: t('footer.hours.monday'), hours: '12h - 00h', closed: false },
+    { day: t('footer.hours.tuesday'), hours: '12h - 00h', closed: false },
+    { day: t('footer.hours.wednesday'), hours: '12h - 00h', closed: false },
+    { day: t('footer.hours.thursday'), hours: '12h - 00h', closed: false },
+    { day: t('footer.hours.friday'), hours: '12h - 00h', closed: false },
+    { day: t('footer.hours.saturday'), hours: '11h30 - 00h', closed: false },
+    { day: t('footer.hours.sunday'), hours: '11h30 - 22h', closed: false },
   ]
 
   return (
@@ -100,7 +104,7 @@ const Footer = () => {
             "name": "Armazém São Joaquim",
             "description": "Restaurante histórico em Santa Teresa, Rio de Janeiro, preservando tradições gastronômicas desde 1854",
             "url": "https://armazemsaojoaquim.com.br",
-            "telephone": "+55-21-98565-8443",
+            "telephone": "+55-21-99409-9166",
             "email": "armazemsaojoaquimoficial@gmail.com",
             "foundingDate": "1854",
             "address": {
@@ -112,8 +116,10 @@ const Footer = () => {
               "addressCountry": "BR"
             },
             "openingHours": [
-              "Tu-Fr 12:00-22:00",
-              "Sa-Su 12:00-23:00"
+              "Mo-Th 12:00-00:00",
+              "Fr 12:00-00:00",
+              "Sa 11:30-00:00",
+              "Su 11:30-22:00"
             ],
             "servesCuisine": "Brazilian",
             "priceRange": "$$",
@@ -307,10 +313,10 @@ const Footer = () => {
                   <div className="flex items-center space-x-3">
                     <Phone className="w-5 h-5 text-amarelo-armazem flex-shrink-0" />
                     <a 
-                      href="tel:+5521985658443"
+                      href="tel:+5521994099166"
                       className="text-cinza-claro hover:text-amarelo-armazem transition-colors duration-300 font-inter text-sm"
                     >
-                      +55 21 98565-8443
+                      +55 21 99409-9166
                     </a>
                   </div>
 
@@ -335,7 +341,7 @@ const Footer = () => {
 {t('footer.quickContact')}
                   </h5>
                   <a 
-                    href="https://wa.me/5521985658443"
+                    href="https://wa.me/5521994099166"
                     target="_blank"
                     rel="noopener noreferrer"
                     className={cn(

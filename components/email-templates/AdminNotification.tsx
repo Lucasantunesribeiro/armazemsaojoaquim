@@ -162,7 +162,7 @@ export const AdminNotification: React.FC<Readonly<AdminNotificationProps>> = ({
               📧 Responder por Email
             </a>
             <a 
-              href={`https://wa.me/5521985658443?text=Olá! Sobre sua reserva para ${formattedDate} às ${horario}...`}
+              href={`https://wa.me/5521994099166?text=Olá! Sobre sua reserva para ${formattedDate} às ${horario}...`}
               style={{
                 backgroundColor: '#25d366',
                 color: 'white',

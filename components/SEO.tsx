@@ -100,12 +100,13 @@ export default function SEO({
       postalCode: '20241-000',
       country: 'BR'
     },
-            phone: '+55 21 98565-8443',
+            phone: '+55 21 99409-9166',
     email: 'contato@armazemsaojoaquim.com.br',
     openingHours: [
-      'Mo-Th 11:00-23:00',
-      'Fr-Sa 11:00-00:00',
-      'Su 11:00-22:00'
+      'Mo-Th 12:00-00:00',
+      'Fr 12:00-00:00',
+      'Sa 11:30-00:00',
+      'Su 11:30-22:00'
     ],
     priceRange: '$$',
     cuisine: ['Brazilian', 'Traditional', 'Regional'],
@@ -132,7 +133,7 @@ export default function SEO({
     url: fullUrl,
     image: fullImage,
     logo: `${DEFAULT_SEO.url}/images/armazem-logo.webp`,
-            telephone: '+55 21 98565-8443',
+            telephone: '+55 21 99409-9166',
     email: 'contato@armazemsaojoaquim.com.br',
     address: {
       '@type': 'PostalAddress',
@@ -148,9 +149,10 @@ export default function SEO({
       longitude: -43.1895,
     },
     openingHours: [
-      'Tu-Th 17:00-01:00',
-      'Fr-Sa 17:00-02:00',
-      'Su 12:00-22:00',
+      'Mo-Th 12:00-00:00',
+      'Fr 12:00-00:00',
+      'Sa 11:30-00:00',
+      'Su 11:30-22:00'
     ],
     priceRange: '$$',
     cuisineType: ['Brazilian', 'Traditional', 'Bar Food'],
@@ -338,7 +340,7 @@ export default function SEO({
         name: 'Qual é o horário de funcionamento?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Funcionamos de segunda a quinta das 11h às 23h, sexta e sábado das 11h à meia-noite, e domingo das 11h às 22h.'
+          text: 'Funcionamos de segunda a quinta das 12h às 00h, sexta das 12h às 00h, sábado das 11h30 às 00h, e domingo das 11h30 às 22h.'
         }
       },
       {
@@ -443,7 +445,7 @@ export default function SEO({
           <meta property="restaurant:contact_info:region" content="Rio de Janeiro" />
           <meta property="restaurant:contact_info:postal_code" content="20241-260" />
           <meta property="restaurant:contact_info:country_name" content="Brasil" />
-          <meta property="restaurant:contact_info:phone_number" content="+5521985658443" />
+          <meta property="restaurant:contact_info:phone_number" content="+5521994099166" />
         </>
       )}
       
