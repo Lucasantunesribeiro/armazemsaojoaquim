@@ -204,13 +204,10 @@ export default function RoomCard({
         {/* Pricing */}
         <div className="mb-4">
           <div className="flex items-center justify-between">
-            <span className="text-sm text-gray-500 dark:text-gray-400">Preços:</span>
+            <span className="text-sm text-gray-500 dark:text-gray-400">Preço por noite:</span>
             <div className="text-right">
               <p className="text-lg font-bold text-gray-900 dark:text-white">
-                R$ {room.price_refundable.toFixed(2)}
-              </p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">
-                R$ {room.price_non_refundable.toFixed(2)} (não reembolsável)
+                R$ {room.price_non_refundable.toFixed(2)}
               </p>
             </div>
           </div>

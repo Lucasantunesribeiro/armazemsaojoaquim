@@ -82,7 +82,7 @@ CEP: 20241-260
 
 ### **Horários de Funcionamento**
 - **Restaurante**: Terça a Domingo, 12h às 23h
-- **Café**: Terça a Domingo, 8h às 18h
+- **Café**: Segunda a Sexta, 12h às 00h | Sábado, 11h30 às 00h | Domingo, 11h30 às 22h
 - **Pousada**: Check-in 14h, Check-out 12h
 
 

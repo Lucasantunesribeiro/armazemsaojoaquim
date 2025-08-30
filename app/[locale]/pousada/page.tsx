@@ -19,7 +19,6 @@ interface Room {
   max_guests: number
   image_url: string
   available: boolean
-  price_refundable: number
   price_non_refundable: number
 }
 
@@ -393,16 +392,10 @@ export default function PousadaPage() {
 
                     {/* Preços */}
                     <div className="space-y-3 pt-4 border-t border-slate-200 dark:border-slate-700">
-                      <h4 className="font-semibold text-sm text-slate-800 dark:text-slate-200">Preços por noite</h4>
+                      <h4 className="font-semibold text-sm text-slate-800 dark:text-slate-200">Preço por noite</h4>
                       <div className="space-y-2">
                         <div className="flex items-center justify-between">
-                          <span className="text-sm text-slate-600 dark:text-slate-400">Reembolsável</span>
-                          <span className="text-lg font-bold text-green-600">
-                            R$ {room.price_refundable.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                          </span>
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <span className="text-sm text-slate-600 dark:text-slate-400">Não reembolsável</span>
+                          <span className="text-sm text-slate-600 dark:text-slate-400">Valor</span>
                           <span className="text-lg font-bold text-amber-600">
                             R$ {room.price_non_refundable.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                           </span>

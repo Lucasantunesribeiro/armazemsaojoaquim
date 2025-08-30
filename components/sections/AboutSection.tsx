@@ -60,12 +60,6 @@ const AboutSection = () => {
       title: t('home.about.features.tradition.title'),
       description: t('home.about.features.tradition.description'),
       highlight: t('home.about.features.tradition.highlight')
-    },
-    {
-      icon: Star,
-      title: t('home.about.features.experience.title'),
-      description: t('home.about.features.experience.description'),
-      highlight: t('home.about.features.experience.highlight')
     }
   ]
 

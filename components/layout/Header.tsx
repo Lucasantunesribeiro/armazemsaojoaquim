@@ -94,6 +94,17 @@ export default function Header() {
     }
   }, [isMobileMenuOpen])
 
+  // Debug effect for user and admin status
+  useEffect(() => {
+    console.log('🔍 [Header Debug] Estado atual:', {
+      user: user?.email,
+      isAdmin,
+      isReady,
+      isMounted,
+      isHydrated
+    })
+  }, [user, isAdmin, isReady, isMounted, isHydrated])
+
   // Get current locale from pathname
   const getCurrentLocale = () => {
     if (pathname.startsWith('/en')) return 'en'
@@ -107,6 +118,8 @@ export default function Header() {
   const handleLogout = async () => {
     try {
       console.log('🔄 Iniciando logout...')
+      console.log('👤 Usuário atual:', user?.email)
+      console.log('🔑 isAdmin:', isAdmin)
       
       // Tentar logout normal primeiro
       const { error } = await supabase.auth.signOut({ scope: 'local' })
@@ -283,7 +296,7 @@ export default function Header() {
               >
                 <FileText className="w-4 w-4" />
                 <span>Cardápio</span>
-              </a>
+              </a> 
               
               {/* Social Media Links */}
               <div className="flex items-center space-x-1 mr-2">

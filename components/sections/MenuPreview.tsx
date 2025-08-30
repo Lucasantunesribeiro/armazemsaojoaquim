@@ -8,11 +8,51 @@ import { Button } from '../ui/Button'
 import { cn } from '../../lib/utils'
 import { useTranslations } from '@/hooks/useTranslations'
 
+interface MenuItem {
+  id: string
+  name: string
+  description: string | null
+  price: number
+  category: string
+  available: boolean
+  featured: boolean
+}
+
 const MenuPreview = () => {
   const { t } = useTranslations()
   const [isVisible, setIsVisible] = useState(false)
   const [activeCategory, setActiveCategory] = useState(0)
+  const [menuItems, setMenuItems] = useState<MenuItem[]>([])
+  const [loading, setLoading] = useState(true)
   const sectionRef = useRef<HTMLDivElement>(null)
+
+  // Função para buscar itens do menu do banco de dados
+  const fetchMenuItems = async () => {
+    try {
+      const response = await fetch('/api/menu?limit=100')
+      if (response.ok) {
+        const data = await response.json()
+        setMenuItems(data.data || [])
+      }
+    } catch (error) {
+      console.error('Erro ao buscar itens do menu:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // Função para buscar preço de um item específico
+  const getItemPrice = (itemName: string): string => {
+    const item = menuItems.find(menuItem => 
+      menuItem.name.toLowerCase().includes(itemName.toLowerCase()) ||
+      itemName.toLowerCase().includes(menuItem.name.toLowerCase())
+    )
+    return item ? `R$ ${item.price.toFixed(2).replace('.', ',')}` : 'R$ --'
+  }
+
+  useEffect(() => {
+    fetchMenuItems()
+  }, [])
 
   const menuCategories = [
     {
@@ -20,9 +60,9 @@ const MenuPreview = () => {
       title: t('home.menuPreview.categories.appetizers.title'),
       description: t('home.menuPreview.categories.appetizers.description'),
       items: [
-        { name: t('home.menuPreview.categories.appetizers.items.patatas.name'), price: 'R$ 25', description: t('home.menuPreview.categories.appetizers.items.patatas.description') },
-        { name: t('home.menuPreview.categories.appetizers.items.croqueta.name'), price: 'R$ 29', description: t('home.menuPreview.categories.appetizers.items.croqueta.description') },
-        { name: t('home.menuPreview.categories.appetizers.items.ceviche.name'), price: 'R$ 49', description: t('home.menuPreview.categories.appetizers.items.ceviche.description') }
+        { name: t('home.menuPreview.categories.appetizers.items.patatas.name'), price: getItemPrice('Patatas Bravas'), description: t('home.menuPreview.categories.appetizers.items.patatas.description') },
+        { name: t('home.menuPreview.categories.appetizers.items.croqueta.name'), price: getItemPrice('Croqueta de Costela'), description: t('home.menuPreview.categories.appetizers.items.croqueta.description') },
+        { name: t('home.menuPreview.categories.appetizers.items.ceviche.name'), price: getItemPrice('Ceviche Carioca'), description: t('home.menuPreview.categories.appetizers.items.ceviche.description') }
       ],
       gradient: 'from-red-500 to-pink-600',
       bgColor: 'bg-red-50',
@@ -33,9 +73,9 @@ const MenuPreview = () => {
       title: t('home.menuPreview.categories.mains.title'),
       description: t('home.menuPreview.categories.mains.description'),
       items: [
-        { name: t('home.menuPreview.categories.mains.items.ancho.name'), price: 'R$ 130', description: t('home.menuPreview.categories.mains.items.ancho.description') },
-        { name: t('home.menuPreview.categories.mains.items.tuna.name'), price: 'R$ 89', description: t('home.menuPreview.categories.mains.items.tuna.description') },
-        { name: t('home.menuPreview.categories.mains.items.octopus.name'), price: 'R$ 68', description: t('home.menuPreview.categories.mains.items.octopus.description') }
+        { name: t('home.menuPreview.categories.mains.items.ancho.name'), price: getItemPrice('Bife Ancho'), description: t('home.menuPreview.categories.mains.items.ancho.description') },
+        { name: t('home.menuPreview.categories.mains.items.tuna.name'), price: getItemPrice('Atum em Crosta'), description: t('home.menuPreview.categories.mains.items.tuna.description') },
+        { name: t('home.menuPreview.categories.mains.items.octopus.name'), price: getItemPrice('Polvo Grelhado'), description: t('home.menuPreview.categories.mains.items.octopus.description') }
       ],
       gradient: 'from-amber-500 to-orange-600',
       bgColor: 'bg-amber-50',
@@ -46,9 +86,9 @@ const MenuPreview = () => {
       title: t('home.menuPreview.categories.feijoada.title'),
       description: t('home.menuPreview.categories.feijoada.description'),
       items: [
-        { name: t('home.menuPreview.categories.feijoada.items.individual.name'), price: 'R$ 45', description: t('home.menuPreview.categories.feijoada.items.individual.description') },
-        { name: t('home.menuPreview.categories.feijoada.items.couple.name'), price: 'R$ 82', description: t('home.menuPreview.categories.feijoada.items.couple.description') },
-        { name: t('home.menuPreview.categories.feijoada.items.buffet.name'), price: 'R$ 55', description: t('home.menuPreview.categories.feijoada.items.buffet.description') }
+        { name: t('home.menuPreview.categories.feijoada.items.individual.name'), price: getItemPrice('Feijoada Individual'), description: t('home.menuPreview.categories.feijoada.items.individual.description') },
+        { name: t('home.menuPreview.categories.feijoada.items.couple.name'), price: getItemPrice('Feijoada para Dois'), description: t('home.menuPreview.categories.feijoada.items.couple.description') },
+        { name: t('home.menuPreview.categories.feijoada.items.buffet.name'), price: getItemPrice('Buffet de Feijoada'), description: t('home.menuPreview.categories.feijoada.items.buffet.description') }
       ],
       gradient: 'from-slate-600 to-slate-800',
       bgColor: 'bg-slate-50',
@@ -171,14 +211,14 @@ const MenuPreview = () => {
             })}
           </div>
 
-          {/* Menu Categories - Mobile Otimizado */}
-          <div className={cn(
+          {/* Menu Categories - Mobile Otimizado - COMENTADO */}
+          {/* <div className={cn(
             "mb-12 md:mb-20",
             "transition-all duration-1000 delay-500 ease-out",
             isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
           )}>
             {/* Category Tabs - Scroll horizontal no mobile */}
-            <div className="flex overflow-x-auto scrollbar-hide pb-2 md:justify-center gap-3 md:gap-4 mb-8 md:mb-12 -mx-4 px-4 md:mx-0 md:px-0">
+            {/* <div className="flex overflow-x-auto scrollbar-hide pb-2 md:justify-center gap-3 md:gap-4 mb-8 md:mb-12 -mx-4 px-4 md:mx-0 md:px-0">
               {menuCategories.map((category, index) => {
                 const Icon = category.icon
                 return (
@@ -200,7 +240,7 @@ const MenuPreview = () => {
             </div>
 
             {/* Active Category Content */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 items-center">
+            {/* <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 items-center">
               <div className="space-y-6 md:space-y-8 order-2 lg:order-1">
                 <div className="text-center lg:text-left">
                   <h3 className="font-playfair text-2xl md:text-3xl lg:text-4xl font-bold text-slate-900 dark:text-white mb-3 md:mb-4">
@@ -242,7 +282,7 @@ const MenuPreview = () => {
               </div>
 
               {/* Category Image - Real Images */}
-              <div className="relative order-1 lg:order-2">
+              {/* <div className="relative order-1 lg:order-2">
                 <div className="relative group">
                   <div className="relative h-64 md:h-80 lg:h-[500px] rounded-3xl overflow-hidden shadow-2xl">
                     <Image
@@ -258,7 +298,7 @@ const MenuPreview = () => {
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                     
                     {/* Overlay info */}
-                    <div className="absolute bottom-6 left-6 right-6 text-white">
+                    {/* <div className="absolute bottom-6 left-6 right-6 text-white">
                       <div className="flex items-center space-x-3 mb-3">
                         <div className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur-lg flex items-center justify-center">
                           {React.createElement(menuCategories[activeCategory].icon, { 
@@ -274,12 +314,12 @@ const MenuPreview = () => {
                   </div>
 
                   {/* Decorative Elements */}
-                  <div className="absolute -top-4 -right-4 w-16 h-16 md:w-20 md:h-20 bg-gradient-to-br from-amber-200 to-amber-300 rounded-full opacity-70 animate-pulse" />
+                  {/* <div className="absolute -top-4 -right-4 w-16 h-16 md:w-20 md:h-20 bg-gradient-to-br from-amber-200 to-amber-300 rounded-full opacity-70 animate-pulse" />
                   <div className="absolute -bottom-6 -left-6 w-12 h-12 md:w-16 md:h-16 bg-gradient-to-br from-slate-200 to-slate-300 rounded-full opacity-50 animate-pulse delay-1000" />
                 </div>
               </div>
             </div>
-          </div>
+          </div> */}
 
           {/* Enhanced Call to Action - Mobile optimizado */}
           <div className={cn(

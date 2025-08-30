@@ -13,7 +13,6 @@ interface Room {
   id: string
   name: string
   type: 'STANDARD' | 'DELUXE' | 'SUITE'
-  price_refundable: number
   price_non_refundable: number
   description: string
   amenities: string[]
@@ -37,7 +36,6 @@ interface BookingForm {
   guestEmail: string
   guestPhone: string
   specialRequests: string
-  pricingOption: 'refundable' | 'non_refundable'
 }
 
 export default function BookingModal({ room, isOpen, onClose, onBookingComplete }: BookingModalProps) {
@@ -51,8 +49,7 @@ export default function BookingModal({ room, isOpen, onClose, onBookingComplete 
     guestName: '',
     guestEmail: '',
     guestPhone: '',
-    specialRequests: '',
-    pricingOption: 'non_refundable'
+    specialRequests: ''
   })
 
   // Reset form when modal opens/closes
@@ -66,8 +63,7 @@ export default function BookingModal({ room, isOpen, onClose, onBookingComplete 
         guestName: '',
         guestEmail: '',
         guestPhone: '',
-        specialRequests: '',
-        pricingOption: 'non_refundable'
+        specialRequests: ''
       })
     }
   }, [isOpen])
@@ -86,10 +82,7 @@ export default function BookingModal({ room, isOpen, onClose, onBookingComplete 
   const calculateTotalPrice = () => {
     const nights = calculateStayDuration()
     if (!room || nights <= 0) return 0
-    const pricePerNight = bookingForm.pricingOption === 'refundable' 
-      ? room.price_refundable 
-      : room.price_non_refundable
-    return nights * pricePerNight
+    return nights * room.price_non_refundable
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -108,7 +101,7 @@ export default function BookingModal({ room, isOpen, onClose, onBookingComplete 
         check_out: bookingForm.checkOut,
         guests: bookingForm.guests,
         special_requests: bookingForm.specialRequests,
-        pricing_option: bookingForm.pricingOption,
+
         total_price: calculateTotalPrice(),
         nights: calculateStayDuration()
       }
@@ -285,48 +278,7 @@ export default function BookingModal({ room, isOpen, onClose, onBookingComplete 
                 </div>
               </div>
 
-              {/* Pricing Options */}
-              <div className="space-y-4">
-                <h4 className="font-semibold text-slate-900 dark:text-white">
-                  {t('pousada.booking.form.pricingOptions')}
-                </h4>
-                <div className="space-y-3">
-                  <label className="flex items-center space-x-3 p-4 border border-slate-200 dark:border-slate-700 rounded-lg cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50">
-                    <input
-                      type="radio"
-                      name="pricingOption"
-                      value="non_refundable"
-                      checked={bookingForm.pricingOption === 'non_refundable'}
-                      onChange={(e) => handleInputChange('pricingOption', e.target.value)}
-                      className="text-amber-600"
-                    />
-                    <div className="flex-1">
-                      <div className="flex items-center justify-between">
-                        <span className="font-medium">{t('pousada.booking.form.nonRefundable')}</span>
-                        <span className="text-lg font-bold text-green-600">R$ {room.price_non_refundable}</span>
-                      </div>
-                      <p className="text-sm text-slate-500">{t('pousada.booking.form.nonRefundableDesc')}</p>
-                    </div>
-                  </label>
-                  <label className="flex items-center space-x-3 p-4 border border-slate-200 dark:border-slate-700 rounded-lg cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50">
-                    <input
-                      type="radio"
-                      name="pricingOption"
-                      value="refundable"
-                      checked={bookingForm.pricingOption === 'refundable'}
-                      onChange={(e) => handleInputChange('pricingOption', e.target.value)}
-                      className="text-amber-600"
-                    />
-                    <div className="flex-1">
-                      <div className="flex items-center justify-between">
-                        <span className="font-medium">{t('pousada.booking.form.refundable')}</span>
-                        <span className="text-lg font-bold">R$ {room.price_refundable}</span>
-                      </div>
-                      <p className="text-sm text-slate-500">{t('pousada.booking.form.refundableDesc')}</p>
-                    </div>
-                  </label>
-                </div>
-              </div>
+
 
               {/* Special Requests */}
               <div>
@@ -351,7 +303,7 @@ export default function BookingModal({ room, isOpen, onClose, onBookingComplete 
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
                       <span>{calculateStayDuration()} {t('pousada.booking.form.nights')}</span>
-                      <span>R$ {bookingForm.pricingOption === 'refundable' ? room.price_refundable : room.price_non_refundable}/noite</span>
+                      <span>R$ {room.price_non_refundable}/noite</span>
                     </div>
                     <Separator />
                     <div className="flex justify-between font-bold text-lg">

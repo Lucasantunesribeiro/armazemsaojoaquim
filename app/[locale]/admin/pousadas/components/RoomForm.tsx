@@ -23,7 +23,6 @@ const roomSchema = z.object({
   type: z.enum(['STANDARD', 'DELUXE', 'SUITE'], {
     errorMap: () => ({ message: 'Selecione um tipo válido' })
   }),
-  price_refundable: z.number().min(0, 'Preço deve ser positivo'),
   price_non_refundable: z.number().min(0, 'Preço deve ser positivo'),
   description: z.string().optional(),
   max_guests: z.number().min(1, 'Mínimo 1 hóspede').max(10, 'Máximo 10 hóspedes'),
@@ -92,7 +91,6 @@ export default function RoomForm({ room, onSubmit, onCancel, isLoading }: RoomFo
     defaultValues: {
       name: room?.name || '',
       type: room?.type as RoomType || 'STANDARD',
-      price_refundable: room?.price_refundable || 0,
       price_non_refundable: room?.price_non_refundable || 0,
       description: room?.description || '',
       max_guests: room?.max_guests || 2,
@@ -192,27 +190,10 @@ export default function RoomForm({ room, onSubmit, onCancel, isLoading }: RoomFo
             </div>
 
             {/* Pricing */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Preço Reembolsável (R$) *
-                </label>
-                <Input
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  {...register('price_refundable', { valueAsNumber: true })}
-                  placeholder="0.00"
-                  className={errors.price_refundable ? 'border-red-500' : ''}
-                />
-                {errors.price_refundable && (
-                  <p className="text-red-500 text-sm mt-1">{errors.price_refundable.message}</p>
-                )}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Preço Não Reembolsável (R$) *
+                  Preço por Noite (R$) *
                 </label>
                 <Input
                   type="number"

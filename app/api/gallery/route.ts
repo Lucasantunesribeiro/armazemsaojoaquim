@@ -17,59 +17,11 @@ export async function GET(request: NextRequest) {
 
     console.log('🎨 Gallery API: Iniciando busca...')
 
-    // Mock data primeiro para testar
-    const mockArtworks = [
-      {
-        id: '1',
-        title: 'Pôr do Sol em Santa Teresa',
-        artist: 'Maria Silva',
-        description: 'Uma linda vista do pôr do sol no bairro histórico',
-        price: 450.00,
-        image_url: '/images/gallery/artwork1.jpg',
-        category: 'PAISAGEM',
-        dimensions: '40x60cm',
-        year_created: 2023,
-        historical_context: 'Retrata a vista icônica do bairro',
-        stock_quantity: 1,
-        featured: true,
-        created_at: '2024-01-01T12:00:00Z',
-        updated_at: '2024-01-01T12:00:00Z'
-      },
-      {
-        id: '2',
-        title: 'Bondinho Amarelo',
-        artist: 'João Santos',
-        description: 'O famoso bondinho amarelo de Santa Teresa',
-        price: 380.00,
-        image_url: '/images/gallery/artwork2.jpg',
-        category: 'TRANSPORTE',
-        dimensions: '30x40cm',
-        year_created: 2022,
-        historical_context: 'Símbolo histórico do transporte local',
-        stock_quantity: 2,
-        featured: false,
-        created_at: '2024-01-15T12:00:00Z',
-        updated_at: '2024-01-15T12:00:00Z'
-      },
-      {
-        id: '3',
-        title: 'Ruas de Paralelepípedo',
-        artist: 'Ana Costa',
-        description: 'As características ruas de paralelepípedo do bairro',
-        price: 520.00,
-        image_url: '/images/gallery/artwork3.jpg',
-        category: 'ARQUITETURA',
-        dimensions: '50x70cm',
-        year_created: 2023,
-        historical_context: 'Preservação do patrimônio histórico',
-        stock_quantity: 1,
-        featured: true,
-        created_at: '2024-02-01T12:00:00Z',
-        updated_at: '2024-02-01T12:00:00Z'
-      }
-    ]
+    // Por enquanto, retornar array vazio com mensagem
+    // Os itens da galeria serão adicionados em breve
+    const artworks: any[] = []
 
-    let filteredArtworks = mockArtworks
+    let filteredArtworks = artworks
 
     if (category && category !== 'all') {
       filteredArtworks = filteredArtworks.filter(art => 
@@ -84,13 +36,14 @@ export async function GET(request: NextRequest) {
     // Aplicar limit e offset
     const paginatedArtworks = filteredArtworks.slice(offset, offset + limit)
 
-    console.log(`✅ Gallery API: ${paginatedArtworks.length} artworks encontrados (mock data)`)
+    console.log(`✅ Gallery API: ${paginatedArtworks.length} artworks encontrados (galeria em construção)`)
 
     return NextResponse.json({
       success: true,
       data: paginatedArtworks,
       count: paginatedArtworks.length,
-      total: filteredArtworks.length
+      total: filteredArtworks.length,
+      message: 'Galeria em construção - itens serão adicionados em breve'
     })
   } catch (error) {
     console.error('💥 Erro na API de galeria:', error)

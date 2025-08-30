@@ -2,12 +2,23 @@
 
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react'
 import Image from 'next/image'
+import { usePathname } from 'next/navigation'
 import { ChevronLeft, ChevronRight, MapPin, Clock, Phone } from 'lucide-react'
 import { useTranslations } from '@/hooks/useTranslations'
 import Link from 'next/link'
 
 export default function HeroSection() {
+  const pathname = usePathname()
   const { t, isReady } = useTranslations()
+
+  // Get current locale from pathname
+  const getCurrentLocale = () => {
+    if (pathname.startsWith('/en')) return 'en'
+    if (pathname.startsWith('/pt')) return 'pt'
+    return 'pt' // default
+  }
+
+  const currentLocale = getCurrentLocale()
 
   // ALL HOOKS MUST BE CALLED BEFORE ANY CONDITIONAL RETURNS
   const [currentSlide, setCurrentSlide] = useState(0)
@@ -53,8 +64,8 @@ export default function HeroSection() {
 
   const quickInfo = useMemo(() => [
     { icon: MapPin, text: 'Santa Teresa, RJ', label: isReady ? t('nav.contact') : 'Contato', href: '#location' },
-    { icon: Clock, text: 'Seg-Dom: 12h-00h', label: isReady ? t('cafe.hours.title') : 'Horário', href: '#hours' },
-            { icon: Phone, text: '(21) 99409-9166', label: isReady ? t('footer.phone') : 'Telefone', href: 'tel:+5521994099166' }
+    { icon: Clock, text: 'Seg-Sex: 12h-00h | Sáb: 11h30-00h | Dom: 11h30-22h', label: isReady ? t('cafe.hours.title') : 'Horário', href: '#hours' },
+    { icon: Phone, text: '(21) 99409-9166', label: isReady ? t('footer.phone') : 'Telefone', href: 'tel:+5521994099166' }
   ], [t, isReady])
 
   // Callbacks - MUST BE BEFORE CONDITIONAL RETURNS
@@ -313,11 +324,11 @@ export default function HeroSection() {
             </Link>
             
             <Link
-              href="/reservas"
+              href={`/${currentLocale}/pousada`}
               className="group bg-transparent border-2 border-white hover:bg-white hover:text-gray-900 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-semibold text-sm sm:text-base transition-all duration-300 transform hover:scale-105 active:scale-95 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-black"
             >
               <span className="flex items-center justify-center space-x-2">
-                <span>{currentImage.cta}</span>
+                <span>Conheça nossa pousada</span>
               </span>
             </Link>
           </div>

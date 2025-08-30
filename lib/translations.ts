@@ -1020,6 +1020,7 @@ export const translations: Record<Language, Translation> = {
           button: 'Explorar Galeria'
         }
       },
+       
       menuPreview: {
         badge: 'GASTRONOMIA ESPECIAL',
         title: 'Sabores que Contam',
@@ -1088,6 +1089,7 @@ export const translations: Record<Language, Translation> = {
             }
           }
         },
+        
         cta: {
           experience: 'Experiência Gastronômica Completa',
           title: 'Pronto para uma',
@@ -1203,9 +1205,9 @@ export const translations: Record<Language, Translation> = {
       },
       hours: {
         title: 'Horário de funcionamento',
-        weekdays: 'Segunda a sexta: 8h às 18h',
-        weekend: 'Sábado: 8h às 19h',
-        sunday: 'Domingo: 9h às 17h',
+        weekdays: 'Segunda a sexta: 12h - 00h',
+        weekend: 'Sábado: 11h30 - 00h',
+        sunday: 'Domingo: 11h30 - 22h',
         weekends: 'Sábado e Domingo',
         closed: 'Fechado'
       },
@@ -1479,7 +1481,7 @@ export const translations: Record<Language, Translation> = {
       },
       history: {
         title: 'História & Patrimônio',
-        description1: 'O **Lobie Armazém São Joaquim** é um casarão histórico construído em **1854**, tombado pela União e totalmente reformado preservando sua arquitetura original.',
+        description1: 'A **Pousada São Joaquim** é um casarão histórico construído em **1854**, tombado pela União e totalmente reformado preservando sua arquitetura original.',
         description2: 'Por mais de **150 anos** funcionou como armazém, sendo um marco comercial no coração de Santa Teresa. Hoje, oferece hospitalidade com o charme do passado e o conforto moderno.',
         description3: 'O prédio amarelo com janelas e portas vermelhas é um ícone do **Largo dos Guimarães**, preservando a memória arquitetônica do Rio de Janeiro.',
         yearBadge: '1854',
@@ -2104,9 +2106,9 @@ export const translations: Record<Language, Translation> = {
       },
       hours: {
         title: 'Opening hours',
-        weekdays: 'Monday to Friday: 8am to 6pm',
-        weekend: 'Saturday: 8am to 7pm',
-        sunday: 'Sunday: 9am to 5pm',
+        weekdays: 'Monday to Friday: 12h - 00h',
+        weekend: 'Saturday: 11h30 - 00h',
+        sunday: 'Sunday: 11h30 - 22h',
         weekends: 'Saturday and Sunday',
         closed: 'Closed'
       },

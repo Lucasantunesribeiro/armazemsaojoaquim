@@ -19,7 +19,6 @@ interface Room {
   id: string
   name: string
   type: 'STANDARD' | 'DELUXE' | 'SUITE'
-  price_refundable: number
   price_non_refundable: number
   description: string
   amenities: string[]
@@ -49,7 +48,6 @@ interface Booking {
 const initialRoomData: Omit<Room, 'id' | 'created_at' | 'updated_at'> = {
   name: '',
   type: 'STANDARD',
-  price_refundable: 0,
   price_non_refundable: 0,
   description: '',
   amenities: [],
@@ -146,7 +144,6 @@ export default function AdminPousadaPage() {
     setRoomData({
       name: room.name,
       type: room.type,
-      price_refundable: room.price_refundable,
       price_non_refundable: room.price_non_refundable,
       description: room.description,
       amenities: room.amenities,
@@ -335,27 +332,15 @@ export default function AdminPousadaPage() {
                     />
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <Label htmlFor="price_refundable">Preço Reembolsável (R$)</Label>
-                      <Input
-                        id="price_refundable"
-                        type="number"
-                        step="0.01"
-                        value={roomData.price_refundable}
-                        onChange={(e) => setRoomData(prev => ({ ...prev, price_refundable: parseFloat(e.target.value) || 0 }))}
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="price_non_refundable">Preço Não-Reembolsável (R$)</Label>
-                      <Input
-                        id="price_non_refundable"
-                        type="number"
-                        step="0.01"
-                        value={roomData.price_non_refundable}
-                        onChange={(e) => setRoomData(prev => ({ ...prev, price_non_refundable: parseFloat(e.target.value) || 0 }))}
-                      />
-                    </div>
+                  <div>
+                    <Label htmlFor="price_non_refundable">Preço por Noite (R$)</Label>
+                    <Input
+                      id="price_non_refundable"
+                      type="number"
+                      step="0.01"
+                      value={roomData.price_non_refundable}
+                      onChange={(e) => setRoomData(prev => ({ ...prev, price_non_refundable: parseFloat(e.target.value) || 0 }))}
+                    />
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">
@@ -452,11 +437,7 @@ export default function AdminPousadaPage() {
                 <CardContent className="space-y-2">
                   <p className="text-sm text-slate-600 line-clamp-2">{room.description}</p>
                   <div className="flex justify-between text-sm">
-                    <span>Reembolsável:</span>
-                    <span className="font-bold">R$ {room.price_refundable}</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span>Não-reembolsável:</span>
+                    <span>Preço por noite:</span>
                     <span className="font-bold text-green-600">R$ {room.price_non_refundable}</span>
                   </div>
                   <div className="flex justify-between text-sm">
