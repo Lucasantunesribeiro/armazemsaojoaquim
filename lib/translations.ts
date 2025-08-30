@@ -1346,8 +1346,8 @@ export const translations: Record<Language, Translation> = {
         },
         hours: {
           title: 'Horário',
-          weekdays: 'Segunda a Sábado: 8:00 - 20:00',
-          sunday: 'Domingo: Fechado'
+          weekdays: 'Seg-Sex: 12h-00h | Sáb: 11h30-00h',
+          sunday: 'Dom: 11h30-22h'
         }
       },
       social: {
@@ -2463,8 +2463,8 @@ export const translations: Record<Language, Translation> = {
         },
         hours: {
           title: 'Hours',
-          weekdays: 'Monday to Saturday: 8:00 AM - 8:00 PM',
-          sunday: 'Sunday: Closed'
+          weekdays: 'Mon-Fri: 12h-00h | Sat: 11h30-00h',
+          sunday: 'Sun: 11h30-22h'
         }
       },
       social: {
