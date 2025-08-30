@@ -31,7 +31,7 @@ const BottomNavigation = memo(() => {
     { name: 'Início', href: '/', icon: Home },
     { name: 'Menu', icon: Menu, isButton: true, onClick: toggleMobileMenu },
     { name: 'Blog', href: '/blog', icon: BookOpen },
-    { name: 'Contato', href: '/#contato', icon: MapPin },
+    { name: 'Contato', icon: MapPin, isButton: true, onClick: () => window.open('https://wa.me/5521994099166', '_blank') },
   ]
 
   return (
