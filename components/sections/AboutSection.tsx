@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
+import { usePathname } from 'next/navigation'
 import { Award, MapPin, Clock, Users, Heart, Star, Camera, Calendar } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from '../ui/Button'
@@ -9,10 +10,20 @@ import { useTranslations } from '@/hooks/useTranslations'
 
 const AboutSection = () => {
   const { t } = useTranslations()
+  const pathname = usePathname()
   const [isVisible, setIsVisible] = useState(false)
   const [activeImageIndex, setActiveImageIndex] = useState(0)
   const [statsAnimated, setStatsAnimated] = useState(false)
   const sectionRef = useRef<HTMLDivElement>(null)
+
+  // Get current locale from pathname
+  const getCurrentLocale = () => {
+    if (pathname.startsWith('/en')) return 'en'
+    if (pathname.startsWith('/pt')) return 'pt'
+    return 'pt' // default
+  }
+
+  const currentLocale = getCurrentLocale()
 
   const historicalImages = [
     {
@@ -282,12 +293,12 @@ const AboutSection = () => {
               {t('home.about.cta.description')}
             </p>
             
-            <Link prefetch={true} href="/reservas">
+            <Link prefetch={true} href={`/${currentLocale}/galeria`}>
               <Button 
                 size="lg" 
                 className="bg-amber-500 hover:bg-amber-600 text-white font-bold px-6 sm:px-8 py-3 sm:py-4 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
               >
-                <Calendar className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
+                <Camera className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
                 {t('home.about.cta.button')}
               </Button>
             </Link>

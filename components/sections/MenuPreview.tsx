@@ -369,11 +369,10 @@ const MenuPreview = () => {
 
                   <Link prefetch={true} href="/menu" className="group">
                     <Button 
-                      variant="outline" 
                       size="lg" 
                       className={cn(
-                        "w-full sm:w-auto border-2 border-white text-white hover:bg-white hover:text-slate-900 dark:border-gray-300 dark:hover:bg-gray-300",
-                        "font-bold text-base md:text-lg px-6 md:px-8 py-3 md:py-4 rounded-2xl backdrop-blur-sm",
+                        "w-full sm:w-auto bg-white/90 hover:bg-white text-slate-900 border-2 border-white",
+                        "font-bold text-base md:text-lg px-6 md:px-8 py-3 md:py-4 rounded-2xl",
                         "shadow-xl hover:shadow-white/25",
                         "transform hover:scale-105 hover:-translate-y-1",
                         "transition-all duration-300"
