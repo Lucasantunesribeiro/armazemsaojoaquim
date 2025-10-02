@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from 'react'
 import { Plus, Edit, Trash2, Eye, Users, DollarSign } from 'lucide-react'
-import { 
-  Button, 
+import {
+  Button,
   Card, CardContent, CardDescription, CardHeader, CardTitle,
   Badge,
   Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger,
@@ -14,6 +14,7 @@ import {
   Switch
 } from '@/components/ui'
 import { Separator } from '@/components/ui/Separator'
+import ImageUpload from '../components/ImageUpload'
 
 interface Room {
   id: string
@@ -354,11 +355,11 @@ export default function AdminPousadaPage() {
                       />
                     </div>
                     <div>
-                      <Label htmlFor="image_url">URL da Imagem</Label>
-                      <Input
-                        id="image_url"
+                      <Label htmlFor="image_url">Imagem</Label>
+                      <ImageUpload
                         value={roomData.image_url}
-                        onChange={(e) => setRoomData(prev => ({ ...prev, image_url: e.target.value }))}
+                        onChange={(url) => setRoomData(prev => ({ ...prev, image_url: url }))}
+                        onRemove={() => setRoomData(prev => ({ ...prev, image_url: '' }))}
                       />
                     </div>
                   </div>

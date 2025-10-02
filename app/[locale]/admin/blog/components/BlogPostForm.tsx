@@ -5,12 +5,12 @@ import { useRouter } from 'next/navigation'
 import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { 
-  Save, 
-  Eye, 
-  Calendar, 
-  Image as ImageIcon, 
-  Tag, 
+import {
+  Save,
+  Eye,
+  Calendar,
+  Image as ImageIcon,
+  Tag,
   FileText,
   Globe,
   Clock,
@@ -26,6 +26,7 @@ import { Switch } from '@/components/ui/Switch'
 import { Badge } from '@/components/ui/Badge'
 import { toast } from 'sonner'
 import { RichTextEditor } from './RichTextEditor'
+import ImageUpload from '../../components/ImageUpload'
 
 const blogPostSchema = z.object({
   title_pt: z.string().min(1, 'Título em português é obrigatório'),
@@ -598,13 +599,13 @@ export function BlogPostForm({ initialData, postId, locale }: BlogPostFormProps)
             </h3>
             
             <div>
-              <Label htmlFor="image_url">URL da Imagem</Label>
-              <Input
-                id="image_url"
-                {...register('image_url')}
-                placeholder="https://exemplo.com/imagem.jpg"
+              <Label htmlFor="image_url">Imagem</Label>
+              <ImageUpload
+                value={watchedValues.image_url}
+                onChange={(url) => setValue('image_url', url)}
+                onRemove={() => setValue('image_url', '')}
               />
-              
+
               {watchedValues.image_url && (
                 <div className="mt-3">
                   <img

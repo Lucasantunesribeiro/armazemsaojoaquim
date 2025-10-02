@@ -11,7 +11,8 @@ import { Label } from '@/components/ui/Label'
 import { Textarea } from '@/components/ui/Textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/Select'
 import { Switch } from '@/components/ui/Switch'
-import { useAuthenticatedFetch } from '@/hooks/useAuthenticatedFetch'
+import { useAdminApi } from '@/lib/hooks/useAdminApi'
+import ImageUpload from '../components/ImageUpload'
 
 interface Product {
   id: string
@@ -48,7 +49,7 @@ const initialProductData: Omit<Product, 'id' | 'created_at' | 'updated_at'> = {
 }
 
 export default function AdminCafePage() {
-  const { authenticatedFetch, hasToken } = useAuthenticatedFetch()
+  const { adminFetch, isAuthorized } = useAdminApi()
   const [products, setProducts] = useState<Product[]>([])
   const [orders, setOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState(true)
@@ -57,16 +58,17 @@ export default function AdminCafePage() {
   const [productData, setProductData] = useState(initialProductData)
 
   useEffect(() => {
-    fetchProducts()
-    fetchOrders()
-  }, [])
+    if (isAuthorized) {
+      fetchProducts()
+      fetchOrders()
+    }
+  }, [isAuthorized])
 
   const fetchProducts = async () => {
     try {
-      const response = await fetch('/api/admin/cafe/products')
-      if (response.ok) {
-        const data = await response.json()
-        setProducts(data)
+      const response = await adminFetch('/cafe/products')
+      if (response.success && response.data) {
+        setProducts(response.data)
       }
     } catch (error) {
       console.error('Erro ao carregar produtos:', error)
@@ -75,10 +77,9 @@ export default function AdminCafePage() {
 
   const fetchOrders = async () => {
     try {
-      const response = await fetch('/api/admin/cafe/orders')
-      if (response.ok) {
-        const data = await response.json()
-        setOrders(data)
+      const response = await adminFetch('/cafe/orders')
+      if (response.success && response.data) {
+        setOrders(response.data)
       }
     } catch (error) {
       console.error('Erro ao carregar pedidos:', error)
@@ -89,21 +90,18 @@ export default function AdminCafePage() {
 
   const handleSaveProduct = async () => {
     try {
-      const url = editingProduct 
-        ? `/api/admin/cafe/products/${editingProduct.id}`
-        : '/api/admin/cafe/products'
-      
+      const endpoint = editingProduct
+        ? `/cafe/products/${editingProduct.id}`
+        : '/cafe/products'
+
       const method = editingProduct ? 'PUT' : 'POST'
-      
-      const response = await fetch(url, {
+
+      const response = await adminFetch(endpoint, {
         method,
-        headers: {
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify(productData)
       })
 
-      if (response.ok) {
+      if (response.success) {
         await fetchProducts()
         setIsProductModalOpen(false)
         setEditingProduct(null)
@@ -118,11 +116,11 @@ export default function AdminCafePage() {
     if (!confirm('Tem certeza que deseja excluir este produto?')) return
 
     try {
-      const response = await fetch(`/api/admin/cafe/products/${productId}`, {
+      const response = await adminFetch(`/cafe/products/${productId}`, {
         method: 'DELETE'
       })
 
-      if (response.ok) {
+      if (response.success) {
         await fetchProducts()
       }
     } catch (error) {
@@ -132,15 +130,12 @@ export default function AdminCafePage() {
 
   const handleUpdateOrderStatus = async (orderId: string, newStatus: string) => {
     try {
-      const response = await fetch(`/api/admin/cafe/orders/${orderId}`, {
+      const response = await adminFetch(`/cafe/orders/${orderId}`, {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify({ status: newStatus })
       })
 
-      if (response.ok) {
+      if (response.success) {
         await fetchOrders()
       }
     } catch (error) {
@@ -340,26 +335,22 @@ export default function AdminCafePage() {
                     />
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <Label htmlFor="price">Preço (R$)</Label>
-                      <Input
-                        id="price"
-                        type="number"
-                        step="0.01"
-                        value={productData.price}
-                        onChange={(e) => setProductData(prev => ({ ...prev, price: parseFloat(e.target.value) || 0 }))}
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="image_url">URL da Imagem</Label>
-                      <Input
-                        id="image_url"
-                        value={productData.image_url}
-                        onChange={(e) => setProductData(prev => ({ ...prev, image_url: e.target.value }))}
-                      />
-                    </div>
+                  <div>
+                    <Label htmlFor="price">Preço (R$)</Label>
+                    <Input
+                      id="price"
+                      type="number"
+                      step="0.01"
+                      value={productData.price}
+                      onChange={(e) => setProductData(prev => ({ ...prev, price: parseFloat(e.target.value) || 0 }))}
+                    />
                   </div>
+
+                  <ImageUpload
+                    value={productData.image_url}
+                    onChange={(url) => setProductData(prev => ({ ...prev, image_url: url }))}
+                    onRemove={() => setProductData(prev => ({ ...prev, image_url: '' }))}
+                  />
 
                   <div className="flex items-center space-x-2">
                     <Switch

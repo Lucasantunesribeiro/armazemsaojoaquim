@@ -55,11 +55,18 @@ export default function Header() {
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Element
+
+      // Não feche se clicar em links ou botões dentro do menu
+      if (target.closest('a') || target.closest('button[type="button"]')) {
+        return
+      }
+
       if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
         setIsUserMenuOpen(false)
       }
-      if (mobileMenuRef.current && !mobileMenuRef.current.contains(event.target as Node) && 
-          !(event.target as Element).closest('button[aria-label="Abrir menu"]')) {
+      if (mobileMenuRef.current && !mobileMenuRef.current.contains(event.target as Node) &&
+          !target.closest('button[aria-label="Abrir menu"]')) {
         closeMobileMenu()
       }
     }
@@ -400,18 +407,25 @@ export default function Header() {
                       </div>
                       
                       {isAdmin && (
-                        <Link prefetch={true}
+                        <Link
                           href={`/${currentLocale}/admin`}
                           className="flex items-center px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700"
-                          onClick={() => setIsUserMenuOpen(false)}
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            setTimeout(() => setIsUserMenuOpen(false), 100)
+                          }}
                         >
                           <Shield className="w-4 h-4 mr-2" />
                           {t('header.adminPanel')}
                         </Link>
                       )}
-                      
+
                       <button
-                        onClick={handleLogout}
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          handleLogout()
+                        }}
                         className="flex items-center w-full px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20"
                       >
                         <LogOut className="w-4 h-4 mr-2" />
@@ -481,18 +495,25 @@ export default function Header() {
                       </div>
                       
                       {isAdmin && (
-                        <Link prefetch={true}
+                        <Link
                           href={`/${currentLocale}/admin`}
                           className="flex items-center px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700"
-                          onClick={() => setIsUserMenuOpen(false)}
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            setTimeout(() => setIsUserMenuOpen(false), 100)
+                          }}
                         >
                           <Shield className="w-4 h-4 mr-2" />
                           {t('header.adminPanel')}
                         </Link>
                       )}
-                      
+
                       <button
-                        onClick={handleLogout}
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          handleLogout()
+                        }}
                         className="flex items-center w-full px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20"
                       >
                         <LogOut className="w-4 h-4 mr-2" />
@@ -642,7 +663,7 @@ export default function Header() {
                     </div>
                     
                     {isAdmin && (
-                      <Link prefetch={true}
+                      <Link
                         href={`/${currentLocale}/admin`}
                         onClick={closeMobileMenu}
                         className="flex items-center px-4 py-3 rounded-xl text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all duration-300"

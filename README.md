@@ -34,6 +34,159 @@ Bem-vindo ao site oficial do **Armazém São Joaquim**, um restaurante tradicion
 - **Histórias de Santa Teresa**: Descubra o bairro através de nossos olhos
 - **Conteúdo Atualizado**: Novos posts regularmente com histórias e receitas
 
+## 🚀 **Stack Tecnológica**
+
+### **Frontend & Framework**
+- **Next.js 15.4.5** - Framework React com App Router
+- **React 18.2.0** - Biblioteca de interface de usuário
+- **TypeScript 5.3.3** - Tipagem estática para JavaScript
+- **Tailwind CSS 3.3.6** - Framework CSS utilitário
+- **Radix UI** - Componentes acessíveis (Dialog, Select, Tabs, etc.)
+- **Shadcn/ui** - Sistema de componentes baseado em Radix UI
+- **Lucide React** - Biblioteca de ícones
+- **React Hook Form** - Gerenciamento de formulários
+- **Zod** - Validação de schemas
+
+### **Backend & Database**
+- **Supabase** - Backend-as-a-Service (PostgreSQL, Auth, Storage)
+- **PostgreSQL** - Banco de dados relacional
+- **Next.js API Routes** - Endpoints serverless
+- **Supabase Auth** - Autenticação e autorização
+- **Row Level Security (RLS)** - Segurança a nível de linha
+
+### **Styling & UI/UX**
+- **Tailwind CSS** - Framework CSS com design system customizado
+- **CSS Variables** - Sistema de cores dinâmicas
+- **Responsive Design** - Mobile-first com breakpoints customizados
+- **Dark Mode** - Suporte a tema escuro
+- **Animations** - Transições e micro-interações
+- **Accessibility** - Componentes acessíveis (WCAG 2.1)
+
+### **Performance & Optimization**
+- **Next.js Image Optimization** - Otimização automática de imagens
+- **Dynamic Imports** - Code splitting e lazy loading
+- **Bundle Analysis** - Análise de bundle size
+- **Edge Runtime** - Compatibilidade com Edge Functions
+- **Caching** - Sistema de cache customizado
+- **PWA** - Progressive Web App capabilities
+
+### **Development & Tools**
+- **ESLint** - Linting de código
+- **Prettier** - Formatação de código
+- **Jest** - Framework de testes
+- **Playwright** - Testes end-to-end
+- **TypeScript** - Verificação de tipos
+- **Hot Reload** - Desenvolvimento com hot reload
+
+### **Deployment & Infrastructure**
+- **Netlify** - Plataforma de deploy e hosting
+- **Netlify Functions** - Serverless functions
+- **Edge Functions** - Funções na edge
+- **CDN** - Content Delivery Network
+- **SSL/HTTPS** - Certificados SSL automáticos
+
+### **Email & Communication**
+- **Resend** - Serviço de email transacional
+- **EmailJS** - Envio de emails via cliente
+- **SMTP** - Configuração de email customizada
+
+### **Analytics & Monitoring**
+- **Google Analytics** - Análise de tráfego
+- **Performance Monitoring** - Monitoramento de performance
+- **Error Tracking** - Rastreamento de erros
+- **Audit Logging** - Log de auditoria
+
+### **Internationalization**
+- **Next.js i18n** - Internacionalização
+- **Multi-language Support** - Suporte a PT-BR e EN
+- **Locale Routing** - Roteamento por idioma
+
+## 🏗️ **Arquitetura do Projeto**
+
+### **Estrutura de Pastas**
+```
+├── app/                    # App Router do Next.js
+│   ├── [locale]/          # Rotas internacionalizadas
+│   │   ├── admin/         # Painel administrativo
+│   │   ├── auth/          # Autenticação
+│   │   ├── blog/          # Blog e artigos
+│   │   ├── cafe/          # Página do café
+│   │   ├── galeria/       # Galeria de fotos
+│   │   ├── menu/          # Cardápio
+│   │   ├── pousada/       # Informações da pousada
+│   │   └── page.tsx       # Página inicial
+│   └── api/               # API Routes
+│       ├── admin/         # Endpoints administrativos
+│       ├── auth/          # Autenticação
+│       ├── blog/          # Gerenciamento do blog
+│       ├── cafe/          # API do café
+│       ├── gallery/       # Galeria de imagens
+│       ├── menu/          # Cardápio
+│       └── reservas/      # Sistema de reservas
+├── components/            # Componentes React
+│   ├── admin/            # Componentes administrativos
+│   ├── atoms/            # Componentes atômicos
+│   ├── molecules/        # Componentes moleculares
+│   ├── sections/         # Seções da página
+│   └── ui/               # Componentes de UI (Shadcn)
+├── lib/                  # Utilitários e configurações
+│   ├── auth/             # Lógica de autenticação
+│   ├── supabase/         # Configuração do Supabase
+│   └── utils.ts          # Funções utilitárias
+├── hooks/                # Custom hooks
+├── types/                # Definições TypeScript
+├── contexts/             # React contexts
+└── public/               # Arquivos estáticos
+```
+
+### **Padrões de Desenvolvimento**
+- **Atomic Design** - Estrutura de componentes hierárquica
+- **Server Components** - Componentes renderizados no servidor
+- **Client Components** - Componentes interativos no cliente
+- **Custom Hooks** - Lógica reutilizável encapsulada
+- **Type Safety** - Tipagem completa com TypeScript
+- **Error Boundaries** - Tratamento de erros robusto
+- **Loading States** - Estados de carregamento otimizados
+
+### **Segurança**
+- **Row Level Security (RLS)** - Segurança a nível de banco
+- **Middleware Protection** - Proteção de rotas administrativas
+- **Input Validation** - Validação com Zod
+- **CSRF Protection** - Proteção contra CSRF
+- **XSS Prevention** - Prevenção de ataques XSS
+- **Rate Limiting** - Limitação de taxa de requisições
+
+## 🛠️ **Como Foi Desenvolvido**
+
+### **Metodologia de Desenvolvimento**
+- **Mobile-First Approach** - Desenvolvimento priorizando dispositivos móveis
+- **Component-Driven Development** - Desenvolvimento baseado em componentes
+- **Progressive Enhancement** - Melhoria progressiva da experiência
+- **Performance-First** - Otimização de performance desde o início
+- **Accessibility-First** - Acessibilidade como prioridade
+
+### **Processo de Desenvolvimento**
+1. **Análise de Requisitos** - Definição das funcionalidades e necessidades
+2. **Design System** - Criação de sistema de design consistente
+3. **Arquitetura** - Definição da estrutura e padrões do projeto
+4. **Desenvolvimento Iterativo** - Implementação em sprints
+5. **Testes Contínuos** - Testes automatizados e manuais
+6. **Deploy Automatizado** - Deploy contínuo via Netlify
+
+### **Decisões Técnicas**
+- **Next.js App Router** - Escolhido para melhor performance e SEO
+- **Supabase** - Backend completo com autenticação e banco de dados
+- **Tailwind CSS** - Para desenvolvimento rápido e consistente
+- **TypeScript** - Para maior segurança e manutenibilidade
+- **Shadcn/ui** - Para componentes acessíveis e customizáveis
+
+### **Otimizações Implementadas**
+- **Code Splitting** - Carregamento otimizado de código
+- **Image Optimization** - Otimização automática de imagens
+- **Caching Strategy** - Estratégia de cache para melhor performance
+- **Bundle Optimization** - Otimização do bundle para menor tamanho
+- **SEO Optimization** - Otimização para mecanismos de busca
+
 ## 🎨 **Experiência do Usuário**
 
 ### ✨ **Design Responsivo**

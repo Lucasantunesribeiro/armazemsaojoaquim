@@ -173,6 +173,72 @@ export default function CafePage() {
         </div>
       </section>
 
+      {/* Informações do Buffet */}
+      <section className="py-12 bg-gradient-to-r from-amarelo-armazem/20 to-amarelo-armazem/10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Buffet Final de Semana */}
+            <Card className="bg-white/90 backdrop-blur-sm border-amarelo-armazem/30 hover:shadow-lg transition-shadow">
+              <CardHeader>
+                <div className="flex items-center space-x-2 text-amarelo-armazem mb-2">
+                  <Clock className="w-5 h-5" />
+                  <CardTitle className="text-lg">Buffet - Sáb/Dom</CardTitle>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <p className="text-2xl font-bold text-madeira-escura">R$ 89,90/kg</p>
+                <p className="text-sm text-cinza-medio">
+                  <Clock className="w-4 h-4 inline mr-1" />
+                  08h - 12h
+                </p>
+              </CardContent>
+            </Card>
+
+            {/* Combo Individual */}
+            <Card className="bg-white/90 backdrop-blur-sm border-amarelo-armazem/30 hover:shadow-lg transition-shadow">
+              <CardHeader>
+                <div className="flex items-center space-x-2 text-amarelo-armazem mb-2">
+                  <Coffee className="w-5 h-5" />
+                  <CardTitle className="text-lg">Combo Individual</CardTitle>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <p className="text-2xl font-bold text-madeira-escura">R$ 59,00</p>
+                <p className="text-sm text-cinza-medio">
+                  Segunda a Sexta
+                </p>
+              </CardContent>
+            </Card>
+
+            {/* Combo Família */}
+            <Card className="bg-white/90 backdrop-blur-sm border-amarelo-armazem/30 hover:shadow-lg transition-shadow">
+              <CardHeader>
+                <div className="flex items-center space-x-2 text-amarelo-armazem mb-2">
+                  <Utensils className="w-5 h-5" />
+                  <CardTitle className="text-lg">Combo Família</CardTitle>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <p className="text-2xl font-bold text-madeira-escura">R$ 98,00</p>
+                <p className="text-sm text-cinza-medio">
+                  Segunda a Sexta
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Horário de Funcionamento */}
+          <div className="mt-6 text-center">
+            <div className="inline-flex items-center space-x-2 bg-white/90 backdrop-blur-sm px-6 py-3 rounded-full border border-amarelo-armazem/30">
+              <Clock className="w-5 h-5 text-amarelo-armazem" />
+              <span className="text-madeira-escura font-semibold">
+                Funcionamento: 08h - 20h (todos os dias)
+              </span>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Cafe Content */}
       <section className="py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

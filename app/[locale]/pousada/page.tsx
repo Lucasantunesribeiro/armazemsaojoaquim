@@ -462,10 +462,10 @@ export default function PousadaPage() {
 
             <div className="text-center">
               <div className="w-16 h-16 bg-amber-100 dark:bg-amber-900/30 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <Coffee className="w-8 h-8 text-amber-600" />
+                <Car className="w-8 h-8 text-amber-600" />
               </div>
-              <h3 className="font-bold mb-2">{t('pousada.amenities.minibar.title')}</h3>
-              <p className="text-sm text-slate-600 dark:text-slate-300">{t('pousada.amenities.minibar.description')}</p>
+              <h3 className="font-bold mb-2">Estacionamento</h3>
+              <p className="text-sm text-slate-600 dark:text-slate-300">Vagas disponíveis para hóspedes</p>
             </div>
           </div>
         </div>

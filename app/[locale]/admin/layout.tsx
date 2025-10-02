@@ -5,10 +5,10 @@ import { useRouter, usePathname } from 'next/navigation'
 import { use } from 'react'
 import { createClient } from '@/lib/supabase'
 import { User, AuthChangeEvent, Session } from '@supabase/supabase-js'
-import { 
-  Menu, 
-  X, 
-  Clock, 
+import {
+  Menu,
+  X,
+  Clock,
   AlertTriangle,
   LayoutDashboard,
   Building2,
@@ -18,7 +18,10 @@ import {
   Utensils,
   ChevronLeft,
   ChevronRight,
-  LogOut
+  LogOut,
+  Coffee,
+  Calendar,
+  Image as ImageIcon
 } from 'lucide-react'
 import Link from 'next/link'
 // Lazy load heavy admin components
@@ -412,16 +415,28 @@ export default function AdminLayout({
       current: pathname === `/${locale}/admin`
     },
     {
-      name: 'Menu',
+      name: 'Restaurante',
       href: `/${locale}/admin/menu`,
       icon: Utensils,
       current: pathname.startsWith(`/${locale}/admin/menu`)
     },
     {
-      name: 'Pousadas',
+      name: 'Café',
+      href: `/${locale}/admin/cafe`,
+      icon: Coffee,
+      current: pathname.startsWith(`/${locale}/admin/cafe`)
+    },
+    {
+      name: 'Pousada',
       href: `/${locale}/admin/pousadas`,
       icon: Building2,
       current: pathname.startsWith(`/${locale}/admin/pousadas`)
+    },
+    {
+      name: 'Galeria',
+      href: `/${locale}/admin/galeria`,
+      icon: ImageIcon,
+      current: pathname.startsWith(`/${locale}/admin/galeria`)
     },
     {
       name: 'Blog',

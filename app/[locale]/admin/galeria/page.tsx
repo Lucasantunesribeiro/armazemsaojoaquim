@@ -9,6 +9,7 @@ import SafeImage from '@/components/ui/SafeImage'
 import Loading from '@/components/ui/Loading'
 import { useAdmin } from '@/hooks/useAdmin'
 import { useRouter } from 'next/navigation'
+import ImageUpload from '../components/ImageUpload'
 
 interface Artwork {
   id: string
@@ -539,12 +540,12 @@ export default function AdminGaleriaPage() {
 
                 <div>
                   <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-                    URL da Imagem
+                    Imagem
                   </label>
-                  <Input
-                    type="url"
+                  <ImageUpload
                     value={formData.image_url}
-                    onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
+                    onChange={(url) => setFormData({ ...formData, image_url: url })}
+                    onRemove={() => setFormData({ ...formData, image_url: '' })}
                   />
                 </div>
 

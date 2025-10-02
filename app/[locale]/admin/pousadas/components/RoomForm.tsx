@@ -63,7 +63,6 @@ const COMMON_AMENITIES = [
   'WiFi gratuita',
   'TV a cabo',
   'Ar-condicionado',
-  'Frigobar',
   'Cofre',
   'Varanda',
   'Banheira',
@@ -263,37 +262,21 @@ export default function RoomForm({ room, onSubmit, onCancel, isLoading }: RoomFo
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Imagem do Quarto
               </label>
-              <div className="space-y-4">
-                {/* Image Upload Component */}
-                <ImageUpload
-                  value={imagePreview || undefined}
-                  onChange={(url) => {
-                    setValue('image_url', url)
-                    setImagePreview(url)
-                  }}
-                  onRemove={() => {
-                    setValue('image_url', '')
-                    setImagePreview(null)
-                  }}
-                  disabled={isLoading}
-                />
-                
-                {/* Manual URL Input */}
-                <div>
-                  <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">
-                    Ou insira uma URL manualmente:
-                  </label>
-                  <Input
-                    {...register('image_url')}
-                    placeholder="URL da imagem (ex: /images/rooms/standard-1.jpg)"
-                    onChange={(e) => handleImageUrlChange(e.target.value)}
-                    className={errors.image_url ? 'border-red-500' : ''}
-                  />
-                  {errors.image_url && (
-                    <p className="text-red-500 text-sm mt-1">{errors.image_url.message}</p>
-                  )}
-                </div>
-              </div>
+              <ImageUpload
+                value={imagePreview || undefined}
+                onChange={(url) => {
+                  setValue('image_url', url)
+                  setImagePreview(url)
+                }}
+                onRemove={() => {
+                  setValue('image_url', '')
+                  setImagePreview(null)
+                }}
+                disabled={isLoading}
+              />
+              {errors.image_url && (
+                <p className="text-red-500 text-sm mt-1">{errors.image_url.message}</p>
+              )}
             </div>
 
             {/* Amenities */}

@@ -4,6 +4,7 @@ import { useState, useEffect, use } from 'react'
 import { useRouter } from 'next/navigation'
 import { useSupabase } from '@/components/providers/SupabaseProvider'
 import { Database } from '@/types/database.types'
+import ImageUpload from '../../components/ImageUpload'
 
 type MenuItem = Database['public']['Tables']['menu_items']['Row']
 type MenuCategory = Database['public']['Tables']['menu_categories']['Row']
@@ -282,17 +283,15 @@ export default function EditMenuItemPage({ params }: Props) {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                URL da Imagem
+                Imagem
               </label>
-              <input
-                type="url"
-                name="image_url"
+              <ImageUpload
                 value={formData.image_url || ''}
-                onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 dark:text-white"
+                onChange={(url) => setFormData(prev => ({ ...prev, image_url: url }))}
+                onRemove={() => setFormData(prev => ({ ...prev, image_url: '' }))}
               />
               {formData.image_url && (
-                <div className="mt-2">
+                <div className="mt-2 hidden">
                   <img
                     src={formData.image_url}
                     alt={formData.name}

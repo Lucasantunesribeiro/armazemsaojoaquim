@@ -1,10 +1,9 @@
 'use client'
 
-import { useEffect, useState, Suspense } from 'react'
+import { useEffect, useState } from 'react'
 import { use } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import dynamic from 'next/dynamic'
 import { useAdminApi } from '@/lib/hooks/useAdminApi'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card'
 import { 
@@ -27,27 +26,9 @@ import {
   Eye
 } from 'lucide-react'
 
-// Lazy load heavy components
-const LazyActivityChart = dynamic(() => import('./components/ActivityChart'), {
-  loading: () => <Card><CardContent className="p-6 animate-pulse h-64" /></Card>,
-  ssr: false
-})
-
-const LazyQuickActions = dynamic(() => import('./components/QuickActions'), {
-  loading: () => <Card><CardContent className="p-6 animate-pulse h-32" /></Card>,
-  ssr: false
-})
-
-const LazyRecentActivity = dynamic(() => import('./components/RecentActivity'), {
-  loading: () => <Card><CardContent className="p-6 animate-pulse h-48" /></Card>,
-  ssr: false
-})
 
 interface DashboardStats {
   totalUsers: number
-  totalReservas: number
-  reservasHoje: number
-  reservasPendentes: number
   totalBlogPosts: number
   totalMenuItems: number
 }
@@ -70,9 +51,6 @@ export default function AdminDashboard({ params }: AdminDashboardProps) {
   const { adminFetch, isAuthorized, isLoading: adminLoading } = useAdminApi()
   const [stats, setStats] = useState<DashboardStats>({
     totalUsers: 0,
-    totalReservas: 0,
-    reservasHoje: 0,
-    reservasPendentes: 0,
     totalBlogPosts: 0,
     totalMenuItems: 0
   })
@@ -109,9 +87,6 @@ export default function AdminDashboard({ params }: AdminDashboardProps) {
         console.warn('API retornou dados de fallback:', response)
         setStats(response.data || {
           totalUsers: 0,
-          totalReservas: 0,
-          reservasHoje: 0,
-          reservasPendentes: 0,
           totalBlogPosts: 0,
           totalMenuItems: 0
         })
@@ -151,30 +126,6 @@ export default function AdminDashboard({ params }: AdminDashboardProps) {
       route: `/${locale}/admin/usuarios`,
       description: "Total cadastrados",
       color: "blue"
-    },
-    {
-      title: "Reservas",
-      value: stats.totalReservas,
-      icon: <Calendar className="h-6 w-6" />,
-      route: `/${locale}/admin/reservas`,
-      description: "Total de reservas",
-      color: "green"
-    },
-    {
-      title: "Hoje",
-      value: stats.reservasHoje,
-      icon: <Clock className="h-6 w-6" />,
-      route: `/${locale}/admin/reservas?filter=today`,
-      description: "Reservas hoje",
-      color: "yellow"
-    },
-    {
-      title: "Pendentes",
-      value: stats.reservasPendentes,
-      icon: <AlertCircle className="h-6 w-6" />,
-      route: `/${locale}/admin/reservas?filter=pending`,
-      description: "Aguardando confirmação",
-      color: "red"
     }
   ]
 
@@ -188,12 +139,28 @@ export default function AdminDashboard({ params }: AdminDashboardProps) {
       color: "purple"
     },
     {
-      title: "Itens do Menu",
+      title: "Restaurante",
       value: stats.totalMenuItems,
       icon: <ChefHat className="h-6 w-6" />,
       route: `/${locale}/admin/menu`,
-      description: "Pratos disponíveis",
+      description: "Menu do restaurante",
       color: "orange"
+    },
+    {
+      title: "Café",
+      value: 0, // TODO: adicionar contagem específica do café
+      icon: <ChefHat className="h-6 w-6" />,
+      route: `/${locale}/admin/cafe`,
+      description: "Menu do café",
+      color: "orange"
+    },
+    {
+      title: "Galeria",
+      value: 0, // TODO: adicionar contagem de imagens
+      icon: <FileText className="h-6 w-6" />,
+      route: `/${locale}/admin/galeria`,
+      description: "Imagens da galeria",
+      color: "purple"
     }
   ]
 
@@ -286,23 +253,6 @@ export default function AdminDashboard({ params }: AdminDashboardProps) {
           />
         ))}
       </div>
-
-      {/* Activity Chart */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Suspense fallback={<Card><CardContent className="p-6 animate-pulse h-64" /></Card>}>
-          <LazyActivityChart />
-        </Suspense>
-        
-        {/* Quick Actions */}
-        <Suspense fallback={<Card><CardContent className="p-6 animate-pulse h-64" /></Card>}>
-          <LazyQuickActions locale={locale} />
-        </Suspense>
-      </div>
-
-      {/* Recent Activity */}
-      <Suspense fallback={<Card><CardContent className="p-6 animate-pulse h-48" /></Card>}>
-        <LazyRecentActivity />
-      </Suspense>
     </div>
   )
 }
