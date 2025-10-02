@@ -31,6 +31,7 @@ interface DashboardStats {
   totalUsers: number
   totalBlogPosts: number
   totalMenuItems: number
+  totalCafeProducts: number
 }
 
 interface DashboardCard {
@@ -52,7 +53,8 @@ export default function AdminDashboard({ params }: AdminDashboardProps) {
   const [stats, setStats] = useState<DashboardStats>({
     totalUsers: 0,
     totalBlogPosts: 0,
-    totalMenuItems: 0
+    totalMenuItems: 0,
+    totalCafeProducts: 0
   })
   const [loading, setLoading] = useState(true)
   const [locale, setLocale] = useState<string>('pt')
@@ -88,7 +90,8 @@ export default function AdminDashboard({ params }: AdminDashboardProps) {
         setStats(response.data || {
           totalUsers: 0,
           totalBlogPosts: 0,
-          totalMenuItems: 0
+          totalMenuItems: 0,
+          totalCafeProducts: 0
         })
         
         if (!response.success) {
@@ -148,7 +151,7 @@ export default function AdminDashboard({ params }: AdminDashboardProps) {
     },
     {
       title: "Café",
-      value: 0, // TODO: adicionar contagem específica do café
+      value: stats.totalCafeProducts,
       icon: <ChefHat className="h-6 w-6" />,
       route: `/${locale}/admin/cafe`,
       description: "Menu do café",

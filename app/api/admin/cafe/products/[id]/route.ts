@@ -1,140 +1,110 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createServerClient } from '@supabase/ssr'
-import { cookies } from 'next/headers'
+import { createClient } from '@supabase/supabase-js'
+import { withAdminAuth } from '@/lib/admin-auth'
 
-export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
-  try {
-    const cookieStore = await cookies()
-    
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        cookies: {
-          getAll() {
-            return cookieStore.getAll()
-          },
-          setAll(cookiesToSet) {
-            try {
-              cookiesToSet.forEach(({ name, value, options }) =>
-                cookieStore.set(name, value, options)
-              )
-            } catch {
-              // The `setAll` method was called from a Server Component.
-              // This can be ignored if you have middleware refreshing
-              // user sessions.
-            }
-          },
-        },
-      }
-    )
-    
-    // Verificar se é admin
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user || user.user_metadata?.role !== 'admin') {
-      return NextResponse.json(
-        { error: 'Acesso negado' },
-        { status: 403 }
-      )
+// Cliente admin com service role para bypass RLS
+const supabaseAdmin = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!,
+  {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false
     }
+  }
+)
 
-    const body = await request.json()
-    const { name, category, price, description, image_url, available } = body
+export async function PUT(request: NextRequest, context: { params: Promise<{ id: string }> }) {
+  return withAdminAuth(async (authResult) => {
+    try {
+      const params = await context.params
+      console.log('🔄 [CAFE-PRODUCTS] Atualizando produto:', params.id)
 
-    const { data: product, error } = await supabase
-      .from('cafe_products')
-      .update({
-        name,
-        category,
-        price,
-        description,
-        image_url,
-        available
+      const supabase = supabaseAdmin
+
+      const body = await request.json()
+      const { name, category, price, description, image_url, available } = body
+
+      console.log('📝 [CAFE-PRODUCTS] Dados recebidos:', { name, category, price, available })
+
+      if (!name || !category || price === undefined) {
+        console.error('❌ [CAFE-PRODUCTS] Dados obrigatórios faltando')
+        return NextResponse.json(
+          { error: 'Dados obrigatórios não fornecidos: name, category, price' },
+          { status: 400 }
+        )
+      }
+
+      const { data: product, error } = await supabase
+        .from('cafe_products')
+        .update({
+          name,
+          category,
+          price,
+          description,
+          image_url,
+          available: available !== false
+        })
+        .eq('id', params.id)
+        .select()
+        .single()
+
+      if (error) {
+        console.error('❌ [CAFE-PRODUCTS] Erro ao atualizar produto:', error)
+        return NextResponse.json(
+          { error: 'Erro ao atualizar produto', debug: error.message },
+          { status: 500 }
+        )
+      }
+
+      console.log(`✅ [CAFE-PRODUCTS] Produto atualizado: ${product.name}`)
+      return NextResponse.json({
+        success: true,
+        data: product,
+        message: 'Produto atualizado com sucesso!'
       })
-      .eq('id', params.id)
-      .select()
-      .single()
-
-    if (error) {
-      console.error('Erro ao atualizar produto:', error)
+    } catch (error) {
+      console.error('💥 [CAFE-PRODUCTS] Erro interno:', error)
       return NextResponse.json(
-        { error: 'Erro ao atualizar produto' },
+        { error: 'Erro interno do servidor' },
         { status: 500 }
       )
     }
-
-    return NextResponse.json({ 
-      success: true, 
-      product,
-      message: 'Produto atualizado com sucesso!' 
-    })
-  } catch (error) {
-    console.error('Erro interno:', error)
-    return NextResponse.json(
-      { error: 'Erro interno do servidor' },
-      { status: 500 }
-    )
-  }
+  }, request)
 }
 
-export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
-  try {
-    const cookieStore = await cookies()
-    
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        cookies: {
-          getAll() {
-            return cookieStore.getAll()
-          },
-          setAll(cookiesToSet) {
-            try {
-              cookiesToSet.forEach(({ name, value, options }) =>
-                cookieStore.set(name, value, options)
-              )
-            } catch {
-              // The `setAll` method was called from a Server Component.
-              // This can be ignored if you have middleware refreshing
-              // user sessions.
-            }
-          },
-        },
+export async function DELETE(request: NextRequest, context: { params: Promise<{ id: string }> }) {
+  return withAdminAuth(async (authResult) => {
+    try {
+      const params = await context.params
+      console.log('🗑️ [CAFE-PRODUCTS] Excluindo produto:', params.id)
+
+      const supabase = supabaseAdmin
+
+      const { error } = await supabase
+        .from('cafe_products')
+        .delete()
+        .eq('id', params.id)
+
+      if (error) {
+        console.error('❌ [CAFE-PRODUCTS] Erro ao excluir produto:', error)
+        return NextResponse.json(
+          { error: 'Erro ao excluir produto', debug: error.message },
+          { status: 500 }
+        )
       }
-    )
-    
-    // Verificar se é admin
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user || user.user_metadata?.role !== 'admin') {
-      return NextResponse.json(
-        { error: 'Acesso negado' },
-        { status: 403 }
-      )
-    }
 
-    const { error } = await supabase
-      .from('cafe_products')
-      .delete()
-      .eq('id', params.id)
-
-    if (error) {
-      console.error('Erro ao excluir produto:', error)
+      console.log(`✅ [CAFE-PRODUCTS] Produto excluído com sucesso`)
+      return NextResponse.json({
+        success: true,
+        message: 'Produto excluído com sucesso!'
+      })
+    } catch (error) {
+      console.error('💥 [CAFE-PRODUCTS] Erro interno:', error)
       return NextResponse.json(
-        { error: 'Erro ao excluir produto' },
+        { error: 'Erro interno do servidor' },
         { status: 500 }
       )
     }
-
-    return NextResponse.json({ 
-      success: true,
-      message: 'Produto excluído com sucesso!' 
-    })
-  } catch (error) {
-    console.error('Erro interno:', error)
-    return NextResponse.json(
-      { error: 'Erro interno do servidor' },
-      { status: 500 }
-    )
-  }
+  }, request)
 }

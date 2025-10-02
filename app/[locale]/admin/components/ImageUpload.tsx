@@ -3,14 +3,16 @@
 import { useState, useRef } from 'react'
 import { Upload, X, Loader2 } from 'lucide-react'
 import Image from 'next/image'
+import { createClient } from '@/utils/supabase/client'
 
 interface ImageUploadProps {
   value?: string
   onChange: (url: string) => void
   onRemove?: () => void
+  disabled?: boolean
 }
 
-export default function ImageUpload({ value, onChange, onRemove }: ImageUploadProps) {
+export default function ImageUpload({ value, onChange, onRemove, disabled }: ImageUploadProps) {
   const [uploading, setUploading] = useState(false)
   const [preview, setPreview] = useState<string | null>(value || null)
   const [error, setError] = useState<string>('')
@@ -44,12 +46,23 @@ export default function ImageUpload({ value, onChange, onRemove }: ImageUploadPr
       }
       reader.readAsDataURL(file)
 
+      // Obter token de autenticação
+      const supabase = createClient()
+      const { data: { session } } = await supabase.auth.getSession()
+
+      if (!session) {
+        throw new Error('Sessão não encontrada. Faça login novamente.')
+      }
+
       // Upload para o servidor
       const formData = new FormData()
       formData.append('file', file)
 
       const response = await fetch('/api/upload', {
         method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`
+        },
         body: formData
       })
 
@@ -71,12 +84,23 @@ export default function ImageUpload({ value, onChange, onRemove }: ImageUploadPr
   const handleRemove = async () => {
     if (value) {
       try {
+        // Obter token de autenticação
+        const supabase = createClient()
+        const { data: { session } } = await supabase.auth.getSession()
+
+        if (!session) {
+          throw new Error('Sessão não encontrada. Faça login novamente.')
+        }
+
         // Extrair fileName da URL
         const urlParts = value.split('/')
         const fileName = urlParts[urlParts.length - 1]
 
         await fetch(`/api/upload?fileName=${fileName}`, {
-          method: 'DELETE'
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${session.access_token}`
+          }
         })
       } catch (err) {
         console.error('Erro ao deletar imagem:', err)

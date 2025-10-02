@@ -88,13 +88,13 @@ export function useAdminApi() {
         console.log(`📡 [useAdminApi] Making request to: ${cleanEndpoint} (attempt ${attempt + 1}/${config.maxRetries + 1})`)
 
         const response = await fetch(cleanEndpoint, {
+          ...options,
           headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${session.access_token}`,
             ...options.headers,
           },
           signal: controller.signal,
-          ...options,
         })
         
         // Clear timeout on successful response

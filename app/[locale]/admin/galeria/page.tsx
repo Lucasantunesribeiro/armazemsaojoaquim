@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/Input'
 import { Card } from '@/components/ui/Card'
 import SafeImage from '@/components/ui/SafeImage'
 import Loading from '@/components/ui/Loading'
-import { useAdmin } from '@/hooks/useAdmin'
+import { useAdminApi } from '@/lib/hooks/useAdminApi'
 import { useRouter } from 'next/navigation'
 import ImageUpload from '../components/ImageUpload'
 
@@ -36,7 +36,7 @@ const categories = [
 ]
 
 export default function AdminGaleriaPage() {
-  const { isAdmin, loading: adminLoading } = useAdmin()
+  const { adminFetch, isAuthorized, isLoading: adminLoading } = useAdminApi()
   const router = useRouter()
   const [artworks, setArtworks] = useState<Artwork[]>([])
   const [loading, setLoading] = useState(true)
@@ -67,23 +67,24 @@ export default function AdminGaleriaPage() {
   })
 
   useEffect(() => {
-    if (!adminLoading && !isAdmin) {
+    if (!adminLoading && !isAuthorized) {
       router.push('/unauthorized')
       return
     }
-    
-    if (isAdmin) {
+
+    if (isAuthorized) {
       fetchArtworks()
     }
-  }, [isAdmin, adminLoading, router])
+  }, [isAuthorized, adminLoading, router])
 
   const fetchArtworks = async () => {
     try {
       setLoading(true)
+      // Usar fetch direto para GET público
       const response = await fetch('/api/gallery')
       const data = await response.json()
-      
-      if (data.success) {
+
+      if (data.success && data.data) {
         setArtworks(data.data)
         calculateStats(data.data)
       }
@@ -154,26 +155,26 @@ export default function AdminGaleriaPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    
+
     try {
-      const url = isEditMode ? `/api/gallery/${selectedArtwork?.id}` : '/api/gallery'
-      const method = isEditMode ? 'PUT' : 'POST'
-      
-      const response = await fetch(url, {
-        method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
-      })
-      
-      const data = await response.json()
-      
-      if (data.success) {
+      const endpoint = isEditMode ? `/gallery/${selectedArtwork?.id}` : '/gallery'
+      const response = isEditMode
+        ? await adminFetch(endpoint, {
+            method: 'PUT',
+            body: JSON.stringify(formData)
+          })
+        : await adminFetch(endpoint, {
+            method: 'POST',
+            body: JSON.stringify(formData)
+          })
+
+      if (response.success) {
         closeModal()
         fetchArtworks()
         // TODO: Adicionar toast de sucesso quando wrapper estiver disponível
       } else {
         // TODO: Substituir por toast quando wrapper estiver disponível
-        alert(data.error || 'Erro ao salvar quadro')
+        alert(response.error || 'Erro ao salvar quadro')
       }
     } catch (error) {
       console.error('Erro ao salvar:', error)
@@ -184,18 +185,16 @@ export default function AdminGaleriaPage() {
 
   const handleDelete = async (artworkId: string) => {
     if (!confirm('Tem certeza que deseja deletar este quadro?')) return
-    
+
     try {
-      const response = await fetch(`/api/gallery/${artworkId}`, {
+      const response = await adminFetch(`/gallery/${artworkId}`, {
         method: 'DELETE'
       })
-      
-      const data = await response.json()
-      
-      if (data.success) {
+
+      if (response.success) {
         fetchArtworks()
       } else {
-        alert(data.error || 'Erro ao deletar quadro')
+        alert(response.error || 'Erro ao deletar quadro')
       }
     } catch (error) {
       console.error('Erro ao deletar:', error)
@@ -218,7 +217,7 @@ export default function AdminGaleriaPage() {
     )
   }
 
-  if (!isAdmin) {
+  if (!isAuthorized) {
     return null
   }
 
