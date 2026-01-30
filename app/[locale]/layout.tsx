@@ -8,8 +8,6 @@ import '../globals.css'
 import { Suspense } from 'react'
 import Loading from '@/components/ui/Loading'
 import { ErrorBoundaryGlobal } from '@/components/ErrorBoundaryGlobal'
-import { HydrationProvider } from '@/components/HydrationProvider'
-
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
@@ -30,18 +28,16 @@ export default async function LocaleLayout({
   return (
     <>
       <ErrorBoundaryGlobal>
-        <HydrationProvider>
-          <Providers>
-            <Header />
-            <main className="min-h-screen main-content-mobile">
-              <Suspense fallback={<Loading />}>
-                {children}
-              </Suspense>
-            </main>
-            <Footer />
-            <BottomNavigation />
-          </Providers>
-        </HydrationProvider>
+        <Providers>
+          <Header />
+          <main className="min-h-screen main-content-mobile">
+            <Suspense fallback={<Loading />}>
+              {children}
+            </Suspense>
+          </main>
+          <Footer />
+          <BottomNavigation />
+        </Providers>
       </ErrorBoundaryGlobal>
     </>
   )
