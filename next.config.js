@@ -20,12 +20,14 @@ const nextConfig = {
     },
   }),
 
-  // Configurações de imagem - Simplificadas para Netlify
+  // Configurações de imagem - Otimizadas para Netlify
   images: {
-    // unoptimized: true, // Optimizations enabled!
+    // Image optimization enabled for Netlify
     formats: ['image/webp', 'image/avif'],
     dangerouslyAllowSVG: true,
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
+    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
 
     remotePatterns: [
       {
@@ -37,6 +39,16 @@ const nextConfig = {
       {
         protocol: 'https',
         hostname: '*.netlify.app',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'armazemsaojoaquim.com.br',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'armazemsaojoaquim.netlify.app',
         pathname: '/**',
       },
       {

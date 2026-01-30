@@ -1,12 +1,15 @@
 [build]
   command = "npm run build"
-  publish = ".next"
+  # Don't set publish when using @netlify/plugin-nextjs
+  # publish = ".next"
 
 [build.environment]
   NODE_VERSION = "22"
   NPM_VERSION = "10"
   NEXT_TELEMETRY_DISABLED = "1"
   NODE_ENV = "production"
+  # Enable Next.js Image Optimization on Netlify
+  NEXT_PUBLIC_NETLIFY = "true"
 
 [functions]
   node_bundler = "esbuild"
@@ -16,6 +19,10 @@
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
+
+  [plugins.inputs]
+    # Enable Next.js Image Optimization
+    imageOptimization = true
 
 [[headers]]
   for = "/*"
@@ -32,6 +39,11 @@
 
 [[headers]]
   for = "/_next/static/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/_next/image*"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
 
