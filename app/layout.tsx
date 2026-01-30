@@ -87,11 +87,12 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html 
+    <html
+      lang="pt"
       className={`${inter.variable} ${playfair.variable} scroll-smooth`}
       suppressHydrationWarning
     >
-      <body 
+      <body
         className="min-h-screen bg-white dark:bg-slate-900 text-gray-900 dark:text-gray-100 antialiased"
         suppressHydrationWarning
       >

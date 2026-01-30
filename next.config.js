@@ -22,7 +22,7 @@ const nextConfig = {
 
   // Configurações de imagem - Simplificadas para Netlify
   images: {
-    unoptimized: true, // Disable optimization for Netlify compatibility
+    // unoptimized: true, // Optimizations enabled!
     formats: ['image/webp', 'image/avif'],
     dangerouslyAllowSVG: true,
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
@@ -71,8 +71,8 @@ const nextConfig = {
 
   // Configurações experimentais para performance e Edge Runtime
   experimental: {
-    // Re-enable CSS optimization now that build is stable
-    optimizeCss: true,
+    // optimizeCss disabled to fix MIME type errors in production (Next.js 16)
+    optimizeCss: false,
     middlewarePrefetch: 'strict',
     // Otimização crítica para Netlify - reduzir bundle size
     optimizePackageImports: [
