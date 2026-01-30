@@ -24,6 +24,7 @@ import {
   Image as ImageIcon
 } from 'lucide-react'
 import Link from 'next/link'
+import { AdminSidebar } from '@/components/admin/AdminSidebar'
 // Lazy load heavy admin components
 const AdminNotificationCenter = lazy(() => import('@/components/ui/AdminNotificationCenter'))
 const AdminProfileSetup = lazy(() => import('@/components/admin/AdminProfileSetup'))
@@ -56,7 +57,7 @@ export default function AdminLayout({
 
   // Desempacotar params usando React.use()
   const resolvedParams = use(params)
-  
+
   // Definir locale diretamente dos params
   useEffect(() => {
     setLocale(resolvedParams.locale || 'pt')
@@ -64,14 +65,14 @@ export default function AdminLayout({
 
   const checkAuth = useCallback(async () => {
     console.log('🔍 AdminLayout: === INICIANDO VERIFICAÇÃO DE AUTENTICAÇÃO ===')
-    
+
     try {
       setError('')
-      
+
       // Step 1: Verificar sessão atual
       console.log('🔍 AdminLayout: [STEP 1] Verificando sessão...')
       const { data: { session }, error: sessionError } = await supabase.auth.getSession()
-      
+
       if (sessionError) {
         console.error('❌ AdminLayout: [STEP 1] Erro na sessão:', sessionError)
         setError(`Erro na sessão: ${sessionError.message}`)
@@ -99,15 +100,15 @@ export default function AdminLayout({
         console.log('✅ AdminLayout: [STEP 2] ADMIN CONFIRMADO POR EMAIL DIRETO!')
         // Admin confirmed by email
         setIsAdmin(true)
-        
+
         // Start session timeout monitoring for admin
         if (sessionManager) {
           sessionManager.start()
         }
-        
+
         return
       }
-      
+
       // Email is not admin, trying APIs
 
       // Step 3: Verificar através da API
@@ -129,12 +130,12 @@ export default function AdminLayout({
             status: response.status,
             statusText: response.statusText
           })
-          
+
           // Tentar ler detalhes do erro
           try {
             const errorData = await response.json()
             console.error('❌ AdminLayout: [STEP 3] Detalhes do erro:', errorData)
-            
+
             // Se API falhou mas email é admin, continuar
             if (session.user.email === 'armazemsaojoaquimoficial@gmail.com') {
               console.log('⚠️ AdminLayout: [STEP 3] API falhou mas email é admin - PERMITINDO ACESSO')
@@ -144,7 +145,7 @@ export default function AdminLayout({
           } catch (parseError) {
             console.error('❌ AdminLayout: [STEP 3] Não foi possível ler erro da API:', parseError)
           }
-          
+
           setError(`API error (${response.status}): ${response.statusText}`)
           router.push(`/${locale}/auth?message=Erro+ao+verificar+permissões`)
           return
@@ -164,7 +165,7 @@ export default function AdminLayout({
             error: roleData.error,
             debug: roleData.debug
           })
-          
+
           // Fallback final: se email é admin mas API disse não, forçar sim
           if (session.user.email === 'armazemsaojoaquimoficial@gmail.com') {
             console.log('⚠️ AdminLayout: [STEP 3] OVERRIDE: Email é admin, ignorando API - PERMITINDO ACESSO')
@@ -175,14 +176,14 @@ export default function AdminLayout({
 
       } catch (apiError: any) {
         console.error('❌ AdminLayout: [STEP 3] Erro ao chamar API:', apiError)
-        
+
         // Fallback: se erro na API mas email é admin, permitir
         if (session.user.email === 'armazemsaojoaquimoficial@gmail.com') {
           console.log('✅ AdminLayout: [STEP 3] Erro na API mas email é admin - PERMITINDO ACESSO')
           setIsAdmin(true)
           return
         }
-        
+
         setError(`Erro na API: ${apiError.message}`)
         router.push(`/${locale}/auth?message=Erro+ao+verificar+permissões`)
         return
@@ -202,7 +203,7 @@ export default function AdminLayout({
         if (response.ok) {
           const roleData = await response.json()
           console.log('✅ AdminLayout: [STEP 4] API alternativa response:', roleData)
-          
+
           if (roleData.isAdmin) {
             console.log('✅ AdminLayout: [STEP 4] ADMIN CONFIRMADO VIA API ALTERNATIVA!')
             setIsAdmin(true)
@@ -229,11 +230,11 @@ export default function AdminLayout({
 
     } catch (error: any) {
       console.error('❌ AdminLayout: [ERRO GERAL]:', error)
-      
+
       // Última tentativa: verificar sessão novamente
       try {
         const { data: { session: currentSession } } = await supabase.auth.getSession()
-        
+
         if (currentSession?.user?.email === 'armazemsaojoaquimoficial@gmail.com') {
           console.log('⚠️ AdminLayout: [ERRO GERAL] Email é admin - PERMITINDO ACESSO FINAL')
           setUser(currentSession.user)
@@ -243,7 +244,7 @@ export default function AdminLayout({
       } catch (finalError) {
         console.error('❌ AdminLayout: [ERRO GERAL] Erro na verificação final:', finalError)
       }
-      
+
       setError('Erro crítico na autenticação: ' + error.message)
     } finally {
       console.log('🏁 AdminLayout: === VERIFICAÇÃO FINALIZADA ===')
@@ -268,14 +269,14 @@ export default function AdminLayout({
         router.push(`/${locale}/auth?message=Sua+sessão+expirou.+Faça+login+novamente.&timeout=true`)
       }
     })
-    
+
     setSessionManager(manager)
 
     // Listener para mudanças na sessão
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event: AuthChangeEvent, session: Session | null) => {
         console.log('🔄 AdminLayout: Auth state changed:', event)
-        
+
         if (event === 'SIGNED_OUT' || !session) {
           setUser(null)
           setIsAdmin(false)
@@ -349,7 +350,7 @@ export default function AdminLayout({
               </div>
             )}
           </div>
-          
+
           <div className="space-y-3">
             <button
               onClick={() => {
@@ -374,7 +375,7 @@ export default function AdminLayout({
               Recarregar Página
             </button>
           </div>
-          
+
           {/* Debug details removed to prevent interference */}
         </div>
       </div>
@@ -385,11 +386,11 @@ export default function AdminLayout({
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center p-4">
         <div className="max-w-md w-full">
-          <AdminProfileSetup 
+          <AdminProfileSetup
             onComplete={() => {
               setNeedsProfileSetup(false)
               checkAuth()
-            }} 
+            }}
           />
         </div>
       </div>
@@ -462,7 +463,7 @@ export default function AdminLayout({
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Session Warning Banner */}
       {showSessionWarning && (
-        <SessionWarningBanner 
+        <SessionWarningBanner
           onExtend={() => {
             if (sessionManager) {
               sessionManager.extendSession()
@@ -480,17 +481,16 @@ export default function AdminLayout({
 
       {/* Mobile menu overlay */}
       {mobileMenuOpen && (
-        <div 
+        <div
           className="fixed inset-0 z-40 bg-gray-600 bg-opacity-75 lg:hidden"
           onClick={() => setMobileMenuOpen(false)}
         />
       )}
 
       {/* Desktop Sidebar */}
-      <div className={`hidden lg:fixed lg:inset-y-0 lg:flex lg:flex-col transition-all duration-300 ${
-        sidebarCollapsed ? 'lg:w-16' : 'lg:w-64'
-      }`}>
-        <AdminSidebar 
+      <div className={`hidden lg:fixed lg:inset-y-0 lg:flex lg:flex-col transition-all duration-300 ${sidebarCollapsed ? 'lg:w-16' : 'lg:w-64'
+        }`}>
+        <AdminSidebar
           navigationItems={navigationItems}
           user={user}
           collapsed={sidebarCollapsed}
@@ -500,14 +500,13 @@ export default function AdminLayout({
       </div>
 
       {/* Mobile Sidebar */}
-      <div className={`fixed inset-y-0 left-0 z-50 w-64 transform transition-transform duration-300 ease-in-out lg:hidden ${
-        mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
-      }`}>
-        <AdminSidebar 
+      <div className={`fixed inset-y-0 left-0 z-50 w-64 transform transition-transform duration-300 ease-in-out lg:hidden ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}>
+        <AdminSidebar
           navigationItems={navigationItems}
           user={user}
           collapsed={false}
-          onToggleCollapse={() => {}}
+          onToggleCollapse={() => { }}
           onLogout={handleLogout}
           mobile
           onClose={() => setMobileMenuOpen(false)}
@@ -515,9 +514,8 @@ export default function AdminLayout({
       </div>
 
       {/* Main content */}
-      <div className={`lg:pl-64 transition-all duration-300 ${
-        sidebarCollapsed ? 'lg:pl-16' : 'lg:pl-64'
-      }`}>
+      <div className={`lg:pl-64 transition-all duration-300 ${sidebarCollapsed ? 'lg:pl-16' : 'lg:pl-64'
+        }`}>
         {/* Top bar */}
         <div className="sticky top-0 z-30 bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
           <div className="flex items-center justify-between px-4 sm:px-6 lg:px-8 h-16">
@@ -542,7 +540,7 @@ export default function AdminLayout({
               <Suspense fallback={<div className="w-8 h-8 animate-pulse bg-gray-200 rounded" />}>
                 <AdminNotificationCenter />
               </Suspense>
-              
+
               {/* User info - desktop only */}
               <div className="hidden sm:flex items-center space-x-3">
                 <span className="text-sm text-gray-600 dark:text-gray-400 truncate max-w-32">
@@ -569,134 +567,13 @@ export default function AdminLayout({
   )
 }
 
-// Sidebar Component
-interface AdminSidebarProps {
-  navigationItems: Array<{
-    name: string
-    href: string
-    icon: any
-    current: boolean
-  }>
-  user: User
-  collapsed: boolean
-  onToggleCollapse: () => void
-  onLogout: () => void
-  mobile?: boolean
-  onClose?: () => void
-}
-
-function AdminSidebar({ 
-  navigationItems, 
-  user, 
-  collapsed, 
-  onToggleCollapse, 
-  onLogout,
-  mobile = false,
-  onClose
-}: AdminSidebarProps) {
-  return (
-    <div className="flex flex-col h-full bg-white dark:bg-gray-800 shadow-lg">
-      {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
-        {(!collapsed || mobile) && (
-          <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm">A</span>
-            </div>
-            <div className="flex flex-col">
-              <span className="text-sm font-semibold text-gray-900 dark:text-white">
-                Armazém São Joaquim
-              </span>
-              <span className="text-xs text-gray-500 dark:text-gray-400">
-                Admin Panel
-              </span>
-            </div>
-          </div>
-        )}
-        
-        {mobile && onClose && (
-          <button
-            onClick={onClose}
-            className="p-2 rounded-md text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
-          >
-            <X className="h-5 w-5" />
-          </button>
-        )}
-        
-        {!mobile && (
-          <button
-            onClick={onToggleCollapse}
-            className="p-2 rounded-md text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
-          >
-            {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
-          </button>
-        )}
-      </div>
-
-      {/* Navigation */}
-      <nav className="flex-1 p-4 space-y-2">
-        {navigationItems.map((item) => {
-          const Icon = item.icon
-          return (
-            <Link
-              key={item.name}
-              href={item.href}
-              className={`flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                item.current
-                  ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300'
-                  : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white'
-              }`}
-              title={collapsed && !mobile ? item.name : undefined}
-            >
-              <Icon className={`h-5 w-5 ${collapsed && !mobile ? '' : 'mr-3'}`} />
-              {(!collapsed || mobile) && item.name}
-            </Link>
-          )
-        })}
-      </nav>
-
-      {/* User section */}
-      <div className="p-4 border-t border-gray-200 dark:border-gray-700">
-        {(!collapsed || mobile) && (
-          <div className="flex items-center space-x-3 mb-3">
-            <div className="w-8 h-8 bg-gray-300 dark:bg-gray-600 rounded-full flex items-center justify-center">
-              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                {user.email?.[0]?.toUpperCase()}
-              </span>
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
-                Administrador
-              </p>
-              <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
-                {user.email}
-              </p>
-            </div>
-          </div>
-        )}
-        
-        <button
-          onClick={onLogout}
-          className={`w-full flex items-center px-3 py-2 rounded-lg text-sm font-medium text-red-700 dark:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors ${
-            collapsed && !mobile ? 'justify-center' : ''
-          }`}
-          title={collapsed && !mobile ? 'Logout' : undefined}
-        >
-          <LogOut className={`h-5 w-5 ${collapsed && !mobile ? '' : 'mr-3'}`} />
-          {(!collapsed || mobile) && 'Logout'}
-        </button>
-      </div>
-    </div>
-  )
-}
-
 // Session Warning Banner Component
-function SessionWarningBanner({ onExtend, onLogout }: { 
+function SessionWarningBanner({ onExtend, onLogout }: {
   onExtend: () => void
-  onLogout: () => void 
+  onLogout: () => void
 }) {
   const { remainingTime, formatTime } = useSessionTimeout()
-  
+
   return (
     <div className="bg-yellow-50 dark:bg-yellow-900/20 border-b border-yellow-200 dark:border-yellow-800 z-50 relative">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -713,7 +590,7 @@ function SessionWarningBanner({ onExtend, onLogout }: {
               </span>
             </div>
           </div>
-          
+
           <div className="flex items-center space-x-2">
             <button
               onClick={onExtend}
