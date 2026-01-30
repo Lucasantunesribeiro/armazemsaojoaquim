@@ -1,7 +1,6 @@
 [build]
   command = "npm run build"
-  # Don't set publish when using @netlify/plugin-nextjs
-  # publish = ".next"
+  publish = ".next"
 
 [build.environment]
   NODE_VERSION = "22"
