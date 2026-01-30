@@ -6,9 +6,9 @@ import { Database } from '../types/database.types'
 // Edge Runtime detection
 const isEdgeRuntime = () => {
   try {
-    return typeof globalThis !== 'undefined' && 
-           ('EdgeRuntime' in globalThis || 
-            globalThis.navigator?.userAgent?.includes('Edge'))
+    return typeof globalThis !== 'undefined' &&
+      ('EdgeRuntime' in globalThis ||
+        globalThis.navigator?.userAgent?.includes('Edge'))
   } catch {
     return false
   }
@@ -18,10 +18,10 @@ const isEdgeRuntime = () => {
 export const isSupabaseConfigured = () => {
   // Use typeof window to detect client-side vs server-side
   const isClient = typeof window !== 'undefined'
-  
+
   let url: string | undefined
   let key: string | undefined
-  
+
   if (isClient) {
     // Client-side: access via window object or direct env vars
     url = process.env.NEXT_PUBLIC_SUPABASE_URL
@@ -31,7 +31,7 @@ export const isSupabaseConfigured = () => {
     url = process.env.NEXT_PUBLIC_SUPABASE_URL
     key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
   }
-  
+
   return !!(url && key && url !== 'your_supabase_url' && key !== 'your_supabase_anon_key')
 }
 
@@ -113,7 +113,7 @@ function createMockClient() {
       setSession: () => Promise.resolve({ data: { session: null }, error: null }),
       refreshSession: () => Promise.resolve({ data: { session: null }, error: null }),
       onAuthStateChange: () => ({
-        data: { subscription: { unsubscribe: () => {} } },
+        data: { subscription: { unsubscribe: () => { } } },
         error: null
       }),
       admin: {
@@ -230,24 +230,25 @@ export function createServerClient() {
   // Server-side environment variables (safe in server context)
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  
+
   // NETLIFY FIX: Use dynamic import to avoid build issues
   return createSSRServerClient<Database>(supabaseUrl, supabaseAnonKey, {
     cookies: {
-      getAll() {
+      async getAll() {
         try {
           // Dynamic import only when needed
-          const { cookies } = require('next/headers')
-          return cookies().getAll()
+          const { cookies } = await import('next/headers')
+          const cookieStore = await cookies()
+          return cookieStore.getAll()
         } catch (error) {
           console.warn('⚠️ Cookies não disponível em server context')
           return []
         }
       },
-      setAll(cookiesToSet: Array<{ name: string; value: string; options?: any }>) {
+      async setAll(cookiesToSet: Array<{ name: string; value: string; options?: any }>) {
         try {
-          const { cookies } = require('next/headers')
-          const cookieStore = cookies()
+          const { cookies } = await import('next/headers')
+          const cookieStore = await cookies()
           cookiesToSet.forEach(({ name, value, options }) =>
             cookieStore.set(name, value, options)
           )
@@ -372,7 +373,7 @@ export const getSupabaseStatus = async () => {
   try {
     const client = createClient()
     const { data, error } = await client.from('users').select('count').limit(1)
-    
+
     return {
       configured: true,
       connected: !error,
@@ -391,7 +392,7 @@ export const forceLogout = async () => {
   try {
     const client = createClient()
     await client.auth.signOut()
-    
+
     if (typeof window !== 'undefined') {
       // Clear all auth related localStorage
       Object.keys(localStorage).forEach(key => {
@@ -401,7 +402,7 @@ export const forceLogout = async () => {
       })
       sessionStorage.clear()
     }
-    
+
     return { success: true }
   } catch (error: any) {
     console.error('Erro no logout forçado:', error)
@@ -444,7 +445,7 @@ export const cachedQuery = async <T>(
 
   // Executar query
   const result = await queryFn()
-  
+
   // Cache apenas resultados de sucesso
   if (!result.error && result.data) {
     queryCache.set(cacheKey, {
@@ -492,9 +493,9 @@ export const getCachedDashboardStats = () => {
       ])
 
       if (users.error || reservas.error || blog.error || menu.error) {
-        return { 
-          data: null, 
-          error: users.error || reservas.error || blog.error || menu.error 
+        return {
+          data: null,
+          error: users.error || reservas.error || blog.error || menu.error
         }
       }
 
@@ -521,19 +522,19 @@ export const createMockSupabaseClient = () => createMockClient()
 export const upsertProfile = async (user: any) => {
   try {
     const supabase = createClient()
-    
+
     // Verificar se o profile já existe
     const { data: existingProfile, error: fetchError } = await supabase
       .from('profiles')
       .select('*')
       .eq('id', user.id)
       .single()
-    
+
     if (fetchError && !fetchError.message.includes('No rows found')) {
       console.error('❌ Erro ao verificar profile existente:', fetchError)
       return { error: fetchError }
     }
-    
+
     const profileData = {
       id: user.id,
       email: user.email,
@@ -541,9 +542,9 @@ export const upsertProfile = async (user: any) => {
       avatar_url: user.user_metadata?.avatar_url || null,
       updated_at: new Date().toISOString()
     }
-    
+
     let result
-    
+
     if (existingProfile) {
       // Atualizar profile existente
       console.log('🔄 Atualizando profile existente para:', user.id)
@@ -553,7 +554,7 @@ export const upsertProfile = async (user: any) => {
         .eq('id', user.id)
         .select()
         .single()
-      
+
       result = { data, error }
     } else {
       // Criar novo profile
@@ -563,32 +564,32 @@ export const upsertProfile = async (user: any) => {
         .insert(profileData)
         .select()
         .single()
-      
+
       result = { data, error }
     }
-    
+
     if (result.error) {
       console.error('❌ Erro ao upsert profile:', result.error)
-      
+
       // Se for erro de duplicação, tentar recuperar o profile existente
       if (result.error.message?.includes('profiles_pkey') || result.error.message?.includes('duplicate key')) {
         console.log('🔄 Tentando recuperar profile após erro de duplicação...')
-        
+
         const { data: recoveredProfile, error: recoveryError } = await supabase
           .from('profiles')
           .select('*')
           .eq('id', user.id)
           .single()
-        
+
         if (!recoveryError && recoveredProfile) {
           console.log('✅ Profile recuperado com sucesso')
           return { data: recoveredProfile, error: null }
         }
       }
-      
+
       return { error: result.error }
     }
-    
+
     console.log('✅ Profile processado com sucesso')
     return { data: result.data, error: null }
   } catch (error) {
