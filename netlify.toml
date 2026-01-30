@@ -20,10 +20,6 @@
 [[plugins]]
   package = "@netlify/plugin-nextjs"
 
-  [plugins.inputs]
-    # Enable Next.js Image Optimization
-    imageOptimization = true
-
 [[headers]]
   for = "/*"
   [headers.values]
