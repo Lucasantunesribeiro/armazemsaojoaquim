@@ -1,4 +1,5 @@
-# Headers para arquivos CSS - Fix MIME type
+# CRITICAL: CSS files MUST be served as text/css
+# These rules must come FIRST to override any wildcard rules
 /_next/static/chunks/*.css
   Content-Type: text/css; charset=utf-8
   Cache-Control: public, max-age=31536000, immutable
@@ -10,20 +11,65 @@
 /*.css
   Content-Type: text/css; charset=utf-8
 
-# Headers para JavaScript
+# JavaScript files
 /_next/static/chunks/*.js
   Content-Type: text/javascript; charset=utf-8
   Cache-Control: public, max-age=31536000, immutable
 
-# Headers para outros assets
+# Static assets from Next.js
+/_next/static/media/*
+  Cache-Control: public, max-age=31536000, immutable
+
 /_next/static/*
   Cache-Control: public, max-age=31536000, immutable
 
+# Next.js Image Optimization
 /_next/image*
   Cache-Control: public, max-age=31536000, immutable
 
-/images/*
+# Fonts
+/*.woff2
+  Content-Type: font/woff2
   Cache-Control: public, max-age=31536000, immutable
 
-/*.woff2
+/*.woff
+  Content-Type: font/woff
   Cache-Control: public, max-age=31536000, immutable
+
+# Images
+/images/*
+  Cache-Control: public, max-age=86400
+  X-Content-Type-Options: nosniff
+
+/*.jpg
+  Content-Type: image/jpeg
+  Cache-Control: public, max-age=86400
+
+/*.jpeg
+  Content-Type: image/jpeg
+  Cache-Control: public, max-age=86400
+
+/*.webp
+  Content-Type: image/webp
+  Cache-Control: public, max-age=86400
+
+/*.png
+  Content-Type: image/png
+  Cache-Control: public, max-age=86400
+
+/*.svg
+  Content-Type: image/svg+xml
+  Cache-Control: public, max-age=86400
+
+# Manifest and service worker
+/manifest.json
+  Content-Type: application/json
+  Cache-Control: public, max-age=86400
+
+/sw.js
+  Content-Type: text/javascript
+  Cache-Control: public, max-age=0, must-revalidate
+
+/*.ico
+  Content-Type: image/x-icon
+  Cache-Control: public, max-age=31536000
