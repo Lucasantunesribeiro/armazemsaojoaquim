@@ -4,9 +4,12 @@
 let withBundleAnalyzer = (config) => config
 
 const nextConfig = {
+  // Silence Next.js 16 Turbopack warning by acknowledging we have webpack config
+  turbopack: {},
+
   // Configurações básicas
   reactStrictMode: true,
-  
+
   // Better error handling in development
   ...(process.env.NODE_ENV === 'development' && {
     onDemandEntries: {
@@ -16,14 +19,14 @@ const nextConfig = {
       pagesBufferLength: 2,
     },
   }),
-  
+
   // Configurações de imagem - Simplificadas para Netlify
   images: {
     unoptimized: true, // Disable optimization for Netlify compatibility
     formats: ['image/webp', 'image/avif'],
     dangerouslyAllowSVG: true,
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
-    
+
     remotePatterns: [
       {
         protocol: 'http',
@@ -73,7 +76,7 @@ const nextConfig = {
     middlewarePrefetch: 'strict',
     // Otimização crítica para Netlify - reduzir bundle size
     optimizePackageImports: [
-      '@radix-ui/react-icons', 
+      '@radix-ui/react-icons',
       'lucide-react',
       '@radix-ui/react-dialog',
       '@radix-ui/react-select',
