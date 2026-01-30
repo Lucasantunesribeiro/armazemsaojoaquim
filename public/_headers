@@ -1,73 +1,29 @@
-/_next/static/css/*
+# Headers para arquivos CSS - Fix MIME type
+/_next/static/chunks/*.css
   Content-Type: text/css; charset=utf-8
   Cache-Control: public, max-age=31536000, immutable
 
-/_next/static/chunks/*
+/_next/static/css/*.css
+  Content-Type: text/css; charset=utf-8
+  Cache-Control: public, max-age=31536000, immutable
+
+/*.css
+  Content-Type: text/css; charset=utf-8
+
+# Headers para JavaScript
+/_next/static/chunks/*.js
   Content-Type: text/javascript; charset=utf-8
   Cache-Control: public, max-age=31536000, immutable
 
-/_next/static/media/*
-  Cache-Control: public, max-age=31536000, immutable
-
+# Headers para outros assets
 /_next/static/*
   Cache-Control: public, max-age=31536000, immutable
 
-/*.woff2
-  Content-Type: font/woff2
+/_next/image*
   Cache-Control: public, max-age=31536000, immutable
 
-/*.woff
-  Content-Type: font/woff
-  Cache-Control: public, max-age=31536000, immutable
-
-/*.ico
-  Content-Type: image/x-icon
-  Cache-Control: public, max-age=31536000
-
-/*.png
-  Content-Type: image/png
-  Cache-Control: public, max-age=86400
-
-/*.jpg
-  Content-Type: image/jpeg
-  Cache-Control: public, max-age=86400
-
-/*.jpeg
-  Content-Type: image/jpeg
-  Cache-Control: public, max-age=86400
-
-/*.webp
-  Content-Type: image/webp
-  Cache-Control: public, max-age=86400
-
-/*.svg
-  Content-Type: image/svg+xml
-  Cache-Control: public, max-age=86400
-
-/manifest.json
-  Content-Type: application/json
-  Cache-Control: public, max-age=86400
-
-/sw.js
-  Content-Type: text/javascript
-  Cache-Control: public, max-age=0, must-revalidate
-
-# CORREÇÃO CRÍTICA: Headers específicos para imagens da pousada
-/images/pousada/*
-  Content-Type: image/jpeg
-  Cache-Control: public, max-age=86400
-  X-Content-Type-Options: nosniff
-
-# Headers para otimização de imagens estáticas
 /images/*
-  X-Content-Type-Options: nosniff
-  Access-Control-Allow-Origin: *
-  
-# CORS para recursos estáticos
-/*.jpg
-  Access-Control-Allow-Origin: *
-  X-Content-Type-Options: nosniff
+  Cache-Control: public, max-age=31536000, immutable
 
-/*.jpeg  
-  Access-Control-Allow-Origin: *
-  X-Content-Type-Options: nosniff
+/*.woff2
+  Cache-Control: public, max-age=31536000, immutable
