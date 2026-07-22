@@ -1,22 +1,20 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import dynamic from 'next/dynamic'
 import { Eye, Clock, Coffee, IceCream, Cake, Utensils, GlassWater, Search, AlertCircle } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
 import SimpleImage from '@/components/ui/SimpleImage'
 
-// Dynamic import for Dialog component (used conditionally)
-const Dialog = dynamic(() => import('@/components/ui/Dialog').then(mod => ({ default: mod.Dialog })), {
-  loading: () => <div className="animate-pulse bg-gray-200 rounded-lg h-8 w-24" />
-})
-const DialogContent = dynamic(() => import('@/components/ui/Dialog').then(mod => ({ default: mod.DialogContent })))
-const DialogDescription = dynamic(() => import('@/components/ui/Dialog').then(mod => ({ default: mod.DialogDescription })))
-const DialogHeader = dynamic(() => import('@/components/ui/Dialog').then(mod => ({ default: mod.DialogHeader })))
-const DialogTitle = dynamic(() => import('@/components/ui/Dialog').then(mod => ({ default: mod.DialogTitle })))
-const DialogTrigger = dynamic(() => import('@/components/ui/Dialog').then(mod => ({ default: mod.DialogTrigger })))
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/Dialog'
 
 interface Product {
   id: string
@@ -44,6 +42,7 @@ export default function CafePage() {
   const [searchTerm, setSearchTerm] = useState<string>('')
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false)
+  const [isDatabaseUnavailable, setIsDatabaseUnavailable] = useState(false)
 
   useEffect(() => {
     console.log('🔄 CafePage: Componente montado')
@@ -60,11 +59,18 @@ export default function CafePage() {
         const data = await response.json()
         console.log('📡 CafePage: Produtos recebidos:', data)
         setProducts(data.data || [])
+        if (data.degraded || data.databaseUnavailable) {
+          setIsDatabaseUnavailable(true)
+        } else {
+          setIsDatabaseUnavailable(false)
+        }
       } else {
         console.error('❌ CafePage: Erro na resposta da API:', response.status, response.statusText)
+        setIsDatabaseUnavailable(true)
       }
     } catch (error) {
       console.error('💥 CafePage: Erro ao carregar produtos:', error)
+      setIsDatabaseUnavailable(true)
     } finally {
       setLoading(false)
       console.log('✅ CafePage: Loading finalizado')
@@ -307,7 +313,7 @@ export default function CafePage() {
                     />
                     
                     {/* Available Badge */}
-                    {!product.available && (
+                    {!isDatabaseUnavailable && !product.available && (
                       <div className="absolute top-3 left-3 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
                         Indisponível
                       </div>
@@ -320,8 +326,10 @@ export default function CafePage() {
                       <h3 className="text-xl font-bold text-madeira-escura font-playfair">
                         {product.name}
                       </h3>
-                      <span className="text-xl font-bold text-amarelo-armazem">
-                        R$ {product.price.toFixed(2)}
+                      <span className="text-sm font-semibold text-amber-700 dark:text-amber-400">
+                        {isDatabaseUnavailable || product.price <= 0
+                          ? 'Consulte no local'
+                          : `R$ ${product.price.toFixed(2)}`}
                       </span>
                     </div>
 
@@ -363,11 +371,11 @@ export default function CafePage() {
                     {/* Action Button */}
                     <button
                       onClick={() => viewProductDetails(product)}
-                      disabled={!product.available}
+                      disabled={!isDatabaseUnavailable && !product.available}
                       className="w-full bg-amarelo-armazem hover:bg-vermelho-portas text-madeira-escura hover:text-white px-4 py-2 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <Eye className="w-4 h-4" />
-                      <span>{product.available ? 'Ver Detalhes' : 'Indisponível'}</span>
+                      <span>{isDatabaseUnavailable || product.available ? 'Ver Detalhes' : 'Indisponível'}</span>
                     </button>
                   </div>
                 </div>
@@ -412,10 +420,18 @@ export default function CafePage() {
                     <Badge className={`${getCategoryColor(selectedProduct.category)}`}>
                       {getCategoryLabel(selectedProduct.category)}
                     </Badge>
-                    <div className="text-2xl font-bold text-amber-600">
-                      R$ {selectedProduct.price.toFixed(2)}
+                    <div className="text-xl font-bold text-amber-600">
+                      {isDatabaseUnavailable || selectedProduct.price <= 0
+                        ? 'Consulte no local'
+                        : `R$ ${selectedProduct.price.toFixed(2)}`}
                     </div>
                   </div>
+
+                  {isDatabaseUnavailable && (
+                    <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg text-xs text-amber-800">
+                      Preços e disponibilidades online indisponíveis no momento. Consulte o garçom no local.
+                    </div>
+                  )}
 
                   {selectedProduct.preparation_time > 0 && (
                     <div className="flex items-center text-sm text-slate-500">

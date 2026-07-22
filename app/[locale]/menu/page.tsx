@@ -3,12 +3,12 @@
 import { useState, useEffect } from 'react'
 import { Search, Download, AlertCircle, Clock } from 'lucide-react'
 import SimpleImage from '@/components/ui/SimpleImage'
-import { supabase } from '@/lib/supabase'
 import { toast } from 'react-hot-toast'
 import { trackDatabaseError, trackApiError } from '@/lib/error-tracking'
 import { menuCache } from '@/lib/cache-manager'
 import { useTranslations } from '@/hooks/useTranslations'
 import { getMenuImageUrl } from '@/lib/menu-image-helper'
+import { getDegradedMenuCatalog } from '@/lib/menu-static-catalog'
 
 interface MenuItem {
   id: string
@@ -73,28 +73,16 @@ export default function MenuPage() {
         return
       }
 
-      const { data, error } = await supabase
-        .from('menu_items')
-        .select('*')
-        .eq('available', true)
-        .order('featured', { ascending: false })
+      const response = await fetch('/api/menu?limit=100')
+      if (response.ok) {
+        const result = await response.json()
+        if (result.degraded || result.databaseUnavailable) {
+          setIsDatabaseUnavailable(true)
+        } else {
+          setIsDatabaseUnavailable(false)
+        }
 
-      if (error) {
-        trackDatabaseError(error, {
-          component: 'MenuPage',
-          action: 'Fetch Menu Items',
-          additionalData: { query: 'menu_items' }
-        })
-        
-        setIsDatabaseUnavailable(true)
-        const catalogItems = getStaticCatalogItems()
-        setMenuItems(catalogItems)
-        toast.error(t('menu.errors.loadError') || 'Serviço em manutenção. Exibindo catálogo de consulta.')
-        return
-      }
-
-      if (data && data.length > 0) {
-        setIsDatabaseUnavailable(false)
+        const data = result.data || []
         const mappedItems = data.map((item: any) => ({
           id: item.id,
           name: item.name,
@@ -108,19 +96,21 @@ export default function MenuPage() {
           preparation_time: item.preparation_time,
           ingredients: item.ingredients
         }))
-        
+
         const sortedItems = mappedItems.sort((a: MenuItem, b: MenuItem) => {
           if (a.featured !== b.featured) return b.featured ? 1 : -1
           if (a.category !== b.category) return a.category.localeCompare(b.category)
           return a.name.localeCompare(b.name)
         })
-        
+
         setMenuItems(sortedItems)
-        menuCache.set('menu-items', sortedItems)
+        if (!result.degraded) {
+          menuCache.set('menu-items', sortedItems)
+        }
       } else {
         setIsDatabaseUnavailable(true)
-        const catalogItems = getStaticCatalogItems()
-        setMenuItems(catalogItems)
+        setMenuItems(getDegradedMenuCatalog())
+        toast.error(t('menu.errors.loadError') || 'Serviço em manutenção. Exibindo catálogo de consulta.')
       }
     } catch (error) {
       trackApiError(error, {
@@ -130,8 +120,7 @@ export default function MenuPage() {
       })
       
       setIsDatabaseUnavailable(true)
-      const catalogItems = getStaticCatalogItems()
-      setMenuItems(catalogItems)
+      setMenuItems(getDegradedMenuCatalog())
       toast.error(t('menu.errors.loadError') || 'Serviço em manutenção. Exibindo catálogo de consulta.')
     } finally {
       setLoading(false)
@@ -139,86 +128,7 @@ export default function MenuPage() {
   }
 
   const getStaticCatalogItems = (): MenuItem[] => {
-    return [
-      {
-        id: 'f16b0add-8704-4620-8ddf-b9b86bbb185e',
-        name: 'PATATAS BRAVAS',
-        description: 'Batatas douradas com aioli de páprica levemente picante (04 un)',
-        price: 0,
-        category: 'PETISCOS',
-        available: true,
-        featured: false,
-        allergens: null,
-        image_url: null,
-        preparation_time: 15,
-        ingredients: ['Batatas', 'Aioli de páprica']
-      },
-      {
-        id: 'bf73205f-5055-4286-8e06-6b536d7decbb',
-        name: 'CAPRESE MINEIRA',
-        description: 'Salada de tomate, queijo minas frescal, pesto de manjericão e torrada finas',
-        price: 0,
-        category: 'SALADAS',
-        available: true,
-        featured: false,
-        allergens: ['laticínios', 'glúten'],
-        image_url: null,
-        preparation_time: 10,
-        ingredients: ['Tomate', 'Queijo minas frescal', 'Pesto de manjericão', 'Torradas']
-      },
-      {
-        id: '441f421e-50cf-4b87-bd3a-fdd67cf22b69',
-        name: 'TILÁPIA NA BRASA',
-        description: 'Tilápia inteira assada na brasa e guarnecida de legumes ≅800g (para 2 pessoas)',
-        price: 0,
-        category: 'PRATOS PRINCIPAIS',
-        available: true,
-        featured: false,
-        allergens: ['peixe'],
-        image_url: null,
-        preparation_time: 30,
-        ingredients: ['Tilápia', 'Legumes grelhados']
-      },
-      {
-        id: '5e9b67c2-24a5-4569-8c4c-764d12e26c4f',
-        name: 'PICANHA AO CARVÃO',
-        description: 'Picanha assada na parrilla, com molho chimichurri, batatas bravas, farofa e vinagrete ≅500g (para 2 pessoas)',
-        price: 0,
-        category: 'PRATOS PRINCIPAIS',
-        available: true,
-        featured: false,
-        allergens: null,
-        image_url: null,
-        preparation_time: 35,
-        ingredients: ['Picanha', 'Molho chimichurri', 'Batatas bravas', 'Farofa', 'Vinagrete']
-      },
-      {
-        id: '8a865961-f1f1-4eb4-91f6-c3103e0a1249',
-        name: 'HAMBÚRGUER DA CASA',
-        description: 'Carne selecionada com queijo cheddar, cebola caramelizada, alface, tomate e batata da casa',
-        price: 0,
-        category: 'SANDUÍCHES',
-        available: true,
-        featured: false,
-        allergens: ['glúten', 'laticínios'],
-        image_url: null,
-        preparation_time: 20,
-        ingredients: ['Carne bovina', 'Queijo cheddar', 'Cebola caramelizada', 'Alface', 'Tomate', 'Batata']
-      },
-      {
-        id: '671960d0-5b4e-4872-b3b0-6e003b3e20a1',
-        name: 'TARTE AUX POMMES',
-        description: 'Deliciosa sobremesa Francesa atemporal de massa sablée recheada com purê fino de maçã, e laminas de maçã, guarnecida de sorvete de creme e coulis do dia',
-        price: 0,
-        category: 'SOBREMESAS',
-        available: true,
-        featured: false,
-        allergens: ['glúten', 'laticínios'],
-        image_url: null,
-        preparation_time: 15,
-        ingredients: ['Massa sablée', 'Maçã', 'Sorvete de creme', 'Coulis']
-      }
-    ]
+    return getDegradedMenuCatalog() as MenuItem[]
   }
 
   const filterItems = () => {
