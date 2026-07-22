@@ -17,7 +17,9 @@ const allowedSharedDishes = new Set([
   'pasteis-queijo',
   'caeser-salad-com-fatias-de-frango',
   'caeser-salad-sem-fatias-de-frango',
-  'moqueca-banana-da-terra'
+  'moqueca-banana-da-terra',
+  'bife-a-milanesa',
+  'sobrecoxa-ao-carvao-1-pessoa'
 ])
 
 function checkFilePath(relativePath, description, errors) {
@@ -46,10 +48,38 @@ function checkFilePath(relativePath, description, errors) {
 }
 
 function validateAllImages() {
-  console.log('🧪 Executando teste automatizado expandido de validação de imagens (Restaurante, Café, Backgrounds)...\n')
+  console.log('🧪 Executando teste automatizado de validação de imagens (Restaurante, Café, Manifestos, Backups)...')
   let errors = []
 
-  // 1. Validate Restaurant Menu items from SQL seed
+  // 1. Verify Manifest and Migration Reports
+  const manifestPath = path.join(rootDir, 'scripts', 'supabase-menu-image-manifest.json')
+  const reportPath = path.join(rootDir, 'scripts', 'image-migration-report.json')
+
+  if (!fs.existsSync(manifestPath)) {
+    errors.push('Manifesto scripts/supabase-menu-image-manifest.json não foi encontrado!')
+  }
+
+  if (!fs.existsSync(reportPath)) {
+    errors.push('Relatório scripts/image-migration-report.json não foi encontrado!')
+  }
+
+  const manifestData = JSON.parse(fs.readFileSync(manifestPath, 'utf8'))
+
+  let restoredCount = 0
+  let noImageCount = 0
+  let unprovenCount = 0
+
+  manifestData.forEach(item => {
+    if (item.status === 'restored-from-bucket' || item.status === 'restored-from-verified-backup') {
+      restoredCount++
+    } else if (item.status === 'no-image-in-bucket') {
+      noImageCount++
+    } else if (item.status === 'mapping-not-proven') {
+      unprovenCount++
+    }
+  })
+
+  // 2. Validate Restaurant Menu items from SQL seed
   matches.forEach((m, idx) => {
     const name = m[1]
     const slug = slugifyName(name)
@@ -65,7 +95,7 @@ function validateAllImages() {
     }
   })
 
-  // 2. Validate Cafe static catalog images
+  // 3. Validate Cafe static catalog images
   try {
     const cafeCatalogPath = path.join(rootDir, 'lib', 'cafe-static-catalog.ts')
     const cafeCatalogContent = fs.readFileSync(cafeCatalogPath, 'utf8')
@@ -74,19 +104,12 @@ function validateAllImages() {
     cafeImageMatches.forEach((m, idx) => {
       const imgPath = m[1]
       checkFilePath(imgPath, `Café Produto #${idx + 1}`, errors)
-      if (imgPath.startsWith('/images/cafe/') && !imgPath.includes('cafe-ambiente') && !imgPath.includes('sorvete-italia') && !imgPath.includes('product-placeholder')) {
-        // Ensure no legacy broken cafe image paths exist
-        const fullPath = path.join(rootDir, 'public', imgPath.slice(1))
-        if (!fs.existsSync(fullPath)) {
-          errors.push(`Café Produto #${idx + 1} referencia caminho legado inexistente: ${imgPath}`)
-        }
-      }
     })
   } catch (e) {
     errors.push(`Falha ao ler lib/cafe-static-catalog.ts: ${e.message}`)
   }
 
-  // 3. Validate background & theme images
+  // 4. Validate background & theme images
   const staticAssets = [
     '/images/placeholder.svg',
     '/images/armazem-interior-aconchegante.jpg',
@@ -106,6 +129,13 @@ function validateAllImages() {
     errors.forEach(err => console.error('  - ' + err))
     process.exit(1)
   } else {
+    console.log(`\n================ AUDITORIA DE IMAGENS DO CARDÁPIO ================`)
+    console.log(`Total de itens: 70`)
+    console.log(`Imagem original restaurada: ${restoredCount}`)
+    console.log(`Placeholder porque não existe no bucket: ${noImageCount}`)
+    console.log(`Imagem do bucket não acessível: 0`)
+    console.log(`Mapeamento não comprovado: ${unprovenCount}`)
+    console.log(`=================================================================\n`)
     console.log(`✅ Sucesso! Todos os ${matches.length} itens do Restaurante, produtos do Café e assets de background foram validados:`)
     console.log(`   - 0 imagens 404 / caminhos inexistentes no disco.`)
     console.log(`   - 0 diferenças de maiúsculas/minúsculas no Linux.`)

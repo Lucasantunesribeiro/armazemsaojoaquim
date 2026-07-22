@@ -80,14 +80,20 @@ async function verifyDegradedMode() {
   // Test 1: Home page /pt
   console.log('📱 Testando rota /pt...')
   await page.goto('http://localhost:3098/pt', { waitUntil: 'networkidle' })
+  await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight))
+  await page.waitForTimeout(500)
 
   // Test 2: Restaurant Menu /pt/menu
   console.log('📱 Testando rota /pt/menu...')
   await page.goto('http://localhost:3098/pt/menu', { waitUntil: 'networkidle' })
+  await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight))
+  await page.waitForTimeout(500)
 
   // Test 3: Cafe /pt/cafe & "Ver Detalhes" modal functionality
   console.log('📱 Testando rota /pt/cafe e modal "Ver Detalhes"...')
   await page.goto('http://localhost:3098/pt/cafe', { waitUntil: 'networkidle' })
+  await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight))
+  await page.waitForTimeout(500)
 
   // Verify "Ver Detalhes" button exists and opens modal
   console.log('  ⌛ Aguardando renderização do botão "Ver Detalhes"...')

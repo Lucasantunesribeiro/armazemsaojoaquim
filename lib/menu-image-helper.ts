@@ -5,52 +5,71 @@
  */
 
 const LOCAL_MENU_IMAGES = new Set<string>([
+  'aperitivos.webp',
   'arroz.webp',
   'atum-em-crosta.webp',
   'bife-ancho.webp',
+  'bife-milanesa.webp',
   'bolinho-de-bacalhau.webp',
   'bolinho-de-feijoada.webp',
   'caesar-salad-com-frango.webp',
   'caesar-salad-sem-frango.webp',
   'caprese-mineira.webp',
+  'ceviche-carioca.webp',
   'chori-pao.webp',
   'croqueta-de-costela.webp',
   'delicia-de-manga.webp',
+  'farofa.webp',
   'feijao.webp',
+  'feijoada-da-casa-buffet-livre.webp',
+  'feijoada-da-casa-individual.webp',
+  'feijoada-da-casa-para-dois.webp',
   'feijoada-tradicional.webp',
   'hamburguer-da-casa.webp',
+  'hamburguer-vegetariano.webp',
   'iscas-de-frango.webp',
   'iscas-de-peixe.webp',
+  'legumes-na-brasa.webp',
+  'linguica-na-brasa.webp',
+  'marquise-au-chocolat.webp',
   'mix-na-brasa.webp',
+  'mix-vegetariano.webp',
   'moqueca-de-banana-da-terra.webp',
   'palmito-pupunha.webp',
   'pao-de-alho.webp',
   'pasteis-carne-seca-e-creme-de-queijo.webp',
+  'pasteis-de-pupunha.webp',
   'pastel-de-queijo.webp',
+  'patatas-brava.webp',
+  'patatas-bravas.webp',
   'picanha-ao-carvao.webp',
   'polvo-grelhado-com-arroz-negro.webp',
   'posta-de-salmao-grelhado.webp',
   'pratos-tradicionais.webp',
+  'pure-de-batata.webp',
   'risoto-de-bacalhau.webp',
   'salada-da-casa.webp',
   'salada-de-graos-com-frango.webp',
   'salada-de-graos-com-tilapia.webp',
+  'sobrecoxa-ao-carvao.webp',
   'tarte-aux-pommes.webp',
   'tilapia-grelhada.webp',
   'tilapia-na-brasa.webp',
   'torresmo.webp',
-  'aperitivos.webp'
+  'vinagrete-de-polvo.webp'
 ])
 
 // Strict mappings ONLY when DB item name maps to its OWN exact image file
 const STRICT_EXACT_MAP: Record<string, string> = {
-  'feijoada-da-casa-individual': 'feijoada-tradicional.webp',
-  'feijoada-da-casa-para-dois': 'feijoada-tradicional.webp',
-  'feijoada-da-casa-buffet-livre': 'feijoada-tradicional.webp',
+  'feijoada-da-casa-individual': 'feijoada-da-casa-individual.webp',
+  'feijoada-da-casa-para-dois': 'feijoada-da-casa-para-dois.webp',
+  'feijoada-da-casa-buffet-livre': 'feijoada-da-casa-buffet-livre.webp',
   'pasteis-queijo': 'pastel-de-queijo.webp',
   'caeser-salad-com-fatias-de-frango': 'caesar-salad-com-frango.webp',
   'caeser-salad-sem-fatias-de-frango': 'caesar-salad-sem-frango.webp',
-  'moqueca-banana-da-terra': 'moqueca-de-banana-da-terra.webp'
+  'moqueca-banana-da-terra': 'moqueca-de-banana-da-terra.webp',
+  'bife-a-milanesa': 'bife-milanesa.webp',
+  'sobrecoxa-ao-carvao-1-pessoa': 'sobrecoxa-ao-carvao.webp'
 }
 
 export function slugifyName(name: string): string {
