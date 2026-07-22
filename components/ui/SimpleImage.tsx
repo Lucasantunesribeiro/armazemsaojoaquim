@@ -20,8 +20,8 @@ const SimpleImage = ({
   height = 300, 
   className = '', 
   fill = false,
-  loading = 'eager',
-  priority = true
+  loading = 'lazy',
+  priority = false
 }: SimpleImageProps) => {
   const [error, setError] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
@@ -61,6 +61,9 @@ const SimpleImage = ({
     )
   }
 
+  const isPriority = priority === true
+  const imageLoadingMode = isPriority ? undefined : (loading || 'lazy')
+
   return (
     <div className={fill ? 'relative w-full h-full' : 'relative'}>
       {isLoading && (
@@ -83,9 +86,9 @@ const SimpleImage = ({
           height: finalHeight!
         })}
         className={`${className} ${isLoading ? 'opacity-0' : 'opacity-100'} transition-opacity duration-300`}
-        
-        loading="eager"
-        priority={true}
+        loading={imageLoadingMode}
+        priority={isPriority}
+        decoding="async"
         onError={() => {
           setRetryCount(prev => prev + 1)
           

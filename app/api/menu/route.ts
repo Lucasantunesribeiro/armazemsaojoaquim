@@ -36,16 +36,21 @@ export async function GET(request: NextRequest) {
 
     if (error) {
       console.error('❌ Menu API: Erro na query:', error)
-      return NextResponse.json({ error: 'Database error' }, { status: 500 })
+      return NextResponse.json(
+        { success: false, error: 'Database error', data: [], count: 0 },
+        { status: 500 }
+      )
     }
 
     console.log(`✅ Menu API: ${menuItems?.length || 0} itens encontrados`)
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       success: true,
       data: menuItems || [],
       count: menuItems?.length || 0
     })
+    response.headers.set('Cache-Control', 'public, max-age=0, s-maxage=10, stale-while-revalidate=30')
+    return response
   } catch (error) {
     console.error('💥 Erro na API de menu:', error)
     return NextResponse.json(

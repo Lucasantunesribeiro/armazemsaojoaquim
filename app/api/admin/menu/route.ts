@@ -1,6 +1,7 @@
 import { createClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
 import { verifyAdminAccess } from '@/lib/admin-auth'
+import { revalidatePath } from 'next/cache'
 
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -77,6 +78,12 @@ export async function POST(request: NextRequest) {
     }
 
     console.log('✅ API Menu: Item criado:', data)
+    try {
+      revalidatePath('/[locale]/menu', 'page')
+      revalidatePath('/api/menu')
+    } catch (e) {
+      console.warn('Revalidation warning:', e)
+    }
     return NextResponse.json(data)
   } catch (error) {
     console.error('❌ API Menu: Erro interno:', error)

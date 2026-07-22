@@ -35,19 +35,21 @@ export async function GET(request: NextRequest) {
     if (error) {
       console.error('❌ Pousada Rooms API: Erro ao buscar quartos:', error)
       return NextResponse.json(
-        { error: 'Erro ao carregar quartos', details: error.message },
+        { success: false, error: 'Erro ao carregar quartos', details: error.message, data: [], count: 0 },
         { status: 500 }
       )
     }
 
     console.log(`✅ Pousada Rooms API: ${rooms?.length || 0} quartos encontrados`)
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       success: true,
       data: rooms || [],
       count: rooms?.length || 0,
       total: rooms?.length || 0
     })
+    response.headers.set('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=600')
+    return response
   } catch (error) {
     console.error('💥 Erro na API de quartos da pousada:', error)
     return NextResponse.json(

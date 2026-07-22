@@ -290,7 +290,7 @@ export default function CafePage() {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {filteredProducts.map((product) => (
+              {filteredProducts.map((product, index) => (
                 <div
                   key={product.id}
                   className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group"
@@ -301,7 +301,8 @@ export default function CafePage() {
                       src={product.image_url}
                       alt={product.name}
                       fill
-                      loading="eager"
+                      priority={index < 2}
+                      loading={index < 2 ? 'eager' : 'lazy'}
                       className="group-hover:scale-105 transition-transform duration-300 object-cover"
                     />
                     

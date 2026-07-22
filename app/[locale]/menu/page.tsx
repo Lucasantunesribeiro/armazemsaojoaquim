@@ -3,12 +3,12 @@
 import { useState, useEffect } from 'react'
 import { Search, Download, AlertCircle, Clock } from 'lucide-react'
 import SimpleImage from '@/components/ui/SimpleImage'
-// import ImageLoadingTest from '@/components/test/ImageLoadingTest'
 import { supabase } from '@/lib/supabase'
 import { toast } from 'react-hot-toast'
 import { trackDatabaseError, trackApiError } from '@/lib/error-tracking'
 import { menuCache } from '@/lib/cache-manager'
 import { useTranslations } from '@/hooks/useTranslations'
+import { getMenuImageUrl } from '@/lib/menu-image-helper'
 
 interface MenuItem {
   id: string
@@ -49,12 +49,12 @@ export default function MenuPage() {
   const [searchTerm, setSearchTerm] = useState('')
   const [loading, setLoading] = useState(true)
   const [downloadingPdf, setDownloadingPdf] = useState(false)
+  const [isDatabaseUnavailable, setIsDatabaseUnavailable] = useState(false)
   
   const CATEGORIES = getCategoriesList(t)
 
   useEffect(() => {
     fetchMenuItems()
-    // Inicializar categoria selecionada com a primeira categoria traduzida
     if (!selectedCategory && CATEGORIES.length > 0) {
       setSelectedCategory(CATEGORIES[0])
     }
@@ -66,7 +66,6 @@ export default function MenuPage() {
 
   const fetchMenuItems = async () => {
     try {
-      // Verificar cache primeiro
       const cachedItems = menuCache.get<MenuItem[]>('menu-items')
       if (cachedItems) {
         setMenuItems(cachedItems)
@@ -87,16 +86,15 @@ export default function MenuPage() {
           additionalData: { query: 'menu_items' }
         })
         
-        // Usar dados de fallback se a consulta falhar
-        const fallbackItems = getFallbackMenuItems()
-        setMenuItems(fallbackItems)
-        menuCache.set('menu-items', fallbackItems) // Cache dos dados de fallback
-        toast.error(t('menu.errors.loadError') || 'Erro ao carregar menu. Exibindo versão local.')
+        setIsDatabaseUnavailable(true)
+        const catalogItems = getStaticCatalogItems()
+        setMenuItems(catalogItems)
+        toast.error(t('menu.errors.loadError') || 'Serviço em manutenção. Exibindo catálogo de consulta.')
         return
       }
 
       if (data && data.length > 0) {
-        // Mapear os dados do banco para a interface esperada
+        setIsDatabaseUnavailable(false)
         const mappedItems = data.map((item: any) => ({
           id: item.id,
           name: item.name,
@@ -111,29 +109,18 @@ export default function MenuPage() {
           ingredients: item.ingredients
         }))
         
-        // Ordenar no cliente para evitar problemas com múltiplas cláusulas order()
         const sortedItems = mappedItems.sort((a: MenuItem, b: MenuItem) => {
-          // Primeiro por featured (destacados primeiro)
-          if (a.featured !== b.featured) {
-            return b.featured ? 1 : -1
-          }
-          // Depois por categoria
-          if (a.category !== b.category) {
-            return a.category.localeCompare(b.category)
-          }
-          // Por último por nome
+          if (a.featured !== b.featured) return b.featured ? 1 : -1
+          if (a.category !== b.category) return a.category.localeCompare(b.category)
           return a.name.localeCompare(b.name)
         })
         
         setMenuItems(sortedItems)
-        menuCache.set('menu-items', sortedItems) // Cache dos dados do banco
-        toast.success(t('menu.success.loaded') || 'Menu carregado com sucesso')
+        menuCache.set('menu-items', sortedItems)
       } else {
-        // Se não há dados no banco, usar dados de fallback
-        const fallbackItems = getFallbackMenuItems()
-        setMenuItems(fallbackItems)
-        menuCache.set('menu-items', fallbackItems) // Cache dos dados de fallback
-        toast.success(t('menu.success.example') || 'Exibindo cardápio de exemplo')
+        setIsDatabaseUnavailable(true)
+        const catalogItems = getStaticCatalogItems()
+        setMenuItems(catalogItems)
       }
     } catch (error) {
       trackApiError(error, {
@@ -142,28 +129,27 @@ export default function MenuPage() {
         additionalData: { errorType: 'unexpected' }
       })
       
-      // Usar dados de fallback em caso de erro
-      const fallbackItems = getFallbackMenuItems()
-      setMenuItems(fallbackItems)
-      menuCache.set('menu-items', fallbackItems) // Cache dos dados de fallback
-      toast.error(t('menu.errors.loadError') || 'Erro ao carregar menu. Exibindo versão local.')
+      setIsDatabaseUnavailable(true)
+      const catalogItems = getStaticCatalogItems()
+      setMenuItems(catalogItems)
+      toast.error(t('menu.errors.loadError') || 'Serviço em manutenção. Exibindo catálogo de consulta.')
     } finally {
       setLoading(false)
     }
   }
 
-  const getFallbackMenuItems = (): MenuItem[] => {
+  const getStaticCatalogItems = (): MenuItem[] => {
     return [
       {
         id: 'f16b0add-8704-4620-8ddf-b9b86bbb185e',
         name: 'PATATAS BRAVAS',
         description: 'Batatas douradas com aioli de páprica levemente picante (04 un)',
-        price: 25.00,
+        price: 0,
         category: 'PETISCOS',
         available: true,
         featured: false,
         allergens: null,
-        image_url: '/images/menu_images/patatas_bravas.webp',
+        image_url: null,
         preparation_time: 15,
         ingredients: ['Batatas', 'Aioli de páprica']
       },
@@ -171,12 +157,12 @@ export default function MenuPage() {
         id: 'bf73205f-5055-4286-8e06-6b536d7decbb',
         name: 'CAPRESE MINEIRA',
         description: 'Salada de tomate, queijo minas frescal, pesto de manjericão e torrada finas',
-        price: 40.00,
+        price: 0,
         category: 'SALADAS',
         available: true,
         featured: false,
         allergens: ['laticínios', 'glúten'],
-        image_url: '/images/menu_images/caprese_mineira.webp',
+        image_url: null,
         preparation_time: 10,
         ingredients: ['Tomate', 'Queijo minas frescal', 'Pesto de manjericão', 'Torradas']
       },
@@ -184,12 +170,12 @@ export default function MenuPage() {
         id: '441f421e-50cf-4b87-bd3a-fdd67cf22b69',
         name: 'TILÁPIA NA BRASA',
         description: 'Tilápia inteira assada na brasa e guarnecida de legumes ≅800g (para 2 pessoas)',
-        price: 150.00,
+        price: 0,
         category: 'PRATOS PRINCIPAIS',
         available: true,
         featured: false,
         allergens: ['peixe'],
-        image_url: '/images/menu_images/tilapia_brasa.webp',
+        image_url: null,
         preparation_time: 30,
         ingredients: ['Tilápia', 'Legumes grelhados']
       },
@@ -197,12 +183,12 @@ export default function MenuPage() {
         id: '5e9b67c2-24a5-4569-8c4c-764d12e26c4f',
         name: 'PICANHA AO CARVÃO',
         description: 'Picanha assada na parrilla, com molho chimichurri, batatas bravas, farofa e vinagrete ≅500g (para 2 pessoas)',
-        price: 195.00,
+        price: 0,
         category: 'PRATOS PRINCIPAIS',
         available: true,
         featured: false,
         allergens: null,
-        image_url: '/images/menu_images/picanha_carvao.webp',
+        image_url: null,
         preparation_time: 35,
         ingredients: ['Picanha', 'Molho chimichurri', 'Batatas bravas', 'Farofa', 'Vinagrete']
       },
@@ -210,12 +196,12 @@ export default function MenuPage() {
         id: '8a865961-f1f1-4eb4-91f6-c3103e0a1249',
         name: 'HAMBÚRGUER DA CASA',
         description: 'Carne selecionada com queijo cheddar, cebola caramelizada, alface, tomate e batata da casa',
-        price: 55.00,
+        price: 0,
         category: 'SANDUÍCHES',
         available: true,
         featured: false,
         allergens: ['glúten', 'laticínios'],
-        image_url: '/images/menu_images/hamburguer_casa.webp',
+        image_url: null,
         preparation_time: 20,
         ingredients: ['Carne bovina', 'Queijo cheddar', 'Cebola caramelizada', 'Alface', 'Tomate', 'Batata']
       },
@@ -223,79 +209,14 @@ export default function MenuPage() {
         id: '671960d0-5b4e-4872-b3b0-6e003b3e20a1',
         name: 'TARTE AUX POMMES',
         description: 'Deliciosa sobremesa Francesa atemporal de massa sablée recheada com purê fino de maçã, e laminas de maçã, guarnecida de sorvete de creme e coulis do dia',
-        price: 25.00,
+        price: 0,
         category: 'SOBREMESAS',
         available: true,
         featured: false,
         allergens: ['glúten', 'laticínios'],
-        image_url: '/images/menu_images/tarte_pommes.webp',
+        image_url: null,
         preparation_time: 15,
         ingredients: ['Massa sablée', 'Maçã', 'Sorvete de creme', 'Coulis']
-      },
-      {
-        id: '12a0ab38-08df-4d7e-83f6-23c1d57a3dc5',
-        name: 'PINK LEMONADE',
-        description: 'Limonada da casa, adoçada com xarope de hibisco',
-        price: 14.00,
-        category: 'BEBIDAS SEM ÁLCOOL',
-        available: true,
-        featured: false,
-        allergens: null,
-        image_url: '/images/menu_images/pink_lemonade.webp',
-        preparation_time: 5,
-        ingredients: ['Limão', 'Xarope de hibisco', 'Água', 'Açúcar']
-      },
-      {
-        id: 'a22115a0-1c62-4f0f-ae56-4cd5ce3cf263',
-        name: 'BADEN BADEN CRISTAL',
-        description: 'Cerveja artesanal - 600ml',
-        price: 28.00,
-        category: 'CERVEJAS',
-        available: true,
-        featured: false,
-        allergens: ['glúten'],
-        image_url: '/images/menu_images/baden_baden_cristal.webp',
-        preparation_time: null,
-        ingredients: ['Malte', 'Lúpulo', 'Água', 'Levedura']
-      },
-      {
-        id: '65e1ff3a-3430-42b4-93bc-60138fd6d3d5',
-        name: 'MORENA TROPICANA',
-        description: 'Gin, manga, limão taití, amaretto, açúcar, clara de ovo',
-        price: 32.00,
-        category: 'COQUETÉIS',
-        available: true,
-        featured: false,
-        allergens: ['ovo'],
-        image_url: '/images/menu_images/morena_tropicana.webp',
-        preparation_time: 8,
-        ingredients: ['Gin', 'Manga', 'Limão taití', 'Amaretto', 'Açúcar', 'Clara de ovo']
-      },
-      {
-        id: 'atum-avocado-special',
-        name: 'ATUM AVOCADO',
-        description: 'Tartare de atum, temperado com teriyaki e mostarda sobre uma pasta de guacamole (avocado)',
-        price: 39.00,
-        category: 'SUGESTÃO DO CHEF',
-        available: true,
-        featured: true,
-        allergens: ['peixe'],
-        image_url: '/images/menu_images/atum_avocado.webp',
-        preparation_time: 12,
-        ingredients: ['Atum', 'Avocado', 'Teriyaki', 'Mostarda']
-      },
-      {
-        id: 'sabor-mediterraneo-special',
-        name: 'SABOR MEDITERRÂNEO',
-        description: 'Frutos do mar (tentáculos de polvo, tilápia grelhada e mini lulinhas), acompanhados de legumes braseados, farofa panko de ervas e molho salsa mango',
-        price: 130.00,
-        category: 'SUGESTÃO DO CHEF',
-        available: true,
-        featured: true,
-        allergens: ['peixe', 'glúten'],
-        image_url: '/images/menu_images/sabor_mediterraneo.webp',
-        preparation_time: 25,
-        ingredients: ['Polvo', 'Tilápia', 'Lulinhas', 'Legumes', 'Farofa panko', 'Molho salsa mango']
       }
     ]
   }
@@ -303,10 +224,8 @@ export default function MenuPage() {
   const filterItems = () => {
     let filtered = menuItems
 
-    // Filtrar por categoria
     const allCategoriesText = t('menu.categories.all') || 'Todos'
     if (selectedCategory !== allCategoriesText) {
-      // Mapeamento entre categorias traduzidas e originais
       const categoryMapping: { [key: string]: string } = {
         [t('menu.categories.starters') || 'PETISCOS']: 'PETISCOS',
         [t('menu.categories.salads') || 'SALADAS']: 'SALADAS',
@@ -323,15 +242,12 @@ export default function MenuPage() {
         [t('menu.categories.specials') || 'SUGESTÃO DO CHEF']: 'SUGESTÃO DO CHEF'
       }
       
-      // Obter a categoria original baseada na tradução selecionada
       const originalCategory = categoryMapping[selectedCategory]
-      
       if (originalCategory) {
         filtered = filtered.filter(item => item.category === originalCategory)
       }
     }
 
-    // Filtrar por termo de busca
     if (searchTerm) {
       const searchLower = searchTerm.toLowerCase()
       filtered = filtered.filter(item => 
@@ -347,6 +263,9 @@ export default function MenuPage() {
   }
 
   const formatPrice = (price: number) => {
+    if (price <= 0 || isDatabaseUnavailable) {
+      return 'Consulte no local'
+    }
     return new Intl.NumberFormat('pt-BR', {
       style: 'currency',
       currency: 'BRL'
@@ -357,14 +276,12 @@ export default function MenuPage() {
     setDownloadingPdf(true)
     try {
       const response = await fetch('/api/cardapio-pdf')
-      
       if (!response.ok) {
         const errorData = await response.json()
         toast.error(errorData.message || 'Erro ao baixar o cardápio')
         return
       }
 
-      // Criar blob e download
       const blob = await response.blob()
       const url = window.URL.createObjectURL(blob)
       const a = document.createElement('a')
@@ -447,6 +364,17 @@ export default function MenuPage() {
       {/* Menu Content */}
       <section className="py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+          {/* Warning Banner if Database Unavailable */}
+          {isDatabaseUnavailable && (
+            <div className="mb-8 p-4 bg-amber-50 border border-amber-300 rounded-2xl text-amber-900 text-sm font-medium flex items-center space-x-3 shadow-sm">
+              <AlertCircle className="w-5 h-5 text-amber-600 flex-shrink-0" />
+              <span>
+                Catálogo em modo informativo. Preços e disponibilidade em tempo real temporariamente indisponíveis.
+              </span>
+            </div>
+          )}
+
           {/* Search and Filter */}
           <div className="mb-12 space-y-6">
             {/* Search Bar */}
@@ -494,7 +422,7 @@ export default function MenuPage() {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {filteredItems.map((item) => (
+              {filteredItems.map((item, index) => (
                 <div
                   key={item.id}
                   className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group"
@@ -502,10 +430,11 @@ export default function MenuPage() {
                   {/* Image */}
                   <div className="relative h-48">
                     <SimpleImage
-                      src={item.image_url}
+                      src={getMenuImageUrl(item, 'thumb')}
                       alt={item.name}
                       fill
-                      loading="eager"
+                      priority={index < 2}
+                      loading={index < 2 ? 'eager' : 'lazy'}
                       className="group-hover:scale-105 transition-transform duration-300 object-cover"
                     />
                     
@@ -545,9 +474,9 @@ export default function MenuPage() {
                     {/* Allergens */}
                     {item.allergens && item.allergens.length > 0 && (
                       <div className="flex flex-wrap gap-1">
-                        {item.allergens.map((allergen, index) => (
+                        {item.allergens.map((allergen, idx) => (
                           <span
-                            key={index}
+                            key={idx}
                             className="px-2 py-1 bg-vermelho-portas/10 text-vermelho-portas text-xs rounded-full"
                           >
                             {allergen}
