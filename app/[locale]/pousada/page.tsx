@@ -29,8 +29,6 @@ export default function PousadaPage() {
   const [selectedRoomType, setSelectedRoomType] = useState<string>('ALL')
 
 
-  const [hasRoomsError, setHasRoomsError] = useState(false)
-
   useEffect(() => {
     fetchRooms()
   }, [])
@@ -40,18 +38,14 @@ export default function PousadaPage() {
       const response = await fetch('/api/pousada/rooms')
       if (response.ok) {
         const result = await response.json()
-        if (result.success && result.data && result.data.length > 0) {
+        if (result.success && result.data) {
           setRooms(result.data)
-          setHasRoomsError(false)
         } else {
-          setHasRoomsError(true)
+          console.error('Invalid API response format:', result)
         }
-      } else {
-        setHasRoomsError(true)
       }
     } catch (error) {
       console.error('Error loading rooms:', error)
-      setHasRoomsError(true)
     } finally {
       setLoading(false)
     }
@@ -328,13 +322,6 @@ export default function PousadaPage() {
               {t('pousada.rooms.filters.suite')}
             </Button>
           </div>
-
-          {hasRoomsError && (
-            <div className="mb-8 p-4 bg-amber-50 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-700 rounded-xl text-amber-900 dark:text-amber-200 text-sm font-medium flex items-center space-x-3 max-w-2xl mx-auto shadow-sm">
-              <span className="text-xl">ℹ️</span>
-              <span>Consultas de disponibilidade e tarifas online temporariamente indisponíveis. Entre em contato diretamente pelo WhatsApp para verificar disponibilidade de acomodação.</span>
-            </div>
-          )}
 
           {loading ? (
             <div className="text-center py-12">

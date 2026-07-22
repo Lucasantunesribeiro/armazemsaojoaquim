@@ -69,7 +69,7 @@ export async function POST(request: NextRequest) {
         .from(BUCKET_NAME)
         .upload(fileName, compressedBuffer, {
           contentType: 'image/webp',
-          cacheControl: '31536000',
+          cacheControl: '3600',
           upsert: false
         })
 

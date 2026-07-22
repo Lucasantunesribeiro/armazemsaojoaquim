@@ -5,7 +5,6 @@ import { useAdminApi } from '@/lib/hooks/useAdminApi'
 import { Plus, Edit, Trash2, Star, Eye, EyeOff } from 'lucide-react'
 import Image from 'next/image'
 import ImageUpload from '../components/ImageUpload'
-import { menuCache } from '@/lib/cache-manager'
 
 interface MenuItem {
   id: string
@@ -112,7 +111,6 @@ export default function AdminMenu() {
       setShowForm(false)
       setEditingItem(null)
       resetForm()
-      menuCache.clear()
       loadData()
     } catch (error) {
       if (error instanceof Error) setError(error.message)
@@ -153,7 +151,6 @@ export default function AdminMenu() {
     
     try {
       await adminFetch(`/api/admin/menu/${id}`, { method: 'DELETE' })
-      menuCache.clear()
       loadData()
     } catch (error) {
       if (error instanceof Error) setError(error.message)
@@ -167,7 +164,6 @@ export default function AdminMenu() {
         method: 'PUT',
         body: JSON.stringify({ available: !available })
       })
-      menuCache.clear()
       loadData()
     } catch (error) {
       if (error instanceof Error) setError(error.message)

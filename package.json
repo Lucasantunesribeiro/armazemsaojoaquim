@@ -8,7 +8,7 @@
     "build:netlify": "next build",
     "build:static": "next build && node scripts/copy-static-assets.js",
     "start": "next start -p 3000",
-    "lint": "eslint app/ components/ lib/",
+    "lint": "next lint",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",

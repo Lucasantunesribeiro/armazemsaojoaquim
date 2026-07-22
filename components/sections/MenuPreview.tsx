@@ -24,7 +24,6 @@ const MenuPreview = () => {
   const [activeCategory, setActiveCategory] = useState(0)
   const [menuItems, setMenuItems] = useState<MenuItem[]>([])
   const [loading, setLoading] = useState(true)
-  const [isDatabaseUnavailable, setIsDatabaseUnavailable] = useState(false)
   const sectionRef = useRef<HTMLDivElement>(null)
 
   // Função para buscar itens do menu do banco de dados
@@ -34,17 +33,9 @@ const MenuPreview = () => {
       if (response.ok) {
         const data = await response.json()
         setMenuItems(data.data || [])
-        if (data.degraded || data.databaseUnavailable) {
-          setIsDatabaseUnavailable(true)
-        } else {
-          setIsDatabaseUnavailable(false)
-        }
-      } else {
-        setIsDatabaseUnavailable(true)
       }
     } catch (error) {
       console.error('Erro ao buscar itens do menu:', error)
-      setIsDatabaseUnavailable(true)
     } finally {
       setLoading(false)
     }
@@ -52,13 +43,11 @@ const MenuPreview = () => {
 
   // Função para buscar preço de um item específico
   const getItemPrice = (itemName: string): string => {
-    if (isDatabaseUnavailable) return 'Consulte no local'
     const item = menuItems.find(menuItem => 
       menuItem.name.toLowerCase().includes(itemName.toLowerCase()) ||
       itemName.toLowerCase().includes(menuItem.name.toLowerCase())
     )
-    if (!item || item.price <= 0) return 'Consulte no local'
-    return `R$ ${item.price.toFixed(2).replace('.', ',')}`
+    return item ? `R$ ${item.price.toFixed(2).replace('.', ',')}` : 'R$ --'
   }
 
   useEffect(() => {

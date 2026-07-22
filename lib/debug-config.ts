@@ -86,7 +86,7 @@ export function useDebugRender(componentName: string, props?: Record<string, any
 /**
  * Wrapper para hooks que podem causar problemas
  */
-export function useSafeMemo<T>(
+export function safeUseMemo<T>(
   factory: () => T,
   deps: DependencyList,
   debugName?: string
@@ -95,11 +95,10 @@ export function useSafeMemo<T>(
     debugLog.hook('useMemo', deps, debugName)
   }
   
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   return useMemo(factory, deps)
 }
 
-export function useSafeCallback<T extends (...args: any[]) => any>(
+export function safeUseCallback<T extends (...args: any[]) => any>(
   callback: T,
   deps: DependencyList,
   debugName?: string
@@ -108,6 +107,5 @@ export function useSafeCallback<T extends (...args: any[]) => any>(
     debugLog.hook('useCallback', deps, debugName)
   }
   
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   return useCallback(callback, deps)
 }
