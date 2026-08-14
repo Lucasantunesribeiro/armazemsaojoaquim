@@ -42,7 +42,7 @@ export async function GET(request: NextRequest) {
     }
     
     // Caminho para o arquivo PDF
-    const pdfPath = join(process.cwd(), 'public', 'images', 'Cardapio.pdf')
+    const pdfPath = join(process.cwd(), 'public', 'images', 'Cardapio-2026.pdf')
     
     // Ler o arquivo PDF
     const pdfBuffer = await readFile(pdfPath)

@@ -289,7 +289,7 @@ export default function Header() {
             <div className="hidden lg:flex items-center space-x-2">
               {/* Menu PDF Link */}
               <a
-                href="/images/Cardapio.pdf"
+                href="/images/Cardapio-2026.pdf"
                 target="_blank"
                 rel="noopener noreferrer"
                 className={`
@@ -591,7 +591,7 @@ export default function Header() {
               <div className="space-y-4 pt-6 border-t border-slate-200 dark:border-slate-700">
                 {/* Menu PDF Link Mobile */}
                 <a
-                  href="/images/Cardapio.pdf"
+                  href="/images/Cardapio-2026.pdf"
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={closeMobileMenu}
