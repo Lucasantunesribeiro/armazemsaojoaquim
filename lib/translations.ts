@@ -334,8 +334,10 @@ export interface Translation {
       starters: string
       salads: string
       mains: string
+      vegetarian: string
       sandwiches: string
       desserts: string
+      coffees: string
       beverages: string
       beers: string
       drinks: string
@@ -1246,8 +1248,10 @@ export const translations: Record<Language, Translation> = {
         starters: 'Petiscos',
         salads: 'Saladas',
         mains: 'Pratos Principais',
+        vegetarian: 'Vegano / Vegetariano',
         sandwiches: 'Sanduíches',
         desserts: 'Sobremesas',
+        coffees: 'Cafés',
         beverages: 'Bebidas Sem Álcool',
         beers: 'Cervejas',
         drinks: 'Coquetéis',
@@ -2295,8 +2299,10 @@ export const translations: Record<Language, Translation> = {
         starters: 'Appetizers',
         salads: 'Salads',
         mains: 'Main Courses',
+        vegetarian: 'Vegan / Vegetarian',
         sandwiches: 'Sandwiches',
         desserts: 'Desserts',
+        coffees: 'Coffees',
         beverages: 'Non-Alcoholic Beverages',
         beers: 'Beers',
         drinks: 'Cocktails',

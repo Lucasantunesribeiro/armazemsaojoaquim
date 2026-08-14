@@ -64,3 +64,6 @@ explicacao.md
 
 #vscode
 .vscode
+
+# agent skills config (local, seeded from ~/.agents/mattpocock-config)
+docs/agents/
